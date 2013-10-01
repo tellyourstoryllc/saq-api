@@ -21,5 +21,9 @@ module ChatApp
     # config.i18n.default_locale = :de
 
     config.active_record.schema_format = :sql
+
+    config.generators do |g|
+      g.test_framework :mini_test, :spec => true, :fixture => false
+    end
   end
 end
