@@ -17,3 +17,5 @@
 
 Gemfile.local
 Gemfile.local.lock
+
+config/*.yml
