@@ -46,6 +46,8 @@ gem 'unicorn'
 
 group :test do
   gem 'minitest-rails'
+  gem 'spork-rails', '4.0.0'
+  gem 'spork-minitest', '1.0.0.beta2'
   gem 'turn'
 end
 
