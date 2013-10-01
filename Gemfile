@@ -47,3 +47,5 @@ gem 'unicorn'
 group :test do
   gem 'minitest-rails'
 end
+
+gem 'mysql2'
