@@ -46,6 +46,7 @@ gem 'unicorn'
 
 group :test do
   gem 'minitest-rails'
+  gem 'turn'
 end
 
 gem 'mysql2'
