@@ -18,4 +18,5 @@
 Gemfile.local
 Gemfile.local.lock
 
+.DS_Store
 config/*.yml
