@@ -7,6 +7,11 @@ class User < ActiveRecord::Base
 
   has_secure_password validations: false
 
+  after_create :create_api_token
+
+  has_one :api_token
+  delegate :token, to: :api_token
+
 
   def object_type
     self.class.name.underscore

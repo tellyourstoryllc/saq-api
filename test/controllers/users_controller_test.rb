@@ -13,8 +13,9 @@ describe UsersController do
     describe "valid" do
       it "must create a user" do
         post :create, {name: 'John Doe', email: 'joe@example.com', password: 'asdf'}
-        result['id'].must_be_instance_of Fixnum
-        result.reject{ |k,v| k == 'id' }.must_equal('object_type' => 'user', 'name' => 'John Doe')
+
+        user = User.last
+        result.must_equal('object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token)
       end
     end
   end
