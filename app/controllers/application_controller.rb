@@ -14,7 +14,8 @@ class ApplicationController < ActionController::Base
   end
 
   def render_json(objects, options = {})
-    render({json: objects}.merge(options))
+    object_array = Array[objects].flatten
+    render({json: object_array}.merge(options))
   end
 
   def render_error(message = nil, code = nil, options = {})
