@@ -3,6 +3,7 @@ ChatApp::Application.routes.draw do
   resources :groups
 
   get '/join/:join_code', to: 'groups#join', as: :join_group
+  post '/user/update', to: 'users#update', as: 'update_user'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
