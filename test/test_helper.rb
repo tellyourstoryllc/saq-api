@@ -33,6 +33,10 @@ Spork.prefork do
     def result
       @result ||= JSON.load(response.body)
     end
+
+    def current_user
+      @current_user ||= FactoryGirl.create(:user)
+    end
   end
 end
 

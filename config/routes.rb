@@ -1,5 +1,7 @@
 ChatApp::Application.routes.draw do
   resources :users
+  resources :groups
+
   get '/join/:join_code', to: 'groups#join', as: :join_group
 
   # The priority is based upon order of creation: first created -> highest priority.

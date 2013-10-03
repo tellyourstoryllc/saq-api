@@ -11,5 +11,7 @@ class User < ActiveRecord::Base
   after_create :create_api_token
 
   has_one :api_token
+  has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
+
   delegate :token, to: :api_token
 end

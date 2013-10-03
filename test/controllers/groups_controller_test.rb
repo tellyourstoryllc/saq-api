@@ -1,0 +1,22 @@
+require "test_helper"
+
+describe GroupsController do
+  describe "POST /groups" do
+    describe "invalid" do
+      it "must not create a group if it's invalid" do
+        post :create, {token: current_user.token}
+        result.must_equal('error' => {'message' => 'error'})
+      end
+    end
+
+
+    describe "valid" do
+      it "must create a group" do
+        post :create, {name: 'Cool Dudes', token: current_user.token}
+
+        group = Group.last
+        result.must_equal [{'object_type' => 'group', 'id' => group.id, 'creator_id' => current_user.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}"}]
+      end
+    end
+  end
+end
