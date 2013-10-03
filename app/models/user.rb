@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  include PeanutModel
   attr_accessor :guest
 
   validates :name, presence: true
@@ -11,9 +12,4 @@ class User < ActiveRecord::Base
 
   has_one :api_token
   delegate :token, to: :api_token
-
-
-  def object_type
-    self.class.name.underscore
-  end
 end

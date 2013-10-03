@@ -15,7 +15,19 @@ describe UsersController do
         post :create, {name: 'John Doe', email: 'joe@example.com', password: 'asdf'}
 
         user = User.last
-        result.must_equal('object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token)
+        result.must_equal [{'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token}]
+      end
+
+      it "must create a user and a group" do
+        post :create, {name: 'John Doe', email: 'joe@example.com', password: 'asdf', group_name: 'Cool Dudes'}
+
+        user = User.last
+        group = Group.last
+
+        result.must_equal [
+          {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token},
+          {'object_type' => 'group', 'id' => group.id, 'creator_id' => user.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}"}
+        ]
       end
     end
   end
