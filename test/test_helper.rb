@@ -29,6 +29,10 @@ Spork.prefork do
     #fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    def result
+      @result ||= JSON.load(response.body)
+    end
   end
 end
 
