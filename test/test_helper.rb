@@ -13,13 +13,13 @@ Spork.prefork do
   require File.expand_path("../../config/environment", __FILE__)
   require "rails/test_help"
   require "minitest/rails"
-  require 'turn/autorun'
+  require "turn/autorun"
+  require "factory_girl_rails"
 
   #Turn.config.format = :progress
 
-  # To add Capybara feature tests add `gem "minitest-rails-capybara"`
-  # to the test group in the Gemfile and uncomment the following:
-  # require "minitest/rails/capybara"
+  FactoryGirl.sequences.clear
+  FactoryGirl.factories.clear
 
   # Uncomment for awesome colorful output
   # require "minitest/pride"

@@ -51,5 +51,9 @@ group :test do
   gem 'turn'
 end
 
+group :test, :development do
+  gem 'factory_girl_rails', require: false
+end
+
 gem 'mysql2'
 gem 'active_model_serializers', '0.8.1'
