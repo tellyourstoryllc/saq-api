@@ -83,7 +83,8 @@ CREATE TABLE `users` (
   `status_text` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_users_on_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -96,7 +97,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-03 16:53:12
+-- Dump completed on 2013-10-04 12:00:31
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -106,3 +107,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131003153120');
 INSERT INTO schema_migrations (version) VALUES ('20131003162500');
 
 INSERT INTO schema_migrations (version) VALUES ('20131003205039');
+
+INSERT INTO schema_migrations (version) VALUES ('20131004155252');

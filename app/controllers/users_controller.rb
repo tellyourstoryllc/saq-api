@@ -9,7 +9,7 @@ class UsersController < ApplicationController
     render_json [@current_user, @group].compact
 
   rescue ActiveRecord::RecordInvalid => e
-    render_error
+    render_error e.message
   end
 
   def update

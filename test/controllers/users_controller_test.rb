@@ -5,7 +5,7 @@ describe UsersController do
     describe "invalid" do
       it "must not create a user if it's invalid" do
         post :create
-        result.must_equal('error' => {'message' => 'error'})
+        result.must_equal('error' => {'message' => "Validation failed: Name can't be blank, Email is invalid, Password can't be blank"})
       end
     end
 
