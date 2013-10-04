@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
 
   def current_user
-    @current_user ||= ApiToken.select(:user_id).where(token: params[:token]).take.try(:user)
+    @current_user ||= ApiToken.select(:user_id).find_by(token: params[:token]).try(:user)
   end
 
 
