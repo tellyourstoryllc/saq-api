@@ -31,9 +31,9 @@ class UsersController < ApplicationController
   end
 
   def group_params
-    @group_params ||= params.permit(:group_name).tap do |hsh|
-      group_name = hsh.delete(:group_name)
-      hsh[:name] = group_name if group_name
+    @group_params ||= params.permit(:group_name).tap do |attrs|
+      group_name = attrs.delete(:group_name)
+      attrs[:name] = group_name if group_name
     end
   end
 end

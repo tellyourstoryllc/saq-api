@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   include PeanutModel
+  include Redis::Objects
   attr_accessor :guest
 
   validates :name, presence: true
@@ -15,4 +16,11 @@ class User < ActiveRecord::Base
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
 
   delegate :token, to: :api_token
+
+  set :group_ids
+
+
+  def groups
+    Group.where(id: group_ids.members)
+  end
 end

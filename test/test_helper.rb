@@ -24,6 +24,12 @@ Spork.prefork do
   class ActiveSupport::TestCase
     # Add more helper methods to be used by all tests here...
 
+    # Delete all test Redis keys before each test
+    def setup
+      keys = Redis.current.keys
+      Redis.current.del(keys) if keys.present?
+    end
+
     def result
       @result ||= JSON.load(response.body)
     end

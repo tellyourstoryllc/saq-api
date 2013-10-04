@@ -2,12 +2,34 @@ class Group < ActiveRecord::Base
   include PeanutModel
   include Redis::Objects
 
-  before_validation :set_join_code
+  before_validation :set_join_code, on: :create
   validates :creator_id, :name, :join_code, presence: true
   after_create :add_admin_and_member
 
+  belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
+
   set :admin_ids
   set :member_ids
+
+
+  def admin?(user)
+    user && admin_ids.include?(user.id)
+  end
+
+  def member?(user)
+    user && member_ids.include?(user.id)
+  end
+
+  def add_admin(user)
+    self.admin_ids << user.id
+  end
+
+  def add_member(user)
+    redis.multi do
+      self.member_ids << user.id
+      user.group_ids << id
+    end
+  end
 
 
   private
@@ -18,9 +40,9 @@ class Group < ActiveRecord::Base
   end
 
   def add_admin_and_member
-    return unless creator_id
+    return unless creator
 
-    self.admin_ids << creator_id
-    self.member_ids << creator_id
+    add_admin(creator)
+    add_member(creator)
   end
 end
