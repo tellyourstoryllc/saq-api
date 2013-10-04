@@ -3,10 +3,10 @@ class UsersController < ApplicationController
 
 
   def create
-    @user = User.create!(user_params)
-    @group = Group.create!(group_params.merge(creator_id: @user.id)) if group_params.present?
+    @current_user = User.create!(user_params)
+    @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
-    render_json [@user, @group].compact
+    render_json [@current_user, @group].compact
 
   rescue ActiveRecord::RecordInvalid => e
     render_error
