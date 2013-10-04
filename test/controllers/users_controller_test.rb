@@ -27,7 +27,7 @@ describe UsersController do
         result.must_equal [
           {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token, 'status' => 'available', 'status_text' => nil},
           {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
-            'admin_ids' => [user.id], 'member_ids' => [user.id]}
+            'topic' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id]}
         ]
       end
     end
