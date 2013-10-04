@@ -1,7 +1,7 @@
 require "test_helper"
 
 describe UsersController do
-  describe "POST /users" do
+  describe "POST /users/create" do
     describe "invalid" do
       it "must not create a user if it's invalid" do
         post :create
@@ -34,7 +34,7 @@ describe UsersController do
   end
 
 
-  describe "POST /user/update" do
+  describe "POST /users/update" do
     it "must update the user" do
       post :update, {name: 'Johnny', status: 'away', status_text: 'be back soon', token: current_user.token}
 

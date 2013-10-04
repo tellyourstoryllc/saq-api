@@ -1,7 +1,7 @@
 require "test_helper"
 
 describe GroupsController do
-  describe "POST /groups" do
+  describe "POST /groups/create" do
     describe "invalid" do
       it "must not create a group if it's invalid" do
         post :create, {token: current_user.token}
