@@ -1,4 +1,4 @@
-module PeanutModel
+module Peanut::Model
   extend ActiveSupport::Concern
 
   def object_type

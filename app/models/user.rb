@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  include PeanutModel
+  include Peanut::Model
   include Redis::Objects
   attr_accessor :guest
 

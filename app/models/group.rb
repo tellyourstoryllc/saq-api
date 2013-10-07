@@ -1,5 +1,5 @@
 class Group < ActiveRecord::Base
-  include PeanutModel
+  include Peanut::Model
   include Redis::Objects
 
   before_validation :set_join_code, on: :create
