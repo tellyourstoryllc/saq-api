@@ -8,5 +8,7 @@ ChatApp::Application.routes.draw do
     match '/groups/create', to: 'groups#create', as: 'create_group'
     match '/groups/:id/update', to: 'groups#update', as: 'update_group'
     match '/join/:join_code', to: 'groups#join', as: 'join_group'
+
+    match '/groups/:group_id/messages/create', to: 'messages#create', as: 'create_message'
   end
 end
