@@ -12,6 +12,8 @@ class Group < ActiveRecord::Base
   set :member_ids
   sorted_set :message_ids
 
+  RECENT_MESSAGES_COUNT = 10
+
 
   def admin?(user)
     user && admin_ids.include?(user.id)
@@ -30,6 +32,14 @@ class Group < ActiveRecord::Base
       self.member_ids << user.id
       user.group_ids << id
     end
+  end
+
+  def members
+    User.where(id: member_ids.members)
+  end
+
+  def recent_messages
+    message_ids.range(-RECENT_MESSAGES_COUNT, -1).map{ |id| Message.new(id: id) }
   end
 
 

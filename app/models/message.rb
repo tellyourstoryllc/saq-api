@@ -13,6 +13,15 @@ class Message
   TEXT_LIMIT = 1_000
 
 
+  def initialize(attributes = {})
+    super
+
+    if id.present?
+      attrs.all.each{ |k,v| send("#{k}=", v) }
+      to_int(:id, :group_id, :user_id, :created_at)
+    end
+  end
+
   def save
     return unless valid?
 

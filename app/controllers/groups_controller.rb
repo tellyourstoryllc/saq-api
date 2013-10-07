@@ -1,4 +1,5 @@
 class GroupsController < ApplicationController
+  before_action :load_group, only: [:show, :update]
 
   def create
     @group = current_user.created_groups.create!(params.permit(:name))
@@ -8,13 +9,13 @@ class GroupsController < ApplicationController
     render_error e.message
   end
 
+  def show
+    render_json [@group, @group.members, @group.recent_messages]
+  end
+
   def update
-    @group = current_user.groups.find(params[:id])
     @group.update_attributes!(update_group_params)
     render_json @group
-
-  rescue ActiveRecord::RecordNotFound => e
-    render_error 'Sorry, you need to be a member of that group to update it.', nil, {status: :unauthorized}
 
   rescue ActiveRecord::RecordInvalid => e
     render_error e.message
@@ -22,6 +23,10 @@ class GroupsController < ApplicationController
 
 
   private
+
+  def load_group
+    @group = current_user.groups.find(params[:id])
+  end
 
   def update_group_params
     params.permit(:topic).tap do |attrs|
