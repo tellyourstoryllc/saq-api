@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action :require_token
+  rescue_from ActiveRecord::RecordNotFound, with: :render_404
 
 
   def current_user
@@ -24,5 +25,9 @@ class ApplicationController < ActionController::Base
     error[:code] = code if code.present?
 
     render({json: {error: error}}.merge(options))
+  end
+
+  def render_404(exception)
+    render_error 'Sorry, that could not be found.', nil, status: :not_found
   end
 end
