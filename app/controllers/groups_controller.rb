@@ -1,6 +1,7 @@
 class GroupsController < ApplicationController
   before_action :load_group, only: [:show, :update]
 
+
   def create
     @group = current_user.created_groups.create!(params.permit(:name))
     render_json @group
@@ -19,6 +20,12 @@ class GroupsController < ApplicationController
 
   rescue ActiveRecord::RecordInvalid => e
     render_error e.message
+  end
+
+  def join
+    @group = Group.find_by!(join_code: params[:join_code])
+    @group.add_member(current_user)
+    render_json [@group, @group.members, @group.recent_messages]
   end
 
 

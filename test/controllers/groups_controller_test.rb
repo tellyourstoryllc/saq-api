@@ -83,6 +83,48 @@ describe GroupsController do
     end
 
 
+    describe "POST /groups/join/:join_code" do
+      it "must not join the group if the join code is not valid" do
+        group = FactoryGirl.create(:group)
+        post :join, {join_code: 'invalid', token: current_user.token}
+        result.must_equal('error' => {'message' => 'Sorry, that could not be found.'})
+      end
+
+      it "must join the group and return the group, its users, and its most recent page of messages" do
+        group = FactoryGirl.create(:group)
+        member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
+
+        group.add_admin(member)
+        group.add_member(member)
+
+        message = Message.new(group_id: group.id, user_id: member.id, text: 'hey guys')
+        message.save
+
+        post :join, {join_code: group.join_code, token: current_user.token}
+
+        result.must_equal [
+          {
+            'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+            'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id]
+          },
+          {
+            'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
+            'status' => 'available', 'status_text' => 'around'
+          },
+          {
+            'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
+            'status' => 'available', 'status_text' => nil, 'token' => current_user.token
+          },
+          {
+            'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
+            'user_id' => member.id, 'text' => 'hey guys', 'created_at' => message.created_at
+          }
+        ]
+      end
+    end
+
+
     describe "GET /groups/:id" do
       it "must not return the group if the user is not a member" do
         group = FactoryGirl.create(:group)
