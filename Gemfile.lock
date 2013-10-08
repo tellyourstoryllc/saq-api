@@ -156,6 +156,7 @@ DEPENDENCIES
   minitest-rails
   mysql2
   rails (= 4.0.0)
+  rake (= 10.1.0)
   redis (= 3.0.5)
   redis-namespace
   redis-objects (= 0.7.0)
