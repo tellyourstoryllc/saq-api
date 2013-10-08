@@ -1,7 +1,16 @@
-redis:
-  persisted:
-    host: 127.0.0.1
-    db: 0
-  cache:
-    host: 127.0.0.1
-    db: 1
+development:
+  redis:
+    persisted:
+      host: 127.0.0.1
+      db: 0
+    cache:
+      host: 127.0.0.1
+      db: 1
+test:
+  redis:
+    persisted:
+      host: 127.0.0.1
+      db: 0
+    cache:
+      host: 127.0.0.1
+      db: 1
