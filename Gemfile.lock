@@ -68,6 +68,7 @@ GEM
       rails (>= 3.0)
     multi_json (1.8.0)
     mysql2 (0.3.13)
+    oj (2.0.3)
     polyglot (0.3.3)
     rack (1.5.2)
     rack-test (0.6.2)
@@ -155,6 +156,7 @@ DEPENDENCIES
   jquery-rails
   minitest-rails
   mysql2
+  oj
   rails (= 4.0.0)
   redis (= 3.0.5)
   redis-namespace
