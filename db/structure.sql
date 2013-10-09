@@ -34,6 +34,24 @@ CREATE TABLE `api_tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `emoticons`
+--
+
+DROP TABLE IF EXISTS `emoticons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `emoticons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `image_data` text COLLATE utf8_unicode_ci NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `groups`
 --
 
@@ -118,7 +136,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-09 12:31:35
+-- Dump completed on 2013-10-09 15:48:58
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -134,3 +152,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131004155252');
 INSERT INTO schema_migrations (version) VALUES ('20131008223611');
 
 INSERT INTO schema_migrations (version) VALUES ('20131009162525');
+
+INSERT INTO schema_migrations (version) VALUES ('20131009193925');

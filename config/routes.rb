@@ -4,6 +4,7 @@ ChatApp::Application.routes.draw do
     match '/users/update', to: 'users#update', as: 'update_user'
 
     match '/login', to: 'sessions#create', as: 'login'
+    match '/checkin', to: 'checkin#index', as: 'checkin'
 
     match '/groups/create', to: 'groups#create', as: 'create_group'
     match '/groups/:id/update', to: 'groups#update', as: 'update_group'
