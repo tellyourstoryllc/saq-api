@@ -1,4 +1,5 @@
 class MessageImage < ActiveRecord::Base
+  attr_writer :message
   before_validation :set_group_id, on: :create
   validates :group_id, :message_id, :image, presence: true
 
@@ -13,6 +14,6 @@ class MessageImage < ActiveRecord::Base
   private
 
   def set_group_id
-    self.group_id = message.group_id if message
+    self.group_id = message.group_id
   end
 end

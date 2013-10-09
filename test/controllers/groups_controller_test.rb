@@ -118,7 +118,8 @@ describe GroupsController do
           },
           {
             'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
-            'user_id' => member.id, 'text' => 'hey guys', 'created_at' => message.created_at
+            'user_id' => member.id, 'text' => 'hey guys', 'image_url' => nil,
+            'created_at' => message.created_at
           }
         ]
       end
@@ -166,7 +167,8 @@ describe GroupsController do
           },
           {
             'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
-            'user_id' => member.id, 'text' => 'hey guys', 'created_at' => message.created_at
+            'user_id' => member.id, 'text' => 'hey guys', 'image_url' => nil,
+            'created_at' => message.created_at
           }
         ]
       end
