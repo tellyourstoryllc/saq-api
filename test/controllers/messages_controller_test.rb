@@ -17,8 +17,10 @@ describe MessagesController do
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {group_id: group.id, text: text, token: current_user.token}
 
-        result.must_equal([{'object_type' => 'message', 'id' => message_id, 'group_id' => group.id,
-                          'user_id' => current_user.id, 'text' => text, 'created_at' => now.to_i}])
+        result.must_equal([{'object_type' => 'message', 'id' => message_id,
+                          'group_id' => group.id, 'user_id' => current_user.id,
+                          'text' => text, 'image_url' => nil,
+                          'created_at' => now.to_i}])
         group.message_ids.last.to_i.must_equal message_id
       end
     end

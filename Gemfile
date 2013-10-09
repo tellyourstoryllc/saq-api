@@ -64,3 +64,7 @@ gem 'hiredis'
 gem 'redis', '3.0.5', require: ['redis', 'redis/connection/hiredis']
 gem 'redis-objects', '0.7.0'
 gem 'redis-namespace'
+
+gem 'mini_magick'
+gem 'carrierwave', '0.9.0'
+gem 'fog', '1.15.0'
