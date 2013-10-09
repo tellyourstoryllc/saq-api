@@ -6,6 +6,10 @@ development:
     cache:
       host: 127.0.0.1
       db: 1
+  aws:
+    access_key_id: key
+    secret_access_key: secret
+    bucket_name: media.something.com
 test:
   redis:
     persisted:
