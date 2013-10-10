@@ -2,6 +2,10 @@ class GroupsController < ApplicationController
   before_action :load_group, only: [:show, :update]
 
 
+  def index
+    render_json current_user.groups.order(:name)
+  end
+
   def create
     @group = current_user.created_groups.create!(params.permit(:name))
     render_json @group

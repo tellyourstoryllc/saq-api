@@ -126,6 +126,34 @@ describe GroupsController do
     end
 
 
+    describe "GET /groups" do
+      it "must return the groups to which the user currently belongs" do
+        group = FactoryGirl.create(:group)
+        group.add_admin(current_user)
+        group.add_member(current_user)
+
+        group2 = FactoryGirl.create(:group, name: 'Another Group')
+        group2.add_admin(current_user)
+        group2.add_member(current_user)
+
+        get :index, {token: current_user.token}
+
+        result.must_equal [
+          {
+            'object_type' => 'group', 'id' => group2.id, 'name' => 'Another Group',
+            'join_url' => "http://test.host/join/#{group2.join_code}", 'topic' => nil,
+            'admin_ids' => [current_user.id], 'member_ids' => [current_user.id]
+          },
+          {
+            'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+            'admin_ids' => [current_user.id], 'member_ids' => [current_user.id]
+          }
+        ]
+      end
+    end
+
+
     describe "GET /groups/:id" do
       it "must not return the group if the user is not a member" do
         group = FactoryGirl.create(:group)
