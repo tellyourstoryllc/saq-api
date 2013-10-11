@@ -32,6 +32,14 @@ class GroupsController < ApplicationController
     render_json [@group, @group.members, @group.recent_messages]
   end
 
+  def is_member
+    if Group.redis.sismember("group:#{params[:id]}:member_ids", current_user.id)
+      render nothing: true
+    else
+      render nothing: true, status: :unauthorized
+    end
+  end
+
 
   private
 
