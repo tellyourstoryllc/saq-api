@@ -46,9 +46,9 @@ class Group < ActiveRecord::Base
   private
 
   def set_join_code
-    # Alpha chars only to make it easier to type on mobile
-    # Exclude lowercase l and uppercase I since they look similar
-    chars = [*'a'..'k', *'m'..'z', *'A'..'H', *'J'..'Z']
+    # Lowercase alpha chars only to make it easier to type on mobile
+    # Exclude L to avoid any confusion
+    chars = [*'a'..'k', *'m'..'z']
     self.join_code = Array.new(8){ chars.sample }.join
   end
 
