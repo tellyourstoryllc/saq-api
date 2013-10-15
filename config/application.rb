@@ -22,6 +22,9 @@ module ChatApp
 
     config.active_record.schema_format = :sql
 
+    # Disable Asset Pipeline
+    config.assets.enabled = false
+
     config.generators do |g|
       g.test_framework :mini_test, spec: true, fixture: false
       g.helper false
