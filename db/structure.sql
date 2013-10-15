@@ -67,8 +67,8 @@ CREATE TABLE `groups` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_groups_on_creator_id` (`creator_id`),
-  KEY `index_groups_on_join_code` (`join_code`)
+  UNIQUE KEY `index_groups_on_join_code` (`join_code`),
+  KEY `index_groups_on_creator_id` (`creator_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -136,7 +136,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-09 15:48:58
+-- Dump completed on 2013-10-15 10:37:40
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -154,3 +154,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131008223611');
 INSERT INTO schema_migrations (version) VALUES ('20131009162525');
 
 INSERT INTO schema_migrations (version) VALUES ('20131009193925');
+
+INSERT INTO schema_migrations (version) VALUES ('20131015143647');

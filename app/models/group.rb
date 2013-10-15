@@ -49,7 +49,11 @@ class Group < ActiveRecord::Base
     # Lowercase alpha chars only to make it easier to type on mobile
     # Exclude L to avoid any confusion
     chars = [*'a'..'k', *'m'..'z']
-    self.join_code = Array.new(8){ chars.sample }.join
+
+    loop do
+      self.join_code = Array.new(8){ chars.sample }.join
+      break unless Group.where(join_code: join_code).exists?
+    end
   end
 
   def add_admin_and_member
