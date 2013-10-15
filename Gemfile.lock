@@ -1,3 +1,11 @@
+GIT
+  remote: git@github.com:bray/redis_logger.git
+  revision: a586282ab8a6c2f23b78a57e6ce27809387b10a2
+  specs:
+    redis_logger (0.0.2)
+      rails (> 3.2.0)
+      redis
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -190,6 +198,7 @@ DEPENDENCIES
   redis (= 3.0.5)
   redis-namespace
   redis-objects (= 0.7.0)
+  redis_logger!
   sass-rails (~> 4.0.0)
   sdoc
   spork-minitest (= 1.0.0.beta2)

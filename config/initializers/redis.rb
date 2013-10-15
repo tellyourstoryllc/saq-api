@@ -1,3 +1,3 @@
 persisted = Rails.configuration.app['redis']['persisted']
-redis = Redis.new(host: persisted['host'], db: persisted['db'])
+redis = Redis.new(host: persisted['host'], db: persisted['db'], logger: Rails.logger)
 Redis.current = Redis::Namespace.new("chat_app_#{Rails.env}", redis: redis)
