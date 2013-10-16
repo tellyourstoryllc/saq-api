@@ -4,7 +4,13 @@ class ApplicationController < ActionController::Base
 
 
   def current_user
-    @current_user ||= ApiToken.select(:user_id).find_by(token: params[:token]).try(:user)
+    @current_user ||= begin
+      user_id = User.user_ids_by_api_token[params[:token]]
+      user = User.find_by(id: user_id) if user_id
+      user_text = user ? "#{user.id} (#{user.name})" : '[not found]'
+      logger.info "Current User: #{user_text}"
+      user
+    end
   end
 
 
