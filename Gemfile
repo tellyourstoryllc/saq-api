@@ -63,7 +63,6 @@ gem 'active_model_serializers', '0.8.1'
 gem 'hiredis'
 gem 'redis', '3.0.5', require: ['redis', 'redis/connection/hiredis']
 gem 'redis-objects', '0.7.0'
-gem 'redis-namespace'
 gem 'redis_logger', git: 'git@github.com:bray/redis_logger.git'
 
 gem 'mini_magick'
