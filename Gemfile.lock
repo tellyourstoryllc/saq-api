@@ -1,5 +1,5 @@
 GIT
-  remote: git@github.com:bray/redis_logger.git
+  remote: git://github.com/bray/redis_logger.git
   revision: a586282ab8a6c2f23b78a57e6ce27809387b10a2
   specs:
     redis_logger (0.0.2)
