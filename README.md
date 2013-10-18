@@ -27,7 +27,7 @@ Copy dev db schema to test db:
 
     rake db:test:prepare
 
-Run the tests:
+Run the tests (Warning: make sure your `test` Redis config in `config/app.yml` is unused and different than `development`, as that Redis db will be cleared before each test):
 
     rake
 
