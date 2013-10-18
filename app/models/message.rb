@@ -5,7 +5,7 @@ class Message
   include Redis::Objects
 
   attr_accessor :id, :group_id, :user_id, :text, :image_file,
-    :message_image_id, :image_url, :created_at
+    :mentioned_user_ids, :message_image_id, :image_url, :created_at
   hash_key :attrs
 
   validates :group_id, :user_id, presence: true
@@ -31,6 +31,7 @@ class Message
     return unless valid?
 
     generate_id
+    sanitize_mentioned_user_ids
     save_message_image
     write_attrs
     add_to_group
@@ -40,11 +41,29 @@ class Message
     @group ||= Group.find_by(id: group_id) if group_id
   end
 
+  def mentioned_user_ids
+    @mentioned_user_ids.blank? ? [] : @mentioned_user_ids.to_s.split(',').map(&:to_i)
+  end
+
 
   private
 
   def generate_id
     self.id ||= redis.incr('message_autoincrement_id')
+  end
+
+  def sanitize_mentioned_user_ids
+    @mentioned_user_ids = @mentioned_user_ids.to_s.split(',')
+
+    if @mentioned_user_ids.blank? || group.nil?
+      @mentioned_user_ids = nil
+    else
+      member_ids = [-1] # @all mention
+      member_ids += group.member_ids.members.map(&:to_i)
+
+      sanitized_user_ids = @mentioned_user_ids.map(&:to_i) & member_ids
+      @mentioned_user_ids = sanitized_user_ids.join(',')
+    end
   end
 
   def text_under_limit?
@@ -70,7 +89,7 @@ class Message
       self.message_image_id = @message_image.id
     end
 
-    self.attrs.bulk_set(id: id, group_id: group_id, user_id: user_id, text: text,
+    self.attrs.bulk_set(id: id, group_id: group_id, user_id: user_id, text: text, mentioned_user_ids: @mentioned_user_ids,
                         message_image_id: message_image_id, image_url: image_url, created_at: created_at)
   end
 

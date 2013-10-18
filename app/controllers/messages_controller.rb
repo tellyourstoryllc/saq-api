@@ -20,6 +20,6 @@ class MessagesController < ApplicationController
   end
 
   def message_params
-    params.permit(:text, :image_file).merge(group_id: @group.id, user_id: current_user.id)
+    params.permit(:text, :mentioned_user_ids, :image_file).merge(group_id: @group.id, user_id: current_user.id)
   end
 end
