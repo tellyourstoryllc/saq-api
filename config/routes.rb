@@ -12,6 +12,8 @@ ChatApp::Application.routes.draw do
     #match '/join/:join_code', to: 'groups#join', as: 'join_group'
 
     match '/groups/:group_id/messages/create', to: 'messages#create', as: 'create_message'
+    match '/groups/:group_id/messages', to: 'messages#index', as: 'group_messages'
+
     match '/groups', to: 'groups#index', as: 'groups'
     match '/groups/:id', to: 'groups#show', as: 'show_group'
     match '/groups/:id/is_member', to: 'groups#is_member', as: 'is_member_group'

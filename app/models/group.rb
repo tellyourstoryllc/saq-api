@@ -12,7 +12,8 @@ class Group < ActiveRecord::Base
   set :member_ids
   sorted_set :message_ids
 
-  RECENT_MESSAGES_COUNT = 10
+  PAGE_SIZE = 20
+  MAX_PAGE_SIZE = 200
 
 
   def admin?(user)
@@ -38,8 +39,19 @@ class Group < ActiveRecord::Base
     User.where(id: member_ids.members)
   end
 
-  def recent_messages
-    message_ids.range(-RECENT_MESSAGES_COUNT, -1).map{ |id| Message.new(id: id) }
+  def paginate_messages(options = {})
+    limit = [(options[:limit].presence || PAGE_SIZE).to_i, MAX_PAGE_SIZE].min
+    return [] if limit == 0
+
+    last_message_id = options[:last_message_id]
+
+    ids = if last_message_id.present?
+      message_ids.revrangebyscore("(#{last_message_id}", '-inf', {limit: limit}).reverse
+    else
+      message_ids.range(-limit, -1)
+    end
+
+    ids.map{ |id| Message.new(id: id) }
   end
 
 

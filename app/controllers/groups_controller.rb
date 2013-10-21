@@ -15,7 +15,7 @@ class GroupsController < ApplicationController
   end
 
   def show
-    render_json [@group, @group.members, @group.recent_messages]
+    render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
   end
 
   def update
@@ -29,7 +29,7 @@ class GroupsController < ApplicationController
   def join
     @group = Group.find_by!(join_code: params[:join_code])
     @group.add_member(current_user)
-    render_json [@group, @group.members, @group.recent_messages]
+    render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
   end
 
   def is_member
@@ -51,5 +51,9 @@ class GroupsController < ApplicationController
     params.permit(:topic).tap do |attrs|
       attrs[:name] = params[:name] if @group.admin?(current_user)
     end
+  end
+
+  def pagination_params
+    params.permit(:limit, :last_message_id)
   end
 end

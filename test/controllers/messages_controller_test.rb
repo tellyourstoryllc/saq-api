@@ -109,4 +109,117 @@ describe MessagesController do
       end
     end
   end
+
+
+  describe "GET /groups/:group_id/messages" do
+    it "must return the most recent page of messages" do
+      silence_warnings{ Group::PAGE_SIZE = 2 }
+
+      group = FactoryGirl.create(:group)
+      member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
+
+      group.add_member(current_user)
+      group.add_member(member)
+
+      m1 = Message.new(group_id: group.id, user_id: member.id, text: 'hey guys')
+      m1.save
+
+      m2 = Message.new(group_id: group.id, user_id: current_user.id, text: 'oh hai')
+      m2.save
+
+      m3 = Message.new(group_id: group.id, user_id: member.id, text: 'hi again')
+      m3.save
+
+      get :index, {group_id: group.id, token: current_user.token}
+
+      result.must_equal [
+        {
+          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
+          'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'created_at' => m2.created_at
+        },
+        {
+          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
+          'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'created_at' => m3.created_at
+        }
+      ]
+    end
+
+    it "must return the most recent page of messages with a given limit" do
+      silence_warnings{ Group::PAGE_SIZE = 2 }
+
+      group = FactoryGirl.create(:group)
+      member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
+
+      group.add_member(current_user)
+      group.add_member(member)
+
+      m1 = Message.new(group_id: group.id, user_id: member.id, text: 'hey guys')
+      m1.save
+
+      m2 = Message.new(group_id: group.id, user_id: current_user.id, text: 'oh hai')
+      m2.save
+
+      m3 = Message.new(group_id: group.id, user_id: member.id, text: 'hi again')
+      m3.save
+
+      get :index, {group_id: group.id, limit: 3, token: current_user.token}
+
+      result.must_equal [
+        {
+          'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,
+          'user_id' => member.id, 'text' => 'hey guys', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'created_at' => m1.created_at
+        },
+        {
+          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
+          'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'created_at' => m2.created_at
+        },
+        {
+          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
+          'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'created_at' => m3.created_at
+        }
+      ]
+    end
+
+    it "must return the most recent page of messages, starting from a given message id" do
+      silence_warnings{ Group::PAGE_SIZE = 2 }
+
+      group = FactoryGirl.create(:group)
+      member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
+
+      group.add_member(current_user)
+      group.add_member(member)
+
+      m1 = Message.new(group_id: group.id, user_id: member.id, text: 'hey guys')
+      m1.save
+
+      m2 = Message.new(group_id: group.id, user_id: current_user.id, text: 'oh hai')
+      m2.save
+
+      m3 = Message.new(group_id: group.id, user_id: member.id, text: 'hi again')
+      m3.save
+
+      m4 = Message.new(group_id: group.id, user_id: member.id, text: 'hello?')
+      m4.save
+
+      get :index, {group_id: group.id, last_message_id: m4.id, token: current_user.token}
+
+      result.must_equal [
+        {
+          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
+          'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'created_at' => m2.created_at
+        },
+        {
+          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
+          'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'created_at' => m3.created_at
+        }
+      ]
+    end
+  end
 end
