@@ -5,7 +5,7 @@ class Message
   include Redis::Objects
 
   attr_accessor :id, :group_id, :user_id, :text, :image_file,
-    :mentioned_user_ids, :message_image_id, :image_url, :created_at
+    :mentioned_user_ids, :message_image_id, :image_url, :image_thumb_url, :created_at
   hash_key :attrs
 
   validates :group_id, :user_id, presence: true
@@ -86,11 +86,12 @@ class Message
 
     if @message_image && @message_image.image.present?
       self.image_url = @message_image.image.url
+      self.image_thumb_url = @message_image.image.thumb.url
       self.message_image_id = @message_image.id
     end
 
     self.attrs.bulk_set(id: id, group_id: group_id, user_id: user_id, text: text, mentioned_user_ids: @mentioned_user_ids,
-                        message_image_id: message_image_id, image_url: image_url, created_at: created_at)
+                        message_image_id: message_image_id, image_url: image_url, image_thumb_url: image_thumb_url, created_at: created_at)
   end
 
   def add_to_group
