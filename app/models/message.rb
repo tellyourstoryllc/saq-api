@@ -7,6 +7,7 @@ class Message
   attr_accessor :id, :group_id, :user_id, :text, :image_file,
     :mentioned_user_ids, :message_image_id, :image_url, :image_thumb_url, :created_at
   hash_key :attrs
+  sorted_set :likes
 
   validates :group_id, :user_id, presence: true
   validate :text_under_limit?, :text_or_image_set?
@@ -43,6 +44,14 @@ class Message
 
   def mentioned_user_ids
     @mentioned_user_ids.blank? ? [] : @mentioned_user_ids.to_s.split(',').map(&:to_i)
+  end
+
+  def like(user)
+    likes[user.id] = Time.current.to_f unless likes.member?(user.id)
+  end
+
+  def unlike(user)
+    likes.delete(user.id)
   end
 
 

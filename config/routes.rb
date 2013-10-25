@@ -17,5 +17,8 @@ ChatApp::Application.routes.draw do
     match '/groups', to: 'groups#index', as: 'groups'
     match '/groups/:id', to: 'groups#show', as: 'show_group'
     match '/groups/:id/is_member', to: 'groups#is_member', as: 'is_member_group'
+
+    match '/messages/:id/like', to: 'message_likes#create', as: 'like_message'
+    match '/messages/:id/unlike', to: 'message_likes#destroy', as: 'unlike_message'
   end
 end
