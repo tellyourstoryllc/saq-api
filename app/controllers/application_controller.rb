@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   before_action :require_token
-  rescue_from ActiveRecord::RecordNotFound, with: :render_404
+  rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
 
 
   def current_user
