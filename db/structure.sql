@@ -43,7 +43,7 @@ DROP TABLE IF EXISTS `emoticons`;
 CREATE TABLE `emoticons` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `image_data` text COLLATE utf8_unicode_ci NOT NULL,
+  `image_data` mediumtext COLLATE utf8_unicode_ci NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -156,3 +156,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131009162525');
 INSERT INTO schema_migrations (version) VALUES ('20131009193925');
 
 INSERT INTO schema_migrations (version) VALUES ('20131015143647');
+
+INSERT INTO schema_migrations (version) VALUES ('20131029165608');
