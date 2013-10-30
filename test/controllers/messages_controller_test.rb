@@ -20,7 +20,7 @@ describe MessagesController do
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'created_at' => now.to_i}])
+                          'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -41,7 +41,7 @@ describe MessagesController do
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [user.id], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'created_at' => now.to_i}])
+                          'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -65,7 +65,7 @@ describe MessagesController do
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [u1.id, u2.id], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'created_at' => now.to_i}])
+                          'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -86,7 +86,7 @@ describe MessagesController do
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [u1.id], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'created_at' => now.to_i}])
+                          'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -104,7 +104,7 @@ describe MessagesController do
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [-1], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'created_at' => now.to_i}])
+                          'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -136,12 +136,12 @@ describe MessagesController do
         {
           'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
           'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'created_at' => m2.created_at
+          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
         },
         {
           'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
           'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'created_at' => m3.created_at
+          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
         }
       ]
     end
@@ -170,17 +170,17 @@ describe MessagesController do
         {
           'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,
           'user_id' => member.id, 'text' => 'hey guys', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'created_at' => m1.created_at
+          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
         },
         {
           'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
           'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'created_at' => m2.created_at
+          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
         },
         {
           'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
           'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'created_at' => m3.created_at
+          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
         }
       ]
     end
@@ -212,12 +212,12 @@ describe MessagesController do
         {
           'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
           'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'created_at' => m2.created_at
+          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
         },
         {
           'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
           'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'created_at' => m3.created_at
+          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
         }
       ]
     end
