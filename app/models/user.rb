@@ -19,6 +19,10 @@ class User < ActiveRecord::Base
   sorted_set :connected_faye_client_ids
 
 
+  def first_name
+    name.split(' ').first
+  end
+
   def token
     @token ||= User.api_tokens[id] if id
   end
@@ -54,6 +58,10 @@ class User < ActiveRecord::Base
 
   def idle_duration
     most_recent_faye_client.try(:idle_duration)
+  end
+
+  def idle_or_unavailable?
+    %w(idle unavailable).include?(computed_status)
   end
 
 

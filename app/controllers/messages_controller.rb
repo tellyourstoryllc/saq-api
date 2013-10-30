@@ -10,6 +10,11 @@ class MessagesController < ApplicationController
     @message = Message.new(message_params)
 
     if @message.save
+      # Notify all Idle/Unavailable mentioned members
+      @message.mentioned_users.each do |recipient|
+        MessageMailer.mention(@message, recipient, recipient.computed_status).deliver! if recipient.idle_or_unavailable?
+      end
+
       render_json @message
     else
       render_error @message.errors.full_messages

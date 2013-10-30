@@ -1,8 +1,8 @@
 development:
   aws:
-    access_key_id: key
-    secret_access_key: secret
-    bucket_name: media.something.com
+    access_key_id: KEY
+    secret_access_key: SECRET
+    bucket_name: MEDIA.SOMETHING.COM
   redis:
     persisted:
       host: 127.0.0.1
@@ -12,11 +12,15 @@ development:
       host: 127.0.0.1
       port: 6380
       db: 1
+  sendgrid:
+    username: USERNAME
+    password: PASSWORD
+
 test:
   aws:
-    access_key_id: key
-    secret_access_key: secret
-    bucket_name: media.something.com
+    access_key_id: KEY
+    secret_access_key: SECRET
+    bucket_name: MEDIA.SOMETHING.COM
   redis:
     persisted:
       host: 127.0.0.1
@@ -26,3 +30,6 @@ test:
       host: 127.0.0.1
       port: 6380
       db: 11
+  sendgrid:
+    username: USERNAME
+    password: PASSWORD

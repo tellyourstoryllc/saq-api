@@ -38,12 +38,29 @@ class Message
     add_to_group
   end
 
+  def user
+    @user ||= User.find_by(id: user_id) if user_id
+  end
+
   def group
     @group ||= Group.find_by(id: group_id) if group_id
   end
 
   def mentioned_user_ids
-    @mentioned_user_ids.blank? ? [] : @mentioned_user_ids.to_s.split(',').map(&:to_i)
+    @mentioned_user_ids.present? ? @mentioned_user_ids.to_s.split(',').map(&:to_i) : []
+  end
+
+  def mentioned_all?
+    mentioned_user_ids.include?(-1)
+  end
+
+  def mentioned_users
+    if mentioned_user_ids.present?
+      user_ids = mentioned_all? ? group.member_ids.members : mentioned_user_ids
+      User.where(id: user_ids)
+    else
+      []
+    end
   end
 
   def like(user)

@@ -1,0 +1,7 @@
+Hi <%= @recipient.first_name %>,
+
+<%= @user.name %> just mentioned <%= @mentioned_name %> in the room <%= @group.name %> but you're <%= @status %>:
+
+<%= @user.name %>: <%= @message.text %> | <%= Time.zone.at(@message.created_at).strftime('%-I:%M %p %Z') %>
+
+
