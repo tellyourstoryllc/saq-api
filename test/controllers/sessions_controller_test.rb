@@ -14,7 +14,8 @@ describe SessionsController do
     it "must log in user when credentials are correct" do
       user = FactoryGirl.create(:user, email: 'login_test@example.com', password: 'asdf')
       post :create, {email: 'login_test@example.com', password: 'asdf'}
-      result.must_equal [{'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token, 'status' => 'available', 'status_text' => nil}]
+      result.must_equal [{'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token,
+        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil}]
     end
   end
 end

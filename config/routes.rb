@@ -20,5 +20,7 @@ ChatApp::Application.routes.draw do
 
     match '/messages/:id/like', to: 'message_likes#create', as: 'like_message'
     match '/messages/:id/unlike', to: 'message_likes#destroy', as: 'unlike_message'
+
+    match '/faye_clients/:id/update', to: 'faye_clients#update', as: 'update_faye_client'
   end
 end
