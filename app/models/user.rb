@@ -45,14 +45,28 @@ class User < ActiveRecord::Base
   end
 
   def computed_status
-    client = most_recent_faye_client
+    @computed_status ||= begin
+      client = nil
+      ids = connected_faye_client_ids.revrange(0, -1)
 
-    if client.nil?
-      'unavailable'
-    elsif client.idle?
-      'idle'
-    else
-      self[:status]
+      ids.each do |id|
+        faye_client = FayeClient.new(id: id)
+
+        if faye_client.active?
+          client = faye_client
+          break
+        elsif faye_client.idle?
+          client ||= faye_client
+        end
+      end
+
+      if client.nil?
+        'unavailable'
+      elsif client.idle?
+        'idle'
+      else
+        self[:status]
+      end
     end
   end
 
