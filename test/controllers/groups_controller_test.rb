@@ -110,11 +110,11 @@ describe GroupsController do
           },
           {
             'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
-            'status' => 'available', 'status_text' => 'around'
+            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around'
           },
           {
             'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
-            'status' => 'available', 'status_text' => nil, 'token' => current_user.token
+            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'token' => current_user.token
           },
           {
             'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
@@ -175,6 +175,7 @@ describe GroupsController do
         group.add_member(member)
 
         current_user.update!(status: 'away', status_text: 'be back soon')
+        FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
 
         m1 = Message.new(group_id: group.id, user_id: member.id, text: 'hey guys')
         m1.save
@@ -195,11 +196,11 @@ describe GroupsController do
           },
           {
             'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
-            'status' => 'available', 'status_text' => 'around'
+            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around'
           },
           {
             'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
-            'status' => 'away', 'status_text' => 'be back soon', 'token' => current_user.token
+            'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'token' => current_user.token
           },
           {
             'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
@@ -225,6 +226,7 @@ describe GroupsController do
         group.add_member(member)
 
         current_user.update!(status: 'away', status_text: 'be back soon')
+        FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
 
         m1 = Message.new(group_id: group.id, user_id: member.id, text: 'hey guys')
         m1.save
@@ -245,11 +247,11 @@ describe GroupsController do
           },
           {
             'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
-            'status' => 'available', 'status_text' => 'around'
+            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around'
           },
           {
             'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
-            'status' => 'away', 'status_text' => 'be back soon', 'token' => current_user.token
+            'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'token' => current_user.token
           },
           {
             'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,

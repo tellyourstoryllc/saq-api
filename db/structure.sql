@@ -118,7 +118,7 @@ CREATE TABLE `users` (
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `password_digest` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `status` enum('available','away','do_not_disturb','idle') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'available',
+  `status` enum('available','away','do_not_disturb') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'available',
   `status_text` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-15 10:37:40
+-- Dump completed on 2013-10-29 13:13:26
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -156,5 +156,7 @@ INSERT INTO schema_migrations (version) VALUES ('20131009162525');
 INSERT INTO schema_migrations (version) VALUES ('20131009193925');
 
 INSERT INTO schema_migrations (version) VALUES ('20131015143647');
+
+INSERT INTO schema_migrations (version) VALUES ('20131029141942');
 
 INSERT INTO schema_migrations (version) VALUES ('20131029165608');
