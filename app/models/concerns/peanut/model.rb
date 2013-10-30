@@ -7,7 +7,8 @@ module Peanut::Model
 
   def to_int(*attrs)
     attrs.each do |attr|
-      send("#{attr}=", send(attr).to_i)
+      value = send(attr)
+      send("#{attr}=", value.present? ? value.to_i : nil)
     end
   end
 end
