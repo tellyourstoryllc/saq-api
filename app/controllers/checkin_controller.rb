@@ -10,6 +10,7 @@ class CheckinController < ApplicationController
     }
 
     objects << meta
+    objects << current_user
     objects += Emoticon.by_version(params[:emoticons_version])
 
     render_json objects
