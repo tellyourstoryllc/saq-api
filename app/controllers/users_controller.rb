@@ -25,9 +25,7 @@ class UsersController < ApplicationController
   end
 
   def update_user_params
-    attrs = params.permit(:name, :password, :status, :status_text)
-    attrs.delete(:status) if attrs[:status] == 'idle'
-    attrs
+    params.permit(:name, :password, :status, :status_text)
   end
 
   def group_params
