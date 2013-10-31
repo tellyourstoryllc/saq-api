@@ -127,6 +127,28 @@ describe GroupsController do
   end
 
 
+  describe "POST /groups/:id/leave" do
+    it "must leave the group" do
+      group = FactoryGirl.create(:group, creator_id: current_user.id)
+      member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
+
+      group.add_member(member)
+
+      group.admin_ids.members.must_equal [current_user.id.to_s]
+      group.member_ids.members.must_equal [current_user.id.to_s, member.id.to_s]
+      current_user.group_ids.must_include group.id.to_s
+
+      post :leave, {id: group.id, token: current_user.token}
+
+      result.must_equal []
+
+      group.admin_ids.members.must_be_empty
+      group.member_ids.members.must_equal [member.id.to_s]
+      current_user.group_ids.wont_include group.id.to_s
+    end
+  end
+
+
   describe "GET /groups" do
     it "must return the groups to which the user currently belongs" do
       group = FactoryGirl.create(:group)

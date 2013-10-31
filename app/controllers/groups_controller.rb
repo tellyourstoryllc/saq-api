@@ -1,5 +1,5 @@
 class GroupsController < ApplicationController
-  before_action :load_group, only: [:show, :update]
+  before_action :load_group, only: [:show, :update, :leave]
 
 
   def index
@@ -30,6 +30,11 @@ class GroupsController < ApplicationController
     @group = Group.find_by!(join_code: params[:join_code])
     @group.add_member(current_user)
     render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
+  end
+
+  def leave
+    @group.leave!(current_user)
+    render_success
   end
 
   def is_member

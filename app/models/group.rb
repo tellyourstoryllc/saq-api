@@ -28,10 +28,22 @@ class Group < ActiveRecord::Base
     self.admin_ids << user.id
   end
 
+  def remove_admin(user)
+    admin_ids.delete(user.id)
+  end
+
   def add_member(user)
     redis.multi do
       self.member_ids << user.id
       user.group_ids << id
+    end
+  end
+
+  def leave!(user)
+    redis.multi do
+      remove_admin(user)
+      member_ids.delete(user.id)
+      user.group_ids.delete(id)
     end
   end
 

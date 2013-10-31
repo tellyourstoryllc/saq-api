@@ -25,6 +25,10 @@ class ApplicationController < ActionController::Base
     render({json: object_array}.merge(options))
   end
 
+  def render_success
+    render json: []
+  end
+
   def render_error(message = nil, code = nil, options = {})
     message ||= 'error'
     error = {message: message}
