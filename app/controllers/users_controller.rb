@@ -2,6 +2,10 @@ class UsersController < ApplicationController
   skip_before_action :require_token, only: :create
 
 
+  def me
+    render_json current_user
+  end
+
   def create
     @current_user = User.create!(user_params)
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
@@ -14,6 +18,11 @@ class UsersController < ApplicationController
 
   def update
     current_user.update_attributes!(update_user_params)
+
+    endpoint = URI.parse(Rails.configuration.app['faye']['url'])
+    message = {channel: '/publish_to_contacts', ext: {token: params[:token]}}
+    Net::HTTP.post_form(endpoint, message: message.to_json)
+
     render_json current_user
   end
 

@@ -3,6 +3,8 @@ development:
     access_key_id: KEY
     secret_access_key: SECRET
     bucket_name: MEDIA.SOMETHING.COM
+  faye:
+    url: http://localhost:8080/faye
   redis:
     persisted:
       host: 127.0.0.1
@@ -21,6 +23,8 @@ test:
     access_key_id: KEY
     secret_access_key: SECRET
     bucket_name: MEDIA.SOMETHING.COM
+  faye:
+    url: http://localhost:8080/faye
   redis:
     persisted:
       host: 127.0.0.1
