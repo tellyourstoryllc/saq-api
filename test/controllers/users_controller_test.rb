@@ -49,12 +49,7 @@ describe UsersController do
 
     it "must not update the user's status to idle" do
       FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
-      post :update, {name: 'Johnny', status: 'idle', status_text: 'be back soon', token: current_user.token}
-
-      result.must_equal [
-        {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny', 'token' => current_user.token,
-          'status' => 'available', 'idle_duration' => nil, 'status_text' => 'be back soon'}
-      ]
+      proc{ post :update, {name: 'Johnny', status: 'idle', status_text: 'be back soon', token: current_user.token} }.must_raise(ActiveRecord::RecordInvalid)
     end
   end
 end

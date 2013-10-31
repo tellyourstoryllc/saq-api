@@ -6,6 +6,7 @@ class User < ActiveRecord::Base
   validates :name, presence: true
   validates :email, format: /.+@.+/, unless: proc{ |u| u.guest }
   validates :email, uniqueness: true
+  validates :status, inclusion: {in: %w[available away do_not_disturb]}
   validates :password, presence: true, on: :create, unless: proc{ |u| u.guest }
 
   has_secure_password validations: false
