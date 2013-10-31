@@ -8,7 +8,6 @@ class FayeClientsController < ApplicationController
     @faye_client.idle_duration = params[:idle_duration]
 
     if @faye_client.save
-      current_user.include_contact_ids = true
       render_json current_user
     else
       render_error @faye_client.errors.full_messages

@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
-  attr_accessor :guest, :include_contact_ids
+  attr_accessor :guest
 
   validates :name, presence: true
   validates :email, format: /.+@.+/, unless: proc{ |u| u.guest }
@@ -29,12 +29,6 @@ class User < ActiveRecord::Base
 
   def groups
     Group.where(id: group_ids.members)
-  end
-
-  def contact_ids
-    gids = group_ids.members
-    group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
-    redis.sunion(group_member_keys).map!(&:to_i)
   end
 
   def most_recent_faye_client
