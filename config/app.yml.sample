@@ -17,6 +17,8 @@ development:
   sendgrid:
     username: USERNAME
     password: PASSWORD
+  web:
+    url: http://localhost:3001
 
 test:
   aws:
@@ -37,3 +39,5 @@ test:
   sendgrid:
     username: USERNAME
     password: PASSWORD
+  web:
+    url: http://localhost:3001
