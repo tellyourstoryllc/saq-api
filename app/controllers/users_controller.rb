@@ -17,12 +17,8 @@ class UsersController < ApplicationController
   end
 
   def update
-    current_user.update_attributes!(update_user_params)
-
-    endpoint = URI.parse(Rails.configuration.app['faye']['url'])
-    message = {channel: '/broadcast_to_contacts', ext: {token: params[:token]}}
-    Net::HTTP.post_form(endpoint, message: message.to_json)
-
+    current_user.update!(update_user_params)
+    FayePublisher.new(params[:token]).broadcast_to_contacts
     render_json current_user
   end
 

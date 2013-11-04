@@ -2,9 +2,12 @@ class Group < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
 
+  attr_accessor :anything_changed
+
   before_validation :set_join_code, on: :create
   validates :creator_id, :name, :join_code, presence: true
   after_create :add_admin_and_member
+  after_save :anything_changed?
 
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
 
@@ -33,17 +36,23 @@ class Group < ActiveRecord::Base
   end
 
   def add_member(user)
-    redis.multi do
-      self.member_ids << user.id
-      user.group_ids << id
+    unless member_ids.member?(user.id)
+      redis.multi do
+        self.member_ids << user.id
+        user.group_ids << id
+      end
+      true
     end
   end
 
   def leave!(user)
-    redis.multi do
-      remove_admin(user)
-      member_ids.delete(user.id)
-      user.group_ids.delete(id)
+    if member_ids.member?(user.id)
+      redis.multi do
+        remove_admin(user)
+        member_ids.delete(user.id)
+        user.group_ids.delete(id)
+      end
+      true
     end
   end
 
@@ -85,5 +94,9 @@ class Group < ActiveRecord::Base
 
     add_admin(creator)
     add_member(creator)
+  end
+
+  def anything_changed?
+    self.anything_changed = changed?
   end
 end

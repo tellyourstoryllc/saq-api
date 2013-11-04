@@ -19,7 +19,8 @@ class GroupsController < ApplicationController
   end
 
   def update
-    @group.update_attributes!(update_group_params)
+    @group.update!(update_group_params)
+    publish_to_group if @group.anything_changed
     render_json @group
 
   rescue ActiveRecord::RecordInvalid => e
@@ -28,12 +29,21 @@ class GroupsController < ApplicationController
 
   def join
     @group = Group.find_by!(join_code: params[:join_code])
-    @group.add_member(current_user)
+
+    # If this is a new member, publish the updated group to its channel
+    if @group.add_member(current_user)
+      publish_to_group
+    end
+
     render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
   end
 
   def leave
-    @group.leave!(current_user)
+    # If the member successfully left the group, publish the updated group to its channel
+    if @group.leave!(current_user)
+      publish_to_group
+    end
+
     render_success
   end
 
@@ -60,5 +70,9 @@ class GroupsController < ApplicationController
 
   def pagination_params
     params.permit(:limit, :last_message_id)
+  end
+
+  def publish_to_group
+    FayePublisher.new(params[:token]).publish_to_group(@group, GroupSerializer.new(@group).as_json)
   end
 end
