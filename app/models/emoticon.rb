@@ -4,7 +4,7 @@ class Emoticon < ActiveRecord::Base
   validates :name, :image_data, presence: true
   scope :active, -> { where(active: true) }
 
-  VERSION = 5
+  VERSION = 6 
 
 
   def self.by_version(version)
