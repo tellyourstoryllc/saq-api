@@ -40,4 +40,4 @@ test:
     username: USERNAME
     password: PASSWORD
   web:
-    url: http://localhost:3001
+    url: http://test.host
