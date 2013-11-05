@@ -1,5 +1,6 @@
 class Message
   include Peanut::Model
+  include Peanut::RedisModel
   include ActiveModel::Model
   include ActiveModel::SerializerSupport
   include Redis::Objects
@@ -17,15 +18,7 @@ class Message
 
   def initialize(attributes = {})
     super
-
-    if id.present?
-      attrs.all.each do |k,v|
-        v = nil if v.blank?
-        send("#{k}=", v)
-      end
-
-      to_int(:id, :group_id, :user_id, :created_at)
-    end
+    to_int(:id, :group_id, :user_id, :created_at) if id.present?
   end
 
   def save

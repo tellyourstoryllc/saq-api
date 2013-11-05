@@ -1,5 +1,6 @@
 class FayeClient
   include Peanut::Model
+  include Peanut::RedisModel
   include ActiveModel::Model
   include ActiveModel::SerializerSupport
   include Redis::Objects
@@ -13,15 +14,7 @@ class FayeClient
 
   def initialize(attributes = {})
     super
-
-    if id.present?
-      attrs.all.each do |k,v|
-        v = nil if v.blank?
-        send("#{k}=", v)
-      end
-
-      to_int(:user_id, :idled_at, :created_at)
-    end
+    to_int(:user_id, :idled_at, :created_at) if id.present?
   end
 
   def active?; status == 'active' end
