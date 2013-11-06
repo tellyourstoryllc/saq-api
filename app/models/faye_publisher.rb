@@ -22,6 +22,6 @@ class FayePublisher
   end
 
   def broadcast_to_contacts
-    publish '/broadcast_to_contacts'
+    publish '/internal/broadcast_to_contacts'
   end
 end
