@@ -1,5 +1,6 @@
 module Peanut::RedisModel
   extend ActiveSupport::Concern
+  include Peanut::Model
 
   def initialize(attributes = {})
     if id.present?
