@@ -1,8 +1,8 @@
 require "test_helper"
 
-describe MessagesController do
-  describe "POST /groups/:group_id/messages/create" do
-    it "must not create a message if the user is not a member" do
+describe GroupMessagesController do
+  describe "POST /messages/create" do
+    it "must not create a message if the user is not a member of the group" do
       group = FactoryGirl.create(:group)
       post :create, {group_id: group.id, text: 'hey everyone', token: current_user.token}
       result.must_equal('error' => {'message' => 'Sorry, that could not be found.'})
@@ -18,9 +18,10 @@ describe MessagesController do
         post :create, {group_id: group.id, text: text, token: current_user.token}
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [], 'image_url' => nil,
                           'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
+
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -39,9 +40,10 @@ describe MessagesController do
         post :create, {group_id: group.id, text: text, mentioned_user_ids: user.id, token: current_user.token}
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [user.id], 'image_url' => nil,
                           'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
+
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -63,9 +65,10 @@ describe MessagesController do
         post :create, {group_id: group.id, text: text, mentioned_user_ids: [u1.id, u2.id].join(','), token: current_user.token}
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [u1.id, u2.id], 'image_url' => nil,
                           'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
+
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -84,9 +87,10 @@ describe MessagesController do
         post :create, {group_id: group.id, text: text, mentioned_user_ids: [99999, u1.id].join(','), token: current_user.token}
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [u1.id], 'image_url' => nil,
                           'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
+
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -102,9 +106,10 @@ describe MessagesController do
         post :create, {group_id: group.id, text: text, mentioned_user_ids: '-1', token: current_user.token}
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
                           'text' => text, 'mentioned_user_ids' => [-1], 'image_url' => nil,
                           'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
+
         group.message_ids.last.to_i.must_equal message_id
       end
     end
@@ -134,12 +139,12 @@ describe MessagesController do
 
       result.must_equal [
         {
-          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
+          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
           'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
         },
         {
-          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
+          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
           'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
         }
@@ -168,17 +173,17 @@ describe MessagesController do
 
       result.must_equal [
         {
-          'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,
+          'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => member.id, 'text' => 'hey guys', 'mentioned_user_ids' => [],
           'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
         },
         {
-          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
+          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
           'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
         },
         {
-          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
+          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
           'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
         }
@@ -210,12 +215,12 @@ describe MessagesController do
 
       result.must_equal [
         {
-          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
+          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
           'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
         },
         {
-          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
+          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
           'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
         }

@@ -1,4 +1,4 @@
-class MessagesController < ApplicationController
+class GroupMessagesController < ApplicationController
   before_action :load_group
 
 

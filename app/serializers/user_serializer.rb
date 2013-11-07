@@ -6,6 +6,6 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def include_token?
-    current_user.id == id
+    respond_to?(:current_user) && current_user.try(:id) == id
   end
 end

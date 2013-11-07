@@ -119,8 +119,9 @@ describe GroupsController do
         },
         {
           'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
-          'user_id' => member.id, 'text' => 'hey guys', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => message.created_at
+          'one_to_one_id' => nil, 'user_id' => member.id, 'text' => 'hey guys',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'likes_count' => 0, 'created_at' => message.created_at
         }
       ]
     end
@@ -145,34 +146,6 @@ describe GroupsController do
       group.admin_ids.members.must_be_empty
       group.member_ids.members.must_equal [member.id.to_s]
       current_user.group_ids.wont_include group.id.to_s
-    end
-  end
-
-
-  describe "GET /groups" do
-    it "must return the groups to which the user currently belongs" do
-      group = FactoryGirl.create(:group)
-      group.add_admin(current_user)
-      group.add_member(current_user)
-
-      group2 = FactoryGirl.create(:group, name: 'Another Group')
-      group2.add_admin(current_user)
-      group2.add_member(current_user)
-
-      get :index, {token: current_user.token}
-
-      result.must_equal [
-        {
-          'object_type' => 'group', 'id' => group2.id, 'name' => 'Another Group',
-          'join_url' => "http://test.host/join/#{group2.join_code}", 'topic' => nil,
-          'admin_ids' => [current_user.id], 'member_ids' => [current_user.id]
-        },
-        {
-          'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
-          'admin_ids' => [current_user.id], 'member_ids' => [current_user.id]
-        }
-      ]
     end
   end
 
@@ -227,13 +200,16 @@ describe GroupsController do
         },
         {
           'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
-          'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
+          'one_to_one_id' => nil, 'user_id' => current_user.id,
+          'text' => 'oh hai', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0,
+          'created_at' => m2.created_at
         },
         {
           'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
-          'user_id' => member.id, 'text' => 'hey!', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
+          'one_to_one_id' => nil, 'user_id' => member.id, 'text' => 'hey!',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'likes_count' => 0, 'created_at' => m3.created_at
         }
       ]
     end
@@ -278,18 +254,21 @@ describe GroupsController do
         },
         {
           'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,
-          'user_id' => member.id, 'text' => 'hey guys', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
+          'one_to_one_id' => nil, 'user_id' => member.id, 'text' => 'hey guys',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'likes_count' => 0, 'created_at' => m1.created_at
         },
         {
           'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
-          'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
+          'one_to_one_id' => nil, 'user_id' => current_user.id, 'text' => 'oh hai',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'likes_count' => 0, 'created_at' => m2.created_at
         },
         {
           'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
-          'user_id' => member.id, 'text' => 'hey!', 'mentioned_user_ids' => [],
-          'image_url' => nil, 'image_thumb_url' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
+          'one_to_one_id' => nil, 'user_id' => member.id, 'text' => 'hey!',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'likes_count' => 0, 'created_at' => m3.created_at
         }
       ]
     end

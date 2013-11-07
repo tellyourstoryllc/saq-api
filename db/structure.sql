@@ -81,7 +81,8 @@ DROP TABLE IF EXISTS `message_images`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_id` int(11) NOT NULL,
+  `group_id` int(11) DEFAULT NULL,
+  `one_to_one_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `message_id` int(11) NOT NULL,
   `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -89,7 +90,8 @@ CREATE TABLE `message_images` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_message_images_on_group_id` (`group_id`),
-  KEY `index_message_images_on_message_id` (`message_id`)
+  KEY `index_message_images_on_message_id` (`message_id`),
+  KEY `index_message_images_on_one_to_one_id` (`one_to_one_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -136,7 +138,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-10-29 13:13:26
+-- Dump completed on 2013-11-06 16:01:58
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -160,3 +162,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131015143647');
 INSERT INTO schema_migrations (version) VALUES ('20131029141942');
 
 INSERT INTO schema_migrations (version) VALUES ('20131029165608');
+
+INSERT INTO schema_migrations (version) VALUES ('20131106205908');

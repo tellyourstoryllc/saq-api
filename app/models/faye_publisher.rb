@@ -21,6 +21,10 @@ class FayePublisher
     publish "/groups/#{group.id}/messages", data, {persisted: true}
   end
 
+  def publish_one_to_one_message(user, data)
+    publish "/users/#{user.id}", data, {action: 'create_one_to_one_message', persisted: true}
+  end
+
   def broadcast_to_contacts
     publish '/internal/broadcast_to_contacts'
   end

@@ -75,6 +75,10 @@ class Group < ActiveRecord::Base
     ids.map{ |id| Message.new(id: id) }
   end
 
+  def fetched_member_ids
+    member_ids.members.map(&:to_i)
+  end
+
 
   private
 

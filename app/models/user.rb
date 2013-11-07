@@ -15,6 +15,8 @@ class User < ActiveRecord::Base
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
 
   set :group_ids
+  set :one_to_one_ids
+  set :one_to_one_user_ids
   hash_key :api_tokens, global: true
   hash_key :user_ids_by_api_token, global: true
   sorted_set :connected_faye_client_ids
@@ -30,6 +32,10 @@ class User < ActiveRecord::Base
 
   def groups
     Group.where(id: group_ids.members)
+  end
+
+  def one_to_ones
+    one_to_one_ids.members.map{ |id| OneToOne.new(id: id) }
   end
 
   def most_recent_faye_client
@@ -71,6 +77,22 @@ class User < ActiveRecord::Base
 
   def idle_or_unavailable?
     %w(idle unavailable).include?(computed_status)
+  end
+
+  def contact_ids
+    gids = group_ids.members
+    group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
+    one_to_one_user_keys = [one_to_one_user_ids.key]
+    redis.sunion(group_member_keys + one_to_one_user_keys).map!(&:to_i)
+  end
+
+  def self.contacts?(user1, user2)
+    return false if user1.blank? || user2.blank?
+    user1.contact_ids.include?(user2.id) && user2.contact_ids.include?(user1.id)
+  end
+
+  def conversations
+    groups + one_to_ones
   end
 
 

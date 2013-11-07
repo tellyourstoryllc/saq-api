@@ -7,18 +7,22 @@ ChatApp::Application.routes.draw do
     match '/login', to: 'sessions#create', as: 'login'
     match '/checkin', to: 'checkin#index', as: 'checkin'
 
+    match '/conversations', to: 'conversations#index', as: 'conversations'
+
     match '/groups/create', to: 'groups#create', as: 'create_group'
     match '/groups/:id/update', to: 'groups#update', as: 'update_group'
     match '/groups/join/:join_code', to: 'groups#join', as: 'join_group'
     match '/groups/:id/leave', to: 'groups#leave', as: 'leave_group'
-    #match '/join/:join_code', to: 'groups#join', as: 'join_group'
 
-    match '/groups/:group_id/messages/create', to: 'messages#create', as: 'create_message'
-    match '/groups/:group_id/messages', to: 'messages#index', as: 'group_messages'
+    match '/groups/:group_id/messages/create', to: 'group_messages#create', as: 'create_group_message'
+    match '/groups/:group_id/messages', to: 'group_messages#index', as: 'group_messages'
 
-    match '/groups', to: 'groups#index', as: 'groups'
     match '/groups/:id', to: 'groups#show', as: 'show_group'
     match '/groups/:id/is_member', to: 'groups#is_member', as: 'is_member_group'
+
+    match '/one_to_ones/:id', to: 'one_to_ones#show', as: 'one_to_one'
+    match '/one_to_ones/:one_to_one_id/messages/create', to: 'one_to_one_messages#create', as: 'create_one_to_one_message'
+    match '/one_to_ones/:one_to_one_id/messages', to: 'one_to_one_messages#index', as: 'one_to_one_messages'
 
     match '/messages/:id/like', to: 'message_likes#create', as: 'like_message'
     match '/messages/:id/unlike', to: 'message_likes#destroy', as: 'unlike_message'

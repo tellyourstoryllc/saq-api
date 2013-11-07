@@ -5,13 +5,13 @@ class Message
   include ActiveModel::SerializerSupport
   include Redis::Objects
 
-  attr_accessor :id, :group_id, :user_id, :text, :image_file,
+  attr_accessor :id, :group_id, :one_to_one_id, :user_id, :text, :image_file,
     :mentioned_user_ids, :message_image_id, :image_url, :image_thumb_url, :created_at
   hash_key :attrs
   sorted_set :likes
 
-  validates :group_id, :user_id, presence: true
-  validate :text_under_limit?, :text_or_image_set?
+  validates :user_id, presence: true
+  validate :group_id_or_one_to_one_id?, :text_under_limit?, :text_or_image_set?
 
   TEXT_LIMIT = 1_000
 
@@ -28,7 +28,9 @@ class Message
     sanitize_mentioned_user_ids
     save_message_image
     write_attrs
-    add_to_group
+    add_to_conversation
+
+    true
   end
 
   def user
@@ -37,6 +39,10 @@ class Message
 
   def group
     @group ||= Group.find_by(id: group_id) if group_id
+  end
+
+  def one_to_one
+    @one_to_one ||= OneToOne.new(id: one_to_one_id) if one_to_one_id
   end
 
   def mentioned_user_ids
@@ -49,7 +55,7 @@ class Message
 
   def mentioned_users
     if mentioned_user_ids.present?
-      user_ids = mentioned_all? ? group.member_ids.members : mentioned_user_ids
+      user_ids = mentioned_all? ? conversation.fetched_member_ids : mentioned_user_ids
       User.where(id: user_ids)
     else
       []
@@ -64,6 +70,10 @@ class Message
     likes.delete(user.id)
   end
 
+  def conversation
+    group || one_to_one
+  end
+
 
   private
 
@@ -74,15 +84,20 @@ class Message
   def sanitize_mentioned_user_ids
     @mentioned_user_ids = @mentioned_user_ids.to_s.split(',')
 
-    if @mentioned_user_ids.blank? || group.nil?
+    if @mentioned_user_ids.blank? || conversation.nil?
       @mentioned_user_ids = nil
     else
       member_ids = [-1] # @all mention
-      member_ids += group.member_ids.members.map(&:to_i)
+      member_ids += conversation.fetched_member_ids
 
       sanitized_user_ids = @mentioned_user_ids.map(&:to_i) & member_ids
       @mentioned_user_ids = sanitized_user_ids.join(',')
     end
+  end
+
+  def group_id_or_one_to_one_id?
+    attrs = [group_id, one_to_one_id]
+    errors.add(:base, "Must specify exactly one of group_id or one_to_one_id.") if attrs.all?(&:blank?) || attrs.all?(&:present?)
   end
 
   def text_under_limit?
@@ -109,11 +124,13 @@ class Message
       self.message_image_id = @message_image.id
     end
 
-    self.attrs.bulk_set(id: id, group_id: group_id, user_id: user_id, text: text, mentioned_user_ids: @mentioned_user_ids,
-                        message_image_id: message_image_id, image_url: image_url, image_thumb_url: image_thumb_url, created_at: created_at)
+    self.attrs.bulk_set(id: id, group_id: group_id, one_to_one_id: one_to_one_id, user_id: user_id,
+                        text: text, mentioned_user_ids: @mentioned_user_ids, message_image_id: message_image_id,
+                        image_url: image_url, image_thumb_url: image_thumb_url, created_at: created_at)
   end
 
-  def add_to_group
-    group.message_ids[id] = id if group
+  def add_to_conversation
+    convo = conversation
+    convo.message_ids[id] = id if convo
   end
 end
