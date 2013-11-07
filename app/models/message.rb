@@ -1,7 +1,5 @@
 class Message
   include Peanut::RedisModel
-  include ActiveModel::Model
-  include ActiveModel::SerializerSupport
   include Redis::Objects
 
   attr_accessor :id, :group_id, :one_to_one_id, :user_id, :text, :image_file,

@@ -19,6 +19,6 @@ module Peanut::Conversation
       message_ids.range(-limit, -1)
     end
 
-    ids.map{ |id| Message.new(id: id) }
+    Message.pipelined_find(ids)
   end
 end

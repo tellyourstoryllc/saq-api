@@ -1,7 +1,5 @@
 class FayeClient
   include Peanut::RedisModel
-  include ActiveModel::Model
-  include ActiveModel::SerializerSupport
   include Redis::Objects
 
   attr_accessor :id, :user_id, :status, :idled_at, :created_at

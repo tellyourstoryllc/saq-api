@@ -1,7 +1,5 @@
 class OneToOne
   include Peanut::RedisModel
-  include ActiveModel::Model
-  include ActiveModel::SerializerSupport
   include Redis::Objects
   include Peanut::Conversation
 
