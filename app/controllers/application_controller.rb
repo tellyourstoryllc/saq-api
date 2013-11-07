@@ -13,6 +13,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def faye_publisher
+    @faye_publisher ||= FayePublisher.new(params[:token])
+  end
+
 
   private
 

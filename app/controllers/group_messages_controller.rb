@@ -11,7 +11,7 @@ class GroupMessagesController < ApplicationController
 
     if @message.save
       unless params[:skip_publish]
-        FayePublisher.new(params[:token]).publish_to_group(@group, MessageSerializer.new(@message).as_json)
+        faye_publisher.publish_to_group(@group, MessageSerializer.new(@message).as_json)
       end
 
       # Notify all Idle/Unavailable mentioned members

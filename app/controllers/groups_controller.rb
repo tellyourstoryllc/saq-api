@@ -69,6 +69,6 @@ class GroupsController < ApplicationController
   end
 
   def publish_to_group
-    FayePublisher.new(params[:token]).publish_to_group(@group, GroupSerializer.new(@group).as_json)
+    faye_publisher.publish_to_group(@group, GroupSerializer.new(@group).as_json)
   end
 end

@@ -18,7 +18,7 @@ class UsersController < ApplicationController
 
   def update
     current_user.update!(update_user_params)
-    FayePublisher.new(params[:token]).broadcast_to_contacts
+    faye_publisher.broadcast_to_contacts
     render_json current_user
   end
 

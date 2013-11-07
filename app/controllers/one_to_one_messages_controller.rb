@@ -14,12 +14,11 @@ class OneToOneMessagesController < ApplicationController
         # TODO: authenticate as server
         # TODO: move to Sidekiq?
 
-        publisher = FayePublisher.new(params[:token])
         data = MessageSerializer.new(@message).as_json
         users = [current_user, @one_to_one.other_user(current_user)]
 
         users.each do |user|
-          publisher.publish_one_to_one_message(user, data)
+          faye_publisher.publish_one_to_one_message(user, data)
         end
       end
 
