@@ -3,7 +3,7 @@ class Message
   include Redis::Objects
 
   attr_accessor :id, :group_id, :one_to_one_id, :user_id, :text, :image_file,
-    :mentioned_user_ids, :message_image_id, :image_url, :image_thumb_url, :created_at
+    :mentioned_user_ids, :message_image_id, :image_url, :image_thumb_url, :client_metadata, :created_at
   hash_key :attrs
   sorted_set :likes
 
@@ -123,7 +123,7 @@ class Message
 
     self.attrs.bulk_set(id: id, group_id: group_id, one_to_one_id: one_to_one_id, user_id: user_id,
                         text: text, mentioned_user_ids: @mentioned_user_ids, message_image_id: message_image_id,
-                        image_url: image_url, image_thumb_url: image_thumb_url, created_at: created_at)
+                        image_url: image_url, image_thumb_url: image_thumb_url, client_metadata: client_metadata, created_at: created_at)
   end
 
   def add_to_conversation
