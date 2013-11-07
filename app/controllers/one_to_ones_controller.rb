@@ -3,7 +3,11 @@ class OneToOnesController < ApplicationController
 
 
   def show
-    render_json [@one_to_one, @one_to_one.sender, @one_to_one.recipient, @one_to_one.paginate_messages(pagination_params)]
+    if @one_to_one.attrs.present?
+      render_json [@one_to_one, *@one_to_one.members, @one_to_one.paginate_messages(pagination_params)]
+    else
+      render_json @one_to_one.members
+    end
   end
 
 
@@ -11,7 +15,7 @@ class OneToOnesController < ApplicationController
 
   def load_one_to_one
     @one_to_one = OneToOne.new(id: params[:id])
-    raise Peanut::Redis::RecordNotFound unless @one_to_one.attrs.present? && @one_to_one.authorized?(current_user)
+    raise Peanut::Redis::RecordNotFound unless @one_to_one.valid? && @one_to_one.authorized?(current_user)
   end
 
   def pagination_params

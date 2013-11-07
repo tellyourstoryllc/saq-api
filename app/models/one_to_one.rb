@@ -49,6 +49,11 @@ class OneToOne
     [sender_id, recipient_id].compact.map(&:to_i).uniq
   end
 
+  # Find the users seprately so it'll use AR cache in most cases
+  def members
+    fetched_member_ids.map{ |id| User.find_by(id: id) }
+  end
+
   def save
     return unless valid?
 
