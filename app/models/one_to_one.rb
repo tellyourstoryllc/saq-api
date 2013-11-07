@@ -3,6 +3,7 @@ class OneToOne
   include ActiveModel::Model
   include ActiveModel::SerializerSupport
   include Redis::Objects
+  include Peanut::Conversation
 
   attr_accessor :id, :created_at, :sender_id, :recipient_id
 
@@ -11,9 +12,6 @@ class OneToOne
 
   validates :sender_id, :recipient_id, presence: true
   validate :users_are_contacts?
-
-  PAGE_SIZE = 20
-  MAX_PAGE_SIZE = 200
 
 
   def initialize(attributes = {})
@@ -68,21 +66,6 @@ class OneToOne
     elsif user.id == recipient.id
       sender
     end
-  end
-
-  def paginate_messages(options = {})
-    limit = [(options[:limit].presence || PAGE_SIZE).to_i, MAX_PAGE_SIZE].min
-    return [] if limit == 0
-
-    last_message_id = options[:last_message_id]
-
-    ids = if last_message_id.present?
-      message_ids.revrangebyscore("(#{last_message_id}", '-inf', {limit: limit}).reverse
-    else
-      message_ids.range(-limit, -1)
-    end
-
-    ids.map{ |id| Message.new(id: id) }
   end
 
 
