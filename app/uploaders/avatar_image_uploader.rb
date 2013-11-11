@@ -19,9 +19,9 @@ class AvatarImageUploader < CarrierWave::Uploader::Base
   # Provide a default URL as a default if there hasn't been a file uploaded:
   def default_url
     # For Rails 3.1+ asset pipeline compatibility:
-    Rails.configuration.app['assets']['url'] + ActionController::Base.helpers.asset_path("defaults/" + [version_name, "#{model.class.to_s.underscore}.png"].compact.join('_'))
-  
+    #Rails.configuration.app['assets']['url'] + ActionController::Base.helpers.asset_path("defaults/" + [version_name, "#{model.class.to_s.underscore}.png"].compact.join('_'))
     #"#{Rails.configuration.app['assets']['url']}/images/defaults/" + [version_name, "avatar_image.png"].compact.join('_')
+    'https://s3.amazonaws.com/' + Rails.configuration.app['aws']['bucket_name'] + ActionController::Base.helpers.asset_path("/defaults/" + [version_name, "#{model.class.to_s.underscore}.png"].compact.join('_'))
   end
 
   # Process files as they are uploaded:

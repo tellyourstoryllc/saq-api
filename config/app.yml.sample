@@ -1,6 +1,4 @@
 development:
-  assets:
-    url: http://localhost:3003
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
