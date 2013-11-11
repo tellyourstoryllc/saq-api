@@ -79,7 +79,7 @@ class Message
   end
 
   def sanitize_mentioned_user_ids
-    @mentioned_user_ids = @mentioned_user_ids.to_s.split(',')
+    @mentioned_user_ids = @mentioned_user_ids.to_s.split(',') unless @mentioned_user_ids.is_a?(Array)
 
     if @mentioned_user_ids.blank? || conversation.nil?
       @mentioned_user_ids = nil
