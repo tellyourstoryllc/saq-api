@@ -1,4 +1,6 @@
 development:
+  assets:
+    url: http://localhost:3003
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -21,6 +23,8 @@ development:
     url: http://localhost:3001
 
 test:
+  assets:
+    url: http://test.assets
   aws:
     access_key_id: KEY
     secret_access_key: SECRET

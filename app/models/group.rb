@@ -55,7 +55,7 @@ class Group < ActiveRecord::Base
   end
 
   def members
-    User.where(id: member_ids.members)
+    User.includes(:avatar_image).where(id: member_ids.members)
   end
 
   def fetched_member_ids

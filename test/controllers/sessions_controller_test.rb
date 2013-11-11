@@ -15,7 +15,8 @@ describe SessionsController do
       user = FactoryGirl.create(:user, email: 'login_test@example.com', password: 'asdf')
       post :create, {email: 'login_test@example.com', password: 'asdf'}
       result.must_equal [{'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token,
-        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil}]
+        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+        'avatar_url' => 'http://test.assets/assets/defaults/avatar_image.png'}]
     end
   end
 end

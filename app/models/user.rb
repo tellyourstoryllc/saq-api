@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
-  attr_accessor :guest
+  attr_accessor :guest, :avatar_image_file
 
   validates :name, presence: true
   validates :email, format: /.+@.+/, unless: proc{ |u| u.guest }
@@ -11,8 +11,10 @@ class User < ActiveRecord::Base
 
   has_secure_password validations: false
 
+  after_save :create_new_avatar_image, on: :update
   after_create :create_api_token
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
+  has_one :avatar_image, -> { order('avatar_images.id DESC') }
 
   set :group_ids
   set :one_to_one_ids
@@ -28,6 +30,10 @@ class User < ActiveRecord::Base
 
   def token
     @token ||= User.api_tokens[id] if id
+  end
+
+  def avatar_url
+    @avatar_url ||= (avatar_image || AvatarImage.new).image.url
   end
 
   def groups
@@ -110,5 +116,9 @@ class User < ActiveRecord::Base
     end
 
     User.api_tokens[id] = @token
+  end
+
+  def create_new_avatar_image
+    create_avatar_image(image: avatar_image_file) unless avatar_image_file.blank?
   end
 end
