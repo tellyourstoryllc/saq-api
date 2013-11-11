@@ -38,6 +38,14 @@ class User < ActiveRecord::Base
     OneToOne.pipelined_find(one_to_one_ids.members)
   end
 
+  def conversations
+    groups + one_to_ones
+  end
+
+  def clients
+    FayeClient.pipelined_find(connected_faye_client_ids.members)
+  end
+
   def most_recent_faye_client
     @most_recent_faye_client ||= begin
       id = connected_faye_client_ids.last
@@ -89,10 +97,6 @@ class User < ActiveRecord::Base
   def self.contacts?(user1, user2)
     return false if user1.blank? || user2.blank?
     user1.contact_ids.include?(user2.id) && user2.contact_ids.include?(user1.id)
-  end
-
-  def conversations
-    groups + one_to_ones
   end
 
 
