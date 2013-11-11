@@ -13,7 +13,8 @@ class OneToOne
 
 
   def initialize(attributes = {})
-    super
+    attributes = attributes.with_indifferent_access
+    super(attributes)
     self.id = attributes[:id]
 
     if id.present?

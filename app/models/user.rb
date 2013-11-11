@@ -35,7 +35,7 @@ class User < ActiveRecord::Base
   end
 
   def one_to_ones
-    one_to_one_ids.members.map{ |id| OneToOne.new(id: id) }
+    OneToOne.pipelined_find(one_to_one_ids.members)
   end
 
   def most_recent_faye_client
