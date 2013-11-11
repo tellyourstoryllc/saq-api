@@ -22,10 +22,9 @@ class OneToOneMessagesController < ApplicationController
         end
       end
 
-      # Notify all Idle/Unavailable mentioned members
-      @message.mentioned_users.each do |recipient|
-        MessageMailer.mention(@message, recipient, recipient.computed_status).deliver! if recipient.idle_or_unavailable?
-      end
+      # Notify the other user if he's Idle/Unavailable
+      recipient = @one_to_one.other_user(current_user)
+      MessageMailer.one_to_one(@message, recipient, recipient.computed_status).deliver! if recipient.idle_or_unavailable?
 
       render_json @message
     else

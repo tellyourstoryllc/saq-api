@@ -11,4 +11,13 @@ class MessageMailer < ActionMailer::Base
 
     mail(to: @recipient.email, subject: "#{@user.name} mentioned #{@mentioned_name} in the room \"#{@group.name}\"")
   end
+
+  def one_to_one(message, recipient, status)
+    @recipient = recipient
+    @status = status
+    @message = message
+    @user = @message.user
+
+    mail(to: @recipient.email, subject: "#{@user.name} sent you a 1-1 message")
+  end
 end
