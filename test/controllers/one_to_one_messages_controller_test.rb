@@ -47,8 +47,8 @@ describe OneToOneMessagesController do
                           'group_id' => nil, 'one_to_one_id' => one_to_one.id,
                           'user_id' => current_user.id, 'text' => text,
                           'mentioned_user_ids' => [], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'likes_count' => 0,
-                          'created_at' => now.to_i}])
+                          'image_thumb_url' => nil, 'client_metadata' => nil,
+                          'likes_count' => 0, 'created_at' => now.to_i}])
 
         one_to_one.message_ids.last.to_i.must_equal message_id
 
@@ -79,8 +79,8 @@ describe OneToOneMessagesController do
                           'group_id' => nil, 'one_to_one_id' => one_to_one_id,
                           'user_id' => current_user.id, 'text' => text,
                           'mentioned_user_ids' => [], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'likes_count' => 0,
-                          'created_at' => now.to_i}])
+                          'image_thumb_url' => nil, 'client_metadata' => nil,
+                          'likes_count' => 0, 'created_at' => now.to_i}])
 
         one_to_one = OneToOne.new(sender_id: current_user.id, recipient_id: member.id)
         one_to_one.attrs.wont_be_empty
