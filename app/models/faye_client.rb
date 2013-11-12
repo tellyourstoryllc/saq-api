@@ -4,6 +4,7 @@ class FayeClient
 
   attr_accessor :id, :user_id, :status, :idled_at, :created_at
   hash_key :attrs
+  value :exists
 
   validates :id, :user_id, presence: true
   validates :idled_at, presence: true, if: proc{ |faye_client| faye_client.status == 'idle' }
