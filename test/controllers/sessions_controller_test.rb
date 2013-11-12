@@ -16,7 +16,7 @@ describe SessionsController do
       post :create, {email: 'login_test@example.com', password: 'asdf'}
       result.must_equal [{'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token,
         'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-        'avatar_url' => 'http://test.assets/assets/defaults/avatar_image.png'}]
+        'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'}]
     end
   end
 end

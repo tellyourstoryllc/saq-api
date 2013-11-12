@@ -112,12 +112,12 @@ describe GroupsController do
         {
           'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
           'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around',
-          'avatar_url' => 'http://test.assets/assets/defaults/avatar_image.png'
+          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
         },
         {
           'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
           'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'token' => current_user.token,
-          'avatar_url' => 'http://test.assets/assets/defaults/avatar_image.png'
+          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
         },
         {
           'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
@@ -194,12 +194,12 @@ describe GroupsController do
           {
             'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
             'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around',
-            'avatar_url' => 'http://test.assets/assets/defaults/avatar_image.png'
+            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
           },
           {
             'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
             'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'token' => current_user.token,
-            'avatar_url' => 'http://test.assets/assets/defaults/avatar_image.png'
+            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
           },
           {
             'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
@@ -250,12 +250,12 @@ describe GroupsController do
           {
             'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
             'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around',
-            'avatar_url' => 'http://test.assets/assets/defaults/avatar_image.png'
+            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
           },
           {
             'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
             'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'token' => current_user.token,
-            'avatar_url' => 'http://test.assets/assets/defaults/avatar_image.png'
+            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
           },
           {
             'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,
