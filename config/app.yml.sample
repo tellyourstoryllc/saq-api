@@ -5,6 +5,7 @@ development:
     bucket_name: MEDIA.SOMETHING.COM
   faye:
     url: http://localhost:8080/faye
+    server_secret: SECRET
   redis:
     persisted:
       host: 127.0.0.1
@@ -29,6 +30,7 @@ test:
     bucket_name: MEDIA.SOMETHING.COM
   faye:
     url: http://localhost:8080/faye
+    server_secret: SECRET
   redis:
     persisted:
       host: 127.0.0.1

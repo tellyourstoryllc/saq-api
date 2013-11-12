@@ -1,5 +1,6 @@
 class FayePublisher
   ENDPOINT = URI.parse(Rails.configuration.app['faye']['url'])
+  SECRET = Rails.configuration.app['faye']['server_secret']
   attr_accessor :token
 
 
@@ -11,7 +12,7 @@ class FayePublisher
     message = {
       channel: channel,
       data: data,
-      ext: ext.merge(token: token)
+      ext: ext.merge(token: token, server_secret: SECRET)
     }
 
     Net::HTTP.post_form(ENDPOINT, message: message.to_json)
