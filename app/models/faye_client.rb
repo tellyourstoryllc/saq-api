@@ -52,6 +52,7 @@ class FayeClient
     redis.multi do
       remove_from_user
       attrs.del
+      exists.del
     end
   end
 
