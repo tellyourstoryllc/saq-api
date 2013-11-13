@@ -105,7 +105,17 @@ class User < ActiveRecord::Base
 
   def self.contacts?(user1, user2)
     return false if user1.blank? || user2.blank?
-    user1.contact_ids.include?(user2.id) && user2.contact_ids.include?(user1.id)
+    user1.id == user2.id || user1.contact_ids.include?(user2.id)
+  end
+
+  def contact?(user)
+    return unless user && user.is_a?(User)
+
+    @contacts_memoizer ||= {}
+    is_contact = @contacts_memoizer[user.id]
+    return is_contact unless is_contact.nil?
+
+    @contacts_memoizer[user.id] = self.class.contacts?(self, user)
   end
 
 

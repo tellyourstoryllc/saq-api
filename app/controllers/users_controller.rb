@@ -6,6 +6,11 @@ class UsersController < ApplicationController
     render_json current_user
   end
 
+  def index
+    ids = params[:ids].split(',') unless ids.is_a?(Array)
+    render_json User.find(ids)
+  end
+
   def create
     @current_user = User.create!(user_params)
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
