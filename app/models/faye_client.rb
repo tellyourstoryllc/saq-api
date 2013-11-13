@@ -2,7 +2,7 @@ class FayeClient
   include Peanut::RedisModel
   include Redis::Objects
 
-  attr_accessor :id, :user_id, :status, :idled_at, :created_at
+  attr_accessor :id, :user_id, :status, :idled_at, :client_type, :created_at
   hash_key :attrs
   value :exists
 
@@ -30,9 +30,14 @@ class FayeClient
     Time.current.to_i - idled_at.to_i if idled_at.present?
   end
 
+  def client_type=(type)
+    @client_type = type if %w(web phone tablet).include?(type)
+  end
+
   def save
     return unless valid?
 
+    set_defaults
     write_attrs
     add_to_user
   end
@@ -56,9 +61,14 @@ class FayeClient
     end
   end
 
-  def write_attrs
+  def set_defaults
     self.created_at ||= Time.current.to_i
-    self.attrs.bulk_set(id: id, user_id: user_id, status: status, idled_at: idled_at, created_at: created_at)
+    self.client_type ||= 'web' # TODO: temporary until all clients have updated
+  end
+
+  def write_attrs
+    self.attrs.bulk_set(id: id, user_id: user_id, status: status, idled_at: idled_at,
+                        client_type: client_type, created_at: created_at)
   end
 
   def add_to_user

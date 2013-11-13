@@ -6,6 +6,7 @@ class FayeClientsController < ApplicationController
     @faye_client.user_id = current_user.id
     @faye_client.status = params[:status]
     @faye_client.idle_duration = params[:idle_duration]
+    @faye_client.client_type = params[:client_type]
 
     if @faye_client.save
       render_json current_user

@@ -54,13 +54,6 @@ class User < ActiveRecord::Base
 
   def most_recent_faye_client
     @most_recent_faye_client ||= begin
-      id = connected_faye_client_ids.last
-      FayeClient.new(id: id) if id
-    end
-  end
-
-  def computed_status
-    @computed_status ||= begin
       client = nil
       ids = connected_faye_client_ids.revrange(0, -1)
 
@@ -75,14 +68,24 @@ class User < ActiveRecord::Base
         end
       end
 
-      if client.nil?
-        'unavailable'
-      elsif client.idle?
-        'idle'
-      else
-        self[:status]
-      end
+      client
     end
+  end
+
+  def computed_status
+    client = most_recent_faye_client
+
+    if client.nil?
+      'unavailable'
+    elsif client.idle?
+      'idle'
+    else
+      self[:status]
+    end
+  end
+
+  def computed_client_type
+    most_recent_faye_client.try(:client_type)
   end
 
   def idle_duration
