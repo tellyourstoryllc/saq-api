@@ -1,6 +1,10 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :object_type, :id, :token, :name, :status, :status_text, :idle_duration, :client_type, :avatar_url
 
+  def name
+    object.name if current_user && current_user.contact?(object)
+  end
+
   def status
     if current_user && current_user.contact?(object)
       object.computed_status
@@ -22,6 +26,14 @@ class UserSerializer < ActiveModel::Serializer
       object.computed_client_type
     else
       'web'
+    end
+  end
+
+  def avatar_url
+    if current_user && current_user.contact?(object)
+      object.avatar_url
+    else
+      AvatarImage.new.image.thumb.default_url
     end
   end
 
