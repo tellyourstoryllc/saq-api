@@ -111,12 +111,13 @@ describe GroupsController do
         },
         {
           'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
-          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around',
+          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
           'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
         },
         {
           'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
-          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'token' => current_user.token,
+          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+          'token' => current_user.token, 'client_type' => nil,
           'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
         },
         {
@@ -172,7 +173,7 @@ describe GroupsController do
         group.add_member(member)
 
         current_user.update!(status: 'away', status_text: 'be back soon')
-        FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
+        FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active', client_type: 'phone')
 
         m1 = Message.new(group_id: group.id, user_id: member.id, text: 'hey guys')
         m1.save
@@ -193,12 +194,13 @@ describe GroupsController do
           },
           {
             'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
-            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around',
+            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
             'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
           },
           {
             'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
-            'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'token' => current_user.token,
+            'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
+            'token' => current_user.token, 'client_type' => 'phone',
             'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
           },
           {
@@ -249,12 +251,13 @@ describe GroupsController do
           },
           {
             'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe',
-            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around',
+            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
             'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
           },
           {
             'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe',
-            'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'token' => current_user.token,
+            'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
+            'token' => current_user.token, 'client_type' => 'web',
             'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
           },
           {

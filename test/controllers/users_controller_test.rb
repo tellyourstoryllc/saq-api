@@ -17,7 +17,7 @@ describe UsersController do
         user = User.last
         result.must_equal [{'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'}]
+          'client_type' => nil, 'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'}]
       end
 
       it "must create a user and a group" do
@@ -28,7 +28,7 @@ describe UsersController do
 
         result.must_equal [
           {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'token' => user.token,
-            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
             'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'},
           {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
             'topic' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id]}
@@ -45,7 +45,7 @@ describe UsersController do
 
       result.must_equal [
         {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny', 'token' => current_user.token,
-          'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
+          'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'client_type' => 'web',
           'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'}
       ]
     end
