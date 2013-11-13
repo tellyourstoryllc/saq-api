@@ -7,7 +7,7 @@ class FayeClient
   value :exists
 
   validates :id, :user_id, presence: true
-  validates :idled_at, presence: true, if: proc{ |faye_client| faye_client.status == 'idle' }
+  validates :idled_at, presence: true, if: proc{ |faye_client| faye_client.status == 'idle' && !%w(phone tablet).include?(faye_client.client_type) }
 
 
   def initialize(attributes = {})
