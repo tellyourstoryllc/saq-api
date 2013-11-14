@@ -132,6 +132,10 @@ class User < ActiveRecord::Base
     away_idle_or_unavailable?
   end
 
+  def preferences
+    Preferences.new(id: id)
+  end
+
 
   private
 

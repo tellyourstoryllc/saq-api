@@ -45,4 +45,16 @@ module Peanut::RedisModel
       send("#{attr}=", value.present? ? value.to_i : nil)
     end
   end
+
+  def to_bool(*attrs)
+    attrs.each do |attr|
+      value = send(attr)
+      new_value = case value
+                  when true, 'true', 1, '1' then true
+                  when false, 'false', 0, '0' then false
+                  else nil
+                  end
+      send("#{attr}=", new_value)
+    end
+  end
 end
