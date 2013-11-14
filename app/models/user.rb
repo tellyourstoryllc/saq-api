@@ -125,22 +125,6 @@ class User < ActiveRecord::Base
 
   private
 
-  def username_format?
-    return if username.blank?
-    valid = username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9]{2,16}\Z/
-    errors.add(:username, "must be 2-16 characters, include at least one letter, and contain only letters and numbers") unless valid
-  end
-
-  def create_api_token
-    loop do
-      @token = SecureRandom.hex
-      saved = redis.hsetnx(User.user_ids_by_api_token.key, @token, id)
-      break if saved
-    end
-
-    User.api_tokens[id] = @token
-  end
-
   def set_username
     return if username.present?
 
@@ -152,6 +136,23 @@ class User < ActiveRecord::Base
       self.username = 'user_' + Array.new(6){ chars.sample }.join
       break unless User.where(username: username).exists?
     end
+  end
+
+  def username_format?
+    return if username.blank?
+    valid = username =~ /\Auser_[a-km-z]{6}\Z/ # system username
+    valid ||= username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9]{2,16}\Z/
+    errors.add(:username, "must be 2-16 characters, include at least one letter, and contain only letters and numbers") unless valid
+  end
+
+  def create_api_token
+    loop do
+      @token = SecureRandom.hex
+      saved = redis.hsetnx(User.user_ids_by_api_token.key, @token, id)
+      break if saved
+    end
+
+    User.api_tokens[id] = @token
   end
 
   def create_new_avatar_image
