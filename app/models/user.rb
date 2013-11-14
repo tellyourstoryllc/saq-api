@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
   validates :email, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
   validates :password, presence: true, on: :create, unless: proc{ |u| u.guest }
+  validate :username_format?
 
   has_secure_password validations: false
 
@@ -123,6 +124,12 @@ class User < ActiveRecord::Base
 
 
   private
+
+  def username_format?
+    return if username.blank?
+    valid = username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9]{2,16}\Z/
+    errors.add(:username, "must be 2-16 characters, include at least one letter, and contain only letters and numbers") unless valid
+  end
 
   def create_api_token
     loop do
