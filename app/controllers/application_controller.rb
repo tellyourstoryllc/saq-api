@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   before_action :require_token
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
+  rescue_from ActiveRecord::RecordInvalid, with: :render_422
 
 
   def current_user
@@ -43,5 +44,9 @@ class ApplicationController < ActionController::Base
 
   def render_404(exception)
     render_error 'Sorry, that could not be found.', nil, status: :not_found
+  end
+
+  def render_422(exception)
+    render_error "Sorry, that could not be saved: #{exception}.", nil, status: :unprocessable_entity
   end
 end

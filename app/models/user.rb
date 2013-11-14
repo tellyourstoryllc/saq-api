@@ -3,7 +3,10 @@ class User < ActiveRecord::Base
   include Redis::Objects
   attr_accessor :guest, :avatar_image_file
 
-  validates :name, presence: true
+  before_validation :set_username, on: :create
+
+  validates :name, :username, presence: true
+  validates :username, uniqueness: true
   validates :email, format: /.+@.+/, unless: proc{ |u| u.guest }
   validates :email, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
@@ -129,6 +132,19 @@ class User < ActiveRecord::Base
     end
 
     User.api_tokens[id] = @token
+  end
+
+  def set_username
+    return if username.present?
+
+    # Lowercase alpha chars only to make it easier to type on mobile
+    # Exclude L to avoid any confusion
+    chars = [*'a'..'k', *'m'..'z']
+
+    loop do
+      self.username = 'user_' + Array.new(6){ chars.sample }.join
+      break unless User.where(username: username).exists?
+    end
   end
 
   def create_new_avatar_image

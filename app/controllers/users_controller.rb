@@ -36,7 +36,7 @@ class UsersController < ApplicationController
   end
 
   def update_user_params
-    params.permit(:name, :password, :status, :status_text, :avatar_image_file)
+    params.permit(:name, :username, :password, :status, :status_text, :avatar_image_file)
   end
 
   def group_params

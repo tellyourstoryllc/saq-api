@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :object_type, :id, :token, :name, :status, :status_text, :idle_duration, :client_type, :avatar_url
+  attributes :object_type, :id, :token, :name, :username, :status, :status_text, :idle_duration, :client_type, :avatar_url
 
   def name
     object.name if current_user && current_user.contact?(object)
