@@ -8,6 +8,7 @@ class PreferencesController < ApplicationController
     end
 
     if @preferences.save
+      faye_publisher.publish_preferences(@preferences, PreferencesSerializer.new(@preferences).as_json)
       render_json @preferences
     else
       render_error @preferences.errors.full_messages
