@@ -53,6 +53,7 @@ class Message
   def mentioned_users
     if mentioned_user_ids.present?
       user_ids = mentioned_all? ? conversation.fetched_member_ids : mentioned_user_ids
+      user_ids.delete(user_id)
       User.where(id: user_ids)
     else
       []
