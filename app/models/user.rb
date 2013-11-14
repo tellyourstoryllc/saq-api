@@ -96,8 +96,8 @@ class User < ActiveRecord::Base
     most_recent_faye_client.try(:idle_duration)
   end
 
-  def idle_or_unavailable?
-    %w(idle unavailable).include?(computed_status)
+  def away_idle_or_unavailable?
+    %w(away idle unavailable).include?(computed_status)
   end
 
   def contact_ids
@@ -120,6 +120,16 @@ class User < ActiveRecord::Base
     return is_contact unless is_contact.nil?
 
     @contacts_memoizer[user.id] = self.class.contacts?(self, user)
+  end
+
+  def email_for_mention?
+    # TODO: also check preferences
+    away_idle_or_unavailable?
+  end
+
+  def email_for_one_to_one?
+    # TODO: also check preferences
+    away_idle_or_unavailable?
   end
 
 

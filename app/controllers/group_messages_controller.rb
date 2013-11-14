@@ -16,7 +16,7 @@ class GroupMessagesController < ApplicationController
 
       # Notify all Idle/Unavailable mentioned members
       @message.mentioned_users.each do |recipient|
-        MessageMailer.mention(@message, recipient, recipient.computed_status).deliver! if recipient.idle_or_unavailable?
+        MessageMailer.mention(@message, recipient, recipient.computed_status).deliver! if recipient.email_for_mention?
       end
 
       render_json @message
