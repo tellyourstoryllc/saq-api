@@ -3,14 +3,17 @@ class Group < ActiveRecord::Base
   include Redis::Objects
   include Peanut::Conversation
 
-  attr_accessor :anything_changed
+  attr_accessor :anything_changed, :wallpaper_image_file, :wallpaper_creator_id
 
   before_validation :set_join_code, on: :create
   validates :creator_id, :name, :join_code, presence: true
-  after_create :add_admin_and_member
+
   after_save :anything_changed?
+  after_save :create_new_group_wallpaper_image, on: :update
+  after_create :add_admin_and_member
 
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
+  has_one :group_wallpaper_image, -> { order('group_wallpaper_images.id DESC') }
 
   set :admin_ids
   set :member_ids
@@ -31,6 +34,10 @@ class Group < ActiveRecord::Base
 
   def remove_admin(user)
     admin_ids.delete(user.id)
+  end
+
+  def wallpaper_url
+    @wallpaper_url ||= group_wallpaper_image.image.url if group_wallpaper_image
   end
 
   def add_member(user)
@@ -76,14 +83,18 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def create_new_group_wallpaper_image
+    create_group_wallpaper_image(creator_id: wallpaper_creator_id, image: wallpaper_image_file) unless wallpaper_image_file.blank?
+  end
+
+  def anything_changed?
+    self.anything_changed = changed? || (wallpaper_image_file && wallpaper_creator_id)
+  end
+
   def add_admin_and_member
     return unless creator
 
     add_admin(creator)
     add_member(creator)
-  end
-
-  def anything_changed?
-    self.anything_changed = changed?
   end
 end

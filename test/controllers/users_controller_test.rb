@@ -31,7 +31,7 @@ describe UsersController do
             'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
             'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'},
           {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
-            'topic' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id]}
+            'topic' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id]}
         ]
       end
     end

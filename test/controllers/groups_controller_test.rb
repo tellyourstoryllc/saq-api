@@ -16,7 +16,7 @@ describe GroupsController do
 
         group = Group.last
         result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
           'admin_ids' => [current_user.id], 'member_ids' => [current_user.id]}]
       end
     end
@@ -47,7 +47,7 @@ describe GroupsController do
       post :update, {id: group.id, topic: 'new topic', token: current_user.token}
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => 'new topic',
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => 'new topic', 'wallpaper_url' => nil,
         'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id]}]
     end
 
@@ -62,7 +62,7 @@ describe GroupsController do
       post :update, {id: group.id, name: 'Really Cool Dudes', token: current_user.token}
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
         'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id]}]
     end
 
@@ -78,7 +78,7 @@ describe GroupsController do
       post :update, {id: group.id, name: 'Really Cool Dudes', token: current_user.token}
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Really Cool Dudes',
-        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
         'admin_ids' => [member.id, current_user.id], 'member_ids' => [member.id, current_user.id]}]
     end
   end
@@ -106,7 +106,7 @@ describe GroupsController do
       result.must_equal [
         {
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
           'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id]
         },
         {
@@ -189,7 +189,7 @@ describe GroupsController do
         result.must_equal [
           {
             'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
             'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id]
           },
           {
@@ -246,7 +246,7 @@ describe GroupsController do
         result.must_equal [
           {
             'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
             'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id]
           },
           {
