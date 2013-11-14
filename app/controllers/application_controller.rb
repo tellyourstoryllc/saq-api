@@ -1,3 +1,5 @@
+require 'active_record/validations'
+
 class ApplicationController < ActionController::Base
   before_action :require_token
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
