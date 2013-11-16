@@ -26,6 +26,7 @@ class User < ActiveRecord::Base
   hash_key :api_tokens, global: true
   hash_key :user_ids_by_api_token, global: true
   sorted_set :connected_faye_client_ids
+  value :idle_since
 
 
   def first_name
@@ -93,7 +94,8 @@ class User < ActiveRecord::Base
   end
 
   def idle_duration
-    most_recent_faye_client.try(:idle_duration)
+    since = idle_since.value
+    Time.current.to_i - since.to_i if since.present?
   end
 
   def away_idle_or_unavailable?

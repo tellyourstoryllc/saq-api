@@ -2,17 +2,17 @@ class FayeClient
   include Peanut::RedisModel
   include Redis::Objects
 
-  attr_accessor :id, :user_id, :status, :idled_at, :client_type, :created_at
+  attr_accessor :id, :user_id, :status, :client_type, :created_at, :idle_duration
   hash_key :attrs
   value :exists
 
   validates :id, :user_id, presence: true
-  validates :idled_at, presence: true, if: proc{ |faye_client| faye_client.status == 'idle' && !%w(phone tablet).include?(faye_client.client_type) }
+  validates :idle_duration, presence: true, if: proc{ |faye_client| faye_client.status == 'idle' && !%w(phone tablet).include?(faye_client.client_type) }
 
 
   def initialize(attributes = {})
     super
-    to_int(:user_id, :idled_at, :created_at) if id.present?
+    to_int(:user_id, :created_at) if id.present?
   end
 
   def active?; status == 'active' end
@@ -20,14 +20,6 @@ class FayeClient
 
   def status=(new_status)
     @status = new_status if %w(active idle).include?(new_status)
-  end
-
-  def idle_duration=(duration)
-    self.idled_at = duration.to_i.seconds.ago.to_i if duration.present?
-  end
-
-  def idle_duration
-    Time.current.to_i - idled_at.to_i if idled_at.present?
   end
 
   def client_type=(type)
@@ -39,7 +31,9 @@ class FayeClient
 
     set_defaults
     write_attrs
-    add_to_user
+    update_user
+
+    true
   end
   alias_method :save!, :save
 
@@ -67,12 +61,21 @@ class FayeClient
   end
 
   def write_attrs
-    self.attrs.bulk_set(id: id, user_id: user_id, status: status, idled_at: idled_at,
-                        client_type: client_type, created_at: created_at)
+    self.attrs.bulk_set(id: id, user_id: user_id, status: status, client_type: client_type, created_at: created_at)
   end
 
-  def add_to_user
+  def update_user
     user.connected_faye_client_ids[id] = Time.current.to_i if user
+
+    if status == 'active'
+      user.idle_since.del
+    elsif status == 'idle' && idle_duration.present? && user.clients.none?(&:active?)
+      # Update the time the user has been idle since if it's most recent
+      old_time = user.idle_since.try(:to_i)
+      new_time = idle_duration.to_i.seconds.ago.to_i
+
+      user.idle_since = new_time if old_time.nil? || new_time > old_time
+    end
   end
 
   def remove_from_user
