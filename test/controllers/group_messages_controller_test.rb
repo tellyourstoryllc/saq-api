@@ -31,6 +31,7 @@ describe GroupMessagesController do
       group.add_member(current_user)
 
       user = FactoryGirl.create(:user)
+      FactoryGirl.create(:account, user_id: user.id)
       group.add_member(user)
 
       text = 'hey everyone'
@@ -53,9 +54,11 @@ describe GroupMessagesController do
       group.add_member(current_user)
 
       u1 = FactoryGirl.create(:user)
+      FactoryGirl.create(:account, user_id: u1.id)
       group.add_member(u1)
 
       u2 = FactoryGirl.create(:user)
+      FactoryGirl.create(:account, user_id: u2.id)
       group.add_member(u2)
 
       text = 'hey everyone'
@@ -78,6 +81,7 @@ describe GroupMessagesController do
       group.add_member(current_user)
 
       u1 = FactoryGirl.create(:user)
+      FactoryGirl.create(:account, user_id: u1.id)
       group.add_member(u1)
 
       text = 'hey everyone'

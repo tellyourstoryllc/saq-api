@@ -1,24 +1,22 @@
 class User < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
-  attr_accessor :guest, :avatar_image_file
+  attr_accessor :avatar_image_file
 
   before_validation :set_username, on: :create
 
   validates :name, :username, presence: true
   validates :username, uniqueness: true
-  validates :email, format: /.+@.+/, unless: proc{ |u| u.guest }
-  validates :email, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
-  validates :password, presence: true, on: :create, unless: proc{ |u| u.guest }
-  validate :username_format?
 
-  has_secure_password validations: false
+  validate :username_format?
 
   after_save :create_new_avatar_image, on: :update
   after_create :create_api_token
-  has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
+
+  has_one :account
   has_one :avatar_image, -> { order('avatar_images.id DESC') }
+  has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
 
   set :group_ids
   set :one_to_one_ids
@@ -27,6 +25,8 @@ class User < ActiveRecord::Base
   hash_key :user_ids_by_api_token, global: true
   sorted_set :connected_faye_client_ids
   value :idle_since
+
+  delegate :email, to: :account
 
 
   def first_name
