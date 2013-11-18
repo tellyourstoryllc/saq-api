@@ -19,6 +19,7 @@ development:
     username: USERNAME
     password: PASSWORD
   web:
+    domain: localhost:3001
     url: http://localhost:3001
 
 test:
@@ -44,4 +45,5 @@ test:
     username: USERNAME
     password: PASSWORD
   web:
+    domain: test.host
     url: http://test.host

@@ -1,6 +1,4 @@
-class MessageMailer < ActionMailer::Base
-  default from: "groupchatappthing@example.com"
-
+class MessageMailer < BaseMailer
   def mention(message, recipient, status)
     @recipient = recipient
     @status = status
