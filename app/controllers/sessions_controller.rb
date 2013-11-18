@@ -3,10 +3,11 @@ class SessionsController < ApplicationController
 
 
   def create
-    @current_user = User.find_by(email: params[:email])
+    @account = Account.find_by(email: params[:email])
 
-    if @current_user.try(:authenticate, params[:password])
-      render_json @current_user
+    if @account.try(:authenticate, params[:password])
+      @current_user = @account.user
+      render_json [current_user, @account]
     else
       render_error 'Invalid credentials.'
     end

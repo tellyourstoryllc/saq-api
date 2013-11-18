@@ -4,6 +4,7 @@ ChatApp::Application.routes.draw do
     match '/users', to: 'users#index', as: 'users'
     match '/users/create', to: 'users#create', as: 'create_user'
     match '/users/update', to: 'users#update', as: 'update_user'
+    match '/accounts/update', to: 'accounts#update', as: 'update_account'
     match '/preferences/update', to: 'preferences#update', as: 'update_preferences'
 
     match '/login', to: 'sessions#create', as: 'login'

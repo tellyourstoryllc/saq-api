@@ -1,7 +1,7 @@
 require "test_helper"
 
 describe User do
-  let(:user) { User.new(name: 'Joe', email: 'joe@example.com', password: 'asdf') }
+  let(:user) { User.new(name: 'Joe') }
 
   it "must be valid" do
     user.valid?.must_equal true

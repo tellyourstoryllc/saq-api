@@ -29,7 +29,7 @@ test:
     secret_access_key: SECRET
     bucket_name: MEDIA.SOMETHING.COM
   faye:
-    url: http://localhost:8080/faye
+    url: http://localhost:8080/faye_TEST
     server_secret: SECRET
   redis:
     persisted:

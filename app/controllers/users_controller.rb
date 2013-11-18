@@ -13,13 +13,11 @@ class UsersController < ApplicationController
   end
 
   def create
-    @current_user = User.create!(user_params)
+    @account = Account.create!(account_params.merge(user_attributes: user_params))
+    @current_user = @account.user
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
-    render_json [@current_user, @group].compact
-
-  rescue ActiveRecord::RecordInvalid => e
-    render_error e.message
+    render_json [@current_user, @account, @group].compact
   end
 
   def update
@@ -31,12 +29,16 @@ class UsersController < ApplicationController
 
   private
 
+  def account_params
+    params.permit(:email, :password)
+  end
+
   def user_params
-    params.permit(:name, :email, :password)
+    params.permit(:name)
   end
 
   def update_user_params
-    params.permit(:name, :username, :password, :status, :status_text, :avatar_image_file)
+    params.permit(:name, :username, :status, :status_text, :avatar_image_file)
   end
 
   def group_params

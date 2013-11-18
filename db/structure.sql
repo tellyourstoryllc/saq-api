@@ -16,6 +16,25 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `accounts`
+--
+
+DROP TABLE IF EXISTS `accounts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `accounts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `password_digest` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_accounts_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `api_tokens`
 --
 
@@ -135,6 +154,25 @@ CREATE TABLE `message_images` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `one_to_one_wallpaper_images`
+--
+
+DROP TABLE IF EXISTS `one_to_one_wallpaper_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `one_to_one_wallpaper_images` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_one_to_one_wallpaper_images_on_account_id` (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `schema_migrations`
 --
 
@@ -179,7 +217,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-14 15:57:52
+-- Dump completed on 2013-11-18 10:45:20
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -211,3 +249,7 @@ INSERT INTO schema_migrations (version) VALUES ('20131111204037');
 INSERT INTO schema_migrations (version) VALUES ('20131114141853');
 
 INSERT INTO schema_migrations (version) VALUES ('20131114201706');
+
+INSERT INTO schema_migrations (version) VALUES ('20131114221959');
+
+INSERT INTO schema_migrations (version) VALUES ('20131118153325');
