@@ -4,6 +4,17 @@ class AccountsController < ApplicationController
 
   def update
     @account = current_user.account
+
+    password = params.delete(:password)
+
+    if password
+      if @account.authenticate(password)
+        @authenticated = true
+      else
+        render_error('Incorrect credentials.', nil, {status: :unauthorized}) and return
+      end
+    end
+
     @account.update!(update_account_params)
     render_json @account
   end
@@ -41,10 +52,8 @@ class AccountsController < ApplicationController
   private
 
   def update_account_params
-    params.permit(:password, :email, :new_password, :one_to_one_wallpaper_image_file).tap do |attrs|
-      password = attrs.delete(:password)
-
-      if @account.authenticate(password)
+    params.permit(:email, :new_password, :one_to_one_wallpaper_image_file).tap do |attrs|
+      if @authenticated
         attrs[:password] = attrs.delete(:new_password) if attrs[:new_password].present?
       else
         attrs.delete(:email)

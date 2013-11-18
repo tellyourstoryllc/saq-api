@@ -9,7 +9,7 @@ class SessionsController < ApplicationController
       @current_user = @account.user
       render_json [current_user, @account]
     else
-      render_error 'Invalid credentials.'
+      render_error('Incorrect credentials.', nil, {status: :unauthorized})
     end
   end
 end

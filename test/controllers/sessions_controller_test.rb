@@ -4,11 +4,11 @@ describe SessionsController do
   describe "POST /login" do
     it "must not log in user when credentials are incorrect" do
       post :create, {email: 'login_test@example.com', password: 'incorrect'}
-      result.must_equal('error' => {'message' => 'Invalid credentials.'})
+      result.must_equal('error' => {'message' => 'Incorrect credentials.'})
 
       FactoryGirl.create(:account, email: 'login_test@example.com', password: 'asdf')
       post :create, {email: 'login_test@example.com', password: 'incorrect'}
-      result.must_equal('error' => {'message' => 'Invalid credentials.'})
+      result.must_equal('error' => {'message' => 'Incorrect credentials.'})
     end
 
     it "must log in account when credentials are correct" do
