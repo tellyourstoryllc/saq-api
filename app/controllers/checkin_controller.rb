@@ -11,6 +11,7 @@ class CheckinController < ApplicationController
 
     objects << meta
     objects << current_user
+    objects << current_user.account
     objects << current_user.preferences
     objects += Emoticon.by_version(params[:emoticons_version])
 
