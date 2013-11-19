@@ -15,7 +15,7 @@ class Message
 
   def initialize(attributes = {})
     super
-    to_int(:id, :user_id, :created_at) if id.present?
+    to_int(:id, :created_at) if id.present?
   end
 
   def save
@@ -43,11 +43,11 @@ class Message
   end
 
   def mentioned_user_ids
-    @mentioned_user_ids.present? ? @mentioned_user_ids.to_s.split(',').map(&:to_i) : []
+    @mentioned_user_ids.present? ? @mentioned_user_ids.to_s.split(',') : []
   end
 
   def mentioned_all?
-    mentioned_user_ids.include?(-1)
+    mentioned_user_ids.include?('-1')
   end
 
   def mentioned_users
@@ -85,10 +85,10 @@ class Message
     if @mentioned_user_ids.blank? || conversation.nil?
       @mentioned_user_ids = nil
     else
-      member_ids = [-1] # @all mention
+      member_ids = ['-1'] # @all mention
       member_ids += conversation.fetched_member_ids
 
-      sanitized_user_ids = @mentioned_user_ids.map(&:to_i) & member_ids
+      sanitized_user_ids = @mentioned_user_ids & member_ids
       @mentioned_user_ids = sanitized_user_ids.join(',')
     end
   end

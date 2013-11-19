@@ -12,7 +12,7 @@ class FayeClient
 
   def initialize(attributes = {})
     super
-    to_int(:user_id, :created_at) if id.present?
+    to_int(:created_at) if id.present?
   end
 
   def active?; status == 'active' end

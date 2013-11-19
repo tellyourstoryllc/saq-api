@@ -20,6 +20,6 @@ class FayeClientsController < ApplicationController
 
   def load_faye_client
     @faye_client = FayeClient.new(id: params[:id])
-    raise Peanut::Redis::RecordNotFound if @faye_client.attrs.present? && @faye_client.user_id.to_i != current_user.id
+    raise Peanut::Redis::RecordNotFound if @faye_client.attrs.present? && @faye_client.user_id != current_user.id
   end
 end

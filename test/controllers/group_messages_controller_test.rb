@@ -111,7 +111,7 @@ describe GroupMessagesController do
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
-                          'text' => text, 'mentioned_user_ids' => [-1], 'image_url' => nil,
+                          'text' => text, 'mentioned_user_ids' => ['-1'], 'image_url' => nil,
                           'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
 
         group.message_ids.last.to_i.must_equal message_id

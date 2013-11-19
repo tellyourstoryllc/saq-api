@@ -6,10 +6,10 @@ class GroupSerializer < ActiveModel::Serializer
   end
 
   def admin_ids
-    object.admin_ids.map(&:to_i)
+    object.admin_ids.members.sort
   end
 
   def member_ids
-    object.member_ids.map(&:to_i)
+    object.fetched_member_ids.sort
   end
 end

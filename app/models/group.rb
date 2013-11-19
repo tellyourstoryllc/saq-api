@@ -66,7 +66,7 @@ class Group < ActiveRecord::Base
   end
 
   def fetched_member_ids
-    member_ids.members.map(&:to_i)
+    member_ids.members
   end
 
 

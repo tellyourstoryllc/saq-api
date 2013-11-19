@@ -7,7 +7,7 @@ describe OneToOneMessagesController do
 
       text = 'hey'
       message_id = Message.redis.get('message_autoincrement_id').to_i + 1
-      one_to_one_id = "#{member.id}-#{current_user.id}"
+      one_to_one_id = [current_user.id, member.id].sort.join('-')
 
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {one_to_one_id: one_to_one_id, text: text, token: current_user.token}
@@ -54,10 +54,10 @@ describe OneToOneMessagesController do
         one_to_one.message_ids.last.to_i.must_equal message_id
 
         current_user.one_to_one_ids.members.must_include one_to_one.id
-        current_user.one_to_one_user_ids.members.must_include member.id.to_s
+        current_user.one_to_one_user_ids.members.must_include member.id
 
         member.one_to_one_ids.members.must_include one_to_one.id
-        member.one_to_one_user_ids.members.must_include current_user.id.to_s
+        member.one_to_one_user_ids.members.must_include current_user.id
       end
     end
 
@@ -72,7 +72,7 @@ describe OneToOneMessagesController do
 
       text = 'hey'
       message_id = Message.redis.get('message_autoincrement_id').to_i + 1
-      one_to_one_id = "#{member.id}-#{current_user.id}"
+      one_to_one_id = [current_user.id, member.id].sort.join('-')
 
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {one_to_one_id: one_to_one_id, text: text, token: current_user.token}
