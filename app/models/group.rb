@@ -3,13 +3,13 @@ class Group < ActiveRecord::Base
   include Redis::Objects
   include Peanut::Conversation
 
-  attr_accessor :anything_changed, :wallpaper_image_file, :wallpaper_creator_id
+  attr_accessor :anything_changed, :wallpaper_image_file, :wallpaper_creator_id, :delete_wallpaper
 
   before_validation :set_join_code, on: :create
   validates :creator_id, :name, :join_code, presence: true
 
   after_save :anything_changed?
-  after_save :create_new_group_wallpaper_image, on: :update
+  after_save :update_group_wallpaper_image, on: :update
   after_create :add_admin_and_member
 
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
@@ -37,7 +37,7 @@ class Group < ActiveRecord::Base
   end
 
   def wallpaper_url
-    @wallpaper_url ||= group_wallpaper_image.image.url if group_wallpaper_image
+    @wallpaper_url ||= group_wallpaper_image.image.url if group_wallpaper_image.try(:active?)
   end
 
   def add_member(user)
@@ -83,8 +83,12 @@ class Group < ActiveRecord::Base
     end
   end
 
-  def create_new_group_wallpaper_image
-    create_group_wallpaper_image(creator_id: wallpaper_creator_id, image: wallpaper_image_file) unless wallpaper_image_file.blank?
+  def update_group_wallpaper_image
+    if wallpaper_image_file.present?
+      create_group_wallpaper_image(creator_id: wallpaper_creator_id, image: wallpaper_image_file)
+    elsif delete_wallpaper
+      group_wallpaper_image.deactivate!
+    end
   end
 
   def anything_changed?

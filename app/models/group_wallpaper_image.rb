@@ -8,6 +8,11 @@ class GroupWallpaperImage < ActiveRecord::Base
   mount_uploader :image, GroupWallpaperImageUploader
 
 
+  def deactivate!
+    update!(active: false)
+  end
+
+
   private
 
   def set_uuid

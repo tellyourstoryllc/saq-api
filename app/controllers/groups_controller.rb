@@ -61,7 +61,11 @@ class GroupsController < ApplicationController
   def update_group_params
     params.permit(:name, :topic, :wallpaper_image_file).tap do |attrs|
       if @group.admin?(current_user)
-        attrs[:wallpaper_creator_id] = current_user.id
+        if attrs.has_key?(:wallpaper_image_file) && attrs[:wallpaper_image_file].blank?
+          attrs[:delete_wallpaper] = true
+        else
+          attrs[:wallpaper_creator_id] = current_user.id
+        end
       else
         attrs.delete(:name)
         attrs.delete(:wallpaper_image_file)
