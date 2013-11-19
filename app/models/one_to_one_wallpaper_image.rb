@@ -7,6 +7,11 @@ class OneToOneWallpaperImage < ActiveRecord::Base
   mount_uploader :image, OneToOneWallpaperImageUploader
 
 
+  def deactivate!
+    update!(active: false)
+  end
+
+
   private
 
   def set_uuid

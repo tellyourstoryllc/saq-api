@@ -59,6 +59,10 @@ class AccountsController < ApplicationController
         attrs.delete(:email)
         attrs.delete(:new_password)
       end
+
+      if attrs.has_key?(:one_to_one_wallpaper_image_file) && attrs[:one_to_one_wallpaper_image_file].blank?
+        attrs[:delete_wallpaper] = true
+      end
     end
   end
 end

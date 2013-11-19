@@ -168,6 +168,7 @@ CREATE TABLE `one_to_one_wallpaper_images` (
   `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `index_one_to_one_wallpaper_images_on_account_id` (`account_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -218,7 +219,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-19  8:17:39
+-- Dump completed on 2013-11-19  8:22:30
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -256,3 +257,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131114221959');
 INSERT INTO schema_migrations (version) VALUES ('20131118153325');
 
 INSERT INTO schema_migrations (version) VALUES ('20131119131536');
+
+INSERT INTO schema_migrations (version) VALUES ('20131119132207');

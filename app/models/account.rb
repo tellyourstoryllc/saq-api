@@ -2,13 +2,13 @@ class Account < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
 
-  attr_accessor :one_to_one_wallpaper_image_file
+  attr_accessor :one_to_one_wallpaper_image_file, :delete_wallpaper
 
   validates :email, format: /.+@.+/
   validates :email, uniqueness: true
 
   has_secure_password validations: false
-  after_save :create_new_one_to_one_wallpaper_image, on: :update
+  after_save :update_one_to_one_wallpaper_image, on: :update
 
   belongs_to :user
   accepts_nested_attributes_for :user
@@ -17,7 +17,7 @@ class Account < ActiveRecord::Base
 
 
   def one_to_one_wallpaper_url
-    @one_to_one_wallpaper_url ||= one_to_one_wallpaper_image.image.url if one_to_one_wallpaper_image
+    @one_to_one_wallpaper_url ||= one_to_one_wallpaper_image.image.url if one_to_one_wallpaper_image.try(:active?)
   end
 
   def self.password_reset_token_key(token)
@@ -39,7 +39,11 @@ class Account < ActiveRecord::Base
 
   private
 
-  def create_new_one_to_one_wallpaper_image
-    create_one_to_one_wallpaper_image(image: one_to_one_wallpaper_image_file) unless one_to_one_wallpaper_image_file.blank?
+  def update_one_to_one_wallpaper_image
+    if one_to_one_wallpaper_image_file.present?
+      create_one_to_one_wallpaper_image(image: one_to_one_wallpaper_image_file)
+    elsif delete_wallpaper
+      one_to_one_wallpaper_image.deactivate!
+    end
   end
 end
