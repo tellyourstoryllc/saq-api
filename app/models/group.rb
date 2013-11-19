@@ -5,7 +5,7 @@ class Group < ActiveRecord::Base
 
   attr_accessor :anything_changed, :wallpaper_image_file, :wallpaper_creator_id, :delete_wallpaper
 
-  before_validation :set_join_code, on: :create
+  before_validation :set_id, :set_join_code, on: :create
   validates :creator_id, :name, :join_code, presence: true
 
   after_save :anything_changed?
@@ -71,6 +71,16 @@ class Group < ActiveRecord::Base
 
 
   private
+
+  def set_id
+    # Exclude L to avoid any confusion
+    chars = [*'a'..'k', *'m'..'z', *0..9]
+
+    loop do
+      self.id = Array.new(8){ chars.sample }.join
+      break unless Group.where(id: id).exists?
+    end
+  end
 
   def set_join_code
     # Lowercase alpha chars only to make it easier to type on mobile

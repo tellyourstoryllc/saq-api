@@ -15,7 +15,7 @@ class Message
 
   def initialize(attributes = {})
     super
-    to_int(:id, :group_id, :user_id, :created_at) if id.present?
+    to_int(:id, :user_id, :created_at) if id.present?
   end
 
   def save
