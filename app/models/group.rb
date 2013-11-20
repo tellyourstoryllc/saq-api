@@ -92,7 +92,7 @@ class Group < ActiveRecord::Base
   end
 
   def anything_changed?
-    self.anything_changed = changed? || (wallpaper_image_file && wallpaper_creator_id)
+    self.anything_changed = changed? || (wallpaper_image_file && wallpaper_creator_id) || delete_wallpaper
   end
 
   def add_admin_and_member
