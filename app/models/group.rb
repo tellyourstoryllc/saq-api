@@ -17,7 +17,6 @@ class Group < ActiveRecord::Base
 
   set :admin_ids
   set :member_ids
-  sorted_set :message_ids
 
 
   def admin?(user)

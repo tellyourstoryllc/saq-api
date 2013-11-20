@@ -37,6 +37,6 @@ class GroupMessagesController < ApplicationController
   end
 
   def pagination_params
-    params.permit(:limit, :last_message_id)
+    params.permit(:limit, :below_rank)
   end
 end

@@ -6,7 +6,6 @@ class OneToOne
   attr_accessor :id, :created_at, :sender_id, :recipient_id
 
   hash_key :attrs
-  sorted_set :message_ids
 
   validates :sender_id, :recipient_id, presence: true
   validate :users_are_contacts?

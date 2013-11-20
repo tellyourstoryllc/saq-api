@@ -12,17 +12,15 @@ describe GroupMessagesController do
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
       text = 'hey everyone'
-      message_id = Message.redis.get('message_autoincrement_id').to_i + 1
 
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {group_id: group.id, text: text, token: current_user.token}
+        message_id = group.message_ids.last
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
                           'text' => text, 'mentioned_user_ids' => [], 'image_url' => nil,
                           'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
-
-        group.message_ids.last.to_i.must_equal message_id
       end
     end
 
@@ -35,17 +33,15 @@ describe GroupMessagesController do
       group.add_member(user)
 
       text = 'hey everyone'
-      message_id = Message.redis.get('message_autoincrement_id').to_i + 1
 
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {group_id: group.id, text: text, mentioned_user_ids: user.id, token: current_user.token}
+        message_id = group.message_ids.last
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
                           'text' => text, 'mentioned_user_ids' => [user.id], 'image_url' => nil,
                           'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
-
-        group.message_ids.last.to_i.must_equal message_id
       end
     end
 
@@ -62,17 +58,15 @@ describe GroupMessagesController do
       group.add_member(u2)
 
       text = 'hey everyone'
-      message_id = Message.redis.get('message_autoincrement_id').to_i + 1
 
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {group_id: group.id, text: text, mentioned_user_ids: [u1.id, u2.id].join(','), token: current_user.token}
+        message_id = group.message_ids.last
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
                           'text' => text, 'mentioned_user_ids' => [u1.id, u2.id], 'image_url' => nil,
                           'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
-
-        group.message_ids.last.to_i.must_equal message_id
       end
     end
 
@@ -85,17 +79,15 @@ describe GroupMessagesController do
       group.add_member(u1)
 
       text = 'hey everyone'
-      message_id = Message.redis.get('message_autoincrement_id').to_i + 1
 
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {group_id: group.id, text: text, mentioned_user_ids: [99999, u1.id].join(','), token: current_user.token}
+        message_id = group.message_ids.last
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
                           'text' => text, 'mentioned_user_ids' => [u1.id], 'image_url' => nil,
                           'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
-
-        group.message_ids.last.to_i.must_equal message_id
       end
     end
 
@@ -104,17 +96,15 @@ describe GroupMessagesController do
       group.add_member(current_user)
 
       text = 'hey everyone'
-      message_id = Message.redis.get('message_autoincrement_id').to_i + 1
 
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {group_id: group.id, text: text, mentioned_user_ids: '-1', token: current_user.token}
+        message_id = group.message_ids.last
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id,
+                          'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
                           'text' => text, 'mentioned_user_ids' => ['-1'], 'image_url' => nil,
                           'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
-
-        group.message_ids.last.to_i.must_equal message_id
       end
     end
   end
@@ -143,12 +133,12 @@ describe GroupMessagesController do
         result.must_equal [
           {
             'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
-            'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
+            'user_id' => current_user.id, 'rank' => 1, 'text' => 'oh hai', 'mentioned_user_ids' => [],
             'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
           },
           {
             'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
-            'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
+            'user_id' => member.id, 'rank' => 2, 'text' => 'hi again', 'mentioned_user_ids' => [],
             'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
           }
         ]
@@ -177,17 +167,17 @@ describe GroupMessagesController do
         result.must_equal [
           {
             'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id, 'one_to_one_id' => nil,
-            'user_id' => member.id, 'text' => 'hey guys', 'mentioned_user_ids' => [],
+            'user_id' => member.id, 'rank' => 0, 'text' => 'hey guys', 'mentioned_user_ids' => [],
             'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
           },
           {
             'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
-            'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
+            'user_id' => current_user.id, 'rank' => 1, 'text' => 'oh hai', 'mentioned_user_ids' => [],
             'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
           },
           {
             'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
-            'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
+            'user_id' => member.id, 'rank' => 2, 'text' => 'hi again', 'mentioned_user_ids' => [],
             'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
           }
         ]
@@ -214,17 +204,17 @@ describe GroupMessagesController do
         m4 = Message.new(group_id: group.id, user_id: member.id, text: 'hello?')
         m4.save
 
-        get :index, {group_id: group.id, last_message_id: m4.id, token: current_user.token}
+        get :index, {group_id: group.id, below_rank: 3, token: current_user.token}
 
         result.must_equal [
           {
             'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
-            'user_id' => current_user.id, 'text' => 'oh hai', 'mentioned_user_ids' => [],
+            'user_id' => current_user.id, 'rank' => 1, 'text' => 'oh hai', 'mentioned_user_ids' => [],
             'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
           },
           {
             'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
-            'user_id' => member.id, 'text' => 'hi again', 'mentioned_user_ids' => [],
+            'user_id' => member.id, 'rank' => 2, 'text' => 'hi again', 'mentioned_user_ids' => [],
             'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
           }
         ]
