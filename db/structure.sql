@@ -30,7 +30,8 @@ CREATE TABLE `accounts` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `index_accounts_on_user_id` (`user_id`)
+  UNIQUE KEY `index_accounts_on_user_id` (`user_id`),
+  UNIQUE KEY `index_accounts_on_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -259,3 +260,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131118153325');
 INSERT INTO schema_migrations (version) VALUES ('20131119131536');
 
 INSERT INTO schema_migrations (version) VALUES ('20131119132207');
+
+INSERT INTO schema_migrations (version) VALUES ('20131121152559');
