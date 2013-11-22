@@ -30,7 +30,7 @@ class AccountsController < ApplicationController
 
     if @account
       token = @account.generate_password_reset_token
-      PasswordResetMailer.reset(@account, token).deliver! if token
+      AccountMailer.password_reset(@account, token).deliver! if token
       render_json []
     else
       render_error("Sorry, we couldn't find your account. Please try again.")

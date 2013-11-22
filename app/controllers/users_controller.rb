@@ -17,6 +17,8 @@ class UsersController < ApplicationController
     @current_user = @account.user
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
+    AccountMailer.welcome(@account).deliver!
+
     render_json [@current_user, @account, @group].compact
   end
 
