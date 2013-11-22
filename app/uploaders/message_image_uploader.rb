@@ -31,9 +31,10 @@ class MessageImageUploader < CarrierWave::Uploader::Base
   #   # do something
   # end
 
-  # Create different versions of your uploaded files:
+  # Create a thumbnail with a max width of 300 and a max height of 300
+  # Only resize if the width or height is larger than 300, and preserve aspect ratio
   version :thumb do
-    process resize_to_fit: [300, 300]
+    process resize_to_limit: [300, 300]
   end
 
   # Add a white list of extensions which are allowed to be uploaded.
