@@ -31,9 +31,9 @@ class AvatarImageUploader < CarrierWave::Uploader::Base
   #   # do something
   # end
 
-  # Create different versions of your uploaded files:
+  # Create a 300x300 square thumbnail, cropping from center if necessary
   version :thumb do
-    process resize_to_fit: [300, 300]
+    process resize_to_fill: [300, 300]
   end
 
   # Add a white list of extensions which are allowed to be uploaded.
