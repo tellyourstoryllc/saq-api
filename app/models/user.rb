@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   include Redis::Objects
   attr_accessor :avatar_image_file
 
-  before_validation :set_username, on: :create
+  before_validation :set_id, :set_username, on: :create
 
   validates :name, :username, presence: true
   validates :username, uniqueness: true
@@ -106,7 +106,7 @@ class User < ActiveRecord::Base
     gids = group_ids.members
     group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
     one_to_one_user_keys = [one_to_one_user_ids.key]
-    redis.sunion(group_member_keys + one_to_one_user_keys).map!(&:to_i)
+    redis.sunion(group_member_keys + one_to_one_user_keys)
   end
 
   def self.contacts?(user1, user2)
@@ -140,6 +140,16 @@ class User < ActiveRecord::Base
 
 
   private
+
+  def set_id
+    # Exclude L to avoid any confusion
+    chars = [*'a'..'k', *'m'..'z', *0..9]
+
+    loop do
+      self.id = Array.new(8){ chars.sample }.join
+      break unless User.where(id: id).exists?
+    end
+  end
 
   def set_username
     return if username.present?

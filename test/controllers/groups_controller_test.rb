@@ -48,7 +48,7 @@ describe GroupsController do
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => 'new topic', 'wallpaper_url' => nil,
-        'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id]}]
+        'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort}]
     end
 
     it "must not update a group's name if the user is not an admin of the group" do
@@ -63,7 +63,7 @@ describe GroupsController do
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-        'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id]}]
+        'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort}]
     end
 
     it "must update a group's name if the user is an admin of the group" do
@@ -79,7 +79,7 @@ describe GroupsController do
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Really Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-        'admin_ids' => [member.id, current_user.id], 'member_ids' => [member.id, current_user.id]}]
+        'admin_ids' => [member.id, current_user.id].sort, 'member_ids' => [member.id, current_user.id].sort}]
     end
   end
 
@@ -103,30 +103,33 @@ describe GroupsController do
 
       post :join, {join_code: group.join_code, token: current_user.token}
 
-      result.must_equal [
-        {
-          'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-          'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id]
-        },
-        {
-          'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
-          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
-          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
-        },
-        {
-          'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
-          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-          'token' => current_user.token, 'client_type' => nil,
-          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
-        },
-        {
-          'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
-          'one_to_one_id' => nil, 'user_id' => member.id, 'text' => 'hey guys',
-          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => message.created_at
-        }
-      ]
+      result.size.must_equal 4
+
+      result.must_include({
+        'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
+        'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort
+      })
+
+      result.must_include({
+        'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
+        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
+        'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+      })
+
+      result.must_include({
+        'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
+        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+        'token' => current_user.token, 'client_type' => nil,
+        'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+      })
+
+      result.must_include({
+        'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
+        'one_to_one_id' => nil, 'user_id' => member.id, 'rank' => 0, 'text' => 'hey guys',
+        'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+        'client_metadata' => nil, 'likes_count' => 0, 'created_at' => message.created_at
+      })
     end
   end
 
@@ -138,17 +141,17 @@ describe GroupsController do
 
       group.add_member(member)
 
-      group.admin_ids.members.must_equal [current_user.id.to_s]
-      group.member_ids.members.must_equal [current_user.id.to_s, member.id.to_s]
-      current_user.group_ids.must_include group.id.to_s
+      group.admin_ids.members.must_equal [current_user.id]
+      group.member_ids.members.sort.must_equal [current_user.id, member.id].sort
+      current_user.group_ids.must_include group.id
 
       post :leave, {id: group.id, token: current_user.token}
 
       result.must_equal []
 
       group.admin_ids.members.must_be_empty
-      group.member_ids.members.must_equal [member.id.to_s]
-      current_user.group_ids.wont_include group.id.to_s
+      group.member_ids.members.must_equal [member.id]
+      current_user.group_ids.wont_include group.id
     end
   end
 
@@ -186,37 +189,41 @@ describe GroupsController do
 
         get :show, {id: group.id, token: current_user.token}
 
-        result.must_equal [
-          {
-            'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-            'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id]
-          },
-          {
-            'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
-            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
-            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
-          },
-          {
-            'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
-            'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
-            'token' => current_user.token, 'client_type' => 'phone',
-            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
-          },
-          {
-            'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
-            'one_to_one_id' => nil, 'user_id' => current_user.id,
-            'text' => 'oh hai', 'mentioned_user_ids' => [],
-            'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0,
-            'created_at' => m2.created_at
-          },
-          {
-            'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
-            'one_to_one_id' => nil, 'user_id' => member.id, 'text' => 'hey!',
-            'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
-            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
-          }
-        ]
+        result.size.must_equal 5
+
+        result.must_include({
+          'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
+          'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort
+        })
+
+        result.must_include({
+          'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
+          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
+          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+        })
+
+        result.must_include({
+          'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
+          'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
+          'token' => current_user.token, 'client_type' => 'phone',
+          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+        })
+
+        result.must_include({
+          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
+          'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1,
+          'text' => 'oh hai', 'mentioned_user_ids' => [],
+          'image_url' => nil, 'image_thumb_url' => nil, 'client_metadata' => nil, 'likes_count' => 0,
+          'created_at' => m2.created_at
+        })
+
+        result.must_include({
+          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
+          'one_to_one_id' => nil, 'user_id' => member.id, 'rank' => 2, 'text' => 'hey!',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
+        })
       end
     end
 
@@ -243,42 +250,47 @@ describe GroupsController do
 
         get :show, {id: group.id, limit: 3, token: current_user.token}
 
-        result.must_equal [
-          {
-            'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-            'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id]
-          },
-          {
-            'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
-            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
-            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
-          },
-          {
-            'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
-            'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
-            'token' => current_user.token, 'client_type' => 'web',
-            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
-          },
-          {
-            'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,
-            'one_to_one_id' => nil, 'user_id' => member.id, 'text' => 'hey guys',
-            'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
-            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
-          },
-          {
-            'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
-            'one_to_one_id' => nil, 'user_id' => current_user.id, 'text' => 'oh hai',
-            'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
-            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
-          },
-          {
-            'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
-            'one_to_one_id' => nil, 'user_id' => member.id, 'text' => 'hey!',
-            'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
-            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
-          }
-        ]
+        result.size.must_equal 6
+
+        result.must_include({
+          'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
+          'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort
+        })
+
+        result.must_include({
+          'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
+          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
+          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+        })
+
+        result.must_include({
+          'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
+          'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
+          'token' => current_user.token, 'client_type' => 'web',
+          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+        })
+
+        result.must_include({
+          'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,
+          'one_to_one_id' => nil, 'user_id' => member.id, 'rank' => 0, 'text' => 'hey guys',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
+        })
+
+        result.must_include({
+          'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
+          'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1, 'text' => 'oh hai',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
+        })
+
+        result.must_include({
+          'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
+          'one_to_one_id' => nil, 'user_id' => member.id, 'rank' => 2, 'text' => 'hey!',
+          'mentioned_user_ids' => [], 'image_url' => nil, 'image_thumb_url' => nil,
+          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
+        })
       end
     end
   end

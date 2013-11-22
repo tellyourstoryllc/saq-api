@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `accounts`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password_digest` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -62,7 +62,7 @@ DROP TABLE IF EXISTS `avatar_images`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `avatar_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -99,8 +99,8 @@ DROP TABLE IF EXISTS `group_wallpaper_images`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `group_wallpaper_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_id` int(11) NOT NULL,
-  `creator_id` int(11) NOT NULL,
+  `group_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `creator_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -119,8 +119,8 @@ DROP TABLE IF EXISTS `groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `groups` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `creator_id` int(11) NOT NULL,
+  `id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `creator_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `join_code` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `topic` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -141,9 +141,9 @@ DROP TABLE IF EXISTS `message_images`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_images` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `group_id` int(11) DEFAULT NULL,
+  `group_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
   `one_to_one_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `message_id` int(11) NOT NULL,
+  `message_id` char(10) COLLATE utf8_unicode_ci NOT NULL,
   `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -196,7 +196,7 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -220,7 +220,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-19  8:22:30
+-- Dump completed on 2013-11-19 18:20:05
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -260,5 +260,15 @@ INSERT INTO schema_migrations (version) VALUES ('20131118153325');
 INSERT INTO schema_migrations (version) VALUES ('20131119131536');
 
 INSERT INTO schema_migrations (version) VALUES ('20131119132207');
+
+INSERT INTO schema_migrations (version) VALUES ('20131119165021');
+
+INSERT INTO schema_migrations (version) VALUES ('20131119171612');
+
+INSERT INTO schema_migrations (version) VALUES ('20131119195654');
+
+INSERT INTO schema_migrations (version) VALUES ('20131119200729');
+
+INSERT INTO schema_migrations (version) VALUES ('20131119231201');
 
 INSERT INTO schema_migrations (version) VALUES ('20131121152559');

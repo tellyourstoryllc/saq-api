@@ -28,9 +28,9 @@ describe UsersController do
       it "must create a user and a group" do
         post :create, {name: 'John Doe', email: 'joe@example.com', password: 'asdf', group_name: 'Cool Dudes'}
 
-        user = User.last
+        user = User.order('created_at DESC').last
         account = Account.last
-        group = Group.last
+        group = Group.order('created_at DESC').last
 
         result.must_equal [
           {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,

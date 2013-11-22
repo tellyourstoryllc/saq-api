@@ -2,8 +2,8 @@ class Message
   include Peanut::RedisModel
   include Redis::Objects
 
-  attr_accessor :id, :group_id, :one_to_one_id, :user_id, :text, :image_file,
-    :mentioned_user_ids, :message_image_id, :image_url, :image_thumb_url, :client_metadata, :created_at
+  attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :image_file,
+    :mentioned_user_ids, :message_image_id, :image_url, :image_thumb_url, :client_metadata, :created_at, :created_at_precise
   hash_key :attrs
   sorted_set :likes
 
@@ -15,7 +15,7 @@ class Message
 
   def initialize(attributes = {})
     super
-    to_int(:id, :group_id, :user_id, :created_at) if id.present?
+    to_int(:rank, :created_at) if id.present?
   end
 
   def save
@@ -26,8 +26,18 @@ class Message
     save_message_image
     write_attrs
     add_to_conversation
+    set_rank
 
     true
+  end
+
+  def set_rank
+    @rank = attrs[:rank] = conversation.message_ids.rank(id)
+  end
+
+  # In case a request for messages comes in between write_attrs and add_to_conversation
+  def rank
+    @rank ||= set_rank
   end
 
   def user
@@ -43,11 +53,11 @@ class Message
   end
 
   def mentioned_user_ids
-    @mentioned_user_ids.present? ? @mentioned_user_ids.to_s.split(',').map(&:to_i) : []
+    @mentioned_user_ids.present? ? @mentioned_user_ids.to_s.split(',') : []
   end
 
   def mentioned_all?
-    mentioned_user_ids.include?(-1)
+    mentioned_user_ids.include?('-1')
   end
 
   def mentioned_users
@@ -76,7 +86,15 @@ class Message
   private
 
   def generate_id
-    self.id ||= redis.incr('message_autoincrement_id')
+    return if id.present?
+
+    # Exclude L to avoid any confusion
+    chars = [*'a'..'k', *'m'..'z', *0..9]
+
+    loop do
+      self.id = Array.new(10){ chars.sample }.join
+      break unless attrs.exists?
+    end
   end
 
   def sanitize_mentioned_user_ids
@@ -85,10 +103,10 @@ class Message
     if @mentioned_user_ids.blank? || conversation.nil?
       @mentioned_user_ids = nil
     else
-      member_ids = [-1] # @all mention
+      member_ids = ['-1'] # @all mention
       member_ids += conversation.fetched_member_ids
 
-      sanitized_user_ids = @mentioned_user_ids.map(&:to_i) & member_ids
+      sanitized_user_ids = @mentioned_user_ids & member_ids
       @mentioned_user_ids = sanitized_user_ids.join(',')
     end
   end
@@ -114,7 +132,8 @@ class Message
   end
 
   def write_attrs
-    self.created_at = Time.current.to_i
+    self.created_at_precise = Time.current.to_f
+    self.created_at = created_at_precise.to_i
 
     if @message_image && @message_image.image.present?
       self.image_url = @message_image.image.url
@@ -129,6 +148,6 @@ class Message
 
   def add_to_conversation
     convo = conversation
-    convo.message_ids[id] = id if convo
+    convo.message_ids[id] = created_at_precise if convo
   end
 end

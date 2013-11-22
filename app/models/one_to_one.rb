@@ -6,7 +6,6 @@ class OneToOne
   attr_accessor :id, :created_at, :sender_id, :recipient_id
 
   hash_key :attrs
-  sorted_set :message_ids
 
   validates :sender_id, :recipient_id, presence: true
   validate :users_are_contacts?
@@ -21,7 +20,7 @@ class OneToOne
       sid, rid = id.split('-')
       self.sender_id ||= sid
       self.recipient_id ||= rid
-      to_int(:sender_id, :recipient_id, :created_at)
+      to_int(:created_at)
     end
   end
 
@@ -32,7 +31,7 @@ class OneToOne
   def self.id_for_user_ids(sender_id, recipient_id)
     return if sender_id.blank? || recipient_id.blank?
 
-    lower_id, higher_id = *[sender_id.to_i, recipient_id.to_i].sort!
+    lower_id, higher_id = *[sender_id, recipient_id].sort!
     "#{lower_id}-#{higher_id}"
   end
 
@@ -45,7 +44,7 @@ class OneToOne
   end
 
   def fetched_member_ids
-    [sender_id, recipient_id].compact.map(&:to_i).uniq
+    [sender_id, recipient_id].compact.uniq
   end
 
   # Find the users seprately so it'll use AR cache in most cases

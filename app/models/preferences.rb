@@ -21,7 +21,7 @@ class Preferences
 
     if id.present?
       self.user_id = id
-      to_int(:id, :user_id, :created_at)
+      to_int(:id, :created_at)
       to_bool(:server_mention_email, :server_mention_ios, :server_one_to_one_email, :server_one_to_one_ios)
     end
   end
