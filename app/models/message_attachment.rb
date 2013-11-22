@@ -1,14 +1,22 @@
-class MessageImage < ActiveRecord::Base
+class MessageAttachment < ActiveRecord::Base
   attr_writer :message
   before_validation :set_group_id, :set_one_to_one_id, :set_uuid, on: :create
-  validates :message_id, :image, :uuid, presence: true
+  validates :message_id, :attachment, :uuid, presence: true
   validate :group_id_or_one_to_one_id?
 
-  mount_uploader :image, MessageImageUploader
+  mount_uploader :attachment, MessageAttachmentUploader
 
 
   def message
     @message ||= Message.new(id: message_id)
+  end
+
+  def preview_url
+    if attachment.version_exists?(:thumb)
+      attachment.thumb.url
+    elsif attachment.version_exists?(:animated_gif)
+      attachment.animated_gif.url
+    end
   end
 
 

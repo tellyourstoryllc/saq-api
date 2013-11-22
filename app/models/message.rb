@@ -2,13 +2,13 @@ class Message
   include Peanut::RedisModel
   include Redis::Objects
 
-  attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :image_file,
-    :mentioned_user_ids, :message_image_id, :image_url, :image_thumb_url, :client_metadata, :created_at, :created_at_precise
+  attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
+    :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_preview_url, :client_metadata, :created_at, :created_at_precise
   hash_key :attrs
   sorted_set :likes
 
   validates :user_id, presence: true
-  validate :group_id_or_one_to_one_id?, :text_under_limit?, :text_or_image_set?
+  validate :group_id_or_one_to_one_id?, :text_under_limit?, :text_or_attachment_set?
 
   TEXT_LIMIT = 1_000
 
@@ -23,7 +23,7 @@ class Message
 
     generate_id
     sanitize_mentioned_user_ids
-    save_message_image
+    save_message_attachment
     write_attrs
     add_to_conversation
     set_rank
@@ -120,30 +120,30 @@ class Message
     errors.add(:base, "Text is too long (maximum is #{TEXT_LIMIT} characters)") if text.present? && text.size > TEXT_LIMIT
   end
 
-  def text_or_image_set?
-    errors.add(:base, "Either text or an image is required.") unless text.present? || image_file.present?
+  def text_or_attachment_set?
+    errors.add(:base, "Either text or an attachment is required.") unless text.present? || attachment_file.present?
   end
 
-  def save_message_image
-    return if image_file.blank?
+  def save_message_attachment
+    return if attachment_file.blank?
 
-    @message_image = MessageImage.new(message_id: id, message: self, image: image_file)
-    @message_image.save!
+    @message_attachment = MessageAttachment.new(message_id: id, message: self, attachment: attachment_file)
+    @message_attachment.save!
   end
 
   def write_attrs
     self.created_at_precise = Time.current.to_f
     self.created_at = created_at_precise.to_i
 
-    if @message_image && @message_image.image.present?
-      self.image_url = @message_image.image.url
-      self.image_thumb_url = @message_image.image.thumb.url
-      self.message_image_id = @message_image.id
+    if @message_attachment && @message_attachment.attachment.present?
+      self.attachment_url = @message_attachment.attachment.url
+      self.attachment_preview_url = @message_attachment.preview_url
+      self.message_attachment_id = @message_attachment.id
     end
 
     self.attrs.bulk_set(id: id, group_id: group_id, one_to_one_id: one_to_one_id, user_id: user_id,
-                        text: text, mentioned_user_ids: @mentioned_user_ids, message_image_id: message_image_id,
-                        image_url: image_url, image_thumb_url: image_thumb_url, client_metadata: client_metadata, created_at: created_at)
+                        text: text, mentioned_user_ids: @mentioned_user_ids, message_attachment_id: message_attachment_id,
+                        attachment_url: attachment_url, attachment_preview_url: attachment_preview_url, client_metadata: client_metadata, created_at: created_at)
   end
 
   def add_to_conversation

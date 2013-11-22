@@ -133,25 +133,25 @@ CREATE TABLE `groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `message_images`
+-- Table structure for table `message_attachments`
 --
 
-DROP TABLE IF EXISTS `message_images`;
+DROP TABLE IF EXISTS `message_attachments`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `message_images` (
+CREATE TABLE `message_attachments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `group_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
   `one_to_one_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `message_id` char(10) COLLATE utf8_unicode_ci NOT NULL,
-  `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `attachment` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_message_images_on_group_id` (`group_id`),
-  KEY `index_message_images_on_message_id` (`message_id`),
-  KEY `index_message_images_on_one_to_one_id` (`one_to_one_id`)
+  KEY `index_message_attachments_on_group_id` (`group_id`),
+  KEY `index_message_attachments_on_message_id` (`message_id`),
+  KEY `index_message_attachments_on_one_to_one_id` (`one_to_one_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -220,7 +220,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-19 18:20:05
+-- Dump completed on 2013-11-22 16:36:07
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -248,6 +248,8 @@ INSERT INTO schema_migrations (version) VALUES ('20131029165608');
 INSERT INTO schema_migrations (version) VALUES ('20131106205908');
 
 INSERT INTO schema_migrations (version) VALUES ('20131111204037');
+
+INSERT INTO schema_migrations (version) VALUES ('20131112200132');
 
 INSERT INTO schema_migrations (version) VALUES ('20131114141853');
 

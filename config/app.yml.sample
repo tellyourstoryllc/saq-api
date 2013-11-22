@@ -3,6 +3,9 @@ development:
     access_key_id: KEY
     secret_access_key: SECRET
     bucket_name: MEDIA.SOMETHING.COM
+  carrierwave:
+    convert_bin: '/usr/local/bin/convert'
+    ffmpeg_bin: '/usr/local/bin/ffmpeg'
   faye:
     url: http://localhost:8080/faye
     server_secret: SECRET
@@ -29,6 +32,9 @@ test:
     access_key_id: KEY
     secret_access_key: SECRET
     bucket_name: MEDIA.SOMETHING.COM
+  carrierwave:
+    convert_bin: '/usr/local/bin/convert'
+    ffmpeg_bin: '/usr/local/bin/ffmpeg'
   faye:
     url: http://localhost:8080/faye_TEST
     server_secret: SECRET

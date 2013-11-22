@@ -46,8 +46,8 @@ describe OneToOneMessagesController do
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => nil, 'one_to_one_id' => one_to_one.id,
                           'user_id' => current_user.id, 'rank' => 0, 'text' => text,
-                          'mentioned_user_ids' => [], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'client_metadata' => nil,
+                          'mentioned_user_ids' => [], 'attachment_url' => nil,
+                          'attachment_preview_url' => nil, 'client_metadata' => nil,
                           'likes_count' => 0, 'created_at' => now.to_i}])
 
         current_user.one_to_one_ids.members.must_include one_to_one.id
@@ -79,8 +79,8 @@ describe OneToOneMessagesController do
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => nil, 'one_to_one_id' => one_to_one_id,
                           'user_id' => current_user.id, 'rank' => 0, 'text' => text,
-                          'mentioned_user_ids' => [], 'image_url' => nil,
-                          'image_thumb_url' => nil, 'client_metadata' => nil,
+                          'mentioned_user_ids' => [], 'attachment_url' => nil,
+                          'attachment_preview_url' => nil, 'client_metadata' => nil,
                           'likes_count' => 0, 'created_at' => now.to_i}])
 
         one_to_one.attrs.wont_be_empty
