@@ -40,11 +40,15 @@ class MessageAttachmentUploader < CarrierWave::Uploader::Base
   def create_animated_gif
     Rails.logger.debug "Animating video #{current_path} #{file.inspect} ..."
 
+    ffmpeg_bin = Rails.configuration.app['carrierwave']['ffmpeg_bin']
+    convert_bin = Rails.configuration.app['carrierwave']['convert_bin']
+
     cache_stored_file! if !cached?
 
     input_path = current_path
     output_path = input_path.sub(/\..+$/, '.gif')
 
+    FFMPEG.ffmpeg_binary = ffmpeg_bin
     movie = FFMPEG::Movie.new(input_path)
 
     # The movie.resolution parser is incorrect for some videos
@@ -55,9 +59,6 @@ class MessageAttachmentUploader < CarrierWave::Uploader::Base
     output_resolution = '240x240'
     delay = 8 # milliseconds, whole number
     framerate = 12.5 # must equal 100 / DELAY
-
-    ffmpeg_bin = Rails.configuration.app['carrierwave']['ffmpeg_bin']
-    convert_bin = Rails.configuration.app['carrierwave']['convert_bin']
 
     system("#{ffmpeg_bin} -i #{input_path} -r #{framerate} #{input_offset} #{input_duration} -f image2pipe -vcodec rawvideo -pix_fmt rgb24 pipe:1 | #{convert_bin} -delay #{delay} -loop 0 -resize #{output_resolution} -layers Optimize -ordered-dither o8x8,24 -fuzz 4% -size #{size} -depth 8 rgb:- #{output_path} &&
            mv #{output_path} #{input_path}")
