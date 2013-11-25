@@ -1,6 +1,6 @@
 class MessageAttachment < ActiveRecord::Base
   attr_writer :message
-  before_validation :set_group_id, :set_one_to_one_id, :set_uuid, on: :create
+  before_validation :set_group_id, :set_one_to_one_id, :set_uuid, :update_attachment_attrs, on: :create
   validates :message_id, :attachment, :uuid, presence: true
   validate :group_id_or_one_to_one_id?
 
@@ -37,5 +37,13 @@ class MessageAttachment < ActiveRecord::Base
 
   def set_uuid
     self.uuid = SecureRandom.uuid
+  end
+
+  def update_attachment_attrs
+    if attachment.present? && attachment_changed?
+      self.media_type = attachment.media_type(attachment.file)
+      self.content_type = attachment.file.content_type
+      self.file_size = attachment.file.size
+    end
   end
 end

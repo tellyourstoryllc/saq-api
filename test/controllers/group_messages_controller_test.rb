@@ -19,7 +19,7 @@ describe GroupMessagesController do
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
-                          'text' => text, 'mentioned_user_ids' => [], 'attachment_url' => nil,
+                          'text' => text, 'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
                           'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
       end
     end
@@ -40,7 +40,7 @@ describe GroupMessagesController do
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
-                          'text' => text, 'mentioned_user_ids' => [user.id], 'attachment_url' => nil,
+                          'text' => text, 'mentioned_user_ids' => [user.id], 'attachment_url' => nil, 'attachment_content_type' => nil,
                           'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
       end
     end
@@ -65,7 +65,7 @@ describe GroupMessagesController do
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
-                          'text' => text, 'mentioned_user_ids' => [u1.id, u2.id], 'attachment_url' => nil,
+                          'text' => text, 'mentioned_user_ids' => [u1.id, u2.id], 'attachment_url' => nil, 'attachment_content_type' => nil,
                           'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
       end
     end
@@ -86,7 +86,7 @@ describe GroupMessagesController do
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
-                          'text' => text, 'mentioned_user_ids' => [u1.id], 'attachment_url' => nil,
+                          'text' => text, 'mentioned_user_ids' => [u1.id], 'attachment_url' => nil, 'attachment_content_type' => nil,
                           'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
       end
     end
@@ -103,7 +103,7 @@ describe GroupMessagesController do
 
         result.must_equal([{'object_type' => 'message', 'id' => message_id,
                           'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 0,
-                          'text' => text, 'mentioned_user_ids' => ['-1'], 'attachment_url' => nil,
+                          'text' => text, 'mentioned_user_ids' => ['-1'], 'attachment_url' => nil, 'attachment_content_type' => nil,
                           'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
       end
     end
@@ -134,12 +134,14 @@ describe GroupMessagesController do
           {
             'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
             'user_id' => current_user.id, 'rank' => 1, 'text' => 'oh hai', 'mentioned_user_ids' => [],
-            'attachment_url' => nil, 'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
+            'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
+            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
           },
           {
             'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
             'user_id' => member.id, 'rank' => 2, 'text' => 'hi again', 'mentioned_user_ids' => [],
-            'attachment_url' => nil, 'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
+            'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
+            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
           }
         ]
       end
@@ -168,17 +170,20 @@ describe GroupMessagesController do
           {
             'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id, 'one_to_one_id' => nil,
             'user_id' => member.id, 'rank' => 0, 'text' => 'hey guys', 'mentioned_user_ids' => [],
-            'attachment_url' => nil, 'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
+            'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
+            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
           },
           {
             'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
             'user_id' => current_user.id, 'rank' => 1, 'text' => 'oh hai', 'mentioned_user_ids' => [],
-            'attachment_url' => nil, 'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
+            'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
+            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
           },
           {
             'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
             'user_id' => member.id, 'rank' => 2, 'text' => 'hi again', 'mentioned_user_ids' => [],
-            'attachment_url' => nil, 'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
+            'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
+            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
           }
         ]
       end
@@ -210,12 +215,14 @@ describe GroupMessagesController do
           {
             'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id, 'one_to_one_id' => nil,
             'user_id' => current_user.id, 'rank' => 1, 'text' => 'oh hai', 'mentioned_user_ids' => [],
-            'attachment_url' => nil, 'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
+            'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
+            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
           },
           {
             'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id, 'one_to_one_id' => nil,
             'user_id' => member.id, 'rank' => 2, 'text' => 'hi again', 'mentioned_user_ids' => [],
-            'attachment_url' => nil, 'attachment_preview_url' => nil, 'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
+            'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
+            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
           }
         ]
       end

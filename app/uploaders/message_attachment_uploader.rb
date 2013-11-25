@@ -11,7 +11,6 @@ class MessageAttachmentUploader < CarrierWave::Uploader::Base
   # storage :file
   storage :fog
 
-  attr_reader :file_type
 
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
@@ -76,18 +75,18 @@ class MessageAttachmentUploader < CarrierWave::Uploader::Base
     dirs.join('/')
   end
 
-
-  private
-
-  def file_type(file)
+  def media_type(file)
     MIME::Types[file.content_type].first.try(:media_type)
   end
 
+
+  private
+
   def image?(file)
-    file_type(file) == 'image'
+    media_type(file) == 'image'
   end
 
   def video?(file)
-    file_type(file) == 'video'
+    media_type(file) == 'video'
   end
 end
