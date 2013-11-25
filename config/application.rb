@@ -31,5 +31,10 @@ module ChatApp
       g.assets false
       g.view_specs false
     end
+
+    # Change upload temp dir from /tmp to /mnt/rails,
+    # so it uses the larger instance storage
+    tmp_dir = '/mnt/rails'
+    ENV['TMPDIR'] = tmp_dir if File.directory?(tmp_dir)
   end
 end
