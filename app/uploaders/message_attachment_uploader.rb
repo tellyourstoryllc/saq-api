@@ -7,6 +7,10 @@ class MessageAttachmentUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
   include CarrierWave::MimeTypes
 
+  def cache_dir
+    '/mnt/rails/skymob-cache'
+  end
+
   # Choose what kind of storage to use for this uploader:
   # storage :file
   storage :fog
