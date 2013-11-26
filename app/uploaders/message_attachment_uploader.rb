@@ -4,7 +4,8 @@ class MessageAttachmentUploader < BaseUploader
   include CarrierWave::MimeTypes
 
   def media_type(file)
-    MIME::Types[file.content_type].first.try(:media_type)
+    type = file.content_type
+    MIME::Types[type].first.try(:media_type) || type.split('/').first
   end
 
   # Create a thumbnail with a max width of 300 and a max height of 300

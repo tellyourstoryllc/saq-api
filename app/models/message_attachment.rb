@@ -41,7 +41,7 @@ class MessageAttachment < ActiveRecord::Base
 
   def update_attachment_attrs
     if attachment.present? && attachment_changed?
-      self.media_type = attachment.media_type(attachment.file) || attachment.file.content_type.split('/').first
+      self.media_type = attachment.media_type(attachment.file)
       self.content_type = attachment.file.content_type
       self.file_size = attachment.file.size
     end
