@@ -4,7 +4,8 @@ class MessageAttachmentUploader < BaseUploader
   include CarrierWave::MimeTypes
 
   def cache_dir
-    '/mnt/rails/skymob-cache'
+    dir = '/mnt/rails/skymob-cache'
+    File.directory?(dir) ? dir : super
   end
 
   def media_type(file)
