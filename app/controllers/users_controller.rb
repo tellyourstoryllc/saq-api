@@ -32,7 +32,7 @@ class UsersController < ApplicationController
   private
 
   def account_params
-    params.permit(:email, :password)
+    params.permit(:email, :password, :facebook_id, :facebook_token)
   end
 
   def user_params
