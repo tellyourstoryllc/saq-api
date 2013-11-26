@@ -4,6 +4,7 @@ development:
     secret_access_key: SECRET
     bucket_name: MEDIA.SOMETHING.COM
   carrierwave:
+    cache_dir: ~
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   faye:
@@ -33,6 +34,7 @@ test:
     secret_access_key: SECRET
     bucket_name: MEDIA.SOMETHING.COM
   carrierwave:
+    cache_dir: ~
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   faye:

@@ -3,11 +3,6 @@
 class MessageAttachmentUploader < BaseUploader
   include CarrierWave::MimeTypes
 
-  def cache_dir
-    dir = '/mnt/rails/skymob-cache'
-    File.directory?(dir) ? dir : super
-  end
-
   def media_type(file)
     MIME::Types[file.content_type].first.try(:media_type)
   end

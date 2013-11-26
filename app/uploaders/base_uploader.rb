@@ -4,6 +4,11 @@ class BaseUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
   storage :fog
 
+  def cache_dir
+    dir = Rails.configuration.app['carrierwave']['cache_dir']
+    (dir && File.directory?(dir)) ? dir : super
+  end
+
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
