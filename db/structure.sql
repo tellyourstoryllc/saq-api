@@ -26,12 +26,14 @@ CREATE TABLE `accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `password_digest` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `password_digest` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `facebook_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_accounts_on_user_id` (`user_id`),
-  UNIQUE KEY `index_accounts_on_email` (`email`)
+  UNIQUE KEY `index_accounts_on_email` (`email`),
+  UNIQUE KEY `index_accounts_on_facebook_id` (`facebook_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -223,7 +225,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-25 10:46:49
+-- Dump completed on 2013-11-26 12:37:23
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -279,3 +281,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131119231201');
 INSERT INTO schema_migrations (version) VALUES ('20131121152559');
 
 INSERT INTO schema_migrations (version) VALUES ('20131125152955');
+
+INSERT INTO schema_migrations (version) VALUES ('20131126173444');

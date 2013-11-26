@@ -5,7 +5,16 @@ describe UsersController do
     describe "invalid" do
       it "must not create a user if it's invalid" do
         post :create
-        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Email is invalid, User name can't be blank."})
+        old_count = User.count
+        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Email is invalid, Password can't be blank, Invalid Facebook credentials, User name can't be blank."})
+        User.count.must_equal old_count
+      end
+
+      it "must not create a user using Facebook authentication if the given Facebook id and token are not valid" do
+        post :create, {name: 'John Doe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'invalidtoken'}
+        old_count = User.count
+        result.must_equal('error' => {'message' => 'Sorry, that could not be saved: Validation failed: Invalid Facebook credentials.'})
+        User.count.must_equal old_count
       end
     end
 
@@ -40,6 +49,25 @@ describe UsersController do
           {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
             'topic' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id]}
         ]
+      end
+
+      it "must create a user and account using Facebook authentication" do
+        api = 'api'
+        def api.get_object(id); {'id' => '100002345'} end
+
+        Koala::Facebook::API.stub :new, api do
+          post :create, {name: 'John Doe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
+
+          user = User.last
+          account = Account.last
+
+          result.must_equal [
+            {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
+              'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+              'client_type' => nil, 'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'},
+            {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'joe@example.com', 'one_to_one_wallpaper_url' => nil}
+          ]
+        end
       end
     end
   end
