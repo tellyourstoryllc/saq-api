@@ -15,6 +15,7 @@ class UsersController < ApplicationController
   def create
     @account = Account.create!(account_params.merge(user_attributes: user_params))
     @current_user = @account.user
+    IosDevice.create_or_assign!(@current_user, ios_device_params)
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
     AccountMailer.welcome(@account).deliver!
@@ -37,6 +38,10 @@ class UsersController < ApplicationController
 
   def user_params
     params.permit(:name, :avatar_image_url)
+  end
+
+  def ios_device_params
+    params.permit(:device_id, :client_version, :os_version, :push_token)
   end
 
   def update_user_params

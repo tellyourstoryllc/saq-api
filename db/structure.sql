@@ -135,6 +135,28 @@ CREATE TABLE `groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `ios_devices`
+--
+
+DROP TABLE IF EXISTS `ios_devices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ios_devices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `device_id` char(32) COLLATE utf8_unicode_ci NOT NULL,
+  `client_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
+  `os_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
+  `push_token` binary(32) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_ios_devices_on_device_id` (`device_id`),
+  KEY `index_ios_devices_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `message_attachments`
 --
 
@@ -281,6 +303,8 @@ INSERT INTO schema_migrations (version) VALUES ('20131119200729');
 INSERT INTO schema_migrations (version) VALUES ('20131119231201');
 
 INSERT INTO schema_migrations (version) VALUES ('20131121152559');
+
+INSERT INTO schema_migrations (version) VALUES ('20131121184910');
 
 INSERT INTO schema_migrations (version) VALUES ('20131125152955');
 

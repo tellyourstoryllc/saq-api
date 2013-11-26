@@ -11,6 +11,7 @@ ChatApp::Application.routes.draw do
     match '/preferences/update', to: 'preferences#update', as: 'update_preferences'
 
     match '/login', to: 'sessions#create', as: 'login'
+    match '/logout', to: 'sessions#destroy', as: 'logout'
     match '/checkin', to: 'checkin#index', as: 'checkin'
 
     match '/conversations', to: 'conversations#index', as: 'conversations'
