@@ -1,6 +1,6 @@
 class ChangeMessageIdsToStrings < ActiveRecord::Migration
   def up
-    change_column :message_images, :message_id, 'CHAR(10)', null: false
+    change_column :message_attachments, :message_id, 'CHAR(10)', null: false
   end
 
   def down
