@@ -1,5 +1,6 @@
 ChatApp::Application.routes.draw do
   scope via: :all do
+    match '/health_check' => 'monitor#health_check'
     match '/me', to: 'users#me', as: 'me'
     match '/users', to: 'users#index', as: 'users'
     match '/users/create', to: 'users#create', as: 'create_user'
