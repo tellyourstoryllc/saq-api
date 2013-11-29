@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  skip_before_action :require_token, only: :create
+  skip_before_action :require_token, :create_or_update_device, only: :create
 
 
   def create
@@ -35,9 +35,5 @@ class SessionsController < ApplicationController
     fb_token = params[:facebook_token]
 
     Account.find_by(facebook_id: fb_id).try(:authenticate_facebook, fb_token) if fb_id.present? && fb_token.present?
-  end
-
-  def ios_device_params
-    params.permit(:device_id, :client_version, :os_version, :push_token)
   end
 end

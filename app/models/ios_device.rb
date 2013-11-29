@@ -1,5 +1,5 @@
 class IosDevice < ActiveRecord::Base
-  validates :device_id, :client_version, :os_version, :push_token, presence: true
+  validates :device_id, :client_version, :os_version, presence: true
   validates :device_id, uniqueness: true
 
   belongs_to :user

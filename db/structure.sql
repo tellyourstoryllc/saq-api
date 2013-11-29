@@ -147,7 +147,7 @@ CREATE TABLE `ios_devices` (
   `device_id` char(32) COLLATE utf8_unicode_ci NOT NULL,
   `client_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
   `os_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
-  `push_token` binary(32) NOT NULL,
+  `push_token` binary(32) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -309,5 +309,7 @@ INSERT INTO schema_migrations (version) VALUES ('20131121184910');
 INSERT INTO schema_migrations (version) VALUES ('20131125152955');
 
 INSERT INTO schema_migrations (version) VALUES ('20131126173444');
+
+INSERT INTO schema_migrations (version) VALUES ('20131129203308');
 
 INSERT INTO schema_migrations (version) VALUES ('20131202142335');

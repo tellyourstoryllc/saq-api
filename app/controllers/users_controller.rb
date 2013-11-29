@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  skip_before_action :require_token, only: :create
+  skip_before_action :require_token, :create_or_update_device, only: :create
 
 
   def me
@@ -38,10 +38,6 @@ class UsersController < ApplicationController
 
   def user_params
     params.permit(:name, :avatar_image_url)
-  end
-
-  def ios_device_params
-    params.permit(:device_id, :client_version, :os_version, :push_token)
   end
 
   def update_user_params
