@@ -21,7 +21,8 @@ describe SessionsController do
         {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
           'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
           'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'},
-        {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'login_test@example.com', 'one_to_one_wallpaper_url' => nil}
+        {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'login_test@example.com',
+          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil}
       ]
     end
 
@@ -39,7 +40,8 @@ describe SessionsController do
           {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
             'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
             'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'},
-          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'login_test@example.com', 'one_to_one_wallpaper_url' => nil}
+          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'login_test@example.com',
+            'one_to_one_wallpaper_url' => nil, 'facebook_id' => '100002345'}
         ]
       end
     end
