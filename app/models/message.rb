@@ -3,8 +3,9 @@ class Message
   include Redis::Objects
 
   attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
-    :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_preview_url,
-    :attachment_content_type, :client_metadata, :created_at, :created_at_precise
+    :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
+    :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
+    :client_metadata, :created_at, :created_at_precise
   hash_key :attrs
   sorted_set :likes
 
@@ -16,7 +17,7 @@ class Message
 
   def initialize(attributes = {})
     super
-    to_int(:rank, :created_at) if id.present?
+    to_int(:rank, :attachment_preview_width, :attachment_preview_height, :created_at) if id.present?
   end
 
   def save
@@ -138,15 +139,18 @@ class Message
 
     if @message_attachment && @message_attachment.attachment.present?
       self.attachment_url = @message_attachment.attachment.url
-      self.attachment_preview_url = @message_attachment.preview_url
       self.attachment_content_type = @message_attachment.content_type
+      self.attachment_preview_url = @message_attachment.preview_url
+      self.attachment_preview_width = @message_attachment.preview_width
+      self.attachment_preview_height = @message_attachment.preview_height
       self.message_attachment_id = @message_attachment.id
     end
 
     self.attrs.bulk_set(id: id, group_id: group_id, one_to_one_id: one_to_one_id, user_id: user_id,
                         text: text, mentioned_user_ids: @mentioned_user_ids, message_attachment_id: message_attachment_id,
-                        attachment_url: attachment_url, attachment_preview_url: attachment_preview_url,
-                        attachment_content_type: attachment_content_type, client_metadata: client_metadata, created_at: created_at)
+                        attachment_url: attachment_url, attachment_content_type: attachment_content_type,
+                        attachment_preview_url: attachment_preview_url, attachment_preview_width: attachment_preview_width,
+                        attachment_preview_height: attachment_preview_height, client_metadata: client_metadata, created_at: created_at)
   end
 
   def add_to_conversation

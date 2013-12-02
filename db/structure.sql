@@ -153,6 +153,8 @@ CREATE TABLE `message_attachments` (
   `media_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `content_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `file_size` int(11) NOT NULL,
+  `preview_width` int(11) DEFAULT NULL,
+  `preview_height` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_message_attachments_on_group_id` (`group_id`),
   KEY `index_message_attachments_on_message_id` (`message_id`),
@@ -225,7 +227,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-26 12:37:23
+-- Dump completed on 2013-12-02  9:23:51
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -283,3 +285,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131121152559');
 INSERT INTO schema_migrations (version) VALUES ('20131125152955');
 
 INSERT INTO schema_migrations (version) VALUES ('20131126173444');
+
+INSERT INTO schema_migrations (version) VALUES ('20131202142335');

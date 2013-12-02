@@ -44,6 +44,19 @@ class MessageAttachment < ActiveRecord::Base
       self.media_type = attachment.media_type(attachment.file)
       self.content_type = attachment.file.content_type
       self.file_size = attachment.file.size
+
+      version = if attachment.version_exists?(:thumb)
+                  attachment.thumb
+                elsif attachment.version_exists?(:animated_gif)
+                  attachment.animated_gif
+                end
+      if version
+        img = MiniMagick::Image.open(version.file.file)
+        if img
+          self.preview_width = img[:width]
+          self.preview_height = img[:height]
+        end
+      end
     end
   end
 end

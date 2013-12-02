@@ -47,8 +47,8 @@ describe OneToOneMessagesController do
                           'group_id' => nil, 'one_to_one_id' => one_to_one.id,
                           'user_id' => current_user.id, 'rank' => 0, 'text' => text,
                           'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
-                          'attachment_preview_url' => nil, 'client_metadata' => nil,
-                          'likes_count' => 0, 'created_at' => now.to_i}])
+                          'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
+                          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
 
         current_user.one_to_one_ids.members.must_include one_to_one.id
         current_user.one_to_one_user_ids.members.must_include member.id
@@ -80,8 +80,8 @@ describe OneToOneMessagesController do
                           'group_id' => nil, 'one_to_one_id' => one_to_one_id,
                           'user_id' => current_user.id, 'rank' => 0, 'text' => text,
                           'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
-                          'attachment_preview_url' => nil, 'client_metadata' => nil,
-                          'likes_count' => 0, 'created_at' => now.to_i}])
+                          'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
+                          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
 
         one_to_one.attrs.wont_be_empty
 
