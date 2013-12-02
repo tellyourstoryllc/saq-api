@@ -36,11 +36,11 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.permit(:name)
+    params.permit(:name, :avatar_image_url)
   end
 
   def update_user_params
-    params.permit(:name, :username, :status, :status_text, :avatar_image_file)
+    params.permit(:name, :username, :status, :status_text, :avatar_image_file, :avatar_image_url)
   end
 
   def group_params

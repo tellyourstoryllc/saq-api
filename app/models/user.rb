@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
-  attr_accessor :avatar_image_file
+  attr_accessor :avatar_image_file, :avatar_image_url
 
   before_validation :set_id, :set_username, on: :create
 
@@ -182,6 +182,10 @@ class User < ActiveRecord::Base
   end
 
   def create_new_avatar_image
-    create_avatar_image(image: avatar_image_file) unless avatar_image_file.blank?
+    if avatar_image_file.present?
+      create_avatar_image(image: avatar_image_file)
+    elsif avatar_image_url.present?
+      create_avatar_image(remote_image_url: avatar_image_url)
+    end
   end
 end
