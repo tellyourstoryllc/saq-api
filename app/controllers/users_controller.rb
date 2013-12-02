@@ -36,7 +36,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.permit(:name)
+    params.permit(:name, :avatar_image_url)
   end
 
   def update_user_params
