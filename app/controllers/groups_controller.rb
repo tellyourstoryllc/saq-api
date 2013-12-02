@@ -1,5 +1,7 @@
 class GroupsController < ApplicationController
-  before_action :load_group, only: [:show, :update, :leave]
+  skip_before_action :require_token, only: :show
+  before_action :load_any_group, only: :show
+  before_action :load_group, only: [:update, :leave]
 
 
   def create
@@ -11,7 +13,9 @@ class GroupsController < ApplicationController
   end
 
   def show
-    render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
+    objects = [@group, @group.members]
+    objects += @group.paginate_messages(pagination_params) if current_user
+    render_json objects
   end
 
   def update
@@ -53,6 +57,16 @@ class GroupsController < ApplicationController
 
 
   private
+
+  def load_any_group
+    @group = if params[:id] && current_user
+               Group.find(params[:id])
+             elsif params[:join_code]
+               Group.find_by!(join_code: params[:join_code])
+             else
+               raise ActiveRecord::RecordNotFound
+             end
+  end
 
   def load_group
     @group = current_user.groups.find(params[:id])

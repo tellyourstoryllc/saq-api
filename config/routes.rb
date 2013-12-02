@@ -23,7 +23,7 @@ ChatApp::Application.routes.draw do
     match '/groups/:group_id/messages/create', to: 'group_messages#create', as: 'create_group_message'
     match '/groups/:group_id/messages', to: 'group_messages#index', as: 'group_messages'
 
-    match '/groups/:id', to: 'groups#show', as: 'show_group'
+    match '/group', to: 'groups#show', as: 'show_group'
     match '/groups/:id/is_member', to: 'groups#is_member', as: 'is_member_group'
 
     match '/one_to_ones/:id', to: 'one_to_ones#show', as: 'one_to_one'

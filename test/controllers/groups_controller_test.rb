@@ -157,14 +157,17 @@ describe GroupsController do
   end
 
 
-  describe "GET /groups/:id" do
-    it "must not return the group if the user is not a member" do
+  describe "GET /group" do
+    it "must return the group by join_code even if the user isn't registered" do
       group = FactoryGirl.create(:group)
       member = FactoryGirl.create(:user)
-      group.add_member(member)
 
-      get :show, {id: group.id, token: current_user.token}
-      result.must_equal('error' => {'message' => 'Sorry, that could not be found.'})
+      get :show, {join_code: group.join_code}
+      result.must_equal [{
+        'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
+        'admin_ids' => [], 'member_ids' => []
+      }]
     end
 
     it "must return the group, its users, and its most recent page of messages" do
