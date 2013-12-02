@@ -157,19 +157,7 @@ describe GroupsController do
   end
 
 
-  describe "GET /group" do
-    it "must return the group by join_code even if the user isn't registered" do
-      group = FactoryGirl.create(:group)
-      member = FactoryGirl.create(:user)
-
-      get :show, {join_code: group.join_code}
-      result.must_equal [{
-        'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-        'admin_ids' => [], 'member_ids' => []
-      }]
-    end
-
+  describe "GET /groups/:id" do
     it "must return the group, its users, and its most recent page of messages" do
       Group.stub :page_size, 2 do
         group = FactoryGirl.create(:group)
@@ -301,6 +289,21 @@ describe GroupsController do
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
           'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
         })
+      end
+    end
+
+
+    describe 'GET /groups/find' do
+      it "must return the group by join_code even if the user isn't registered" do
+        group = FactoryGirl.create(:group)
+        member = FactoryGirl.create(:user)
+
+        get :find, {join_code: group.join_code}
+        result.must_equal [{
+          'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
+          'admin_ids' => [], 'member_ids' => []
+        }]
       end
     end
   end
