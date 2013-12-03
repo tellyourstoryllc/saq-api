@@ -8,6 +8,7 @@ class FayeClient
 
   validates :id, :user_id, :client_type, presence: true
   validates :idle_duration, presence: true, if: proc{ |faye_client| faye_client.status == 'idle' && !%w(phone tablet).include?(faye_client.client_type) }
+  validate :exists?
 
 
   def initialize(attributes = {})
@@ -41,17 +42,22 @@ class FayeClient
     @user ||= User.find_by(id: user_id) if user_id
   end
 
-
-  private
-
-  # Only use for debugging purposes
   def destroy
-    return if Rails.env.production?
-
     redis.multi do
       remove_from_user
       attrs.del
       exists.del
+    end
+  end
+
+
+  private
+
+  # Protect against race conditions that lead to stale clients
+  def exists?
+    unless exists.exists?
+      destroy
+      errors.add(:base, "Doesn't exist in Faye, so self-destructing.")
     end
   end
 
