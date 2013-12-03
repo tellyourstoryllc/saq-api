@@ -10,6 +10,8 @@ development:
   faye:
     url: http://localhost:8080/faye
     server_secret: SECRET
+  rapns:
+    db_ios_app_name: skymob_ios
   redis:
     persisted:
       host: 127.0.0.1
@@ -40,6 +42,8 @@ test:
   faye:
     url: http://localhost:8080/faye_TEST
     server_secret: SECRET
+  rapns:
+    db_ios_app_name: ~
   redis:
     persisted:
       host: 127.0.0.1

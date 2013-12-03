@@ -1,4 +1,13 @@
- # Rapns configuration. Options set here are overridden by command-line options.
+rapns_config = Rails.configuration.app['rapns']
+
+begin
+  RAPNS_IOS_APP = Rapns::Apns::App.find_by!(name: rapns_config['db_ios_app_name'])
+rescue ActiveRecord::RecordNotFound
+  Rails.logger.warn "Could not find Rapns app #{rapns_config['db_ios_app_name']}. iOS Push Notifications will not work."
+end
+
+
+# Rapns configuration. Options set here are overridden by command-line options.
 
 Rapns.configure do |config|
   # Run in the foreground?
@@ -30,8 +39,9 @@ Rapns.reflect do |on|
   # Called with a Rapns::Apns::Feedback instance when feedback is received
   # from the APNs that a notification has failed to be delivered.
   # Further notifications should not be sent to the device.
-  # on.apns_feedback do |feedback|
-  # end
+  on.apns_feedback do |feedback|
+    Rapns.logger.info "(Rapns) Received feedback: #{feedback.inspect}"
+  end
 
   # Called when a notification is queued internally for delivery.
   # The internal queue for each app runner can be inspected:
@@ -41,17 +51,20 @@ Rapns.reflect do |on|
   #   runner.queue_size
   # end
   #
-  # on.notification_enqueued do |notification|
-  # end
+  on.notification_enqueued do |notification|
+    Rapns.logger.info "(Rapns) Notification enqueued: #{notification.inspect}"
+  end
 
   # Called when a notification is successfully delivered.
-  # on.notification_delivered do |notification|
-  # end
+  on.notification_delivered do |notification|
+    Rapns.logger.info "(Rapns) Notification delivered: #{notification.inspect}"
+  end
 
   # Called when notification delivery failed.
   # Call 'error_code' and 'error_description' on the notification for the cause.
-  # on.notification_failed do |notification|
-  # end
+  on.notification_failed do |notification|
+    Rapns.logger.info "(Rapns) Notification delivery failed: #{notification.inspect}"
+  end
 
   # Called when a notification will be retried at a later date.
   # Call 'deliver_after' on the notification for the next delivery date
@@ -60,8 +73,9 @@ Rapns.reflect do |on|
   # end
 
   # Called when an APNs connection is lost and will be reconnected.
-  # on.apns_connection_lost do |app, error|
-  # end
+  on.apns_connection_lost do |app, error|
+    Rapns.logger.info "(Rapns) APNs connection lost, will reconnect: #{app.inspect} | #{error.inspect}"
+  end
 
   # Called when the GCM returns a canonical registration ID.
   # You will need to replace old_id with canonical_id in your records.
@@ -74,6 +88,7 @@ Rapns.reflect do |on|
   # end
 
   # Called when an exception is raised.
-  # on.error do |error|
-  # end
+  on.error do |error|
+    Rapns.logger.info "(Rapns) Exception: #{error.inspect}"
+  end
 end
