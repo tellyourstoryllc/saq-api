@@ -14,7 +14,9 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
-    render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
+    objects = [@group, @group.members]
+    objects += @group.paginate_messages(pagination_params) if @group.member?(current_user)
+    render_json objects
   end
 
   def find
