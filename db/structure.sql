@@ -205,6 +205,83 @@ CREATE TABLE `one_to_one_wallpaper_images` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `rapns_apps`
+--
+
+DROP TABLE IF EXISTS `rapns_apps`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rapns_apps` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `environment` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `certificate` text COLLATE utf8_unicode_ci,
+  `password` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `connections` int(11) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `auth_key` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `rapns_feedback`
+--
+
+DROP TABLE IF EXISTS `rapns_feedback`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rapns_feedback` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `device_token` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
+  `failed_at` datetime NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `app` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_rapns_feedback_on_device_token` (`device_token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `rapns_notifications`
+--
+
+DROP TABLE IF EXISTS `rapns_notifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rapns_notifications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `badge` int(11) DEFAULT NULL,
+  `device_token` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `sound` varchar(255) COLLATE utf8_unicode_ci DEFAULT 'default',
+  `alert` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `data` text COLLATE utf8_unicode_ci,
+  `expiry` int(11) DEFAULT '86400',
+  `delivered` tinyint(1) NOT NULL DEFAULT '0',
+  `delivered_at` datetime DEFAULT NULL,
+  `failed` tinyint(1) NOT NULL DEFAULT '0',
+  `failed_at` datetime DEFAULT NULL,
+  `error_code` int(11) DEFAULT NULL,
+  `error_description` text COLLATE utf8_unicode_ci,
+  `deliver_after` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `alert_is_json` tinyint(1) DEFAULT '0',
+  `type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `collapse_key` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `delay_while_idle` tinyint(1) NOT NULL DEFAULT '0',
+  `registration_ids` mediumtext COLLATE utf8_unicode_ci,
+  `app_id` int(11) NOT NULL,
+  `retries` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `index_rapns_notifications_multi` (`app_id`,`delivered`,`failed`,`deliver_after`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `schema_migrations`
 --
 
@@ -249,7 +326,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-12-02  9:23:51
+-- Dump completed on 2013-12-02 11:56:37
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -313,3 +390,15 @@ INSERT INTO schema_migrations (version) VALUES ('20131126173444');
 INSERT INTO schema_migrations (version) VALUES ('20131129203308');
 
 INSERT INTO schema_migrations (version) VALUES ('20131202142335');
+
+INSERT INTO schema_migrations (version) VALUES ('20131202165559');
+
+INSERT INTO schema_migrations (version) VALUES ('20131202165600');
+
+INSERT INTO schema_migrations (version) VALUES ('20131202165601');
+
+INSERT INTO schema_migrations (version) VALUES ('20131202165602');
+
+INSERT INTO schema_migrations (version) VALUES ('20131202165603');
+
+INSERT INTO schema_migrations (version) VALUES ('20131202165604');
