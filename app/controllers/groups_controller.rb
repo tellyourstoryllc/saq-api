@@ -1,7 +1,7 @@
 class GroupsController < ApplicationController
   skip_before_action :require_token, only: :find
-  before_action :load_group, only: [:show, :update, :leave]
-  before_action :load_any_group, only: :find
+  before_action :load_group, only: [:update, :leave]
+  before_action :load_group_by_join_code, only: [:find, :join]
 
 
   def create
@@ -13,6 +13,7 @@ class GroupsController < ApplicationController
   end
 
   def show
+    @group = Group.find(params[:id])
     render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
   end
 
@@ -32,8 +33,6 @@ class GroupsController < ApplicationController
   end
 
   def join
-    @group = Group.find_by!(join_code: params[:join_code])
-
     # If this is a new member, publish the updated group to its channel
     if @group.add_member(current_user)
       publish_to_group
@@ -66,7 +65,7 @@ class GroupsController < ApplicationController
     @group = current_user.groups.find(params[:id])
   end
 
-  def load_any_group
+  def load_group_by_join_code
     @group = Group.find_by!(join_code: params[:join_code])
   end
 
