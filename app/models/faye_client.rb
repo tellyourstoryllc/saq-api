@@ -6,7 +6,7 @@ class FayeClient
   hash_key :attrs
   value :exists
 
-  validates :id, :user_id, presence: true
+  validates :id, :user_id, :client_type, presence: true
   validates :idle_duration, presence: true, if: proc{ |faye_client| faye_client.status == 'idle' && !%w(phone tablet).include?(faye_client.client_type) }
 
 
@@ -57,7 +57,6 @@ class FayeClient
 
   def set_defaults
     self.created_at ||= Time.current.to_i
-    self.client_type ||= 'web' # TODO: temporary until all clients have updated
   end
 
   def write_attrs
