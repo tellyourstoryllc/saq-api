@@ -20,3 +20,4 @@ Gemfile.local.lock
 
 .DS_Store
 config/*.yml
+!config/newrelic.yml
