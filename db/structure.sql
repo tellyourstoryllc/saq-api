@@ -147,7 +147,7 @@ CREATE TABLE `ios_devices` (
   `device_id` char(32) COLLATE utf8_unicode_ci NOT NULL,
   `client_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
   `os_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
-  `push_token` binary(32) DEFAULT NULL,
+  `push_token` char(64) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -326,7 +326,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-12-02 11:56:37
+-- Dump completed on 2013-12-03 15:20:51
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -402,3 +402,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131202165602');
 INSERT INTO schema_migrations (version) VALUES ('20131202165603');
 
 INSERT INTO schema_migrations (version) VALUES ('20131202165604');
+
+INSERT INTO schema_migrations (version) VALUES ('20131203201851');

@@ -1,6 +1,6 @@
 class Ios::ApnController < ApplicationController
   def set
-    if params[:push_token] && current_device && current_device.update!(push_token: Base64.decode64(params[:push_token].gsub(' ', '+')))
+    if params[:push_token] && current_device && current_device.update!(push_token: params[:push_token])
       render_success
     else
       render_error
