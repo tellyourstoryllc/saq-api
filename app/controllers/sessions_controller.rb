@@ -15,7 +15,6 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    # TODO: destroy API token?
     IosDevice.unassign!(current_user)
     render_json current_user
   end
