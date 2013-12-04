@@ -32,6 +32,22 @@ class Preferences
     true
   end
 
+  def server_mention_email
+    !@server_mention_email.nil? ? @server_mention_email : DEFAULTS[:server_mention_email]
+  end
+
+  def server_mention_ios
+    !@server_mention_ios.nil? ? @server_mention_ios : DEFAULTS[:server_mention_ios]
+  end
+
+  def server_one_to_one_email
+    !@server_one_to_one_email.nil? ? @server_one_to_one_email : DEFAULTS[:server_one_to_one_email]
+  end
+
+  def server_one_to_one_ios
+    !@server_one_to_one_ios.nil? ? @server_one_to_one_ios : DEFAULTS[:server_one_to_one_ios]
+  end
+
 
   private
 
