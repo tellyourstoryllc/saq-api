@@ -1,8 +1,8 @@
 rapns_config = Rails.configuration.app['rapns']
 
-begin
-  RAPNS_IOS_APP = Rapns::Apns::App.find_by!(name: rapns_config['db_ios_app_name'])
-rescue ActiveRecord::RecordNotFound
+Rails.configuration.app['rapns']['app'] = Rapns::Apns::App.find_by(name: rapns_config['db_ios_app_name']) if !Rails.configuration.app['rapns']['app'] && Rapns::Apns::App && Rapns::Apns::App.table_exists?
+
+if Rails.configuration.app['rapns']['app'].nil?
   Rails.logger.warn "Could not find Rapns app #{rapns_config['db_ios_app_name']}. iOS Push Notifications will not work."
 end
 

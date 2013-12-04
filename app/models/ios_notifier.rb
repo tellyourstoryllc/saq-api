@@ -21,7 +21,7 @@ class IosNotifier
       custom_data[:oid] = message.one_to_one.id
     end
 
-    attrs = {app: RAPNS_IOS_APP, alert: alert, data: custom_data}
+    attrs = {app: Rails.configuration.app['rapns']['app'], alert: alert, data: custom_data}
     notification = Rapns::Apns::Notification.new(attrs)
     Rails.logger.debug "Notification: #{notification}; payload_size: #{notification.payload_size}"
 
