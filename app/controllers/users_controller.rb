@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  skip_before_action :require_token, only: :create
+  skip_before_action :require_token, :create_or_update_device, only: :create
 
 
   def me
@@ -15,6 +15,7 @@ class UsersController < ApplicationController
   def create
     @account = Account.create!(account_params.merge(user_attributes: user_params))
     @current_user = @account.user
+    IosDevice.create_or_assign!(@current_user, ios_device_params)
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
     AccountMailer.welcome(@account).deliver!

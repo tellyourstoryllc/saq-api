@@ -1,5 +1,5 @@
 class SessionsController < ApplicationController
-  skip_before_action :require_token, only: :create
+  skip_before_action :require_token, :create_or_update_device, only: :create
 
 
   def create
@@ -7,10 +7,17 @@ class SessionsController < ApplicationController
 
     if @account
       @current_user = @account.user
+      IosDevice.create_or_assign!(@current_user, ios_device_params)
       render_json [current_user, @account]
     else
       render_error('Incorrect credentials.', nil, {status: :unauthorized})
     end
+  end
+
+  def destroy
+    # TODO: destroy API token?
+    IosDevice.unassign!(current_user)
+    render_json current_user
   end
 
 

@@ -1,7 +1,7 @@
 require 'active_record/validations'
 
 class ApplicationController < ActionController::Base
-  before_action :require_token
+  before_action :require_token, :create_or_update_device
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
   rescue_from ActiveRecord::RecordInvalid, with: :render_422
 
@@ -16,6 +16,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def current_device
+    @current_device ||= IosDevice.find_by(device_id: params[:device_id]) if params[:device_id]
+  end
+
   def faye_publisher
     @faye_publisher ||= FayePublisher.new(params[:token])
   end
@@ -25,6 +29,14 @@ class ApplicationController < ActionController::Base
 
   def require_token
     render_error('Invalid token.', nil, status: :unauthorized) if current_user.nil?
+  end
+
+  def create_or_update_device
+    IosDevice.create_or_assign!(current_user, ios_device_params) if current_user && ios_device_params.include?(:device_id)
+  end
+
+  def ios_device_params
+    params.permit(:device_id, :client_version, :os_version)
   end
 
   def render_json(objects, options = {})

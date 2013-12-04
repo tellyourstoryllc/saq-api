@@ -17,6 +17,7 @@ class User < ActiveRecord::Base
   has_one :account
   has_one :avatar_image, -> { order('avatar_images.id DESC') }
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
+  has_many :ios_devices
 
   set :group_ids
   set :one_to_one_ids
@@ -124,18 +125,24 @@ class User < ActiveRecord::Base
     @contacts_memoizer[user.id] = self.class.contacts?(self, user)
   end
 
-  def email_for_mention?
-    # TODO: also check preferences
-    away_idle_or_unavailable?
-  end
-
-  def email_for_one_to_one?
-    # TODO: also check preferences
-    away_idle_or_unavailable?
-  end
-
   def preferences
     Preferences.new(id: id)
+  end
+
+  def ios_notifier
+    @ios_notifier ||= IosNotifier.new(self)
+  end
+
+  def email_notifier
+    @email_notifier ||= EmailNotifier.new(self)
+  end
+
+  # Send notifications via all the user's channels, taking into account his preferences for each
+  def send_notifications(notification_type, message)
+    return unless [:mention, :one_to_one].include?(notification_type.to_sym) && away_idle_or_unavailable?
+
+    ios_notifier.notify!(notification_type, message)
+    email_notifier.notify!(notification_type, message)
   end
 
 
