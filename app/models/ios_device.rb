@@ -12,9 +12,7 @@ class IosDevice < ActiveRecord::Base
     ios_device.update!(attrs.merge(user_id: user.id))
   end
 
-  def self.unassign!(user)
-    user.ios_devices.each do |ios_device|
-      ios_device.update!(user_id: nil)
-    end
+  def unassign!
+    update!(user_id: nil)
   end
 end
