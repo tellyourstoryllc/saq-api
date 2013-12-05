@@ -5,6 +5,7 @@ development:
     bucket_name: MEDIA.SOMETHING.COM
   carrierwave:
     cache_dir: ~
+    cdn_url: ~
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   faye:
@@ -37,6 +38,7 @@ test:
     bucket_name: MEDIA.SOMETHING.COM
   carrierwave:
     cache_dir: ~
+    cdn_url: ~
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   faye:

@@ -1,4 +1,5 @@
 aws_config = Rails.configuration.app['aws']
+carrierwave_config = Rails.configuration.app['carrierwave']
 
 CarrierWave.configure do |config|
   config.fog_credentials = {
@@ -13,4 +14,5 @@ CarrierWave.configure do |config|
   config.fog_directory  = aws_config['bucket_name']               # required
   config.fog_public     = true                                    # optional, defaults to true
   config.fog_attributes = {'Cache-Control'=>'max-age=315576000'}  # optional, defaults to {}
+  config.asset_host     = carrierwave_config['cdn_url'] if carrierwave_config['cdn_url']
 end
