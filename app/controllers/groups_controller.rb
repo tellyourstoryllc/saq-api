@@ -1,5 +1,5 @@
 class GroupsController < ApplicationController
-  skip_before_action :require_token, only: :find
+  skip_before_action :require_token, only: [:show, :find]
   before_action :load_group, only: [:update, :leave]
   before_action :load_group_by_join_code, only: [:find, :join]
 
@@ -15,13 +15,13 @@ class GroupsController < ApplicationController
   def show
     @group = Group.find(params[:id])
     objects = [@group, @group.members]
-    objects += @group.paginate_messages(pagination_params) if @group.member?(current_user)
+    objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
     render_json objects
   end
 
   def find
     objects = [@group, @group.members]
-    objects += @group.paginate_messages(pagination_params) if current_user
+    objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
     render_json objects
   end
 
