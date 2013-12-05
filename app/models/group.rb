@@ -73,23 +73,25 @@ class Group < ActiveRecord::Base
 
   def set_id
     # Exclude L to avoid any confusion
-    chars = [*'a'..'k', *'m'..'z', *0..9]
+    chars = [*'a'..'k', *'m'..'z']
 
     loop do
-      self.id = Array.new(8){ chars.sample }.join
+      self.id = Array.new(5){ chars.sample }.join
       break unless Group.where(id: id).exists?
     end
   end
 
   def set_join_code
+    self.join_code = id
+
     # Lowercase alpha chars only to make it easier to type on mobile
     # Exclude L to avoid any confusion
-    chars = [*'a'..'k', *'m'..'z']
+    #chars = [*'a'..'k', *'m'..'z']
 
-    loop do
-      self.join_code = Array.new(5){ chars.sample }.join
-      break unless Group.where(join_code: join_code).exists?
-    end
+    #loop do
+    #  self.join_code = Array.new(5){ chars.sample }.join
+    #  break unless Group.where(join_code: join_code).exists?
+    #end
   end
 
   def update_group_wallpaper_image
