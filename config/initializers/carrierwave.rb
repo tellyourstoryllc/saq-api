@@ -14,5 +14,5 @@ CarrierWave.configure do |config|
   config.fog_directory  = aws_config['bucket_name']               # required
   config.fog_public     = true                                    # optional, defaults to true
   config.fog_attributes = {'Cache-Control'=>'max-age=315576000'}  # optional, defaults to {}
-  config.asset_host     = carrierwave_config['cdn_url'] if carrierwave_config['cdn_url']
+  config.asset_host     = carrierwave_config['cdn_url'] || 'https://s3.amazonaws.com/' + aws_config['bucket_name']
 end
