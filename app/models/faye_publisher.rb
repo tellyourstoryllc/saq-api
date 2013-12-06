@@ -1,5 +1,5 @@
 class FayePublisher
-  ENDPOINT = URI.parse(Rails.configuration.app['faye']['url'])
+  ENDPOINT = Rails.configuration.app['faye']['url']
   SECRET = Rails.configuration.app['faye']['server_secret']
   attr_accessor :token
 
@@ -15,7 +15,7 @@ class FayePublisher
       ext: ext.merge(token: token, server_secret: SECRET)
     }
 
-    Net::HTTP.post_form(ENDPOINT, message: message.to_json)
+    HTTParty.post(ENDPOINT, body: {message: message.to_json})
   end
 
   def publish_to_group(group, data)
