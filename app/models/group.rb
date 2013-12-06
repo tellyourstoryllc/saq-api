@@ -3,16 +3,19 @@ class Group < ActiveRecord::Base
   include Redis::Objects
   include Peanut::Conversation
 
-  attr_accessor :anything_changed, :wallpaper_image_file, :wallpaper_creator_id, :delete_wallpaper
+  attr_accessor :anything_changed, :wallpaper_image_file, :wallpaper_image_url,
+    :wallpaper_creator_id, :delete_wallpaper, :avatar_image_file, :avatar_image_url,
+    :avatar_creator_id, :delete_avatar
 
   before_validation :set_id, :set_join_code, on: :create
   validates :creator_id, :name, :join_code, presence: true
 
   after_save :anything_changed?
-  after_save :update_group_wallpaper_image, on: :update
+  after_save :update_group_avatar_image, :update_group_wallpaper_image, on: :update
   after_create :add_admin_and_member
 
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id'
+  has_one :group_avatar_image, -> { order('group_avatar_images.id DESC') }
   has_one :group_wallpaper_image, -> { order('group_wallpaper_images.id DESC') }
 
   set :admin_ids
@@ -33,6 +36,10 @@ class Group < ActiveRecord::Base
 
   def remove_admin(user)
     admin_ids.delete(user.id)
+  end
+
+  def avatar_url
+    @avatar_url ||= group_avatar_image.image.thumb.url if group_avatar_image.try(:active?)
   end
 
   def wallpaper_url
@@ -94,16 +101,29 @@ class Group < ActiveRecord::Base
     #end
   end
 
+  def update_group_avatar_image
+    if avatar_image_file.present?
+      create_group_avatar_image(creator_id: avatar_creator_id, image: avatar_image_file)
+    elsif avatar_image_url.present?
+      create_group_avatar_image(creator_id: avatar_creator_id, remote_image_url: avatar_image_url)
+    elsif delete_avatar
+      group_avatar_image.deactivate!
+    end
+  end
+
   def update_group_wallpaper_image
     if wallpaper_image_file.present?
       create_group_wallpaper_image(creator_id: wallpaper_creator_id, image: wallpaper_image_file)
+    elsif wallpaper_image_url.present?
+      create_group_wallpaper_image(creator_id: wallpaper_creator_id, remote_image_url: wallpaper_image_url)
     elsif delete_wallpaper
       group_wallpaper_image.deactivate!
     end
   end
 
   def anything_changed?
-    self.anything_changed = changed? || (wallpaper_image_file && wallpaper_creator_id) || delete_wallpaper
+    self.anything_changed = changed? || avatar_image_file || avatar_image_url ||
+      delete_avatar || wallpaper_image_file || wallpaper_image_url || delete_wallpaper
   end
 
   def add_admin_and_member

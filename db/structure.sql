@@ -93,6 +93,27 @@ CREATE TABLE `emoticons` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `group_avatar_images`
+--
+
+DROP TABLE IF EXISTS `group_avatar_images`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `group_avatar_images` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `group_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `creator_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_group_avatar_images_on_group_id` (`group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `group_wallpaper_images`
 --
 
@@ -326,7 +347,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-12-03 15:20:51
+-- Dump completed on 2013-12-06 12:48:35
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -404,3 +425,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131202165603');
 INSERT INTO schema_migrations (version) VALUES ('20131202165604');
 
 INSERT INTO schema_migrations (version) VALUES ('20131203201851');
+
+INSERT INTO schema_migrations (version) VALUES ('20131206171513');

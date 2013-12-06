@@ -49,7 +49,7 @@ describe UsersController do
           {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'joe@example.com',
             'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil},
           {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
-            'topic' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id]}
+            'topic' => nil, 'avatar_url' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id]}
         ]
       end
 

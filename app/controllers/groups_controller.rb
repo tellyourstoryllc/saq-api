@@ -72,16 +72,27 @@ class GroupsController < ApplicationController
   end
 
   def update_group_params
-    params.permit(:name, :topic, :wallpaper_image_file).tap do |attrs|
+    permitted = [:name, :topic, :avatar_image_file, :avatar_image_url, :wallpaper_image_file, :wallpaper_image_url]
+    params.permit(permitted).tap do |attrs|
       if @group.admin?(current_user)
-        if attrs.has_key?(:wallpaper_image_file) && attrs[:wallpaper_image_file].blank?
+        if (attrs.has_key?(:avatar_image_file) && attrs[:avatar_image_file].blank?) ||
+          (attrs.has_key?(:avatar_image_url) && attrs[:avatar_image_url].blank?)
+
+          attrs[:delete_avatar] = true
+        else
+          attrs[:avatar_creator_id] = current_user.id
+        end
+
+        if (attrs.has_key?(:wallpaper_image_file) && attrs[:wallpaper_image_file].blank?) ||
+          (attrs.has_key?(:wallpaper_image_url) && attrs[:wallpaper_image_url].blank?)
+
           attrs[:delete_wallpaper] = true
         else
           attrs[:wallpaper_creator_id] = current_user.id
         end
       else
-        attrs.delete(:name)
-        attrs.delete(:wallpaper_image_file)
+        attrs_to_delete = [:name, :avatar_image_file, :avatar_image_url, :wallpaper_image_file, :wallpaper_image_url]
+        attrs_to_delete.each{ |attr| attrs.delete(attr) }
       end
     end
   end

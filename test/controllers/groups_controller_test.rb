@@ -16,8 +16,8 @@ describe GroupsController do
 
         group = Group.last
         result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-          'admin_ids' => [current_user.id], 'member_ids' => [current_user.id]}]
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
+          'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [current_user.id]}]
       end
     end
   end
@@ -47,8 +47,8 @@ describe GroupsController do
       post :update, {id: group.id, topic: 'new topic', token: current_user.token}
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => 'new topic', 'wallpaper_url' => nil,
-        'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort}]
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => 'new topic', 'avatar_url' => nil,
+        'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort}]
     end
 
     it "must not update a group's name if the user is not an admin of the group" do
@@ -62,8 +62,8 @@ describe GroupsController do
       post :update, {id: group.id, name: 'Really Cool Dudes', token: current_user.token}
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-        'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort}]
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
+        'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort}]
     end
 
     it "must update a group's name if the user is an admin of the group" do
@@ -78,7 +78,7 @@ describe GroupsController do
       post :update, {id: group.id, name: 'Really Cool Dudes', token: current_user.token}
 
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Really Cool Dudes',
-        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil, 'wallpaper_url' => nil,
         'admin_ids' => [member.id, current_user.id].sort, 'member_ids' => [member.id, current_user.id].sort}]
     end
   end
@@ -107,8 +107,8 @@ describe GroupsController do
 
       result.must_include({
         'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-        'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort
+        'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
+        'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort
       })
 
       result.must_include({
@@ -185,8 +185,8 @@ describe GroupsController do
 
         result.must_include({
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-          'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
+          'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort
         })
 
         result.must_include({
@@ -249,8 +249,8 @@ describe GroupsController do
 
         result.must_include({
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-          'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
+          'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort
         })
 
         result.must_include({
@@ -301,8 +301,8 @@ describe GroupsController do
         get :find, {join_code: group.join_code}
         result.must_equal [{
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'wallpaper_url' => nil,
-          'admin_ids' => [], 'member_ids' => []
+          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
+          'wallpaper_url' => nil, 'admin_ids' => [], 'member_ids' => []
         }]
       end
     end
