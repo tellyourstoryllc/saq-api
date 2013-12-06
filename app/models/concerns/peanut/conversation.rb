@@ -25,4 +25,8 @@ module Peanut::Conversation
 
     Message.pipelined_find(ids)
   end
+
+  def last_message_at
+    @last_message_at ||= message_ids.range(-1, -1, with_scores: true).first.try(:last).try(:round)
+  end
 end
