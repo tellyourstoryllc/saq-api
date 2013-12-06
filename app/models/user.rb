@@ -51,7 +51,7 @@ class User < ActiveRecord::Base
   end
 
   def conversations
-    groups + one_to_ones
+    groups.includes(:group_avatar_image, :group_wallpaper_image) + one_to_ones
   end
 
   def clients
