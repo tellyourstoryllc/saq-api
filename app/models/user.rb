@@ -39,7 +39,7 @@ class User < ActiveRecord::Base
   end
 
   def avatar_url
-    @avatar_url ||= (avatar_image || AvatarImage.new).image.thumb.url
+    @avatar_url ||= avatar_image.image.thumb.url if avatar_image
   end
 
   def groups

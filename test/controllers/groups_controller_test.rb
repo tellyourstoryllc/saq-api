@@ -114,14 +114,14 @@ describe GroupsController do
       result.must_include({
         'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
         'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
-        'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+        'avatar_url' => nil
       })
 
       result.must_include({
         'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
         'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
         'token' => current_user.token, 'client_type' => nil,
-        'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+        'avatar_url' => nil
       })
 
       result.must_include({
@@ -192,14 +192,14 @@ describe GroupsController do
         result.must_include({
           'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
           'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
-          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+          'avatar_url' => nil
         })
 
         result.must_include({
           'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
           'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
           'token' => current_user.token, 'client_type' => 'phone',
-          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+          'avatar_url' => nil
         })
 
         result.must_include({
@@ -256,14 +256,14 @@ describe GroupsController do
         result.must_include({
           'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
           'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
-          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+          'avatar_url' => nil
         })
 
         result.must_include({
           'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
           'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
           'token' => current_user.token, 'client_type' => 'web',
-          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'
+          'avatar_url' => nil
         })
 
         result.must_include({

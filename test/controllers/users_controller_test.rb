@@ -29,7 +29,7 @@ describe UsersController do
         result.must_equal [
           {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
             'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-            'client_type' => nil, 'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'},
+            'client_type' => nil, 'avatar_url' => nil},
           {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'joe@example.com',
             'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil}
         ]
@@ -45,7 +45,7 @@ describe UsersController do
         result.must_equal [
           {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
             'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-            'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'},
+            'avatar_url' => nil},
           {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'joe@example.com',
             'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil},
           {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
@@ -66,7 +66,7 @@ describe UsersController do
           result.must_equal [
             {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
               'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-              'client_type' => nil, 'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'},
+              'client_type' => nil, 'avatar_url' => nil},
             {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'joe@example.com',
               'one_to_one_wallpaper_url' => nil, 'facebook_id' => '100002345'}
           ]
@@ -84,7 +84,7 @@ describe UsersController do
       result.must_equal [
         {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny', 'username' => current_user.username, 'token' => current_user.token,
           'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'client_type' => 'web',
-          'avatar_url' => 'https://s3.amazonaws.com/TESTbray.media.chat.com/defaults/thumb_avatar_image.png'}
+          'avatar_url' => nil}
       ]
     end
 
