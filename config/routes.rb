@@ -8,8 +8,11 @@ ChatApp::Application.routes.draw do
     match '/accounts/update', to: 'accounts#update', as: 'update_account'
     match '/password/reset_email' => 'accounts#send_reset_email', as: 'send_reset_email'
     match '/password/reset/:token' => 'accounts#reset_password', :as => 'reset_password'
+
     match '/preferences/update', to: 'user_preferences#update', as: 'update_user_preferences'
     match '/ios_device_preferences/update', to: 'ios_device_preferences#update', as: 'update_ios_device_preferences'
+    match '/groups/:group_id/user_group_preferences', to: 'user_group_preferences#show', as: 'show_user_group_preferences'
+    match '/groups/:group_id/user_group_preferences/update', to: 'user_group_preferences#update', as: 'update_user_group_preferences'
 
     match '/login', to: 'sessions#create', as: 'login'
     match '/logout', to: 'sessions#destroy', as: 'logout'
