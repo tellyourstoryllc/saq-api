@@ -13,6 +13,7 @@ class CheckinController < ApplicationController
     objects << current_user
     objects << current_user.account
     objects << current_user.preferences
+    objects << current_device.preferences if current_device
     objects += Emoticon.by_version(params[:emoticons_version])
 
     render_json objects

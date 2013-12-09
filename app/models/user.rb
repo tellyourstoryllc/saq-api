@@ -126,7 +126,7 @@ class User < ActiveRecord::Base
   end
 
   def preferences
-    Preferences.new(id: id)
+    UserPreferences.new(id: id)
   end
 
   def ios_notifier

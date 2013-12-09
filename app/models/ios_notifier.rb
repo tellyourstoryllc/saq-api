@@ -6,8 +6,6 @@ class IosNotifier
   end
 
   def notify!(notification_type, message)
-    return unless user.preferences.send("server_#{notification_type}_ios")
-
     notification_type = notification_type.to_sym
     custom_data = {}
 
@@ -34,7 +32,7 @@ class IosNotifier
     end
 
     user.ios_devices.each do |ios_device|
-      next if ios_device.push_token.blank?
+      next if ios_device.push_token.blank? || !ios_device.preferences.send("server_#{notification_type}")
 
       n = notification.dup
       n.device_token = ios_device.push_token

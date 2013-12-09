@@ -15,4 +15,8 @@ class IosDevice < ActiveRecord::Base
   def unassign!
     update!(user_id: nil)
   end
+
+  def preferences
+    IosDevicePreferences.new(id: id)
+  end
 end
