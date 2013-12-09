@@ -96,6 +96,8 @@ describe GroupMessagesController do
     end
 
     it "must create a message and allow an @all mention" do
+      FactoryGirl.create(:account, user_id: current_user.id)
+
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
 
