@@ -22,9 +22,9 @@ class OneToOneMessagesController < ApplicationController
         end
       end
 
-      # Notify the other user if he's Idle/Unavailable
+      # Potentially notify the other user, according to his status and preferences
       recipient = @one_to_one.other_user(current_user)
-      recipient.send_notifications(:one_to_one, @message)
+      recipient.send_notifications(@message)
 
       render_json @message
     else

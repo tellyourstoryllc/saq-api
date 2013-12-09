@@ -14,10 +14,8 @@ class GroupMessagesController < ApplicationController
         faye_publisher.publish_to_group(@group, MessageSerializer.new(@message).as_json)
       end
 
-      # Notify all Idle/Unavailable mentioned members
-      @message.mentioned_users.each do |recipient|
-        recipient.send_notifications(:mention, @message)
-      end
+      # Potentially notify each user, according to his status and preferences
+      @group.members.each{ |user| user.send_notifications(@message) }
 
       render_json @message
     else

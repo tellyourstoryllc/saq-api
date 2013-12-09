@@ -1,6 +1,5 @@
 class UserPreferencesController < ApplicationController
 
-
   def update
     @preferences = current_user.preferences
 

@@ -138,11 +138,11 @@ class User < ActiveRecord::Base
   end
 
   # Send notifications via all the user's channels, taking into account his preferences for each
-  def send_notifications(notification_type, message)
-    return unless [:mention, :one_to_one].include?(notification_type.to_sym) && away_idle_or_unavailable?
+  def send_notifications(message)
+    return unless away_idle_or_unavailable?
 
-    ios_notifier.notify!(notification_type, message)
-    email_notifier.notify!(notification_type, message)
+    ios_notifier.notify!(message)
+    email_notifier.notify!(message)
   end
 
 

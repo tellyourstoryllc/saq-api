@@ -72,6 +72,10 @@ class Message
     end
   end
 
+  def mentioned?(user)
+    mentioned_all? || mentioned_user_ids.include?(user.id)
+  end
+
   def like(user)
     likes[user.id] = Time.current.to_f unless likes.member?(user.id)
   end

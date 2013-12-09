@@ -5,18 +5,26 @@ class IosNotifier
     self.user = user
   end
 
-  def notify!(notification_type, message)
-    notification_type = notification_type.to_sym
+  def notify!(message)
+    convo = message.conversation
     custom_data = {}
+
+    if convo.is_a?(Group)
+      notification_type = message.mentioned?(user) ? :mention : :all
+      custom_data[:gid] = convo.id
+    elsif convo.is_a?(OneToOne)
+      notification_type = :one_to_one
+      custom_data[:oid] = convo.id
+    end
 
     if notification_type == :mention
       mentioned_name = message.mentioned_all? ? '@all' : 'you'
       alert = "#{message.user.name} mentioned #{mentioned_name} in the room \"#{message.group.name}\""
       alert << ": #{message.text}" if message.text.present?
-      custom_data[:gid] = message.group.id
     elsif notification_type == :one_to_one
       alert = message.text.present? ? "#{message.user.name}: #{message.text}" : "#{message.user.name} sent you a 1-1 message"
-      custom_data[:oid] = message.one_to_one.id
+    elsif notification_type == :all
+      alert = message.text.present? ? "(#{message.group.name}) #{message.user.name}: #{message.text}" : "#{message.user.name} sent a message in the room \"#{message.group.name}\""
     end
 
     attrs = {app: Rails.configuration.app['rapns']['app'], alert: alert, data: custom_data}
@@ -32,7 +40,15 @@ class IosNotifier
     end
 
     user.ios_devices.each do |ios_device|
-      next if ios_device.push_token.blank? || !ios_device.preferences.send("server_#{notification_type}")
+      next if ios_device.push_token.blank?
+
+      enabled_in_prefs = case notification_type
+                         when :one_to_one then ios_device.preferences.server_one_to_one
+                         when :mention then ios_device.preferences.server_mention || UserGroupPreferences.find(user, convo).server_all_messages_mobile_push
+                         when :all then UserGroupPreferences.find(user, convo).server_all_messages_mobile_push
+                         end
+
+      next unless enabled_in_prefs
 
       n = notification.dup
       n.device_token = ios_device.push_token
