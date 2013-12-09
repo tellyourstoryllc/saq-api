@@ -6,6 +6,8 @@ class IosNotifier
   end
 
   def notify!(message)
+    return if message.user_id == user.id
+
     convo = message.conversation
     custom_data = {}
 
