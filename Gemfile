@@ -47,3 +47,5 @@ gem 'koala', '1.6.0'
 gem 'newrelic_rpm', '3.6.9.171'
 gem 'newrelic-redis'
 gem 'rapns', '3.4.1'
+
+gem 'statsd-instrument', '1.5.0'
