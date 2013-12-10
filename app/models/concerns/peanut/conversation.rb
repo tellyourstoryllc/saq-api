@@ -15,9 +15,10 @@ module Peanut::Conversation
     return [] if limit == 0
 
     below_rank = options[:below_rank]
+    below_rank = below_rank.to_i if below_rank.present?
+    return [] if below_rank && below_rank <= 0
 
-    ids = if below_rank.present?
-      below_rank = below_rank.to_i
+    ids = if below_rank
       message_ids.range([below_rank - limit, 0].max, below_rank - 1)
     else
       message_ids.range(-limit, -1)
