@@ -84,10 +84,12 @@ DROP TABLE IF EXISTS `emoticons`;
 CREATE TABLE `emoticons` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `image_data` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `local_file_path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `sha1` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -347,7 +349,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-12-06 12:48:35
+-- Dump completed on 2013-12-09 19:19:44
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -427,3 +429,5 @@ INSERT INTO schema_migrations (version) VALUES ('20131202165604');
 INSERT INTO schema_migrations (version) VALUES ('20131203201851');
 
 INSERT INTO schema_migrations (version) VALUES ('20131206171513');
+
+INSERT INTO schema_migrations (version) VALUES ('20131209235938');

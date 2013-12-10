@@ -3,10 +3,7 @@ class CheckinController < ApplicationController
     objects = []
 
     meta = {
-      object_type: 'meta',
-      emoticons: {
-        version: Emoticon::VERSION
-      }
+      object_type: 'meta'
     }
 
     objects << meta
@@ -14,7 +11,7 @@ class CheckinController < ApplicationController
     objects << current_user.account
     objects << current_user.preferences
     objects << current_device.preferences if current_device
-    objects += Emoticon.by_version(params[:emoticons_version])
+    objects += Emoticon.active
 
     render_json objects
   end

@@ -1,28 +1,32 @@
 class Emoticon < ActiveRecord::Base
   include Peanut::Model
 
-  validates :name, :image_data, presence: true
+  before_validation :set_sha1
+  validates :name, :image, :local_file_path, :sha1, presence: true
   scope :active, -> { where(active: true) }
 
-  VERSION = 8
+  mount_uploader :image, EmoticonUploader
 
 
-  def self.by_version(version)
-    if version.to_i != VERSION
-      active
-    else
-      []
+  def self.reload
+    Emoticon.update_all(active: false)
+
+    r = /([^\/]+)\.[^\/]+$/
+    Dir.glob('app/assets/images/emoticons/*.{png,gif}') do |file_path|
+      name = ":#{r.match(file_path)[1]}:"
+      puts "Found emoticon #{name}"
+      e = Emoticon.find_by_name(name) || Emoticon.new(name: name)
+      e.image = File.open(file_path)
+      e.local_file_path = file_path
+      e.active = true
+      e.save!
     end
   end
 
-  def self.reload
-    r = /([^\/]+)\.[^\/]+$/
-    Dir.glob('app/assets/images/emoticons/*.{png,gif}') do |filename|
-      name = ":#{r.match(filename)[1]}:"
-      puts "Found emoticon #{name}"
-      e = Emoticon.find_by_name(name) || Emoticon.new(name: name)
-      e.image_data = Base64.encode64(File.read(filename))
-      e.save!
-    end
+
+  private
+
+  def set_sha1
+    self.sha1 = Digest::SHA1.hexdigest(File.read(local_file_path))
   end
 end
