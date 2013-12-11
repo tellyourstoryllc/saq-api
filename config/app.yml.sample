@@ -25,6 +25,8 @@ development:
   sendgrid:
     username: USERNAME
     password: PASSWORD
+  statsd:
+    server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
   web:
     domain: localhost:3001
     url: http://localhost:3001
@@ -58,6 +60,8 @@ test:
   sendgrid:
     username: USERNAME
     password: PASSWORD
+  statsd:
+    server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
   web:
     domain: test.host
     url: http://test.host
