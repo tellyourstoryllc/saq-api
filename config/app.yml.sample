@@ -18,10 +18,6 @@ development:
       host: 127.0.0.1
       port: 6380
       db: 0
-    cache:
-      host: 127.0.0.1
-      port: 6380
-      db: 1
   sendgrid:
     username: USERNAME
     password: PASSWORD
@@ -53,10 +49,6 @@ test:
       host: 127.0.0.1
       port: 6380
       db: 10
-    cache:
-      host: 127.0.0.1
-      port: 6380
-      db: 11
   sendgrid:
     username: USERNAME
     password: PASSWORD
