@@ -142,8 +142,8 @@ class User < ActiveRecord::Base
   def send_notifications(message)
     return unless away_idle_or_unavailable?
 
-    ios_notifier.notify!(message)
-    email_notifier.notify!(message)
+    ios_notifier.notify(message)
+    email_notifier.notify(message)
   end
 
 

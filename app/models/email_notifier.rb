@@ -5,7 +5,7 @@ class EmailNotifier
     self.user = user
   end
 
-  def notify!(message)
+  def notify(message)
     convo = message.conversation
     notification_type = if convo.is_a?(Group) && message.mentioned?(user)
                           :mention
@@ -14,6 +14,15 @@ class EmailNotifier
                         end
 
     return unless notification_type && user.preferences.send("server_#{notification_type}_email")
-    MessageMailer.send(notification_type, message, user, user.computed_status).deliver!
+
+    if Settings.enabled?(:queue)
+      EmailNotificationWorker.perform_async(notification_type, message.id, user.id, user.computed_status)
+    else
+      notify!(notification_type, message, user.computed_status)
+    end
+  end
+
+  def notify!(notification_type, message, status)
+    MessageMailer.send(notification_type, message, user, status).deliver!
   end
 end
