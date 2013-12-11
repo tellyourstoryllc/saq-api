@@ -44,4 +44,7 @@ ChatApp::Application.routes.draw do
     match '/ios/apn/set', to: 'ios/apn#set', as: 'set_apn'
     match '/ios/apn/reset', to: 'ios/apn#reset', as: 'reset_apn'
   end
+
+  require 'sidekiq/web'
+  mount Sidekiq::Web, at: '/sidekiq'
 end
