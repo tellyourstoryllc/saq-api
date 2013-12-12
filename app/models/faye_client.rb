@@ -75,11 +75,14 @@ class FayeClient
     if status == 'active'
       user.idle_since.del
     elsif status == 'idle' && idle_duration.present? && user.clients.none?(&:active?)
-      # Update the time the user has been idle since if it's most recent
-      old_time = user.idle_since.value.try(:to_i)
+      # Update the user's idle time to either the passed-in time or the user's
+      # last active time, but only if it's more recent than the exising idle time
+      old_time = user.idle_since.to_i
       new_time = idle_duration.to_i.seconds.ago.to_i
+      last_active_time = user.last_client_disconnect_at.to_i
+      new_idle_since = [new_time, last_active_time].max
 
-      user.idle_since = new_time if old_time.nil? || new_time > old_time
+      user.idle_since = new_idle_since if new_idle_since > old_time
     end
   end
 

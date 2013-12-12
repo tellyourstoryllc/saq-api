@@ -26,6 +26,7 @@ class User < ActiveRecord::Base
   hash_key :user_ids_by_api_token, global: true
   sorted_set :connected_faye_client_ids
   value :idle_since
+  value :last_client_disconnect_at
 
   delegate :email, to: :account
 
