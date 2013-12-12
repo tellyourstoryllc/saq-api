@@ -47,4 +47,9 @@ ChatApp::Application.routes.draw do
 
   require 'sidekiq/web'
   mount Sidekiq::Web, at: '/sidekiq'
+
+  Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+    username == Rails.configuration.app['admin']['username'] &&
+      password == Rails.configuration.app['admin']['password']
+  end
 end

@@ -1,4 +1,7 @@
 development:
+  admin:
+    username: USERNAME
+    password: PASSWORD
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -28,8 +31,9 @@ development:
     url: http://localhost:3001
 
 test:
-  assets:
-    url: http://test.assets
+  admin:
+    username: USERNAME
+    password: PASSWORD
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
