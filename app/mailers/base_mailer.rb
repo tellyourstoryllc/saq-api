@@ -1,3 +1,3 @@
 class BaseMailer < ActionMailer::Base
-  default from: 'SkyMob <info@skymob.co>'
+  default from: 'skymob <info@skymob.co>'
 end
