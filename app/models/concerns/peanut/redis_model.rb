@@ -15,6 +15,14 @@ module Peanut::RedisModel
 
       attrs.map{ |attrs| new(attrs.merge(fetched: true)) }
     end
+
+    def self.to_bool(value)
+      case value
+      when true, 'true', 1, '1' then true
+      when false, 'false', 0, '0' then false
+      else nil
+      end
+    end
   end
 
   def initialize(attributes = {})
@@ -49,12 +57,7 @@ module Peanut::RedisModel
   def to_bool(*attrs)
     attrs.each do |attr|
       value = send(attr)
-      new_value = case value
-                  when true, 'true', 1, '1' then true
-                  when false, 'false', 0, '0' then false
-                  else nil
-                  end
-      send("#{attr}=", new_value)
+      send("#{attr}=", self.class.to_bool(value))
     end
   end
 end
