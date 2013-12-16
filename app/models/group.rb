@@ -83,7 +83,7 @@ class Group < ActiveRecord::Base
     chars = [*'a'..'k', *'m'..'z']
 
     loop do
-      self.id = Array.new(5){ chars.sample }.join
+      self.id = Array.new(6){ chars.sample }.join
       break unless Group.where(id: id).exists?
     end
   end
