@@ -44,4 +44,12 @@ ChatApp::Application.routes.draw do
     match '/ios/apn/set', to: 'ios/apn#set', as: 'set_apn'
     match '/ios/apn/reset', to: 'ios/apn#reset', as: 'reset_apn'
   end
+
+  require 'sidekiq/web'
+  mount Sidekiq::Web, at: '/sidekiq'
+
+  Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+    username == Rails.configuration.app['admin']['username'] &&
+      password == Rails.configuration.app['admin']['password']
+  end
 end
