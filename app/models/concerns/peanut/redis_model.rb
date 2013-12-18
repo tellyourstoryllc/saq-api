@@ -15,14 +15,6 @@ module Peanut::RedisModel
 
       attrs.map{ |attrs| new(attrs.merge(fetched: true)) }
     end
-
-    def self.to_bool(value)
-      case value
-      when true, 'true', 1, '1' then true
-      when false, 'false', 0, '0' then false
-      else nil
-      end
-    end
   end
 
   def initialize(attributes = {})

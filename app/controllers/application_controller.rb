@@ -2,6 +2,7 @@ require 'active_record/validations'
 
 class ApplicationController < ActionController::Base
   before_action :require_token, :create_or_update_device
+  around_action :set_client
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
   rescue_from ActiveRecord::RecordInvalid, with: :render_422
 
@@ -24,6 +25,10 @@ class ApplicationController < ActionController::Base
     @faye_publisher ||= FayePublisher.new(params[:token])
   end
 
+  def mixpanel
+    @mixpanel ||= MixpanelClient.new(current_user)
+  end
+
 
   private
 
@@ -33,6 +38,16 @@ class ApplicationController < ActionController::Base
 
   def create_or_update_device
     IosDevice.create_or_assign!(current_user, ios_device_params) if current_user && ios_device_params.include?(:device_id)
+  end
+
+  def set_client
+    Thread.current[:client] = params[:client]
+
+    begin
+      yield
+    ensure
+      Thread.current[:client] = nil
+    end
   end
 
   def ios_device_params

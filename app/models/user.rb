@@ -27,6 +27,7 @@ class User < ActiveRecord::Base
   sorted_set :connected_faye_client_ids
   value :idle_since
   value :last_client_disconnect_at
+  value :last_mixpanel_checkin_at
 
   delegate :email, to: :account
 
