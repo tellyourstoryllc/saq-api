@@ -15,7 +15,7 @@ class MixpanelClient
     {
       'distinct_id' => user.id, '$created' => user.created_at, 'Client' => Thread.current[:client],
       'Name' => user.name, '$username' => user.username, '$email' => user.email, 'Status' => user.computed_status,
-      'Groups Count' => user.group_ids.size, 'Created Groups Count' => user.created_groups.size
+      'Invited' => user.invited?, 'Groups Count' => user.group_ids.size, 'Created Groups Count' => user.created_groups.size
     }
   end
 
