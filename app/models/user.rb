@@ -148,6 +148,11 @@ class User < ActiveRecord::Base
     end
   end
 
+  def live_created_groups_count
+    member_counts = redis.pipelined{ created_groups.map{ |g| g.member_ids.size } }
+    member_counts.count{ |size| size > 1 }
+  end
+
   def preferences
     UserPreferences.new(id: id)
   end
