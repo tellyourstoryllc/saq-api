@@ -179,10 +179,16 @@ class Message
   end
 
   def increment_stats
-    StatsD.increment('messages.sent')
+    if group
+      StatsD.increment('messages.group.sent')
 
-    # For each message sent, count all the members in the group/1-1
-    # (except the sender) as recipients
-    StatsD.increment('messages.received', conversation.fetched_member_ids.size - 1)
+      # For each message sent, count all the members in the group,
+      # (except the sender) as recipients
+      recipients = conversation.fetched_member_ids.size - 1
+      StatsD.increment('messages.group.received', recipients) if recipients > 0
+    elsif one_to_one
+      StatsD.increment('messages.one_to_one.sent')
+      StatsD.increment('messages.one_to_one.received')
+    end
   end
 end
