@@ -30,6 +30,7 @@ class User < ActiveRecord::Base
   value :last_client_disconnect_at
   value :last_mixpanel_checkin_at
   value :invited
+  hash_key :metrics
 
   delegate :email, to: :account
 

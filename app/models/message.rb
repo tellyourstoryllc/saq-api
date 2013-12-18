@@ -29,6 +29,7 @@ class Message
     write_attrs
     add_to_conversation
     set_rank
+    increment_user_stats
     increment_stats
 
     true
@@ -161,6 +162,20 @@ class Message
   def add_to_conversation
     convo = conversation
     convo.message_ids[id] = created_at_precise if convo
+  end
+
+  def increment_user_stats
+    key = user.metrics.key
+
+    user.redis.pipelined do
+      if group
+        user.redis.hincrby(key, :sent_group_messages_count, 1)
+      elsif one_to_one
+        user.redis.hincrby(key, :sent_one_to_one_messages_count, 1)
+      end
+
+      user.redis.hincrby(key, :sent_messages_count, 1)
+    end
   end
 
   def increment_stats
