@@ -29,6 +29,7 @@ class Message
     write_attrs
     add_to_conversation
     set_rank
+    increment_stats
 
     true
   end
@@ -160,5 +161,13 @@ class Message
   def add_to_conversation
     convo = conversation
     convo.message_ids[id] = created_at_precise if convo
+  end
+
+  def increment_stats
+    StatsD.increment('messages.sent')
+
+    # For each message sent, count all the members in the group/1-1
+    # (except the sender) as recipients
+    StatsD.increment('messages.received', conversation.fetched_member_ids.size - 1)
   end
 end
