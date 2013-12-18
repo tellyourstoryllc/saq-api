@@ -68,8 +68,10 @@ class Group < ActiveRecord::Base
     end
   end
 
-  def members
-    User.includes(:avatar_image).where(id: member_ids.members)
+  def members(options = {includes: [:avatar_image]})
+    scope = User
+    scope = scope.includes(options[:includes]) if options[:includes].present?
+    scope.where(id: member_ids.members)
   end
 
   def fetched_member_ids

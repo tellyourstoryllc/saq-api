@@ -48,7 +48,7 @@ class OneToOne
   end
 
   # Find the users seprately so it'll use AR cache in most cases
-  def members
+  def members(options = {})
     fetched_member_ids.map{ |id| User.find_by(id: id) }
   end
 

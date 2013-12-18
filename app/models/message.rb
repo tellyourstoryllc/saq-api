@@ -166,12 +166,22 @@ class Message
 
   def increment_user_stats
     key = user.metrics.key
+    recipients = conversation.members(includes: nil).reject{ |m| m.id == user.id }
 
     user.redis.pipelined do
       if group
         user.redis.hincrby(key, :sent_group_messages_count, 1)
+
+        recipients.each do |recipient|
+          user.redis.hincrby(recipient.metrics.key, :received_group_messages_count, 1)
+          user.redis.hincrby(recipient.metrics.key, :received_messages_count, 1)
+        end
       elsif one_to_one
         user.redis.hincrby(key, :sent_one_to_one_messages_count, 1)
+
+        recipient_key = one_to_one.other_user(user).metrics.key
+        user.redis.hincrby(recipient_key, :received_one_to_one_messages_count, 1)
+        user.redis.hincrby(recipient_key, :received_messages_count, 1)
       end
 
       user.redis.hincrby(key, :sent_messages_count, 1)
