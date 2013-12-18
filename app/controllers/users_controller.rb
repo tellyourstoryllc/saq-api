@@ -18,6 +18,7 @@ class UsersController < ApplicationController
     IosDevice.create_or_assign!(@current_user, ios_device_params)
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
+    mixpanel.user_registered(@current_user)
     AccountMailer.welcome(@account).deliver!
 
     render_json [@current_user, @account, @group].compact

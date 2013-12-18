@@ -65,6 +65,7 @@ GEM
     em-socksify (0.3.0)
       eventmachine (>= 1.0.0.beta.4)
     erubis (2.7.0)
+    escape (0.0.4)
     eventmachine (1.0.3)
     excon (0.25.3)
     execjs (2.0.2)
@@ -128,6 +129,10 @@ GEM
     minitest-rails (0.9.2)
       minitest (~> 4.7)
       rails (>= 3.0)
+    mixpanel (4.1.1)
+      escape
+      json
+      rack
     multi_json (1.8.2)
     multi_xml (0.5.3)
     multipart-post (1.2.0)
@@ -256,6 +261,7 @@ DEPENDENCIES
   koala (= 1.6.0)
   mini_magick
   minitest-rails
+  mixpanel (= 4.1.1)
   mysql2
   newrelic-redis
   newrelic_rpm (= 3.6.9.171)

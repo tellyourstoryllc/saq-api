@@ -20,6 +20,7 @@ class User < ActiveRecord::Base
   has_many :ios_devices
 
   set :group_ids
+  sorted_set :group_join_times
   set :one_to_one_ids
   set :one_to_one_user_ids
   hash_key :api_tokens, global: true
@@ -27,6 +28,8 @@ class User < ActiveRecord::Base
   sorted_set :connected_faye_client_ids
   value :idle_since
   value :last_client_disconnect_at
+  value :last_mixpanel_checkin_at
+  value :invited
 
   delegate :email, to: :account
 
@@ -124,6 +127,30 @@ class User < ActiveRecord::Base
     return is_contact unless is_contact.nil?
 
     @contacts_memoizer[user.id] = self.class.contacts?(self, user)
+  end
+
+  # Did the user join his first group (not including creating a group)
+  # within 5 minutes of registering?
+  def invited?
+    invited_period = 5.minutes
+    was_invited = invited.get
+
+    if was_invited.nil?
+      joined_group_ids = groups.where('creator_id != ?', id).pluck(:id)
+      join_times = group_join_times.members(with_scores: true)
+      joined_first_group_at = join_times.detect{ |group_id, time| joined_group_ids.include?(group_id) }.try(:last)
+
+      invited_val = (joined_first_group_at && joined_first_group_at <= (created_at + invited_period).to_i) ? 1 : 0
+      self.invited = invited_val if invited_val == 1 || created_at < invited_period.ago
+      self.class.to_bool(invited_val)
+    else
+      self.class.to_bool(was_invited)
+    end
+  end
+
+  def live_created_groups_count
+    member_counts = redis.pipelined{ created_groups.map{ |g| g.member_ids.size } }
+    member_counts.count{ |size| size > 1 }
   end
 
   def preferences

@@ -1,5 +1,7 @@
 class CheckinController < ApplicationController
   def index
+    mixpanel.checked_in
+
     objects = []
 
     meta = {

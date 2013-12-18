@@ -51,6 +51,7 @@ class Group < ActiveRecord::Base
       redis.multi do
         self.member_ids << user.id
         user.group_ids << id
+        user.group_join_times[id] = Time.current.to_i
       end
       true
     end
