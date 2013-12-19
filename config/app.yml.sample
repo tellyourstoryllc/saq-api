@@ -11,6 +11,8 @@ development:
     cdn_url: ~
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
+  facebook:
+    app_access_token: TOKEN
   faye:
     url: https://local.skymob.co:8080/faye
     server_secret: SECRET
@@ -45,6 +47,8 @@ test:
     cdn_url: ~
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
+  facebook:
+    app_access_token: TOKEN
   faye:
     url: https://local.skymob.co:8080/faye_TEST
     server_secret: SECRET

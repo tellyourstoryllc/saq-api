@@ -56,7 +56,13 @@ class Account < ActiveRecord::Base
     return false if facebook_token.blank?
 
     profile = Koala::Facebook::API.new(facebook_token).get_object('me')
-    profile['id'] == facebook_id
+
+    if profile['id'] == facebook_id
+      FacebookUser.new(id: facebook_id).fetch_profile
+      true
+    else
+      false
+    end
 
   rescue Koala::Facebook::APIError
     false

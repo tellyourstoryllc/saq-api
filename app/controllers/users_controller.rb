@@ -20,6 +20,7 @@ class UsersController < ApplicationController
 
     mixpanel.user_registered(@current_user)
     AccountMailer.welcome(@account).deliver!
+    FacebookUser.new(id: @account.facebook_id).fetch_friends if @account.facebook_id
 
     render_json [@current_user, @account, @group].compact
   end
