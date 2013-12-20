@@ -27,7 +27,7 @@ class GroupsController < ApplicationController
 
   def update
     @group.update!(update_group_params)
-    publish_to_group if @group.anything_changed
+    publish_updated_group if @group.anything_changed
     render_json @group
 
   rescue ActiveRecord::RecordInvalid => e
