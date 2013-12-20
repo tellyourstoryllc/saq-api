@@ -10,6 +10,7 @@ group :test do
   gem 'spork-rails', '4.0.0'
   gem 'spork-minitest', '1.0.0.beta2'
   gem 'turn'
+  gem 'webmock'
 end
 
 group :test, :development do
