@@ -15,6 +15,7 @@ Spork.prefork do
   require "minitest/rails"
   require "turn/autorun"
   require "factory_girl_rails"
+  require "webmock/minitest"
 
   #Turn.config.format = :progress
 
@@ -25,6 +26,10 @@ Spork.prefork do
     def setup
       keys = Redis.current.keys
       Redis.current.del(keys) if keys.present?
+
+      stub_request(:any, Rails.configuration.app['faye']['url'])
+      stub_request(:any, /.*mixpanel.com/)
+      stub_request(:any, /.*facebook.com/)
     end
 
     def result

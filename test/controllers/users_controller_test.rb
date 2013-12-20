@@ -11,6 +11,8 @@ describe UsersController do
       end
 
       it "must not create a user using Facebook authentication if the given Facebook id and token are not valid" do
+        stub_request(:any, /.*facebook.com/).to_return(body: {})
+
         post :create, {name: 'John Doe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'invalidtoken'}
         old_count = User.count
         result.must_equal('error' => {'message' => 'Sorry, that could not be saved: Validation failed: Invalid Facebook credentials.'})
@@ -56,6 +58,7 @@ describe UsersController do
       it "must create a user and account using Facebook authentication" do
         api = 'api'
         def api.get_object(id); {'id' => '100002345'} end
+        def api.get_connections(id, connection); [] end
 
         Koala::Facebook::API.stub :new, api do
           post :create, {name: 'John Doe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
