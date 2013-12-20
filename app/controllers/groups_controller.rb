@@ -37,7 +37,7 @@ class GroupsController < ApplicationController
   def join
     # If this is a new member, publish the updated group to its channel
     if @group.add_member(current_user)
-      publish_to_group
+      publish_updated_group(true)
     end
 
     render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
@@ -46,7 +46,7 @@ class GroupsController < ApplicationController
   def leave
     # If the member successfully left the group, publish the updated group to its channel
     if @group.leave!(current_user)
-      publish_to_group
+      publish_updated_group
     end
 
     render_success
@@ -101,7 +101,10 @@ class GroupsController < ApplicationController
     params.permit(:limit, :below_rank)
   end
 
-  def publish_to_group
-    faye_publisher.publish_to_group(@group, GroupSerializer.new(@group).as_json)
+  def publish_updated_group(publish_to_self = false)
+    data = GroupSerializer.new(@group).as_json
+
+    faye_publisher.publish_to_group(@group, data)
+    faye_publisher.publish_group_to_user(current_user, data) if publish_to_self
   end
 end

@@ -18,6 +18,10 @@ class FayePublisher
     HTTParty.post(ENDPOINT, body: {message: message.to_json})
   end
 
+  def broadcast_to_contacts
+    publish '/internal/broadcast_to_contacts'
+  end
+
   def publish_to_group(group, data)
     publish "/groups/#{group.id}/messages", data, {persisted: true}
   end
@@ -26,8 +30,8 @@ class FayePublisher
     publish "/users/#{user.id}", data, {action: 'create_one_to_one_message', persisted: true}
   end
 
-  def broadcast_to_contacts
-    publish '/internal/broadcast_to_contacts'
+  def publish_group_to_user(user, data)
+    publish "/users/#{user.id}", data, {action: 'updated_group'}
   end
 
   def publish_preferences(user, data)
