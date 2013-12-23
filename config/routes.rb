@@ -37,6 +37,7 @@ ChatApp::Application.routes.draw do
     match '/groups/:id/unban', to: 'banned_group_users#destroy', as: 'unban_group_user'
 
     match '/one_to_ones/:id', to: 'one_to_ones#show', as: 'one_to_one'
+    match '/one_to_ones/:id/update', to: 'one_to_ones#update', as: 'update_one_to_one'
     match '/one_to_ones/:one_to_one_id/messages/create', to: 'one_to_one_messages#create', as: 'create_one_to_one_message'
     match '/one_to_ones/:one_to_one_id/messages', to: 'one_to_one_messages#index', as: 'one_to_one_messages'
 

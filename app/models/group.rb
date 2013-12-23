@@ -3,14 +3,13 @@ class Group < ActiveRecord::Base
   include Redis::Objects
   include Peanut::Conversation
 
-  attr_accessor :anything_changed, :wallpaper_image_file, :wallpaper_image_url,
+  attr_accessor :wallpaper_image_file, :wallpaper_image_url,
     :wallpaper_creator_id, :delete_wallpaper, :avatar_image_file, :avatar_image_url,
     :avatar_creator_id, :delete_avatar
 
   before_validation :set_id, :set_join_code, on: :create
   validates :creator_id, :name, :join_code, presence: true
 
-  after_save :anything_changed?
   after_save :update_group_avatar_image, :update_group_wallpaper_image, on: :update
   after_create :add_admin_and_member
 
@@ -179,11 +178,6 @@ class Group < ActiveRecord::Base
     elsif delete_wallpaper
       group_wallpaper_image.deactivate!
     end
-  end
-
-  def anything_changed?
-    self.anything_changed = changed? || avatar_image_file || avatar_image_url ||
-      delete_avatar || wallpaper_image_file || wallpaper_image_url || delete_wallpaper
   end
 
   def add_admin_and_member

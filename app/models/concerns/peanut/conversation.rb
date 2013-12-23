@@ -1,9 +1,10 @@
 module Peanut::Conversation
   extend ActiveSupport::Concern
+  attr_accessor :viewer
+
 
   included do
     sorted_set :message_ids
-    counter :messages_count
 
     # These can be overridden
     def self.page_size; 20 end
@@ -29,5 +30,22 @@ module Peanut::Conversation
 
   def last_message_at
     @last_message_at ||= message_ids.range(-1, -1, with_scores: true).first.try(:last).try(:round)
+  end
+
+  def metadata_key
+    "#{self.class.to_s.underscore}:#{id}:viewer_metadata:#{viewer.id}" if viewer
+  end
+
+  def metadata
+    redis.hgetall(metadata_key) if viewer
+  end
+
+  def last_seen_rank
+    data = metadata
+    data['last_seen_rank'].try(:to_i) if data
+  end
+
+  def last_seen_rank=(rank)
+    redis.hset(metadata_key, :last_seen_rank, rank) if viewer
   end
 end

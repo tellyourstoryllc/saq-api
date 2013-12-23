@@ -10,15 +10,34 @@ class OneToOnesController < ApplicationController
     end
   end
 
+  def update
+    update_params.each do |k,v|
+      @one_to_one.send("#{k}=", v)
+    end
+
+    publish_updated_one_to_one
+    render_json @one_to_one
+  end
+
 
   private
 
   def load_one_to_one
     @one_to_one = OneToOne.new(id: params[:id])
+    @one_to_one.viewer = current_user
+
     raise Peanut::Redis::RecordNotFound unless @one_to_one.valid? && @one_to_one.authorized?(current_user)
   end
 
   def pagination_params
     params.permit(:limit, :below_rank)
+  end
+
+  def update_params
+    params.permit(:last_seen_rank)
+  end
+
+  def publish_updated_one_to_one
+    faye_publisher.publish_one_to_one_to_user(current_user, OneToOneSerializer.new(@one_to_one).as_json)
   end
 end

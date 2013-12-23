@@ -14,6 +14,7 @@ class GroupsController < ApplicationController
 
   def show
     @group = Group.find(params[:id])
+    @group.viewer = current_user
     objects = [@group, @group.members]
     objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
     render_json objects
@@ -26,8 +27,9 @@ class GroupsController < ApplicationController
   end
 
   def update
+    @group.viewer = current_user
     @group.update!(update_group_params)
-    publish_updated_group if @group.anything_changed
+    publish_updated_group
     render_json @group
 
   rescue ActiveRecord::RecordInvalid => e
@@ -36,7 +38,7 @@ class GroupsController < ApplicationController
 
   def join
     if @group.add_member(current_user)
-      publish_updated_group(true)
+      publish_updated_group
       render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
     else
       render_error "Sorry, you cannot join that group at this time."
@@ -72,14 +74,15 @@ class GroupsController < ApplicationController
   end
 
   def update_group_params
-    permitted = [:name, :topic, :avatar_image_file, :avatar_image_url, :wallpaper_image_file, :wallpaper_image_url]
+    permitted = [:name, :topic, :avatar_image_file, :avatar_image_url, :wallpaper_image_file,
+      :wallpaper_image_url, :last_seen_rank]
     params.permit(permitted).tap do |attrs|
       if @group.admin?(current_user)
         if (attrs.has_key?(:avatar_image_file) && attrs[:avatar_image_file].blank?) ||
           (attrs.has_key?(:avatar_image_url) && attrs[:avatar_image_url].blank?)
 
           attrs[:delete_avatar] = true
-        else
+        elsif attrs[:avatar_image_file].present? || attrs[:avatar_image_url].present?
           attrs[:avatar_creator_id] = current_user.id
         end
 
@@ -87,7 +90,7 @@ class GroupsController < ApplicationController
           (attrs.has_key?(:wallpaper_image_url) && attrs[:wallpaper_image_url].blank?)
 
           attrs[:delete_wallpaper] = true
-        else
+        elsif attrs[:wallpaper_image_file].present? || attrs[:wallpaper_image_url].present?
           attrs[:wallpaper_creator_id] = current_user.id
         end
       else
@@ -101,10 +104,8 @@ class GroupsController < ApplicationController
     params.permit(:limit, :below_rank)
   end
 
-  def publish_updated_group(publish_to_self = false)
-    data = GroupSerializer.new(@group).as_json
-
-    faye_publisher.publish_to_group(@group, data)
-    faye_publisher.publish_group_to_user(current_user, data) if publish_to_self
+  def publish_updated_group
+    faye_publisher.publish_to_group(@group, PublishGroupSerializer.new(@group).as_json) unless update_group_params.keys == %w(last_seen_rank)
+    faye_publisher.publish_group_to_user(current_user, GroupSerializer.new(@group).as_json)
   end
 end

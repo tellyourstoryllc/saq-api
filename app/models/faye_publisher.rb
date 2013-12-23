@@ -34,6 +34,10 @@ class FayePublisher
     publish "/users/#{user.id}", data, {action: 'updated_group'}
   end
 
+  def publish_one_to_one_to_user(user, data)
+    publish "/users/#{user.id}", data, {action: 'updated_one_to_one'}
+  end
+
   def publish_preferences(user, data)
     publish "/users/#{user.id}", data, {action: 'updated_preferences'}
   end

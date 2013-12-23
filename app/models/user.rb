@@ -32,6 +32,8 @@ class User < ActiveRecord::Base
   value :invited
   hash_key :metrics
   sorted_set :blocked_user_ids
+  hash_key :group_last_seen_ranks
+  hash_key :one_to_one_last_seen_ranks
 
   delegate :email, to: :account
 
