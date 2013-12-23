@@ -56,6 +56,10 @@ class Message
     @one_to_one ||= OneToOne.new(id: one_to_one_id) if one_to_one_id
   end
 
+  def message_attachment
+    @message_attachment ||= MessageAttachment.find_by(id: message_attachment_id) if message_attachment_id
+  end
+
   def mentioned_user_ids
     @mentioned_user_ids.present? ? @mentioned_user_ids.to_s.split(',') : []
   end

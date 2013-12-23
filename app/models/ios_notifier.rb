@@ -26,7 +26,18 @@ class IosNotifier
     elsif notification_type == :one_to_one
       alert = message.text.present? ? "#{message.user.name}: #{message.text}" : "#{message.user.name} sent you a 1-1 message"
     elsif notification_type == :all
-      alert = message.text.present? ? "(#{message.group.name}) #{message.user.name}: #{message.text}" : "#{message.user.name} sent a message in the room \"#{message.group.name}\""
+      media_type = message.message_attachment.try(:media_type)
+      alert = if media_type.present?
+                media_desc = case media_type
+                             when 'image' then 'an image'
+                             when 'video' then 'a video'
+                             when 'audio' then 'an audio clip'
+                             else 'a file'
+                             end
+                "#{message.user.name} uploaded #{media_desc} to the room \"#{message.group.name}\""
+              elsif message.text.present?
+                "(#{message.group.name}) #{message.user.name}: #{message.text}"
+              end
     end
 
     attrs = {app: Rails.configuration.app['rapns']['app'], alert: alert, data: custom_data}
