@@ -37,7 +37,7 @@ module Peanut::Conversation
   end
 
   def metadata
-    redis.hgetall(metadata_key) if viewer
+    @metadata ||= redis.hgetall(metadata_key) if viewer
   end
 
   def last_seen_rank
@@ -47,5 +47,14 @@ module Peanut::Conversation
 
   def last_seen_rank=(rank)
     redis.hset(metadata_key, :last_seen_rank, rank) if viewer
+  end
+
+  def hidden
+    data = metadata
+    self.class.to_bool(data['hidden']) || false if data
+  end
+
+  def hidden=(value)
+    redis.hset(metadata_key, :hidden, value) if viewer
   end
 end

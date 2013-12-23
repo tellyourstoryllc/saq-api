@@ -79,7 +79,7 @@ class GroupsController < ApplicationController
 
   def update_group_params
     permitted = [:name, :topic, :avatar_image_file, :avatar_image_url, :wallpaper_image_file,
-      :wallpaper_image_url, :last_seen_rank]
+      :wallpaper_image_url, :last_seen_rank, :hidden]
     params.permit(permitted).tap do |attrs|
       if @group.admin?(current_user)
         if (attrs.has_key?(:avatar_image_file) && attrs[:avatar_image_file].blank?) ||
@@ -109,7 +109,7 @@ class GroupsController < ApplicationController
   end
 
   def publish_updated_group
-    faye_publisher.publish_to_group(@group, PublishGroupSerializer.new(@group).as_json) unless update_group_params.keys == %w(last_seen_rank)
+    faye_publisher.publish_to_group(@group, PublishGroupSerializer.new(@group).as_json) if update_group_params.keys.any?{ |k| !%w(last_seen_rank hidden).include?(k) }
     faye_publisher.publish_group_to_user(current_user, GroupSerializer.new(@group).as_json)
   end
 
