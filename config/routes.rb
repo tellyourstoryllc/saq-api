@@ -44,6 +44,10 @@ ChatApp::Application.routes.draw do
 
     match '/ios/apn/set', to: 'ios/apn#set', as: 'set_apn'
     match '/ios/apn/reset', to: 'ios/apn#reset', as: 'reset_apn'
+
+    match '/blocked_users', to: 'blocked_users#index', as: 'blocked_users'
+    match '/users/:id/block', to: 'blocked_users#create', as: 'block_user'
+    match '/users/:id/unblock', to: 'blocked_users#destroy', as: 'unblock_user'
   end
 
   require 'sidekiq/web'

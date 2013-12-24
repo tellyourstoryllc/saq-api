@@ -63,6 +63,10 @@ class OneToOne
     user && (user.id == sender_id || user.id == recipient_id)
   end
 
+  def blocked?
+    sender.blocked?(recipient)
+  end
+
   def other_user_id(user)
     if user.id == sender_id
       recipient_id

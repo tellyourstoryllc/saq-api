@@ -31,6 +31,7 @@ class User < ActiveRecord::Base
   value :last_mixpanel_checkin_at
   value :invited
   hash_key :metrics
+  sorted_set :blocked_user_ids
 
   delegate :email, to: :account
 
@@ -173,6 +174,49 @@ class User < ActiveRecord::Base
     ios_notifier.notify(message)
     email_notifier.notify(message)
   end
+
+  def block(user)
+    blocked_user_ids[user.id] = Time.current.to_f unless blocked_user_ids.member?(user.id)
+  end
+
+  def unblock(user)
+    blocked_user_ids.delete(user.id)
+  end
+
+  def blocked?(user)
+    replies = redis.pipelined do
+      redis.zscore(blocked_user_ids.key, user.id)
+      redis.zscore(user.blocked_user_ids.key, id)
+    end
+
+    !replies.all?(&:nil?)
+  end
+
+  def paginated_blocked_user_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+    options[:limit] = options[:limit].to_i
+    options[:offset] = options[:offset].to_i
+
+    start = options[:offset]
+    stop = options[:offset] + options[:limit] - 1
+
+    blocked_user_ids.revrange(start, stop)
+  end
+
+  def paginated_blocked_users(options = {})
+    user_ids = paginated_blocked_user_ids(options)
+
+    if user_ids.present?
+      field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
+      User.includes(:avatar_image).where(id: user_ids).order("FIELD(id, #{field_order})")
+    else
+      []
+    end
+  end
+
 
 
   private

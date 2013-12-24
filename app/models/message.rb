@@ -10,7 +10,7 @@ class Message
   sorted_set :likes
 
   validates :user_id, presence: true
-  validate :group_id_or_one_to_one_id?, :text_under_limit?, :text_or_attachment_set?
+  validate :group_id_or_one_to_one_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
 
   TEXT_LIMIT = 1_000
 
@@ -151,6 +151,10 @@ class Message
   def group_id_or_one_to_one_id?
     attrs = [group_id, one_to_one_id]
     errors.add(:base, "Must specify exactly one of group_id or one_to_one_id.") if attrs.all?(&:blank?) || attrs.all?(&:present?)
+  end
+
+  def not_blocked?
+    errors.add(:base, "Sorry, you can't send a 1-1 message to that user.") if one_to_one.try(:blocked?)
   end
 
   def text_under_limit?
