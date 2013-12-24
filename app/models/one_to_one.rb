@@ -8,7 +8,7 @@ class OneToOne
   hash_key :attrs
 
   validates :sender_id, :recipient_id, presence: true
-  validate :users_are_contacts?
+  validate :users_are_contacts?, :not_blocked?
 
 
   def initialize(attributes = {})
@@ -56,7 +56,7 @@ class OneToOne
     return unless valid?
 
     write_attrs
-    add_members
+    add_to_lists
   end
 
   def authorized?(user)
@@ -64,7 +64,7 @@ class OneToOne
   end
 
   def blocked?
-    sender.blocked?(recipient)
+    User.blocked?(sender, recipient)
   end
 
   def other_user_id(user)
@@ -83,19 +83,7 @@ class OneToOne
     end
   end
 
-
-  private
-
-  def users_are_contacts?
-    errors.add(:base, "Users must be contacts to send private messages.") unless User.contacts?(sender, recipient)
-  end
-
-  def write_attrs
-    self.created_at = Time.current.to_i
-    self.attrs.bulk_set(id: id, created_at: created_at)
-  end
-
-  def add_members
+  def add_to_lists
     redis.pipelined do
       sender.one_to_one_ids << id
       sender.one_to_one_user_ids << recipient.id
@@ -103,5 +91,31 @@ class OneToOne
       recipient.one_to_one_ids << id
       recipient.one_to_one_user_ids << sender.id
     end
+  end
+
+  def remove_from_lists
+    redis.pipelined do
+      sender.one_to_one_ids.delete(id)
+      sender.one_to_one_user_ids.delete(recipient.id)
+
+      recipient.one_to_one_ids.delete(id)
+      recipient.one_to_one_user_ids.delete(sender.id)
+    end
+  end
+
+
+  private
+
+  def users_are_contacts?
+    errors.add(:base, "Users must be contacts to send private messages.") unless User.contacts?(sender, recipient)
+  end
+
+  def not_blocked?
+    errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") if blocked?
+  end
+
+  def write_attrs
+    self.created_at = Time.current.to_i
+    self.attrs.bulk_set(id: id, created_at: created_at)
   end
 end

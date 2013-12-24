@@ -176,17 +176,25 @@ class User < ActiveRecord::Base
   end
 
   def block(user)
-    blocked_user_ids[user.id] = Time.current.to_f unless blocked_user_ids.member?(user.id)
+    return if blocked_user_ids.member?(user.id)
+
+    blocked_user_ids[user.id] = Time.current.to_f
+
+    one_to_one = OneToOne.new(sender_id: id, recipient_id: user.id)
+    one_to_one.remove_from_lists if one_to_one.attrs.exists?
   end
 
   def unblock(user)
     blocked_user_ids.delete(user.id)
+
+    one_to_one = OneToOne.new(sender_id: id, recipient_id: user.id)
+    one_to_one.add_to_lists if one_to_one.attrs.exists?
   end
 
-  def blocked?(user)
+  def self.blocked?(user, other_user)
     replies = redis.pipelined do
-      redis.zscore(blocked_user_ids.key, user.id)
-      redis.zscore(user.blocked_user_ids.key, id)
+      redis.zscore(user.blocked_user_ids.key, other_user.id)
+      redis.zscore(other_user.blocked_user_ids.key, user.id)
     end
 
     !replies.all?(&:nil?)
