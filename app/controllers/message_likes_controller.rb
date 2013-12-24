@@ -8,11 +8,13 @@ class MessageLikesController < ApplicationController
 
   def create
     @message.like(current_user)
+    publish_updated_message
     render_json @message
   end
 
   def destroy
     @message.unlike(current_user)
+    publish_updated_message
     render_json @message
   end
 
@@ -27,5 +29,20 @@ class MessageLikesController < ApplicationController
 
   def pagination_params
     params.permit(:limit, :offset)
+  end
+
+  def publish_updated_message
+    convo = @message.conversation
+
+    if convo.is_a?(Group)
+      faye_publisher.publish_to_group(convo, MessageSerializer.new(@message).as_json)
+    elsif convo.is_a?(OneToOne)
+      data = MessageSerializer.new(@message).as_json
+
+      users = [current_user, convo.other_user(current_user)]
+      users.each do |user|
+        faye_publisher.publish_one_to_one_message(user, data)
+      end
+    end
   end
 end
