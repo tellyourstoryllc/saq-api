@@ -90,6 +90,31 @@ class Message
     likes.delete(user.id)
   end
 
+  def paginated_liked_user_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+    options[:limit] = options[:limit].to_i
+    options[:offset] = options[:offset].to_i
+
+    start = options[:offset]
+    stop = options[:offset] + options[:limit] - 1
+
+    likes.revrange(start, stop)
+  end
+
+  def paginated_liked_users(options = {})
+    user_ids = paginated_liked_user_ids(options)
+
+    if user_ids.present?
+      field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
+      User.includes(:avatar_image).where(id: user_ids).order("FIELD(id, #{field_order})")
+    else
+      []
+    end
+  end
+
   def conversation
     group || one_to_one
   end
