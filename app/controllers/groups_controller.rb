@@ -35,12 +35,12 @@ class GroupsController < ApplicationController
   end
 
   def join
-    # If this is a new member, publish the updated group to its channel
     if @group.add_member(current_user)
       publish_updated_group(true)
+      render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
+    else
+      render_error "Sorry, you cannot join that group at this time."
     end
-
-    render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
   end
 
   def leave

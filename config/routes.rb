@@ -32,6 +32,10 @@ ChatApp::Application.routes.draw do
     match '/groups/:id', to: 'groups#show', as: 'show_group'
     match '/groups/:id/is_member', to: 'groups#is_member', as: 'is_member_group'
 
+    match '/groups/:id/banned_users', to: 'banned_group_users#index', as: 'banned_group_users'
+    match '/groups/:id/ban', to: 'banned_group_users#create', as: 'ban_group_user'
+    match '/groups/:id/unban', to: 'banned_group_users#destroy', as: 'unban_group_user'
+
     match '/one_to_ones/:id', to: 'one_to_ones#show', as: 'one_to_one'
     match '/one_to_ones/:one_to_one_id/messages/create', to: 'one_to_one_messages#create', as: 'create_one_to_one_message'
     match '/one_to_ones/:one_to_one_id/messages', to: 'one_to_one_messages#index', as: 'one_to_one_messages'

@@ -20,6 +20,7 @@ class Group < ActiveRecord::Base
 
   set :admin_ids
   set :member_ids
+  sorted_set :banned_user_ids
 
 
   def admin?(user)
@@ -31,7 +32,7 @@ class Group < ActiveRecord::Base
   end
 
   def add_admin(user)
-    self.admin_ids << user.id
+    self.admin_ids << user.id unless banned?(user)
   end
 
   def remove_admin(user)
@@ -47,7 +48,11 @@ class Group < ActiveRecord::Base
   end
 
   def add_member(user)
-    unless member_ids.member?(user.id)
+    if member_ids.member?(user.id)
+      true
+    elsif banned?(user)
+      false
+    else
       redis.multi do
         self.member_ids << user.id
         user.group_ids << id
@@ -76,6 +81,58 @@ class Group < ActiveRecord::Base
 
   def fetched_member_ids
     member_ids.members
+  end
+
+  def can_view_bans?(current_user)
+    admin?(current_user)
+  end
+
+  def can_ban?(current_user, user)
+    admin?(current_user) && !admin?(user)
+  end
+
+  def can_unban?(current_user, user)
+    admin?(current_user)
+  end
+
+  def banned?(user)
+    banned_user_ids.member?(user.id)
+  end
+
+  def ban(user)
+    return if banned_user_ids.member?(user.id)
+
+    banned_user_ids[user.id] = Time.current.to_f
+    leave!(user)
+  end
+
+  def unban(user)
+    banned_user_ids.delete(user.id)
+  end
+
+  def paginated_banned_user_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+    options[:limit] = options[:limit].to_i
+    options[:offset] = options[:offset].to_i
+
+    start = options[:offset]
+    stop = options[:offset] + options[:limit] - 1
+
+    banned_user_ids.revrange(start, stop)
+  end
+
+  def paginated_banned_users(options = {})
+    user_ids = paginated_banned_user_ids(options)
+
+    if user_ids.present?
+      field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
+      User.includes(:avatar_image).where(id: user_ids).order("FIELD(id, #{field_order})")
+    else
+      []
+    end
   end
 
 
