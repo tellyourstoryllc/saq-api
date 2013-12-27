@@ -12,13 +12,15 @@ describe GroupsController do
 
     describe "valid" do
       it "must create a group" do
-        post :create, {name: 'Cool Dudes', token: current_user.token}
+        Time.stub :now, now = Time.parse('2013-12-26 15:08') do
+          post :create, {name: 'Cool Dudes', token: current_user.token}
 
-        group = Group.last
-        result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-          'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
-          'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [current_user.id],
-          'last_message_at' => nil}]
+          group = Group.last
+          result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
+            'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [current_user.id],
+            'last_message_at' => nil, 'created_at' => now.to_i}]
+        end
       end
     end
   end
@@ -38,7 +40,8 @@ describe GroupsController do
     end
 
     it "must update a group's topic if the user is a member" do
-      group = FactoryGirl.create(:group)
+      now = Time.parse('2013-12-26 15:08')
+      group = FactoryGirl.create(:group, created_at: now)
       member = FactoryGirl.create(:user)
 
       group.add_admin(member)
@@ -50,11 +53,12 @@ describe GroupsController do
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => 'new topic', 'avatar_url' => nil,
         'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort,
-        'last_message_at' => nil}]
+        'last_message_at' => nil, 'created_at' => now.to_i}]
     end
 
     it "must not update a group's name if the user is not an admin of the group" do
-      group = FactoryGirl.create(:group)
+      now = Time.parse('2013-12-26 15:08')
+      group = FactoryGirl.create(:group, created_at: now)
       member = FactoryGirl.create(:user)
 
       group.add_admin(member)
@@ -66,11 +70,12 @@ describe GroupsController do
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
         'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort,
-        'last_message_at' => nil}]
+        'last_message_at' => nil, 'created_at' => now.to_i}]
     end
 
     it "must update a group's name if the user is an admin of the group" do
-      group = FactoryGirl.create(:group)
+      now = Time.parse('2013-12-26 15:08')
+      group = FactoryGirl.create(:group, created_at: now)
       member = FactoryGirl.create(:user)
 
       group.add_admin(member)
@@ -83,7 +88,7 @@ describe GroupsController do
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Really Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil, 'wallpaper_url' => nil,
         'admin_ids' => [member.id, current_user.id].sort, 'member_ids' => [member.id, current_user.id].sort,
-        'last_message_at' => nil}]
+        'last_message_at' => nil, 'created_at' => now.to_i}]
     end
   end
 
@@ -96,7 +101,8 @@ describe GroupsController do
     end
 
     it "must join the group and return the group, its users, and its most recent page of messages" do
-      group = FactoryGirl.create(:group)
+      now = Time.parse('2013-12-26 15:08')
+      group = FactoryGirl.create(:group, created_at: now)
       member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
 
       group.add_admin(member)
@@ -113,7 +119,7 @@ describe GroupsController do
         'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
         'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort,
-        'last_message_at' => group.last_message_at
+        'last_message_at' => group.last_message_at, 'created_at' => now.to_i
       })
 
       result.must_include({
@@ -165,7 +171,8 @@ describe GroupsController do
   describe "GET /groups/:id" do
     it "must return the group, its users, and its most recent page of messages" do
       Group.stub :page_size, 2 do
-        group = FactoryGirl.create(:group)
+        now = Time.parse('2013-12-26 15:08')
+        group = FactoryGirl.create(:group, created_at: now)
         member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
 
         group.add_admin(current_user)
@@ -192,7 +199,8 @@ describe GroupsController do
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
           'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
           'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort,
-          'last_message_at' => group.last_message_at
+          'last_message_at' => group.last_message_at,
+          'created_at' => now.to_i
         })
 
         result.must_include({
@@ -230,7 +238,8 @@ describe GroupsController do
 
     it "must return the group, its users, and its most recent page of messages with a given limit" do
       Group.stub :page_size, 2 do
-        group = FactoryGirl.create(:group)
+        now = Time.parse('2013-12-26 15:08')
+        group = FactoryGirl.create(:group, created_at: now)
         member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
 
         group.add_admin(current_user)
@@ -257,7 +266,8 @@ describe GroupsController do
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
           'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
           'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort,
-          'last_message_at' => group.last_message_at
+          'last_message_at' => group.last_message_at,
+          'created_at' => now.to_i
         })
 
         result.must_include({
@@ -302,14 +312,16 @@ describe GroupsController do
 
     describe 'GET /groups/find' do
       it "must return the group by join_code even if the user isn't registered" do
-        group = FactoryGirl.create(:group)
+        now = Time.parse('2013-12-26 15:08')
+        group = FactoryGirl.create(:group, created_at: now)
         member = FactoryGirl.create(:user)
 
         get :find, {join_code: group.join_code}
         result.must_equal [{
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
           'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
-          'wallpaper_url' => nil, 'admin_ids' => [], 'member_ids' => [], 'last_message_at' => nil
+          'wallpaper_url' => nil, 'admin_ids' => [], 'member_ids' => [], 'last_message_at' => nil,
+          'created_at' => now.to_i
         }]
       end
     end
