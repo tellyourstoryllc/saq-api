@@ -4,11 +4,14 @@ class CheckinController < ApplicationController
 
     objects = []
 
-    meta = {
-      object_type: 'meta'
-    }
+    config_class = case params[:client]
+                   when 'web' then WebConfiguration
+                   when 'ios' then IosConfiguration
+                   else ClientConfiguration
+                   end
+    client_config = {object_type: 'configuration'}.merge(config_class.config)
 
-    objects << meta
+    objects << client_config
     objects << current_user
     objects << current_user.account
     objects << current_user.preferences
