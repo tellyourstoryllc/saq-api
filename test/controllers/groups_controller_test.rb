@@ -19,7 +19,7 @@ describe GroupsController do
           result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
             'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
             'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [current_user.id],
-            'last_message_at' => nil, 'created_at' => now.to_i}]
+            'last_message_at' => nil, 'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i}]
         end
       end
     end
@@ -53,7 +53,7 @@ describe GroupsController do
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => 'new topic', 'avatar_url' => nil,
         'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort,
-        'last_message_at' => nil, 'created_at' => now.to_i}]
+        'last_message_at' => nil, 'last_seen_rank' => nil, 'hidden' => false, 'created_at' => now.to_i}]
     end
 
     it "must not update a group's name if the user is not an admin of the group" do
@@ -70,7 +70,7 @@ describe GroupsController do
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
         'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort,
-        'last_message_at' => nil, 'created_at' => now.to_i}]
+        'last_message_at' => nil, 'last_seen_rank' => nil, 'hidden' => false, 'created_at' => now.to_i}]
     end
 
     it "must update a group's name if the user is an admin of the group" do
@@ -88,7 +88,7 @@ describe GroupsController do
       result.must_equal [{'object_type' => 'group', 'id' => group.id, 'name' => 'Really Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil, 'wallpaper_url' => nil,
         'admin_ids' => [member.id, current_user.id].sort, 'member_ids' => [member.id, current_user.id].sort,
-        'last_message_at' => nil, 'created_at' => now.to_i}]
+        'last_message_at' => nil, 'last_seen_rank' => nil, 'hidden' => false, 'created_at' => now.to_i}]
     end
   end
 
@@ -119,7 +119,7 @@ describe GroupsController do
         'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
         'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort,
-        'last_message_at' => group.last_message_at, 'created_at' => now.to_i
+        'last_message_at' => group.last_message_at, 'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i
       })
 
       result.must_include({
@@ -199,7 +199,7 @@ describe GroupsController do
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
           'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
           'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort,
-          'last_message_at' => group.last_message_at,
+          'last_message_at' => group.last_message_at, 'last_seen_rank' => nil, 'hidden' => false,
           'created_at' => now.to_i
         })
 
@@ -266,8 +266,7 @@ describe GroupsController do
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
           'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
           'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort,
-          'last_message_at' => group.last_message_at,
-          'created_at' => now.to_i
+          'last_message_at' => group.last_message_at, 'last_seen_rank' => nil, 'hidden' => false, 'created_at' => now.to_i
         })
 
         result.must_include({
@@ -321,7 +320,7 @@ describe GroupsController do
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
           'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
           'wallpaper_url' => nil, 'admin_ids' => [], 'member_ids' => [], 'last_message_at' => nil,
-          'created_at' => now.to_i
+          'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i
         }]
       end
     end

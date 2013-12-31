@@ -53,7 +53,7 @@ describe UsersController do
               'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil},
             {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
               'topic' => nil, 'avatar_url' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id], 'last_message_at' => nil,
-              'created_at' => now.to_i}
+              'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i}
           ]
         end
       end
