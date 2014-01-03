@@ -6,10 +6,13 @@ class Account < ActiveRecord::Base
 
   has_secure_password validations: false
 
+  before_validation :set_time_zone, on: :create
+
   validates :email, format: /.+@.+/
   validates :email, uniqueness: true
   validates :password, presence: true, on: :create, if: proc{ |account| account.facebook_id.blank? && account.facebook_token.blank? }
   validate :valid_facebook_credentials?, on: :create
+  validate :time_zone_set?
 
   after_save :update_one_to_one_wallpaper_image, on: :update
 
@@ -18,6 +21,11 @@ class Account < ActiveRecord::Base
 
   has_one :one_to_one_wallpaper_image, -> { order('one_to_one_wallpaper_images.id DESC') }
 
+
+  def time_zone=(tz_name)
+    self[:time_zone_offset] = ActiveSupport::TimeZone.new(tz_name).try(:utc_offset)
+    self[:time_zone] = tz_name
+  end
 
   def one_to_one_wallpaper_url
     @one_to_one_wallpaper_url ||= one_to_one_wallpaper_image.image.url if one_to_one_wallpaper_image.try(:active?)
@@ -46,6 +54,14 @@ class Account < ActiveRecord::Base
 
 
   private
+
+  def set_time_zone
+    self.time_zone ||= 'America/New_York'
+  end
+
+  def time_zone_set?
+    errors.add(:base, "Time zone is required.") if time_zone.blank? || time_zone_offset.blank?
+  end
 
   def valid_facebook_credentials?
     return if password.present?
