@@ -25,8 +25,8 @@ class IosDevice < ActiveRecord::Base
 
     case notification_type
     when :one_to_one then preferences.server_one_to_one
-    when :mention then preferences.server_mention || UserGroupPreferences.find(user, convo).server_all_messages_mobile_push
-    when :all then UserGroupPreferences.find(user, convo).server_all_messages_mobile_push
+    when :mention then preferences.server_mention || UserGroupPreferences.find(user, conversation).server_all_messages_mobile_push
+    when :all then UserGroupPreferences.find(user, conversation).server_all_messages_mobile_push
     end
   end
 end
