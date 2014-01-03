@@ -16,7 +16,7 @@ class EmailNotifier
     return unless notification_type && user.preferences.send("server_#{notification_type}_email")
 
     if Settings.enabled?(:queue)
-      EmailNotificationWorker.perform_async(notification_type, message.id, user.id, user.computed_status)
+      EmailNotificationWorker.perform_in(1.minute, notification_type, message.id, user.id, user.computed_status)
     else
       notify!(notification_type, message, user.computed_status)
     end

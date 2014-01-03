@@ -16,6 +16,7 @@ end
 
 class Peanut::Sidekiq::Middleware::EnqueueStats
   def call(worker_class, msg, queue)
+    worker_class = worker_class.constantize if worker_class.is_a?(String)
     worker_class.record_event(:enqueue, Rails.logger)
     yield
   end

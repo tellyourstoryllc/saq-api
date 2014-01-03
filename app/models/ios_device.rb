@@ -17,6 +17,16 @@ class IosDevice < ActiveRecord::Base
   end
 
   def preferences
-    IosDevicePreferences.new(id: id)
+    @preferences ||= IosDevicePreferences.new(id: id)
+  end
+
+  def notify?(user, conversation, message, notification_type)
+    return false if push_token.blank?
+
+    case notification_type
+    when :one_to_one then preferences.server_one_to_one
+    when :mention then preferences.server_mention || UserGroupPreferences.find(user, convo).server_all_messages_mobile_push
+    when :all then UserGroupPreferences.find(user, convo).server_all_messages_mobile_push
+    end
   end
 end

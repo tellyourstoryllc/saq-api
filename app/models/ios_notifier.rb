@@ -53,19 +53,11 @@ class IosNotifier
     end
 
     user.ios_devices.each do |ios_device|
-      next if ios_device.push_token.blank?
-
-      enabled_in_prefs = case notification_type
-                         when :one_to_one then ios_device.preferences.server_one_to_one
-                         when :mention then ios_device.preferences.server_mention || UserGroupPreferences.find(user, convo).server_all_messages_mobile_push
-                         when :all then UserGroupPreferences.find(user, convo).server_all_messages_mobile_push
-                         end
-
-      next unless enabled_in_prefs
-
-      n = notification.dup
-      n.device_token = ios_device.push_token
-      n.save!
+      if ios_device.notify?(user, convo, message, notification_type)
+        n = notification.dup
+        n.device_token = ios_device.push_token
+        n.save!
+      end
     end
   end
 end

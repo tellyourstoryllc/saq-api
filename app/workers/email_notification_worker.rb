@@ -6,7 +6,8 @@ class EmailNotificationWorker < BaseWorker
     perform_with_tracking(notification_type, message_id, user_id, status) do
       user = User.find(user_id)
       message = Message.new(id: message_id)
-      EmailNotifier.new(user).notify!(notification_type, message, status)
+      EmailNotifier.new(user).notify!(notification_type, message, status) if user.away_idle_or_unavailable?
+      true
     end
   end
 
