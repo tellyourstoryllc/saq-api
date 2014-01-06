@@ -1,6 +1,8 @@
 class CheckinController < ApplicationController
+  skip_before_action :require_token, only: :index
+
   def index
-    mixpanel.checked_in
+    mixpanel.checked_in if current_user
 
     objects = []
 
@@ -12,9 +14,13 @@ class CheckinController < ApplicationController
     client_config = {object_type: 'configuration'}.merge(config_class.config)
 
     objects << client_config
-    objects << current_user
-    objects << current_user.account
-    objects << current_user.preferences
+
+    if current_user
+      objects << current_user
+      objects << current_user.account
+      objects << current_user.preferences
+    end
+
     objects << current_device.preferences if current_device
     objects += Emoticon.active
 
