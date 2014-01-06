@@ -116,6 +116,7 @@ class GroupsController < ApplicationController
   def notify_admins
     @group.admins.each do |user|
       user.ios_notifier.notify_new_member(current_user, @group)
+      user.email_notifier.notify_new_member(current_user, @group)
     end
   end
 end

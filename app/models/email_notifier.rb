@@ -25,4 +25,16 @@ class EmailNotifier
   def notify!(notification_type, message, status)
     MessageMailer.send(notification_type, message, user, status).deliver!
   end
+
+  def notify_new_member(new_member, group)
+    if Settings.enabled?(:queue)
+      EmailNewMemberNotificationWorker.perform_async(user.id, new_member.id, group.id)
+    else
+      notify_new_member!(new_member, group)
+    end
+  end
+
+  def notify_new_member!(new_member, group)
+    GroupMailer.new_member(user, new_member, group).deliver!
+  end
 end
