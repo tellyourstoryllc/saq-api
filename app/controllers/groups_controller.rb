@@ -37,8 +37,12 @@ class GroupsController < ApplicationController
   end
 
   def join
-    if @group.add_member(current_user)
+    result = @group.add_member(current_user)
+
+    if result
       publish_updated_group
+      notify_admins unless result == :already_member
+
       render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
     else
       render_error "Sorry, you cannot join that group at this time."
@@ -107,5 +111,11 @@ class GroupsController < ApplicationController
   def publish_updated_group
     faye_publisher.publish_to_group(@group, PublishGroupSerializer.new(@group).as_json) unless update_group_params.keys == %w(last_seen_rank)
     faye_publisher.publish_group_to_user(current_user, GroupSerializer.new(@group).as_json)
+  end
+
+  def notify_admins
+    @group.admins.each do |user|
+      user.ios_notifier.notify_new_member(current_user, @group)
+    end
   end
 end

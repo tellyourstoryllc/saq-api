@@ -38,6 +38,10 @@ class Group < ActiveRecord::Base
     admin_ids.delete(user.id)
   end
 
+  def admins
+    User.where(id: admin_ids.members)
+  end
+
   def avatar_url
     @avatar_url ||= group_avatar_image.image.thumb.url if group_avatar_image.try(:active?)
   end
@@ -48,7 +52,7 @@ class Group < ActiveRecord::Base
 
   def add_member(user)
     if member_ids.member?(user.id)
-      true
+      :already_member
     elsif banned?(user)
       false
     else

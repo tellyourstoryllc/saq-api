@@ -5,6 +5,22 @@ class IosNotifier
     self.user = user
   end
 
+  def build_notification(alert, custom_data = {})
+    attrs = {app: Rails.configuration.app['rapns']['app'], alert: alert, data: custom_data}
+    notification = Rapns::Apns::Notification.new(attrs)
+    Rails.logger.debug "Notification: #{notification}; payload_size: #{notification.payload_size}"
+
+    # Truncate the alert if the total payload size is too big
+    max_size = 256
+    if notification.payload_size > max_size
+      alert_size = notification.alert.size - (notification.payload_size - max_size)
+      notification.alert = notification.alert.truncate(alert_size, {separator: ' '})
+      Rails.logger.debug "Truncated payload_size: #{notification.payload_size}"
+    end
+
+    notification
+  end
+
   def notify(message)
     return if message.user_id == user.id
 
@@ -40,20 +56,26 @@ class IosNotifier
               end
     end
 
-    attrs = {app: Rails.configuration.app['rapns']['app'], alert: alert, data: custom_data}
-    notification = Rapns::Apns::Notification.new(attrs)
-    Rails.logger.debug "Notification: #{notification}; payload_size: #{notification.payload_size}"
-
-    # Truncate the alert if the total payload size is too big
-    max_size = 256
-    if notification.payload_size > max_size
-      alert_size = notification.alert.size - (notification.payload_size - max_size)
-      notification.alert = notification.alert.truncate(alert_size, {separator: ' '})
-      Rails.logger.debug "Truncated payload_size: #{notification.payload_size}"
-    end
+    notification = build_notification(alert, custom_data)
 
     user.ios_devices.each do |ios_device|
       if ios_device.notify?(user, convo, message, notification_type)
+        n = notification.dup
+        n.device_token = ios_device.push_token
+        n.save!
+      end
+    end
+  end
+
+  def notify_new_member(member, group)
+    return if member.id == user.id
+
+    alert = "#{member.name} just joined the room #{group.name}. Go say hi!"
+    custom_data = {gid: group.id}
+    notification = build_notification(alert, custom_data)
+
+    user.ios_devices.each do |ios_device|
+      if ios_device.notify_new_member?(user)
         n = notification.dup
         n.device_token = ios_device.push_token
         n.save!

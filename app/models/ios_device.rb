@@ -29,4 +29,8 @@ class IosDevice < ActiveRecord::Base
     when :all then UserGroupPreferences.find(user, conversation).server_all_messages_mobile_push
     end
   end
+
+  def notify_new_member?(user)
+    push_token.present?
+  end
 end
