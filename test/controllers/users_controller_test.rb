@@ -33,7 +33,7 @@ describe UsersController do
             'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
             'client_type' => nil, 'avatar_url' => nil},
           {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'joe@example.com',
-            'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil}
+            'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
         ]
       end
 
@@ -50,7 +50,7 @@ describe UsersController do
               'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
               'avatar_url' => nil},
             {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'joe@example.com',
-              'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil},
+              'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'},
             {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
               'topic' => nil, 'avatar_url' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id], 'last_message_at' => nil,
               'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i}
@@ -74,7 +74,7 @@ describe UsersController do
               'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
               'client_type' => nil, 'avatar_url' => nil},
             {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'joe@example.com',
-              'one_to_one_wallpaper_url' => nil, 'facebook_id' => '100002345'}
+              'one_to_one_wallpaper_url' => nil, 'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
           ]
         end
       end

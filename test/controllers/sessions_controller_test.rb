@@ -22,7 +22,7 @@ describe SessionsController do
           'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
           'avatar_url' => nil},
         {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'login_test@example.com',
-          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil}
+          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
       ]
     end
 
@@ -41,7 +41,7 @@ describe SessionsController do
             'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
             'avatar_url' => nil},
           {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'email' => 'login_test@example.com',
-            'one_to_one_wallpaper_url' => nil, 'facebook_id' => '100002345'}
+            'one_to_one_wallpaper_url' => nil, 'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
         ]
       end
     end
