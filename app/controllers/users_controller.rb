@@ -7,7 +7,8 @@ class UsersController < ApplicationController
   end
 
   def index
-    ids = params[:ids].split(',') unless ids.is_a?(Array)
+    ids = params[:ids]
+    ids = ids.split(',') unless ids.is_a?(Array)
     ids = ids.first(20) # Max of 20 users at a time
     render_json User.find(ids)
   end
