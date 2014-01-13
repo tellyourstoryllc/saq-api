@@ -17,6 +17,9 @@ class GroupMessagesController < ApplicationController
       # Potentially notify each user, according to his status and preferences
       @group.members.each{ |user| user.send_notifications(@message) }
 
+      # Track activity in Mixpanel
+      group_mixpanel.sent_daily_message(@group)
+
       render_json @message
     else
       render_error @message.errors.full_messages

@@ -30,6 +30,8 @@ class GroupsController < ApplicationController
     @group.viewer = current_user
     @group.update!(update_group_params)
     publish_updated_group
+    group_mixpanel.fetched_daily_messages(@group) if update_group_params.keys.include?('last_seen_rank')
+
     render_json @group
 
   rescue ActiveRecord::RecordInvalid => e

@@ -9,6 +9,8 @@ describe GroupMessagesController do
     end
 
     it "must create a message" do
+      FactoryGirl.create(:account, user_id: current_user.id)
+
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
       text = 'hey everyone'
@@ -26,6 +28,8 @@ describe GroupMessagesController do
     end
 
     it "must create a message with one mention" do
+      FactoryGirl.create(:account, user_id: current_user.id)
+
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
 
@@ -48,6 +52,8 @@ describe GroupMessagesController do
     end
 
     it "must create a message with multiple mentions" do
+      FactoryGirl.create(:account, user_id: current_user.id)
+
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
 
@@ -74,6 +80,8 @@ describe GroupMessagesController do
     end
 
     it "must create a message and sanitize mentions" do
+      FactoryGirl.create(:account, user_id: current_user.id)
+
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
 

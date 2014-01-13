@@ -29,6 +29,10 @@ class ApplicationController < ActionController::Base
     @mixpanel ||= MixpanelClient.new(current_user)
   end
 
+  def group_mixpanel
+    @group_mixpanel ||= GroupMixpanelClient.new(current_user)
+  end
+
 
   private
 

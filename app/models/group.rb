@@ -20,6 +20,9 @@ class Group < ActiveRecord::Base
   set :admin_ids
   set :member_ids
   sorted_set :banned_user_ids
+  value :last_mixpanel_activity_at
+  value :last_mixpanel_message_at
+  value :last_mixpanel_fetched_messages_at
 
 
   def admin?(user)
