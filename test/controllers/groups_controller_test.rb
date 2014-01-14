@@ -12,6 +12,8 @@ describe GroupsController do
 
     describe "valid" do
       it "must create a group" do
+        FactoryGirl.create(:account, user_id: current_user.id)
+
         Time.stub :now, now = Time.parse('2013-12-26 15:08') do
           post :create, {name: 'Cool Dudes', token: current_user.token}
 
