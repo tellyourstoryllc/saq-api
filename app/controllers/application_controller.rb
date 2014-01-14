@@ -84,4 +84,12 @@ class ApplicationController < ActionController::Base
   def render_422(exception)
     render_error "Sorry, that could not be saved: #{exception}.", nil, status: :unprocessable_entity
   end
+
+  def remote_ip
+    @remote_ip ||= secure_request? ? params[:ip] : request.remote_ip
+  end
+
+  def secure_request?
+    params[:api_secret] == Rails.configuration.app['api']['request_secret']
+  end
 end

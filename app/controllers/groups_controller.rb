@@ -1,7 +1,6 @@
 class GroupsController < ApplicationController
   skip_before_action :require_token, only: [:show, :find]
   before_action :load_group, only: [:update, :leave]
-  before_action :load_group_by_join_code, only: [:find, :join]
 
 
   def create
@@ -14,14 +13,22 @@ class GroupsController < ApplicationController
   end
 
   def show
-    @group = Group.find(params[:id])
+    throttle_failed_attempts do
+      @group = Group.find(params[:id])
+    end
+
     @group.viewer = current_user
     objects = [@group, @group.members]
     objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
     render_json objects
+
   end
 
   def find
+    throttle_failed_attempts do
+      @group = Group.find_by!(join_code: params[:join_code])
+    end
+
     objects = [@group, @group.members]
     objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
     render_json objects
@@ -40,6 +47,10 @@ class GroupsController < ApplicationController
   end
 
   def join
+    throttle_failed_attempts do
+      @group = Group.find_by!(join_code: params[:join_code])
+    end
+
     result = @group.add_member(current_user)
 
     if result
@@ -72,12 +83,75 @@ class GroupsController < ApplicationController
 
   private
 
-  def load_group
-    @group = current_user.groups.find(params[:id])
+  def throttle_failed_attempts(&block)
+    begin
+      yield
+    rescue ActiveRecord::RecordNotFound
+      increment_failed_attempts
+      raise
+    end
+
+    check_failed_attempts
   end
 
-  def load_group_by_join_code
-    @group = Group.find_by!(join_code: params[:join_code])
+  def check_failed_attempts
+    raise ActiveRecord::RecordNotFound if !@group.member?(current_user) && over_limit?
+  end
+
+  def over_limit?
+    user_key = user_locked_key
+    ip_key = ip_locked_key
+
+    results = User.redis.pipelined do
+      User.redis.exists(user_key) if user_key
+      User.redis.exists(ip_key)
+    end
+
+    results.any?
+  end
+
+  def increment_failed_attempts
+    return if over_limit?
+
+    max_attempts = 15
+    within_period = 60.seconds
+    lockout_period = 1.hour
+
+    if current_user
+      _, attempts = User.redis.multi do
+        User.redis.set(user_failed_key, 0, {ex: within_period, nx: true})
+        User.redis.incr(user_failed_key)
+      end
+
+      User.redis.set(user_locked_key, 1, {ex: lockout_period}) if attempts >= max_attempts
+    end
+
+    _, attempts = User.redis.multi do
+      User.redis.set(ip_failed_key, 0, {ex: within_period, nx: true})
+      User.redis.incr(ip_failed_key)
+    end
+
+    User.redis.set(ip_locked_key, 1, {ex: lockout_period}) if attempts >= max_attempts
+  end
+
+  def user_failed_key
+    "user:#{current_user.id}:failed_group_attempts" if current_user
+  end
+
+  def user_locked_key
+    "user:#{current_user.id}:locked_from_new_groups" if current_user
+  end
+
+  def ip_failed_key
+    "ip:#{remote_ip}:failed_group_attempts"
+  end
+
+  def ip_locked_key
+    "ip:#{remote_ip}:locked_from_new_groups"
+  end
+
+  def load_group
+    @group = current_user.groups.find(params[:id])
   end
 
   def update_group_params

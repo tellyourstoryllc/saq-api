@@ -2,6 +2,8 @@ development:
   admin:
     username: USERNAME
     password: PASSWORD
+  api:
+    request_secret: SECRET
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -38,6 +40,8 @@ test:
   admin:
     username: USERNAME
     password: PASSWORD
+  api:
+    request_secret: SECRET
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
