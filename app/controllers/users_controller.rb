@@ -20,6 +20,8 @@ class UsersController < ApplicationController
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
     mixpanel.user_registered(@current_user)
+    group_mixpanel.group_created(@group) if @group
+
     AccountMailer.welcome(@account).deliver!
     FacebookUser.new(id: @account.facebook_id).fetch_friends if @account.facebook_id
 

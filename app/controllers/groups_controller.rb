@@ -6,6 +6,7 @@ class GroupsController < ApplicationController
 
   def create
     @group = current_user.created_groups.create!(params.permit(:name))
+    group_mixpanel.group_created(@group)
     render_json @group
 
   rescue ActiveRecord::RecordInvalid => e

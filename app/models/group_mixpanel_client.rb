@@ -31,6 +31,11 @@ class GroupMixpanelClient < MixpanelClient
     end
   end
 
+  def group_created(group)
+    self.group = group
+    track('Group Created')
+  end
+
   def daily_activity(group)
     self.group = group
 
