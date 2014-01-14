@@ -37,7 +37,7 @@ class GroupsController < ApplicationController
   def update
     @group.viewer = current_user
     @group.update!(update_group_params)
-    publish_updated_group
+    publish_updated_group if update_group_params.keys.any?{ |k| ! %w(last_seen_rank hidden).include?(k) }
     group_mixpanel.fetched_daily_messages(@group) if update_group_params.keys.include?('last_seen_rank')
 
     render_json @group
@@ -186,7 +186,7 @@ class GroupsController < ApplicationController
   end
 
   def publish_updated_group
-    faye_publisher.publish_to_group(@group, PublishGroupSerializer.new(@group).as_json) if update_group_params.keys.any?{ |k| !%w(last_seen_rank hidden).include?(k) }
+    faye_publisher.publish_to_group(@group, PublishGroupSerializer.new(@group).as_json)
     faye_publisher.publish_group_to_user(current_user, GroupSerializer.new(@group).as_json)
   end
 
