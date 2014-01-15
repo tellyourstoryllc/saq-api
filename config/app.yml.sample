@@ -20,6 +20,7 @@ development:
     server_secret: SECRET
   mixpanel:
     token: TOKEN
+    group_token: GROUP_TOKEN
   rapns:
     db_ios_app_name: skymob_ios
   redis:
@@ -58,6 +59,7 @@ test:
     server_secret: SECRET
   mixpanel:
     token: TOKEN
+    group_token: GROUP_TOKEN
   rapns:
     db_ios_app_name: ~
   redis:
