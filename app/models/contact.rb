@@ -12,6 +12,8 @@ class Contact
   end
 
   def self.add_with_reciprocal(user, other_user)
+    return if User.blocked?(user, other_user)
+
     User.redis.multi do
       add_user(user, other_user)
       add_user(other_user, user)
