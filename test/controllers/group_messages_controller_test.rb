@@ -34,7 +34,8 @@ describe GroupMessagesController do
       group.add_member(current_user)
 
       user = FactoryGirl.create(:user)
-      FactoryGirl.create(:account, user_id: user.id)
+      account = FactoryGirl.create(:account, user_id: user.id)
+      FactoryGirl.create(:email, account: account)
       group.add_member(user)
 
       text = 'hey everyone'
@@ -58,11 +59,13 @@ describe GroupMessagesController do
       group.add_member(current_user)
 
       u1 = FactoryGirl.create(:user)
-      FactoryGirl.create(:account, user_id: u1.id)
+      a1 = FactoryGirl.create(:account, user_id: u1.id)
+      FactoryGirl.create(:email, account: a1)
       group.add_member(u1)
 
       u2 = FactoryGirl.create(:user)
-      FactoryGirl.create(:account, user_id: u2.id)
+      a2 = FactoryGirl.create(:account, user_id: u2.id)
+      FactoryGirl.create(:email, account: a2)
       group.add_member(u2)
 
       text = 'hey everyone'
@@ -86,7 +89,8 @@ describe GroupMessagesController do
       group.add_member(current_user)
 
       u1 = FactoryGirl.create(:user)
-      FactoryGirl.create(:account, user_id: u1.id)
+      account = FactoryGirl.create(:account, user_id: u1.id)
+      FactoryGirl.create(:email, account: account)
       group.add_member(u1)
 
       text = 'hey everyone'
@@ -104,7 +108,8 @@ describe GroupMessagesController do
     end
 
     it "must create a message and allow an @all mention" do
-      FactoryGirl.create(:account, user_id: current_user.id)
+      account = FactoryGirl.create(:account, user_id: current_user.id)
+      FactoryGirl.create(:email, account: account)
 
       group = FactoryGirl.create(:group)
       group.add_member(current_user)

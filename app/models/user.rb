@@ -18,6 +18,7 @@ class User < ActiveRecord::Base
   has_one :avatar_image, -> { order('avatar_images.id DESC') }
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
   has_many :ios_devices
+  has_many :emails
 
   set :group_ids
   sorted_set :group_join_times
@@ -34,8 +35,6 @@ class User < ActiveRecord::Base
   sorted_set :blocked_user_ids
   hash_key :group_last_seen_ranks
   hash_key :one_to_one_last_seen_ranks
-
-  delegate :email, to: :account
 
 
   def first_name

@@ -53,6 +53,11 @@ ChatApp::Application.routes.draw do
     match '/blocked_users', to: 'blocked_users#index', as: 'blocked_users'
     match '/users/:id/block', to: 'blocked_users#create', as: 'block_user'
     match '/users/:id/unblock', to: 'blocked_users#destroy', as: 'unblock_user'
+
+    match '/emails', to: 'emails#index', as: 'emails'
+    match '/emails/create', to: 'emails#create', as: 'create_email'
+    match '/emails/:id/update', to: 'emails#update', as: 'update_email'
+    match '/emails/:id/destroy', to: 'emails#destroy', as: 'destroy_email'
   end
 
   require 'sidekiq/web'

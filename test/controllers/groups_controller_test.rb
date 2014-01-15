@@ -106,7 +106,8 @@ describe GroupsController do
       now = Time.parse('2013-12-26 15:08')
       group = FactoryGirl.create(:group, created_at: now)
       member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
-      FactoryGirl.create(:account, user_id: member.id)
+      account = FactoryGirl.create(:account, user_id: member.id)
+      FactoryGirl.create(:email, account: account)
 
       group.add_admin(member)
       group.add_member(member)

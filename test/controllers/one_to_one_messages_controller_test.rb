@@ -27,7 +27,8 @@ describe OneToOneMessagesController do
 
     it "must create a message for an existing one-to-one" do
       member = FactoryGirl.create(:user)
-      FactoryGirl.create(:account, user_id: member.id)
+      account = FactoryGirl.create(:account, user_id: member.id)
+      FactoryGirl.create(:email, account: account)
 
       # Make the users contacts
       group = FactoryGirl.create(:group)
@@ -60,7 +61,8 @@ describe OneToOneMessagesController do
 
     it "must create a message for an non-existant one-to-one" do
       member = FactoryGirl.create(:user)
-      FactoryGirl.create(:account, user_id: member.id)
+      account = FactoryGirl.create(:account, user_id: member.id)
+      FactoryGirl.create(:email, account: account)
 
       # Make the users contacts
       group = FactoryGirl.create(:group)

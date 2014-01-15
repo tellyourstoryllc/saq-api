@@ -25,7 +25,6 @@ DROP TABLE IF EXISTS `accounts`;
 CREATE TABLE `accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password_digest` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -34,7 +33,6 @@ CREATE TABLE `accounts` (
   `time_zone_offset` mediumint(9) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_accounts_on_user_id` (`user_id`),
-  UNIQUE KEY `index_accounts_on_email` (`email`),
   UNIQUE KEY `index_accounts_on_facebook_id` (`facebook_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -55,6 +53,27 @@ CREATE TABLE `avatar_images` (
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_avatar_images_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `emails`
+--
+
+DROP TABLE IF EXISTS `emails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `emails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL,
+  `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_emails_on_email` (`email`),
+  KEY `index_emails_on_account_id` (`account_id`),
+  KEY `index_emails_on_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -330,7 +349,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-03 16:32:35
+-- Dump completed on 2014-01-15 16:35:56
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -420,3 +439,7 @@ INSERT INTO schema_migrations (version) VALUES ('20131220132745');
 INSERT INTO schema_migrations (version) VALUES ('20131220144240');
 
 INSERT INTO schema_migrations (version) VALUES ('20140103212016');
+
+INSERT INTO schema_migrations (version) VALUES ('20140109190320');
+
+INSERT INTO schema_migrations (version) VALUES ('20140109192600');

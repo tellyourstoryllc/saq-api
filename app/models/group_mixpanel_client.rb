@@ -12,8 +12,7 @@ class GroupMixpanelClient < MixpanelClient
       'Creator ID' => group.creator_id, 'Members' => group.member_ids.size, 'Messages' => group.message_ids.size,
       'User ID' => user.id, 'User Created' => user.created_at, 'User Client' => Thread.current[:client],
       'User OS' => Thread.current[:os], 'User Name' => user.name, 'User Username' => user.username,
-      'User Email' => user.email, 'User Time Zone' => user.account.time_zone,
-      'User Status' => user.computed_status, 'User Invited' => user.invited?,
+      'User Time Zone' => user.account.time_zone, 'User Status' => user.computed_status, 'User Invited' => user.invited?,
       'User Groups' => user.group_ids.size, 'User Created Groups' => user.live_created_groups_count,
       'User Sent Messages' => user.metrics[:sent_messages_count].to_i,
       'User Received Messages' => user.metrics[:received_messages_count].to_i

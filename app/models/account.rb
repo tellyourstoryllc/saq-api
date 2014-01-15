@@ -8,8 +8,6 @@ class Account < ActiveRecord::Base
 
   before_validation :set_time_zone, on: :create
 
-  validates :email, format: /.+@.+/
-  validates :email, uniqueness: true
   validates :password, presence: true, on: :create, if: proc{ |account| account.facebook_id.blank? && account.facebook_token.blank? }
   validate :valid_facebook_credentials?, on: :create
   validate :time_zone_set?
@@ -17,9 +15,11 @@ class Account < ActiveRecord::Base
   after_save :update_one_to_one_wallpaper_image, on: :update
 
   belongs_to :user
-  accepts_nested_attributes_for :user
+  has_many :emails, inverse_of: :account
 
   has_one :one_to_one_wallpaper_image, -> { order('one_to_one_wallpaper_images.id DESC') }
+
+  accepts_nested_attributes_for :user, :emails
 
 
   def time_zone=(tz_name)

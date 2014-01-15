@@ -52,11 +52,10 @@ class AccountsController < ApplicationController
   private
 
   def update_account_params
-    params.permit(:email, :new_password, :time_zone, :one_to_one_wallpaper_image_file).tap do |attrs|
+    params.permit(:new_password, :time_zone, :one_to_one_wallpaper_image_file).tap do |attrs|
       if @authenticated
         attrs[:password] = attrs.delete(:new_password) if attrs[:new_password].present?
       else
-        attrs.delete(:email)
         attrs.delete(:new_password)
       end
 

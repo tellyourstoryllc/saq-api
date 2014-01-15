@@ -14,7 +14,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    @account = Account.create!(account_params.merge(user_attributes: user_params))
+    @account = Account.create!(account_params.merge(user_attributes: user_params, emails_attributes: [{email: params[:email]}]))
     @current_user = @account.user
     IosDevice.create_or_assign!(@current_user, ios_device_params)
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
@@ -38,7 +38,7 @@ class UsersController < ApplicationController
   private
 
   def account_params
-    params.permit(:email, :password, :facebook_id, :facebook_token)
+    params.permit(:password, :facebook_id, :facebook_token)
   end
 
   def user_params

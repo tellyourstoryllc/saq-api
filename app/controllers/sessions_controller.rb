@@ -26,7 +26,7 @@ class SessionsController < ApplicationController
     email = params[:email]
     password = params[:password]
 
-    Account.find_by(email: email).try(:authenticate, password) if email.present? && password.present?
+    Account.joins(:emails).find_by(emails: {email: email}).try(:authenticate, password) if email.present? && password.present?
   end
 
   def login_via_facebook
