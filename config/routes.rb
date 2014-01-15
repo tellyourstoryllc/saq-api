@@ -58,6 +58,9 @@ ChatApp::Application.routes.draw do
     match '/emails/create', to: 'emails#create', as: 'create_email'
     match '/emails/:id/update', to: 'emails#update', as: 'update_email'
     match '/emails/:id/destroy', to: 'emails#destroy', as: 'destroy_email'
+
+    match '/contacts/add', to: 'contacts#add', as: 'add_contacts'
+    match '/contacts/remove', to: 'contacts#remove', as: 'remove_contacts'
   end
 
   require 'sidekiq/web'

@@ -92,4 +92,10 @@ class ApplicationController < ActionController::Base
   def secure_request?
     params[:api_secret] == Rails.configuration.app['api']['request_secret']
   end
+
+  def split_param(param_name)
+    values = params[param_name] || []
+    values = values.split(',') unless values.is_a?(Array)
+    values
+  end
 end

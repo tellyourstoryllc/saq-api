@@ -35,6 +35,7 @@ class User < ActiveRecord::Base
   sorted_set :blocked_user_ids
   hash_key :group_last_seen_ranks
   hash_key :one_to_one_last_seen_ranks
+  set :contact_ids
 
 
   def first_name
@@ -110,18 +111,6 @@ class User < ActiveRecord::Base
     %w(away idle unavailable).include?(computed_status)
   end
 
-  def contact_ids
-    gids = group_ids.members
-    group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
-    one_to_one_user_keys = [one_to_one_user_ids.key]
-    redis.sunion(group_member_keys + one_to_one_user_keys)
-  end
-
-  def self.contacts?(user1, user2)
-    return false if user1.blank? || user2.blank?
-    user1.id == user2.id || user1.contact_ids.include?(user2.id)
-  end
-
   def contact?(user)
     return unless user && user.is_a?(User)
 
@@ -129,7 +118,7 @@ class User < ActiveRecord::Base
     is_contact = @contacts_memoizer[user.id]
     return is_contact unless is_contact.nil?
 
-    @contacts_memoizer[user.id] = self.class.contacts?(self, user)
+    @contacts_memoizer[user.id] = contact_ids.include?(user.id)
   end
 
   # Did the user join his first group (not including creating a group)
