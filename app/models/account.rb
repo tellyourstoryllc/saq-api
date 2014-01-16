@@ -37,8 +37,8 @@ class Account < ActiveRecord::Base
 
   def self.find_by_password_reset_token(token)
     return if token.blank?
-    user_id = redis.get(password_reset_token_key(token))
-    find_by(id: user_id) if user_id
+    account_id = redis.get(password_reset_token_key(token))
+    find_by(id: account_id) if account_id
   end
 
   def generate_password_reset_token
@@ -50,6 +50,18 @@ class Account < ActiveRecord::Base
   def authenticate_facebook(facebook_token)
     self.facebook_token = facebook_token
     verify_facebook_token && self
+  end
+
+  def send_welcome_email
+    if Settings.enabled?(:queue)
+      WelcomeEmailWorker.perform_async(id)
+    else
+      send_welcome_email!
+    end
+  end
+
+  def send_welcome_email!
+    AccountMailer.welcome(self).deliver!
   end
 
 

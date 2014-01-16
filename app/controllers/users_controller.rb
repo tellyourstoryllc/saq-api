@@ -22,7 +22,7 @@ class UsersController < ApplicationController
     mixpanel.user_registered(@current_user)
     group_mixpanel.group_created(@group) if @group
 
-    AccountMailer.welcome(@account).deliver!
+    @account.send_welcome_email
     FacebookUser.new(id: @account.facebook_id).fetch_friends if @account.facebook_id
 
     render_json [@current_user, @account, @group].compact
