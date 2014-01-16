@@ -113,6 +113,14 @@ class User < ActiveRecord::Base
     %w(away idle unavailable).include?(computed_status)
   end
 
+  def dynamic_contact_ids
+    gids = group_ids.members
+    group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
+    one_to_one_user_keys = [one_to_one_user_ids.key]
+
+    redis.sunion([contact_ids.key] + group_member_keys + one_to_one_user_keys)
+  end
+
   def contact?(user)
     return unless user && user.is_a?(User)
 
@@ -121,6 +129,16 @@ class User < ActiveRecord::Base
     return is_contact unless is_contact.nil?
 
     @contacts_memoizer[user.id] = contact_ids.include?(user.id)
+  end
+
+  def dynamic_contact?(user)
+    return unless user && user.is_a?(User)
+
+    @dynamic_contacts_memoizer ||= {}
+    is_contact = @dynamic_contacts_memoizer[user.id]
+    return is_contact unless is_contact.nil?
+
+    @dynamic_contacts_memoizer[user.id] = dynamic_contact_ids.include?(user.id)
   end
 
   # Did the user join his first group (not including creating a group)
