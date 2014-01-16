@@ -8,7 +8,7 @@ class OneToOne
   hash_key :attrs
 
   validates :sender_id, :recipient_id, presence: true
-  validate :users_are_contacts?, :not_blocked?
+  validate :not_blocked?
 
 
   def initialize(attributes = {})
@@ -105,10 +105,6 @@ class OneToOne
 
 
   private
-
-  def users_are_contacts?
-    errors.add(:base, "Users must be contacts to send private messages.") unless User.contacts?(sender, recipient)
-  end
 
   def not_blocked?
     errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") if blocked?
