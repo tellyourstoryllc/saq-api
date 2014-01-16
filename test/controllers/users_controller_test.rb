@@ -6,7 +6,7 @@ describe UsersController do
       it "must not create a user if it's invalid" do
         post :create
         old_count = User.count
-        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Password can't be blank, Invalid Facebook credentials, Emails email is invalid, User name can't be blank."})
+        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Emails email is invalid, User name can't be blank."})
         User.count.must_equal old_count
       end
 
@@ -24,6 +24,21 @@ describe UsersController do
     describe "valid" do
       it "must create a user and account" do
         post :create, {name: 'John Doe', email: 'joe@example.com', password: 'asdf'}
+
+        user = User.last
+        account = Account.last
+
+        result.must_equal [
+          {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
+            'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+            'client_type' => nil, 'avatar_url' => nil},
+          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+            'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+        ]
+      end
+
+      it "must create a user and account without a password" do
+        post :create, {name: 'John Doe', email: 'joe@example.com'}
 
         user = User.last
         account = Account.last

@@ -27,9 +27,6 @@ class Email < ActiveRecord::Base
     self.user = account.user
   end
 
-
-  private
-
   def not_last_email?
     if account.emails.size <= 1
       errors.add(:base, "Sorry, you need at least one email address.")

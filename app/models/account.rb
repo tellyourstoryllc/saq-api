@@ -8,11 +8,11 @@ class Account < ActiveRecord::Base
 
   before_validation :set_time_zone, on: :create
 
-  validates :password, presence: true, on: :create, if: proc{ |account| account.facebook_id.blank? && account.facebook_token.blank? }
   validate :valid_facebook_credentials?, on: :create
   validate :time_zone_set?
 
   after_save :update_one_to_one_wallpaper_image, on: :update
+  after_create :send_missing_password_email
 
   belongs_to :user
   has_many :emails, inverse_of: :account
@@ -64,6 +64,20 @@ class Account < ActiveRecord::Base
     AccountMailer.welcome(self).deliver!
   end
 
+  def send_missing_password_email
+    return if password_digest.present? || facebook_id.present?
+
+    if Settings.enabled?(:queue)
+      MissingPasswordWorker.perform_in(10.seconds, id)
+    else
+      send_missing_password_email!
+    end
+  end
+
+  def send_missing_password_email!
+    AccountMailer.missing_password(self, generate_password_reset_token).deliver!
+  end
+
 
   private
 
@@ -76,8 +90,9 @@ class Account < ActiveRecord::Base
   end
 
   def valid_facebook_credentials?
-    return if password.present?
-    errors.add(:base, 'Invalid Facebook credentials') unless facebook_id.present? && facebook_token.present? && verify_facebook_token
+    errors.add(:base, 'Invalid Facebook credentials') if (facebook_id.present? && facebook_token.blank?) ||
+      (facebook_id.blank? && facebook_token.present?) ||
+      (facebook_id.present? && facebook_token.present? && !verify_facebook_token)
   end
 
   def verify_facebook_token

@@ -1,7 +1,11 @@
 FactoryGirl.define do
+  sequence :email_address do |n|
+    "email#{n}@example.com"
+  end
+
   factory :email do
     account_id 1
     user_id 'asdf1234'
-    sequence(:email){ |n| "email#{n}@example.com" }
+    email { generate(:email_address) }
   end
 end

@@ -7,4 +7,9 @@ class AccountMailer < BaseMailer
     @url = reset_password_url(token)
     mail(to: account.emails.map(&:email), subject: 'Password Reset Instructions')
   end
+
+  def missing_password(account, token)
+    @url = reset_password_url(token)
+    mail(to: account.emails.map(&:email), subject: 'Set Your Password')
+  end
 end

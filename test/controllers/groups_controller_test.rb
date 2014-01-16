@@ -107,7 +107,6 @@ describe GroupsController do
       group = FactoryGirl.create(:group, created_at: now)
       member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
       account = FactoryGirl.create(:account, user_id: member.id)
-      FactoryGirl.create(:email, account: account)
 
       group.add_admin(member)
       group.add_member(member)
