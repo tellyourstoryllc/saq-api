@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   def index
-    # TODO: paginate contacts?
+    render_json current_user.paginated_contacts(pagination_params)
   end
 
   def add
@@ -15,5 +15,12 @@ class ContactsController < ApplicationController
     Contact.remove_users(current_user, user_ids)
 
     render_json User.where(id: user_ids)
+  end
+
+
+  private
+
+  def pagination_params
+    params.permit(:limit, :offset)
   end
 end

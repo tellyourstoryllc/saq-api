@@ -59,6 +59,7 @@ ChatApp::Application.routes.draw do
     match '/emails/:id/update', to: 'emails#update', as: 'update_email'
     match '/emails/:id/destroy', to: 'emails#destroy', as: 'destroy_email'
 
+    match '/contacts', to: 'contacts#index', as: 'contacts'
     match '/contacts/add', to: 'contacts#add', as: 'add_contacts'
     match '/contacts/remove', to: 'contacts#remove', as: 'remove_contacts'
   end

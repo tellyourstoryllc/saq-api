@@ -11,6 +11,7 @@ class User < ActiveRecord::Base
 
   validate :username_format?
 
+  after_save :update_sorting_name
   after_save :create_new_avatar_image, on: :update
   after_create :create_api_token
 
@@ -31,6 +32,7 @@ class User < ActiveRecord::Base
   value :last_client_disconnect_at
   value :last_mixpanel_checkin_at
   value :invited
+  value :sorting_name # Used for sorting contacts lists
   hash_key :metrics
   sorted_set :blocked_user_ids
   hash_key :group_last_seen_ranks
@@ -215,6 +217,25 @@ class User < ActiveRecord::Base
     end
   end
 
+  def paginated_contact_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+
+    contact_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+  end
+
+  def paginated_contacts(options = {})
+    user_ids = paginated_contact_ids(options)
+
+    if user_ids.present?
+      field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
+      User.includes(:avatar_image).where(id: user_ids).order("FIELD(id, #{field_order})")
+    else
+      []
+    end
+  end
 
 
   private
@@ -257,6 +278,10 @@ class User < ActiveRecord::Base
     end
 
     User.api_tokens[id] = @token
+  end
+
+  def update_sorting_name
+    self.sorting_name = name if name_changed?
   end
 
   def create_new_avatar_image
