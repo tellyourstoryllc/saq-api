@@ -38,6 +38,7 @@ class User < ActiveRecord::Base
   hash_key :group_last_seen_ranks
   hash_key :one_to_one_last_seen_ranks
   set :contact_ids
+  set :reciprocal_contact_ids
 
 
   def first_name

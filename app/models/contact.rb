@@ -21,10 +21,16 @@ class Contact
   end
 
   def self.add_user(user, other_user)
-    user.contact_ids << other_user.id
+    User.redis.multi do
+      user.contact_ids << other_user.id
+      other_user.reciprocal_contact_ids << user.id
+    end
   end
 
   def self.remove_user(user, other_user)
-    user.contact_ids.delete(other_user.id)
+    User.redis.multi do
+      user.contact_ids.delete(other_user.id)
+      other_user.reciprocal_contact_ids.delete(user.id)
+    end
   end
 end
