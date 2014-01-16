@@ -21,7 +21,7 @@ class AccountsController < ApplicationController
 
   # Lost password
   def send_reset_email
-    @account = Account.find_by(email: params[:login])
+    @account = Account.joins(:emails).find_by(emails: {email: params[:login]})
 
     if @account.nil?
       @user = User.find_by(username: params[:login])
