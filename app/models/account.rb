@@ -7,16 +7,12 @@ class Account < ActiveRecord::Base
   has_secure_password validations: false
 
   before_validation :set_time_zone, on: :create
-
   validate :valid_facebook_credentials?, on: :create
   validate :time_zone_set?
-
   after_save :update_one_to_one_wallpaper_image, on: :update
-  after_create :send_missing_password_email
 
   belongs_to :user
   has_many :emails, inverse_of: :account
-
   has_one :one_to_one_wallpaper_image, -> { order('one_to_one_wallpaper_images.id DESC') }
 
   accepts_nested_attributes_for :user, :emails
@@ -64,8 +60,12 @@ class Account < ActiveRecord::Base
     AccountMailer.welcome(self).deliver!
   end
 
+  def no_login_credentials?
+    password_digest.blank? && facebook_id.blank?
+  end
+
   def send_missing_password_email
-    return if password_digest.present? || facebook_id.present?
+    return if no_login_credentials?
 
     if Settings.enabled?(:queue)
       MissingPasswordWorker.perform_in(10.seconds, id)

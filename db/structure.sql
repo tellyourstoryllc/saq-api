@@ -161,6 +161,31 @@ CREATE TABLE `groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `invites`
+--
+
+DROP TABLE IF EXISTS `invites`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `invites` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `recipient_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `invited_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `new_user` tinyint(1) NOT NULL,
+  `group_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `invite_token` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_invites_on_sender_id` (`sender_id`),
+  KEY `index_invites_on_recipient_id` (`recipient_id`),
+  KEY `index_invites_on_group_id` (`group_id`),
+  KEY `index_invites_on_invite_token` (`invite_token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `ios_devices`
 --
 
@@ -349,7 +374,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-15 16:35:56
+-- Dump completed on 2014-01-17 14:50:29
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -443,3 +468,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140103212016');
 INSERT INTO schema_migrations (version) VALUES ('20140109190320');
 
 INSERT INTO schema_migrations (version) VALUES ('20140109192600');
+
+INSERT INTO schema_migrations (version) VALUES ('20140117145107');

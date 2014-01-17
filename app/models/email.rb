@@ -17,6 +17,11 @@ class Email < ActiveRecord::Base
     email.downcase.strip if email
   end
 
+  def self.get(email)
+    find_by(email: normalize(email))
+  end
+
+
   private
 
   def normalize_email

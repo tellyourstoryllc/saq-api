@@ -22,6 +22,8 @@ class UsersController < ApplicationController
     group_mixpanel.group_created(@group) if @group
 
     @account.send_welcome_email
+    @account.send_missing_password_email
+
     FacebookUser.new(id: @account.facebook_id).fetch_friends if @account.facebook_id
 
     render_json [@current_user, @account, @group].compact
