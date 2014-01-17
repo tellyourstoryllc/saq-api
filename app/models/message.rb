@@ -79,7 +79,7 @@ class Message
   end
 
   def mentioned?(user)
-    mentioned_all? || mentioned_user_ids.include?(user.id)
+    user.id != user_id && (mentioned_all? || mentioned_user_ids.include?(user.id))
   end
 
   def like(user)
