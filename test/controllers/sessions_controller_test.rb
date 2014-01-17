@@ -69,4 +69,20 @@ describe SessionsController do
       end
     end
   end
+
+  it "must log in account when the invite token correct" do
+    user = FactoryGirl.create(:user)
+    account = FactoryGirl.create(:account, user_id: user.id)
+    invite = FactoryGirl.create(:invite, recipient_id: user.id)
+
+    post :create, {invite_token: invite.invite_token}
+
+    result.must_equal [
+      {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
+        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
+        'avatar_url' => nil},
+      {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+        'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+    ]
+  end
 end

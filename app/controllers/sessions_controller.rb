@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
 
 
   def create
-    @account = login_via_email_and_password || login_via_facebook
+    @account = login_via_email_and_password || login_via_facebook || login_via_invite_token
 
     if @account
       @current_user = @account.user
@@ -37,5 +37,9 @@ class SessionsController < ApplicationController
     fb_token = params[:facebook_token]
 
     Account.find_by(facebook_id: fb_id).try(:authenticate_facebook, fb_token) if fb_id.present? && fb_token.present?
+  end
+
+  def login_via_invite_token
+    Account.joins(user: :received_invites).find_by(invites: {invite_token: params[:invite_token]}) if params[:invite_token].present?
   end
 end
