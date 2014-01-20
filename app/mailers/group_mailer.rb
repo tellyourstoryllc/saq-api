@@ -4,6 +4,6 @@ class GroupMailer < BaseMailer
     @new_member = new_member
     @group = group
 
-    mail(to: @recipient.emails.map(&:email), subject: "#{@new_member.name} just joined the room #{group.name}")
+    mail(to: @recipient.emails.map(&:email), subject: "#{@new_member.name} just joined the room \"#{group.name}\"")
   end
 end
