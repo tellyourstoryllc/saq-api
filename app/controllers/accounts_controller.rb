@@ -4,14 +4,21 @@ class AccountsController < ApplicationController
 
   def update
     @account = current_user.account
-
+    new_password = params[:new_password]
     password = params.delete(:password)
 
-    if password
-      if @account.authenticate(password)
-        @authenticated = true
+    if new_password
+      # If the account has a password, require verification of old password to change it
+      if @account.password_digest.present?
+        if @account.authenticate(password)
+          @authenticated = true
+        else
+          render_error('Incorrect credentials.', nil, {status: :unauthorized}) and return
+        end
+
+      # If the account has no password, allow setting one with just with token
       else
-        render_error('Incorrect credentials.', nil, {status: :unauthorized}) and return
+        @authenticated = true
       end
     end
 
