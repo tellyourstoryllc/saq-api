@@ -8,4 +8,16 @@ class InviteMailer < BaseMailer
 
     mail(to: email, subject: "#{@sender.name} added you as a contact")
   end
+
+  def invite_to_group(sender, recipient, group, email, invite_token)
+    @sender = sender
+    @recipient = recipient
+    @group = group
+    @url = Rails.configuration.app['web']['url'] + "/rooms/#{@group.id}"
+    @url << "?invite_token=#{invite_token}" if invite_token.present?
+
+    to = email.present? ? email : @recipient.emails.map(&:email)
+
+    mail(to: to, subject: "#{@sender.name} added you to the room \"#{@group.name}\"")
+  end
 end

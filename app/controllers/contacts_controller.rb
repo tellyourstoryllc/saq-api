@@ -7,15 +7,17 @@ class ContactsController < ApplicationController
     user_ids = split_param(:user_ids)
     emails = split_param(:emails)
 
-    Contact.add_users(current_user, user_ids)
-    Contact.add_by_emails(current_user, emails)
+    contact_inviter = ContactInviter.new(current_user)
+    contact_inviter.add_users(user_ids)
+    contact_inviter.add_by_emails(emails)
 
-    render_json []
+    users = User.where(id: user_ids) | User.joins(:emails).where(emails: {email: emails})
+    render_json users
   end
 
   def remove
     user_ids = split_param(:user_ids)
-    Contact.remove_users(current_user, user_ids)
+    ContactInviter.new(current_user).remove_users(user_ids)
 
     render_json User.where(id: user_ids)
   end

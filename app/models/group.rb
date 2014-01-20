@@ -64,6 +64,8 @@ class Group < ActiveRecord::Base
         user.group_ids << id
         user.group_join_times[id] = Time.current.to_i
       end
+
+      publish_updated_group(user)
       true
     end
   end
@@ -75,6 +77,8 @@ class Group < ActiveRecord::Base
         member_ids.delete(user.id)
         user.group_ids.delete(id)
       end
+
+      publish_updated_group(user)
       true
     end
   end
@@ -192,5 +196,11 @@ class Group < ActiveRecord::Base
 
     add_admin(creator)
     add_member(creator)
+  end
+
+  def publish_updated_group(user)
+    publisher = FayePublisher.new(user.token)
+    publisher.publish_to_group(self, PublishGroupSerializer.new(self).as_json)
+    publisher.publish_group_to_user(user, GroupSerializer.new(self).as_json)
   end
 end

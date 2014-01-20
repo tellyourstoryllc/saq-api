@@ -1,6 +1,6 @@
 class GroupsController < ApplicationController
   skip_before_action :require_token, only: [:show, :find]
-  before_action :load_group, only: [:update, :leave]
+  before_action :load_group, only: [:update, :leave, :add_users]
 
 
   def create
@@ -54,9 +54,7 @@ class GroupsController < ApplicationController
     result = @group.add_member(current_user)
 
     if result
-      publish_updated_group
       notify_admins unless result == :already_member
-
       render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
     else
       render_error "Sorry, you cannot join that group at this time."
@@ -64,11 +62,7 @@ class GroupsController < ApplicationController
   end
 
   def leave
-    # If the member successfully left the group, publish the updated group to its channel
-    if @group.leave!(current_user)
-      publish_updated_group
-    end
-
+    @group.leave!(current_user)
     render_success
   end
 
@@ -78,6 +72,19 @@ class GroupsController < ApplicationController
     else
       render nothing: true, status: :unauthorized
     end
+  end
+
+  def add_users
+    user_ids = split_param(:user_ids)
+    emails = split_param(:emails)
+
+    group_inviter = GroupInviter.new(current_user, @group)
+    group_inviter.add_users(user_ids)
+    group_inviter.add_by_emails(emails)
+    # TODO: phone_numbers as well
+
+    users = User.where(id: user_ids) | User.joins(:emails).where(emails: {email: emails})
+    render_json [@group] + users
   end
 
 
@@ -186,7 +193,6 @@ class GroupsController < ApplicationController
   end
 
   def publish_updated_group
-    faye_publisher.publish_to_group(@group, PublishGroupSerializer.new(@group).as_json)
     faye_publisher.publish_group_to_user(current_user, GroupSerializer.new(@group).as_json)
   end
 

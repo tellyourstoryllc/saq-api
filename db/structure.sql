@@ -174,7 +174,7 @@ CREATE TABLE `invites` (
   `invited_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `new_user` tinyint(1) NOT NULL,
   `group_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `invite_token` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `invite_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -374,7 +374,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-17 14:50:29
+-- Dump completed on 2014-01-20 15:29:34
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -470,3 +470,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140109190320');
 INSERT INTO schema_migrations (version) VALUES ('20140109192600');
 
 INSERT INTO schema_migrations (version) VALUES ('20140117145107');
+
+INSERT INTO schema_migrations (version) VALUES ('20140120202824');
