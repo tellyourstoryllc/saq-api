@@ -52,7 +52,15 @@ class IosNotifier
                              end
                 "#{message.user.name} uploaded #{media_desc} to the room \"#{message.group.name}\""
               elsif message.text.present?
-                "(#{message.group.name}) #{message.user.name}: #{message.text}"
+                others = message.group.active_members
+                sender = others.detect{ |u| u.id == message.user_id } || message.user
+                others.reject!{ |u| u.id == sender.id }
+
+                case others.size
+                when 0 then "#{sender.name} sent a message in the room \"#{message.group.name}\""
+                when 1 then "#{sender.name} and #{others.first.name} are chatting in the room \"#{message.group.name}\""
+                else "#{sender.name}, #{others.shift.name}, and #{others.size} other#{'s' unless others.size == 1} are chatting in the room \"#{message.group.name}\""
+                end
               end
     end
 
