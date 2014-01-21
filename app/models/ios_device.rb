@@ -26,7 +26,19 @@ class IosDevice < ActiveRecord::Base
     case notification_type
     when :one_to_one then preferences.server_one_to_one
     when :mention then preferences.server_mention || UserGroupPreferences.find(user, conversation).server_all_messages_mobile_push
-    when :all then UserGroupPreferences.find(user, conversation).server_all_messages_mobile_push
+    when :all then UserGroupPreferences.find(user, conversation).server_all_messages_mobile_push && under_limit?(user, conversation)
+    end
+  end
+
+  def under_limit?(user, conversation)
+    limit = 10.minutes
+    last_push_at = user.last_group_pushes[conversation.id]
+
+    if last_push_at.nil? || Time.zone.at(last_push_at.to_i) < limit.ago
+      user.last_group_pushes[conversation.id] = Time.current.to_i
+      true
+    else
+      false
     end
   end
 

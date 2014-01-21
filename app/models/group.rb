@@ -145,6 +145,10 @@ class Group < ActiveRecord::Base
     end
   end
 
+  def active_members
+    @active_members ||= members.reject(&:away_idle_or_unavailable?)
+  end
+
 
   private
 

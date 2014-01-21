@@ -4,4 +4,6 @@ Hi <%= @recipient.first_name %>,
 
 <%= @user.name %>: <%= @message.text %> | <%= Time.zone.at(@message.created_at).strftime('%-I:%M %p %Z') %>
 
+Join the conversation: <%= @url %>
+
 
