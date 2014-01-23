@@ -11,6 +11,12 @@ describe SessionsController do
       result.must_equal('error' => {'message' => 'Incorrect credentials.'})
     end
 
+    it "must not log in user when the user has no password nor Facebook id" do
+      FactoryGirl.create(:account, user_attributes: {name: 'John'}, emails_attributes: [{email: 'login_test@example.com'}])
+      post :create, {email: 'login_test@example.com', password: 'incorrect'}
+      result.must_equal('error' => {'message' => 'Incorrect credentials.'})
+    end
+
     it "must log in account when email and password are correct" do
       user = FactoryGirl.create(:user)
       account = FactoryGirl.create(:account, user_id: user.id, password: 'asdf', emails_attributes: [{email: 'login_test@example.com'}])
@@ -43,14 +49,14 @@ describe SessionsController do
     end
 
     it "must log in account when Facebook credentials are correct" do
-      user = FactoryGirl.create(:user)
-      account = FactoryGirl.create(:account, user_id: user.id, password: 'asdf', facebook_id: '100002345',
-                                   emails_attributes: [{email: 'login_test@example.com'}])
-
       api = 'api'
       def api.get_object(id); {'id' => '100002345'} end
 
       Koala::Facebook::API.stub :new, api do
+        user = FactoryGirl.create(:user)
+        account = FactoryGirl.create(:account, user_id: user.id, facebook_id: '100002345', facebook_token: 'fb_asdf1234',
+                                     emails_attributes: [{email: 'login_test@example.com'}])
+
         post :create, {facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
 
         result.must_equal [
