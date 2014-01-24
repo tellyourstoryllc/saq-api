@@ -42,8 +42,12 @@ class IosNotifier
     last_notification_at + current_delay if last_notification_at
   end
 
-  def self.job_token(user_id, digests_sent)
+  def self.job_token_key(user_id, digests_sent)
     "user:#{user_id}:mobile_digest:#{digests_sent}:job_token"
+  end
+
+  def self.group_chatting_member_ids_key(user_id, group_id)
+    "user:#{user_id}:mobile_digest_group_chatting_member_ids:#{group_id}"
   end
 
   def notify(message)
@@ -89,7 +93,7 @@ class IosNotifier
 
     user.redis.multi do
       user.mobile_digest_group_ids[message.group_id] = now
-      user.redis.zadd("user:#{user.id}:mobile_digest_group_chatting_members:#{message.group_id}", now, message.user_id)
+      user.redis.zadd(IosNotifier.group_chatting_member_ids_key(user.id, message.group_id), now, message.user_id)
     end
   end
 
@@ -97,7 +101,7 @@ class IosNotifier
   # at the time of the last notification + current delay
   def create_delayed_job(message)
     ttl = (next_digest_at + 5.minutes - Time.current).ceil
-    key = IosNotifier.job_token(user.id, digests_sent)
+    key = IosNotifier.job_token_key(user.id, digests_sent)
 
     token = SecureRandom.hex
     if User.redis.set(key, token, {nx: true, ex: ttl})
@@ -167,7 +171,7 @@ class IosNotifier
         group_ids = user.mobile_digest_group_ids.revrange(0, -1)
         grouped_member_ids = user.redis.pipelined do
           group_ids.each do |group_id|
-            user.redis.zrevrange("user:#{user.id}:mobile_digest_group_chatting_members:#{group_id}", 0, -1)
+            user.redis.zrevrange(IosNotifier.group_chatting_member_ids_key(user.id, group_id), 0, -1)
           end
         end
 

@@ -236,7 +236,7 @@ class User < ActiveRecord::Base
     # Delete only the few most recent job keys (the rest should have already expired)
     # So we're not deleting potentially hundreds of keys for lost users
     digests_sent = mobile_digests_sent.value
-    ([digests_sent - 3, 1].max).upto(digests_sent + 1){ |i| keys << IosNotifier.job_token(id, digests_sent) }
+    ([digests_sent - 3, 1].max).upto(digests_sent + 1){ |i| keys << IosNotifier.job_token_key(id, digests_sent) }
 
     keys += digest_data_keys
 
@@ -249,7 +249,7 @@ class User < ActiveRecord::Base
 
   def digest_data_keys
     [mobile_digest_group_ids.key] + mobile_digest_group_ids.members.map do |group_id|
-      "user:#{id}:mobile_digest_group_chatting_members:#{group_id}"
+      IosNotifier.group_chatting_member_ids_key(id, group_id)
     end
   end
 

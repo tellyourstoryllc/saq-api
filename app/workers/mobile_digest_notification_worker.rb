@@ -9,7 +9,7 @@ class MobileDigestNotificationWorker < BaseWorker
 
       # Only send the digest if the user has been unavailable the entire time since the last digest
       digests_sent = user.mobile_digests_sent.value
-      if digests_sent > 0 && user.redis.get(IosNotifier.job_token(user.id, digests_sent)) == job_token && user.away_idle_or_unavailable?
+      if digests_sent > 0 && user.redis.get(IosNotifier.job_token_key(user.id, digests_sent)) == job_token && user.away_idle_or_unavailable?
         user.ios_notifier.send_notification(message, :all)
       end
 
