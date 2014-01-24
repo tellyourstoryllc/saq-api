@@ -35,7 +35,10 @@ class User < ActiveRecord::Base
   sorted_set :blocked_user_ids
   hash_key :group_last_seen_ranks
   hash_key :one_to_one_last_seen_ranks
-  hash_key :last_group_pushes
+
+  value :last_mobile_digest_notification_at
+  counter :mobile_digests_sent
+  sorted_set :mobile_digest_group_ids
 
 
   def first_name
@@ -227,6 +230,15 @@ class User < ActiveRecord::Base
     end
   end
 
+  def delete_digest_data
+    redis.del(digest_data_keys)
+  end
+
+  def digest_data_keys
+    [mobile_digest_group_ids.key] + mobile_digest_group_ids.members.map do |group_id|
+      "user:#{id}:mobile_digest_group_chatting_members:#{group_id}"
+    end
+  end
 
 
   private
