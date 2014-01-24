@@ -1,6 +1,6 @@
 class IosNotifier
   attr_accessor :user
-  NOTIFICATION_DELAYS = [1, 2, 4, 8, 16, 32, 64].map!(&:minutes) # 2^n exponential backoff, in minutes
+  NOTIFICATION_DELAYS = [1.minute, 2.minutes, 4.minutes, 8.minutes, 15.minutes, 30.minutes, 1.hour, 2.hours, 4.hours, 8.hours, 24.hours] # approximate 2^n exponential backoff
 
 
   def initialize(user)
