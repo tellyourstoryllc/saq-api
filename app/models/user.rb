@@ -69,28 +69,16 @@ class User < ActiveRecord::Base
     FayeClient.pipelined_find(connected_faye_client_ids.members)
   end
 
-  def most_recent_faye_client
-    @most_recent_faye_client ||= begin
-      client = nil
-      ids = connected_faye_client_ids.revrange(0, -1)
-
-      ids.each do |id|
-        faye_client = FayeClient.new(id: id)
-
-        if faye_client.active?
-          client = faye_client
-          break
-        elsif faye_client.idle?
-          client ||= faye_client
-        end
-      end
-
-      client
+  def most_recent_faye_client(reload = false)
+    if reload
+      @most_recent_faye_client = get_most_recent_faye_client
+    else
+      @most_recent_faye_client ||= get_most_recent_faye_client
     end
   end
 
-  def computed_status
-    client = most_recent_faye_client
+  def computed_status(reload = false)
+    client = most_recent_faye_client(reload)
 
     if client.nil?
       'unavailable'
@@ -110,8 +98,12 @@ class User < ActiveRecord::Base
     Time.current.to_i - since.to_i if since.present?
   end
 
+  def self.away_idle_or_unavailable?(status)
+    %w(away idle unavailable).include?(status)
+  end
+
   def away_idle_or_unavailable?
-    %w(away idle unavailable).include?(computed_status)
+    self.class.away_idle_or_unavailable?(computed_status)
   end
 
   def contact_ids
@@ -230,6 +222,27 @@ class User < ActiveRecord::Base
     end
   end
 
+  # Reset digests if the user just went from not available to available
+  def reset_digests_if_needed(old_status, new_status)
+    if self.class.away_idle_or_unavailable?(old_status) && !self.class.away_idle_or_unavailable?(new_status)
+      reset_digest_cycle
+    end
+  end
+
+  # Reset all digest data when the user becomes available
+  def reset_digest_cycle
+    keys = [last_mobile_digest_notification_at, mobile_digests_sent].map!(&:key)
+
+    # Delete only the few most recent job keys (the rest should have already expired)
+    # So we're not deleting potentially hundreds of keys for lost users
+    digests_sent = mobile_digests_sent.value
+    ([digests_sent - 3, 1].max).upto(digests_sent + 1){ |i| keys << IosNotifier.job_token(id, digests_sent) }
+
+    keys += digest_data_keys
+
+    redis.del(keys)
+  end
+
   def delete_digest_data
     redis.del(digest_data_keys)
   end
@@ -289,5 +302,23 @@ class User < ActiveRecord::Base
     elsif avatar_image_url.present?
       create_avatar_image(remote_image_url: avatar_image_url)
     end
+  end
+
+  def get_most_recent_faye_client
+    client = nil
+    ids = connected_faye_client_ids.revrange(0, -1)
+
+    ids.each do |id|
+      faye_client = FayeClient.new(id: id)
+
+      if faye_client.active?
+        client = faye_client
+        break
+      elsif faye_client.idle?
+        client ||= faye_client
+      end
+    end
+
+    client
   end
 end

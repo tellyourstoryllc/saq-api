@@ -8,7 +8,12 @@ class FayeClientsController < ApplicationController
     @faye_client.client_type = params[:client_type]
     @faye_client.idle_duration = params[:idle_duration]
 
+    old_status = current_user.computed_status
+
     if @faye_client.save
+      new_status = current_user.computed_status(true)
+      current_user.reset_digests_if_needed(old_status, new_status)
+
       render_json current_user
     else
       render_error @faye_client.errors.full_messages

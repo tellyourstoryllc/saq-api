@@ -42,6 +42,10 @@ class IosNotifier
     last_notification_at + current_delay if last_notification_at
   end
 
+  def self.job_token(user_id, digests_sent)
+    "user:#{user_id}:mobile_digest:#{digests_sent}:job_token"
+  end
+
   def notify(message)
     return if message.user_id == user.id
 
@@ -92,11 +96,12 @@ class IosNotifier
   # If there's not yet a job for the current delay interval, create one to run
   # at the time of the last notification + current delay
   def create_delayed_job(message)
-    ttl = (next_digest_at + 1.minute - Time.current).ceil
-    key = "user:#{user.id}:mobile_digest_job_created:#{digests_sent}"
+    ttl = (next_digest_at + 5.minutes - Time.current).ceil
+    key = IosNotifier.job_token(user.id, digests_sent)
 
-    if User.redis.set(key, 1, {nx: true, ex: ttl})
-      MobileDigestNotificationWorker.perform_at(next_digest_at, user.id, message.id)
+    token = SecureRandom.hex
+    if User.redis.set(key, token, {nx: true, ex: ttl})
+      MobileDigestNotificationWorker.perform_at(next_digest_at, user.id, message.id, token)
     end
   end
 
