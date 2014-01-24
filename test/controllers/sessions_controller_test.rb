@@ -72,8 +72,9 @@ describe SessionsController do
 
   it "must log in account when the invite token correct" do
     user = FactoryGirl.create(:user)
+    sender = FactoryGirl.create(:user)
     account = FactoryGirl.create(:account, user_id: user.id)
-    invite = FactoryGirl.create(:invite, recipient_id: user.id)
+    invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'test@example.com')
 
     post :create, {invite_token: invite.invite_token}
 
@@ -82,7 +83,7 @@ describe SessionsController do
         'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
         'avatar_url' => nil},
       {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-        'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+        'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
     ]
   end
 end

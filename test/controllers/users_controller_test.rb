@@ -48,7 +48,7 @@ describe UsersController do
             'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
             'client_type' => nil, 'avatar_url' => nil},
           {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-            'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+            'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
         ]
       end
 
