@@ -30,7 +30,12 @@ class UsersController < ApplicationController
   end
 
   def update
+    old_status = current_user.computed_status
     current_user.update!(update_user_params)
+
+    new_status = current_user.computed_status(true)
+    current_user.reset_digests_if_needed(old_status, new_status)
+
     faye_publisher.broadcast_to_contacts
     render_json current_user
   end

@@ -14,6 +14,10 @@ class Settings
     attrs[key] = value.nil? ? '_nil' : value
   end
 
+  def self.delete(key)
+    attrs.delete(key)
+  end
+
   def self.feature_toggle_key(feature)
     "feature_#{feature}"
   end

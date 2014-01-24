@@ -3,6 +3,6 @@ class ClientConfiguration < Settings
   hash_key :attrs, global: true
 
   def self.config
-    attrs.all
+    attrs.all.reject{ |k,v| v == '_nil' }
   end
 end

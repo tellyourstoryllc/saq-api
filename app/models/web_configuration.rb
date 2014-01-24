@@ -3,6 +3,6 @@ class WebConfiguration < ClientConfiguration
   hash_key :attrs, global: true
 
   def self.config
-    ClientConfiguration.config.merge(attrs.all)
+    ClientConfiguration.config.merge(attrs.all).reject{ |k,v| v == '_nil' }
   end
 end
