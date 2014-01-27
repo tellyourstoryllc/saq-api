@@ -23,6 +23,9 @@ class Peanut::Sidekiq::Middleware::EnqueueStats
 end
 
 Sidekiq.configure_server do |config|
+  # Keep the logging out of the regular Rails log
+  ActiveRecord::Base.logger = Logger.new(STDOUT)
+
   config.redis = {url: sidekiq_config['redis_url'], namespace: namespace, driver: 'hiredis'}
 
   config.client_middleware do |chain|
