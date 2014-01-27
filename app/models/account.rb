@@ -65,7 +65,7 @@ class Account < ActiveRecord::Base
   end
 
   def send_missing_password_email
-    return if no_login_credentials?
+    return unless no_login_credentials?
 
     if Settings.enabled?(:queue)
       MissingPasswordWorker.perform_in(10.seconds, id)
