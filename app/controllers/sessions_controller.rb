@@ -40,6 +40,10 @@ class SessionsController < ApplicationController
   end
 
   def login_via_invite_token
-    Account.joins(user: :received_invites).find_by(invites: {invite_token: params[:invite_token]}) if params[:invite_token].present?
+    if params[:invite_token].present?
+      account = Account.joins(user: :received_invites).find_by(invites: {invite_token: params[:invite_token]})
+      account.try(:send_missing_password_email)
+      account
+    end
   end
 end
