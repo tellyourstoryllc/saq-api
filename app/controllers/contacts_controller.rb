@@ -11,7 +11,8 @@ class ContactsController < ApplicationController
     contact_inviter.add_users(user_ids)
     contact_inviter.add_by_emails(emails)
 
-    users = User.where(id: user_ids) | User.joins(:emails).where(emails: {email: emails})
+    normalized_emails = emails.map {|e| Email.normalize(e) }
+    users = User.where(id: user_ids) | User.joins(:emails).where(emails: {email: normalized_emails})
     render_json users
   end
 
