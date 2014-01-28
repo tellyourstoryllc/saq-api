@@ -53,3 +53,5 @@ gem 'statsd-instrument', '1.5.0'
 gem 'sinatra', '>= 1.3.0', require: nil
 gem 'sidekiq', '2.17.0'
 gem 'mixpanel', '4.1.1'
+
+gem 'phony'
