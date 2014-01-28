@@ -23,6 +23,8 @@ class AccountsController < ApplicationController
     end
 
     @account.update!(update_account_params)
+    faye_publisher.broadcast_account_to_one_to_one_users(current_user, AccountSerializer.new(@account).as_json) if update_account_params.include?(:one_to_one_wallpaper_image_file)
+
     render_json @account
   end
 

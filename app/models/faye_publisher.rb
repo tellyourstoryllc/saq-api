@@ -41,4 +41,8 @@ class FayePublisher
   def publish_preferences(user, data)
     publish "/users/#{user.id}", data, {action: 'updated_preferences'}
   end
+
+  def broadcast_account_to_one_to_one_users(user, data)
+    publish '/internal/broadcast_account_to_one_to_one_users', data
+  end
 end
