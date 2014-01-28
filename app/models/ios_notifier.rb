@@ -137,7 +137,7 @@ class IosNotifier
     if notified && notification_type == :all
       user.mobile_digests_sent.incr
       user.last_mobile_digest_notification_at = Time.current.to_i
-      user.delete_digest_data
+      user.delete_mobile_digest_data
     end
   end
 

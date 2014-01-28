@@ -42,6 +42,9 @@ class User < ActiveRecord::Base
   value :last_mobile_digest_notification_at
   counter :mobile_digests_sent
   sorted_set :mobile_digest_group_ids
+  value :last_email_digest_notification_at
+  counter :email_digests_sent
+  sorted_set :email_digest_group_ids
 
   set :contact_ids
   set :reciprocal_contact_ids
@@ -243,25 +246,40 @@ class User < ActiveRecord::Base
 
   # Reset all digest data when the user becomes available
   def reset_digest_cycle
-    keys = [last_mobile_digest_notification_at, mobile_digests_sent].map!(&:key)
+    keys = [last_mobile_digest_notification_at, mobile_digests_sent,
+      last_email_digest_notification_at, email_digests_sent].map!(&:key)
 
     # Delete only the few most recent job keys (the rest should have already expired)
     # So we're not deleting potentially hundreds of keys for lost users
-    digests_sent = mobile_digests_sent.value
-    ([digests_sent - 3, 1].max).upto(digests_sent + 1){ |i| keys << IosNotifier.job_token_key(id, digests_sent) }
+    mobile_sent = mobile_digests_sent.value
+    ([mobile_sent - 3, 1].max).upto(mobile_sent + 1){ |i| keys << IosNotifier.job_token_key(id, mobile_sent) }
 
-    keys += digest_data_keys
+    email_sent = email_digests_sent.value
+    ([email_sent - 3, 1].max).upto(email_sent + 1){ |i| keys << EmailNotifier.job_token_key(id, email_sent) }
+
+    keys += mobile_digest_data_keys
+    keys += email_digest_data_keys
 
     redis.del(keys)
   end
 
-  def delete_digest_data
-    redis.del(digest_data_keys)
+  def delete_mobile_digest_data
+    redis.del(mobile_digest_data_keys)
   end
 
-  def digest_data_keys
+  def delete_email_digest_data
+    redis.del(email_digest_data_keys)
+  end
+
+  def mobile_digest_data_keys
     [mobile_digest_group_ids.key] + mobile_digest_group_ids.members.map do |group_id|
       IosNotifier.group_chatting_member_ids_key(id, group_id)
+    end
+  end
+
+  def email_digest_data_keys
+    [email_digest_group_ids.key] + email_digest_group_ids.members.map do |group_id|
+      EmailNotifier.group_chatting_member_ids_key(id, group_id)
     end
   end
 
