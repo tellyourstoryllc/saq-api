@@ -180,11 +180,12 @@ class IosNotifier
           user_ids = grouped_member_ids.first
           field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
           names = User.where(id: user_ids).order("FIELD(id, #{field_order})").pluck(:name)
+          group_name = Group.find(group_ids.first).name
 
           case names.size
-          when 1 then "#{names.first} is chatting in the room \"#{message.group.name}\""
-          when 2 then "#{names.first} and #{names.last} are chatting in the room \"#{message.group.name}\""
-          else "#{names.shift}, #{names.shift}, and #{names.size} other#{'s' unless names.size == 1} are chatting in the room \"#{message.group.name}\""
+          when 1 then "#{names.first} is chatting in the room \"#{group_name}\""
+          when 2 then "#{names.first} and #{names.last} are chatting in the room \"#{group_name}\""
+          else "#{names.shift}, #{names.shift}, and #{names.size} other#{'s' unless names.size == 1} are chatting in the room \"#{group_name}\""
           end
         else
           # Fetch the groups' names, ordered by most recent activity first
