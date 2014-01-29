@@ -18,6 +18,9 @@ development:
   faye:
     url: https://local.skymob.co:8080/faye
     server_secret: SECRET
+  hook:
+    passcode: '37e38420-5f61-11e2-bcfd-0800200c9a66'
+    invite_from: '+13025175920'
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
@@ -57,6 +60,9 @@ test:
   faye:
     url: https://local.skymob.co:8080/faye_TEST
     server_secret: SECRET
+  hook:
+    passcode: 'invalid'
+    invite_from: 'invalid'
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
