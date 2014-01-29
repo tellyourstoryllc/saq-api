@@ -49,6 +49,42 @@ class ContactInviter
     add_with_reciprocal(user)
   end
 
+  def add_by_phone_numbers(numbers, names)
+    return if numbers.size != names.size
+
+    numbers.each_with_index do |number, i|
+      add_by_phone_number(number, names[i])
+    end
+  end
+
+  def add_by_phone_number(number, name)
+    if Settings.enabled?(:queue)
+      ContactInviterPhoneWorker.perform_async(current_user.id, number, name)
+    else
+      add_by_phone_number!(number, name)
+    end
+  end
+
+  def add_by_phone_number!(number, name)
+    # Look for existing user/account
+    phone = Phone.get(number)
+
+    # If it exists, just add him to my contacts
+    if phone
+      user = phone.user
+
+    # If not, create a user for him, send an invite SMS, and add him to my contacts
+    else
+      number = Phone.normalize(number)
+      account = Account.create!(user_attributes: {name: name}, phones_attributes: [{number: number}])
+      user = account.user
+
+      Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number, new_user: true)
+    end
+
+    add_with_reciprocal(user)
+  end
+
   def add_with_reciprocal(other_user)
     return if current_user.id == other_user.id || User.blocked?(current_user, other_user)
 
