@@ -7,7 +7,7 @@ Set up the db:
     rake db:create
     rake db:migrate
 
-Install Redis if not already installed:
+Install Redis (>= 2.6.12) if not already installed:
 
     brew install redis
     # Start redis-server however you like
