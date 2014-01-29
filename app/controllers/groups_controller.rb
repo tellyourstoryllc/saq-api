@@ -83,7 +83,8 @@ class GroupsController < ApplicationController
     group_inviter.add_by_emails(emails)
     # TODO: phone_numbers as well
 
-    users = User.where(id: user_ids) | User.joins(:emails).where(emails: {email: emails})
+    normalized_emails = emails.map {|e| Email.normalize(e) }
+    users = User.where(id: user_ids) | User.joins(:emails).where(emails: {email: normalized_emails})
     render_json [@group] + users
   end
 
