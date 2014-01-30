@@ -14,9 +14,14 @@ class ContactsController < ApplicationController
     contact_inviter.add_by_emails(emails)
     contact_inviter.add_by_phone_numbers(phone_numbers, phone_names)
 
-    normalized_emails = emails.map {|e| Email.normalize(e) }
-    normalized_numbers = phone_numbers.map {|n| Phone.normalize(n) }
-    users = User.where(id: user_ids) | User.joins(:emails).where(emails: {email: normalized_emails}) | User.joins(:phones).where(phones: {number: normalized_numbers})
+    normalized_emails = emails.map {|e| Email.normalize(e) }.compact
+    normalized_numbers = phone_numbers.map {|n| Phone.normalize(n) }.compact
+
+    users = []
+    users = users | User.where(id: user_ids) if user_ids.present?
+    users = users | User.joins(:emails).where(emails: {email: normalized_emails}) if normalized_emails.present?
+    users = users | User.joins(:phones).where(phones: {number: normalized_numbers}) if normalized_numbers.present?
+
     render_json users
   end
 

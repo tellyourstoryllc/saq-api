@@ -42,7 +42,7 @@ class Invite < ActiveRecord::Base
 
     if invited_phone.present?
       if group
-        # TODO
+        HookClient.invite_to_group(sender, recipient, group, invited_phone, invite_token)
       else
         HookClient.invite_to_contacts(sender, recipient, invited_phone, invite_token)
       end
