@@ -13,9 +13,10 @@ class Account < ActiveRecord::Base
 
   belongs_to :user
   has_many :emails, inverse_of: :account
+  has_many :phones, inverse_of: :account
   has_one :one_to_one_wallpaper_image, -> { order('one_to_one_wallpaper_images.id DESC') }
 
-  accepts_nested_attributes_for :user, :emails
+  accepts_nested_attributes_for :user, :emails, :phones
 
 
   def time_zone=(tz_name)
