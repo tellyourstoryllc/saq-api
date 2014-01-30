@@ -28,24 +28,23 @@ class ContactInviter
 
   def add_by_email!(email_address)
     # Look for existing user/account
-    email = Email.get(email_address)
+    address = Email.normalize(email_address)
+    email = Email.find_by(email: address)
+    account = email.try(:account)
+    user = email.try(:user)
+    new_user = user.nil?
 
-    # If it exists, just add him to my contacts
-    if email
-      user = email.user
-
-    # If not, create a user for him, send an invite email, and add him to my contacts
-    else
-      address = Email.normalize(email_address)
+    # If the user doesn't exist, create one
+    unless account
       name = address.split('@').first
       account = Account.create!(user_attributes: {name: name}, emails_attributes: [{email: address}])
       user = account.user
-
-      Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address, new_user: true)
-      # TODO: log to mixpanel
-      #mixpanel.
     end
 
+    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address,
+                   new_user: new_user, can_login: !account.no_login_credentials?)
+
+    # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)
   end
 
@@ -67,21 +66,22 @@ class ContactInviter
 
   def add_by_phone_number!(number, name)
     # Look for existing user/account
-    phone = Phone.get(number)
+    number = Phone.normalize(number)
+    phone = Phone.find_by(number: number)
+    account = phone.try(:account)
+    user = phone.try(:user)
+    new_user = user.nil?
 
-    # If it exists, just add him to my contacts
-    if phone
-      user = phone.user
-
-    # If not, create a user for him, send an invite SMS, and add him to my contacts
-    else
-      number = Phone.normalize(number)
+    # If the user doesn't exist, create one
+    unless account
       account = Account.create!(user_attributes: {name: name}, phones_attributes: [{number: number}])
       user = account.user
-
-      Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number, new_user: true)
     end
 
+    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number,
+                   new_user: true, can_login: !account.no_login_credentials?)
+
+    # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)
   end
 

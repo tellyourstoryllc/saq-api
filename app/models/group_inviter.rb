@@ -34,23 +34,22 @@ class GroupInviter
 
   def add_by_email!(email_address)
     # Look for existing user/account
-    email = Email.get(email_address)
+    address = Email.normalize(email_address)
+    email = Email.find_by(email: address)
+    account = email.try(:account)
+    user = email.try(:user)
+    new_user = user.nil?
 
-    # If it exists, just add him to the group and my contacts
-    if email
-      user = email.user
-      add_to_group(user)
-
-    # If not, create a user for him, send an invite email, and add him to the group and my contacts
-    else
-      address = Email.normalize(email_address)
+    # If the user doesn't exist, create one
+    unless account
       name = address.split('@').first
       account = Account.create!(user_attributes: {name: name}, emails_attributes: [{email: address}])
       user = account.user
-
-      add_to_group(user, {invited_email: address, new_user: true})
     end
 
+    add_to_group(user, {invited_email: address, new_user: new_user})
+
+    # Add the new or existing user to my contacts and vice versa
     contact_inviter.add_with_reciprocal(user)
   end
 
@@ -72,22 +71,21 @@ class GroupInviter
 
   def add_by_phone_number!(number, name)
     # Look for existing user/account
-    phone = Phone.get(number)
+    number = Phone.normalize(number)
+    phone = Phone.find_by(number: number)
+    account = phone.try(:account)
+    user = phone.try(:user)
+    new_user = user.nil?
 
-    # If it exists, just add him to the group and my contacts
-    if phone
-      user = phone.user
-      add_to_group(user)
-
-    # If not, create a user for him, send an invite SMS, and add him to the group and my contacts
-    else
-      number = Phone.normalize(number)
+    # If the user doesn't exist, create one
+    unless account
       account = Account.create!(user_attributes: {name: name}, phones_attributes: [{number: number}])
       user = account.user
-
-      add_to_group(user, {invited_phone: number, new_user: true})
     end
 
+    add_to_group(user, {invited_phone: number, new_user: new_user})
+
+    # Add the new or existing user to my contacts and vice versa
     contact_inviter.add_with_reciprocal(user)
   end
 
@@ -98,10 +96,9 @@ class GroupInviter
   end
 
   def create_group_invite(user, attrs = {})
-    unless group.member?(user)
-      default_attrs = {sender_id: current_user.id, recipient_id: user.id, new_user: false, group_id: group.id}
-      attrs.reverse_merge!(default_attrs)
-      Invite.create!(attrs)
-    end
+    default_attrs = {sender_id: current_user.id, recipient_id: user.id,
+      new_user: false, can_login: !user.account.no_login_credentials?, group_id: group.id}
+    attrs.reverse_merge!(default_attrs)
+    Invite.create!(attrs)
   end
 end
