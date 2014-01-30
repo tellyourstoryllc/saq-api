@@ -40,9 +40,9 @@ class HookController < ApplicationController
                          message_id: parsed_body['messageId'], timestamp: parsed_body['timestamp'])
 
     case parsed_body['text'].strip
-    when /^(NO+|STOP|UNSUBSCRIBE|CANCEL)$/
+    when /^(NO+|STOP|UNSUBSCRIBE|CANCEL)$/i
       from_phone.update!(unsubscribed: true)
-    when /^(YES+|START|SUBSCRIBE)$/
+    when /^(YES+|START|SUBSCRIBE)$/i
       from_phone.update!(unsubscribed: false)
     end
   end
