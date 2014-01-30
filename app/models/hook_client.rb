@@ -3,12 +3,18 @@ class HookClient
   MAX_CONTENT_LENGTH = HookApiClient::MAX_LENGTH - CANCEL_TEXT.size
 
 
+  def self.send_sms(from, recipient_number, text)
+    # Silently throw away the SMS if the recipient has unsubscribed
+    return if Phone.get(recipient_number).try(:unsubscribed?)
+    HookApiClient.send_sms(from, recipient_number, text)
+  end
+
   def self.invite_to_contacts(sender, recipient, recipient_number, invite_token)
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['domain'] + "/i/#{invite_token}"
     text = render_text_with_name(sender.name, " wants to chat with you on the new app: #{url}")
 
-    HookApiClient.send_sms(from, recipient_number, text)
+    send_sms(from, recipient_number, text)
   end
 
   def self.invite_to_group(sender, recipient, group, recipient_number, invite_token)
@@ -16,7 +22,7 @@ class HookClient
     url = Rails.configuration.app['web']['domain'] + "/i/#{invite_token}"
     text = render_text_with_name(sender.name, " added you to the room \"#{group.name.truncate(30)}\" on the new app: #{url}")
 
-    HookApiClient.send_sms(from, recipient_number, text)
+    send_sms(from, recipient_number, text)
   end
 
 
