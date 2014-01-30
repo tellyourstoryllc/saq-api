@@ -12,7 +12,9 @@ class Phone < ActiveRecord::Base
 
 
   def self.normalize(number)
-    Phony.normalize(number) if number
+    # Remove the optional +1 country code for US
+    # TODO: Other country codes & formats
+    Phony.normalize(number).sub(/^1?(\d{10})$/, '\1') if number
   rescue Phony::NormalizationError
   end
 
