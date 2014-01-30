@@ -161,6 +161,27 @@ CREATE TABLE `groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `incoming_texts`
+--
+
+DROP TABLE IF EXISTS `incoming_texts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `incoming_texts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `raw_body` text COLLATE utf8_unicode_ci,
+  `from` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `recipient` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `text` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `message_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `timestamp` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `invites`
 --
 
@@ -397,7 +418,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-29 10:30:38
+-- Dump completed on 2014-01-30 14:31:26
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -499,3 +520,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140120202824');
 INSERT INTO schema_migrations (version) VALUES ('20140128220106');
 
 INSERT INTO schema_migrations (version) VALUES ('20140129153001');
+
+INSERT INTO schema_migrations (version) VALUES ('20140130183911');

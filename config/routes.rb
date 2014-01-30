@@ -63,6 +63,8 @@ ChatApp::Application.routes.draw do
     match '/contacts/add', to: 'contacts#add', as: 'add_contacts'
     match '/contacts/remove', to: 'contacts#remove', as: 'remove_contacts'
     match '/groups/:id/add_users', to: 'groups#add_users', as: 'groups_add_users'
+
+    match '/hook/callback', to: 'hook#callback', as: 'hook_callback'
   end
 
   require 'sidekiq/web'
