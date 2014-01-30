@@ -13,10 +13,12 @@ class Phone < ActiveRecord::Base
 
   def self.normalize(number)
     Phony.normalize(number) if number
+  rescue Phony::NormalizationError
   end
 
   def self.get(number)
-    find_by(number: normalize(number))
+    normalized_number = normalize(number)
+    find_by(number: normalized_number) if normalized_number
   end
 
 
