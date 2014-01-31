@@ -33,6 +33,9 @@ Rapns.configure do |config|
 
   # Define a custom logger.
   # config.logger = MyLogger.new
+
+  # Set ActiveRecord logger to Rapns.logger.
+  config.intercept_active_record_logger = true
 end
 
 Rapns.reflect do |on|
