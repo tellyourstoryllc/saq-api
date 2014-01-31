@@ -17,6 +17,10 @@ class Invite < ActiveRecord::Base
     !can_login? && (invited_email.present? || invited_phone.present?)
   end
 
+  def phone
+    @phone ||= Phone.find_by(number: invited_phone) if invited_phone.present?
+  end
+
 
   private
 
