@@ -27,11 +27,26 @@ class HookController < ApplicationController
   end
 
   def parsed_body
-    @parsed_body ||= JSON.load(request.raw_post) rescue nil
+    @parsed_body ||= JSON.load(request.raw_post) rescue {}
+  end
+
+  def content
+    @content ||= parsed_body['text'].strip
   end
 
   def from_phone
-    @from_phone ||= Phone.get(parsed_body['from'])
+    return @from_phone if defined?(@from_phone)
+
+    number = Phone.normalize(parsed_body['from'])
+    @from_phone = Phone.create_with(user: user).find_or_create_by(number: number) if number && user
+  end
+
+  def user
+    return @user if defined?(@user)
+
+    content =~ /: (\w+)$/
+    user_id = User.user_ids_by_phone_verification_token[$1] if $1
+    @user = User.find_by(id: user_id) if user_id
   end
 
   def handle_incoming_sms
@@ -39,11 +54,16 @@ class HookController < ApplicationController
                          recipient: parsed_body['recipient'], text: parsed_body['text'],
                          message_id: parsed_body['messageId'], timestamp: parsed_body['timestamp'])
 
-    case parsed_body['text'].strip
+    return if from_phone.nil?
+
+    case content
     when /^(NO+|STOP|UNSUBSCRIBE|CANCEL)$/i
-      from_phone.update!(unsubscribed: true)
+      from_phone.unsubscribed = true
     when /^(YES+|START|SUBSCRIBE)$/i
-      from_phone.update!(unsubscribed: false)
+      from_phone.unsubscribed = false
     end
+
+    from_phone.verified = true
+    from_phone.save!
   end
 end

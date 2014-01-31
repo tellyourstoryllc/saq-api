@@ -290,13 +290,15 @@ CREATE TABLE `phones` (
   `account_id` int(11) NOT NULL,
   `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `number` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `verified` tinyint(1) NOT NULL DEFAULT '0',
   `unsubscribed` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_phones_on_number` (`number`),
   KEY `index_phones_on_account_id` (`account_id`),
-  KEY `index_phones_on_user_id` (`user_id`)
+  KEY `index_phones_on_user_id` (`user_id`),
+  KEY `index_phones_on_verified` (`verified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -419,7 +421,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-30 17:25:08
+-- Dump completed on 2014-01-31 17:32:05
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -525,3 +527,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140129153001');
 INSERT INTO schema_migrations (version) VALUES ('20140130183911');
 
 INSERT INTO schema_migrations (version) VALUES ('20140130222415');
+
+INSERT INTO schema_migrations (version) VALUES ('20140131164058');
