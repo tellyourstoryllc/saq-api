@@ -25,6 +25,11 @@ class Phone < ActiveRecord::Base
     find_by(number: normalized_number) if normalized_number
   end
 
+  def verify!
+    self.verified = true
+    save!
+  end
+
 
   private
 
