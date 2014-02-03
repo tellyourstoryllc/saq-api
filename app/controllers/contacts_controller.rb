@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   def index
-    render_json current_user.paginated_contacts(pagination_params)
+    render_json current_user.paginated_contacts(pagination_params), each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
   def add
@@ -37,7 +37,7 @@ class ContactsController < ApplicationController
     hashed_phone_numbers = split_param(:hashed_phone_numbers)
 
     added_users = ContactInviter.new(current_user).autoconnect(hashed_emails, hashed_phone_numbers)
-    render_json added_users
+    render_json added_users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
 

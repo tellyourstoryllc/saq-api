@@ -129,7 +129,7 @@ class ContactInviter
     #end
 
     if hashed_phone_numbers.present?
-      phones = Phone.includes(:user).where(hashed_number: hashed_phone_numbers, verified: true)
+      phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers, verified: true)
 
       phones.each do |phone|
         added_users << phone.user

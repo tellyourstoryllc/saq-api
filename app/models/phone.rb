@@ -12,6 +12,8 @@ class Phone < ActiveRecord::Base
   belongs_to :account, inverse_of: :phones
   belongs_to :user
 
+  scope :verified, -> { where(verified: true) }
+
 
   def self.normalize(number)
     # Remove the optional +1 country code for US
