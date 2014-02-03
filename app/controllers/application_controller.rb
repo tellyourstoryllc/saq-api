@@ -96,6 +96,6 @@ class ApplicationController < ActionController::Base
   def split_param(param_name)
     values = params[param_name] || []
     values = values.split(',') unless values.is_a?(Array)
-    values
+    values.map(&:strip)
   end
 end
