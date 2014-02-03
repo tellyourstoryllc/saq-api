@@ -32,6 +32,14 @@ class ContactsController < ApplicationController
     render_json User.where(id: user_ids)
   end
 
+  def autoconnect
+    hashed_emails = split_param(:hashed_emails)
+    hashed_phone_numbers = split_param(:hashed_phone_numbers)
+
+    added_users = ContactInviter.new(current_user).autoconnect(hashed_emails, hashed_phone_numbers)
+    render_json added_users
+  end
+
 
   private
 

@@ -113,4 +113,30 @@ class ContactInviter
       other_user.reciprocal_contact_ids.delete(user.id)
     end
   end
+
+
+  def autoconnect(hashed_emails, hashed_phone_numbers)
+    added_users = []
+
+    # TODO: wait until we verify emails
+    #if hashed_emails.present?
+    #  emails = Email.includes(:user).where(hashed_email: hashed_emails)
+
+    #  emails.each do |email|
+    #    added_users << email.user
+    #    add_with_reciprocal(email.user)
+    #  end
+    #end
+
+    if hashed_phone_numbers.present?
+      phones = Phone.includes(:user).where(hashed_number: hashed_phone_numbers, verified: true)
+
+      phones.each do |phone|
+        added_users << phone.user
+        add_with_reciprocal(phone.user)
+      end
+    end
+
+    added_users
+  end
 end
