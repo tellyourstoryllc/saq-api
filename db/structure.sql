@@ -68,10 +68,12 @@ CREATE TABLE `emails` (
   `account_id` int(11) NOT NULL,
   `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `hashed_email` char(64) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_emails_on_email` (`email`),
+  UNIQUE KEY `index_emails_on_hashed_email` (`hashed_email`),
   KEY `index_emails_on_account_id` (`account_id`),
   KEY `index_emails_on_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -290,12 +292,14 @@ CREATE TABLE `phones` (
   `account_id` int(11) NOT NULL,
   `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `number` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashed_number` char(64) COLLATE utf8_unicode_ci NOT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT '0',
   `unsubscribed` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_phones_on_number` (`number`),
+  UNIQUE KEY `index_phones_on_hashed_number` (`hashed_number`),
   KEY `index_phones_on_account_id` (`account_id`),
   KEY `index_phones_on_user_id` (`user_id`),
   KEY `index_phones_on_verified` (`verified`)
@@ -421,7 +425,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-31 17:32:05
+-- Dump completed on 2014-02-03 14:58:12
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -529,3 +533,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140130183911');
 INSERT INTO schema_migrations (version) VALUES ('20140130222415');
 
 INSERT INTO schema_migrations (version) VALUES ('20140131164058');
+
+INSERT INTO schema_migrations (version) VALUES ('20140203154504');
