@@ -1,11 +1,11 @@
 class Email < ActiveRecord::Base
   include Peanut::Model
 
-  before_validation :normalize_email, :set_user
+  before_validation :normalize_email, :set_hashed_email, :set_user
 
-  validates :account, :user, presence: true
+  validates :account, :user, :hashed_email, presence: true
   validates :email, format: /.+@.+/
-  validates :email, uniqueness: true
+  validates :email, :hashed_email, uniqueness: true
 
   before_destroy :not_last_email?
 
@@ -26,6 +26,10 @@ class Email < ActiveRecord::Base
 
   def normalize_email
     self.email = self.class.normalize(email)
+  end
+
+  def set_hashed_email
+    self.hashed_email = Digest::SHA2.new(256).hexdigest(email) if email
   end
 
   def set_user

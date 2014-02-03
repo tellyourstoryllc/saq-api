@@ -1,11 +1,11 @@
 class Phone < ActiveRecord::Base
   include Peanut::Model
 
-  before_validation :normalize_number, :set_user, :set_account
+  before_validation :normalize_number, :set_hashed_number, :set_user, :set_account
 
-  validates :account, :user, presence: true
+  validates :account, :user, :hashed_number, presence: true
   validates :number, format: /\d+/
-  validates :number, uniqueness: true
+  validates :number, :hashed_number, uniqueness: true
 
   after_save :delete_verification_token
 
@@ -35,6 +35,10 @@ class Phone < ActiveRecord::Base
 
   def normalize_number
     self.number = self.class.normalize(number)
+  end
+
+  def set_hashed_number
+    self.hashed_number = Digest::SHA2.new(256).hexdigest(number) if number
   end
 
   def set_user
