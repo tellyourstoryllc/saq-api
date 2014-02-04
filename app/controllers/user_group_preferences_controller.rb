@@ -31,6 +31,6 @@ class UserGroupPreferencesController < ApplicationController
   end
 
   def update_params
-    params.permit(:server_all_messages_mobile_push)
+    params.permit(:server_all_messages_mobile_push, :server_all_messages_email)
   end
 end
