@@ -114,7 +114,6 @@ class ContactInviter
     end
   end
 
-
   def autoconnect(hashed_emails, hashed_phone_numbers)
     added_users = []
 
@@ -138,5 +137,19 @@ class ContactInviter
     end
 
     added_users
+  end
+
+  def facebook_autoconnect
+    if Settings.enabled?(:queue)
+      ContactInviterFacebookAutoconnectWorker.perform_async(current_user.id)
+    else
+      facebook_autoconnect!
+    end
+  end
+
+  def facebook_autoconnect!
+    current_user.account.facebook_friends_with_app.each do |u|
+      add_with_reciprocal(u)
+    end
   end
 end
