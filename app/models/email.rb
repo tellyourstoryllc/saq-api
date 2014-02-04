@@ -3,9 +3,9 @@ class Email < ActiveRecord::Base
 
   before_validation :normalize_email, :set_hashed_email, :set_user
 
-  validates :account, :user, :hashed_email, presence: true
+  validates :account, :user, presence: true
   validates :email, format: /.+@.+/
-  validates :email, :hashed_email, uniqueness: true
+  validates :email, uniqueness: true
 
   before_destroy :not_last_email?
 

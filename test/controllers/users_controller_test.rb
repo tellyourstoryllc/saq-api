@@ -6,7 +6,7 @@ describe UsersController do
       it "must not create a user if it's invalid" do
         post :create
         old_count = User.count
-        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Emails hashed email can't be blank, Email is invalid, User name can't be blank."})
+        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Email is invalid, User name can't be blank."})
         User.count.must_equal old_count
       end
 
