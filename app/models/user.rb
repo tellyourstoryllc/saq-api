@@ -19,6 +19,7 @@ class User < ActiveRecord::Base
   has_one :avatar_image, -> { order('avatar_images.id DESC') }
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
   has_many :ios_devices
+  has_many :android_devices
   has_many :emails
   has_many :received_invites, class_name: 'Invite', foreign_key: 'recipient_id'
 
