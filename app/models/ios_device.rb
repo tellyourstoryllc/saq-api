@@ -4,6 +4,8 @@ class IosDevice < ActiveRecord::Base
 
   belongs_to :user
 
+  after_save :remove_old_push_tokens
+
 
   def self.create_or_assign!(user, attrs)
     return if attrs[:device_id].blank?
@@ -32,5 +34,12 @@ class IosDevice < ActiveRecord::Base
 
   def notify_new_member?(user)
     push_token.present?
+  end
+
+
+  private
+
+  def remove_old_push_tokens
+    IosDevice.where('id != ?', id).where(push_token: push_token).update_all(push_token: nil) if push_token.present?
   end
 end
