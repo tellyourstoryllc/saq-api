@@ -18,6 +18,9 @@ development:
   faye:
     url: https://local.skymob.co:8080/faye
     server_secret: SECRET
+  hook:
+    passcode: PASSCODE
+    invite_from: PHONE_NUMBER
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
