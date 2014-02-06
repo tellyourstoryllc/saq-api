@@ -1,8 +1,11 @@
 rapns_config = Rails.configuration.app['rapns']
 
-if Rapns::Apns::App && Rapns::Apns::App.table_exists?
-  Rails.configuration.app['rapns']['ios_app'] = Rapns::Apns::App.find_by(name: rapns_config['db_ios_app_name']) if !Rails.configuration.app['rapns']['ios_app']
-  Rails.configuration.app['rapns']['android_app'] = Rapns::Apns::App.find_by(name: rapns_config['db_android_app_name']) if !Rails.configuration.app['rapns']['android_app']
+if Rapns::Apns::App && Rapns::Apns::App.table_exists? && !Rails.configuration.app['rapns']['ios_app']
+  Rails.configuration.app['rapns']['ios_app'] = Rapns::Apns::App.find_by(name: rapns_config['db_ios_app_name'])
+end
+
+if Rapns::Gcm::App && Rapns::Gcm::App.table_exists? && !Rails.configuration.app['rapns']['android_app']
+  Rails.configuration.app['rapns']['android_app'] = Rapns::Gcm::App.find_by(name: rapns_config['db_android_app_name'])
 end
 
 if Rails.configuration.app['rapns']['ios_app'].nil?
