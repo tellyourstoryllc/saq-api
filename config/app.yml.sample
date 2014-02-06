@@ -26,6 +26,7 @@ development:
     group_token: GROUP_TOKEN
   rapns:
     db_ios_app_name: skymob_ios
+    db_android_app_name: skymob_android
   redis:
     persisted:
       host: 127.0.0.1
@@ -65,6 +66,7 @@ test:
     group_token: GROUP_TOKEN
   rapns:
     db_ios_app_name: ~
+    db_android_app_name: ~
   redis:
     persisted:
       host: 127.0.0.1

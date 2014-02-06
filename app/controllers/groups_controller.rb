@@ -21,7 +21,6 @@ class GroupsController < ApplicationController
     objects = [@group, @group.members]
     objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
     render_json objects
-
   end
 
   def find
@@ -198,7 +197,7 @@ class GroupsController < ApplicationController
 
   def notify_admins
     @group.admins.each do |user|
-      user.ios_notifier.notify_new_member(current_user, @group)
+      user.mobile_notifier.notify_new_member(current_user, @group)
       user.email_notifier.notify_new_member(current_user, @group)
     end
   end
