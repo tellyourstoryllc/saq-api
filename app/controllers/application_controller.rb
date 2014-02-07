@@ -18,7 +18,11 @@ class ApplicationController < ActionController::Base
   end
 
   def current_device
-    @current_device ||= IosDevice.find_by(device_id: params[:device_id]) if params[:device_id]
+    @current_device ||= if params[:device_id].present?
+      IosDevice.find_by(device_id: params[:device_id])
+    elsif params[:android_id].present?
+      AndroidDevice.find_by(device_id: params[:android_id])
+    end
   end
 
   def faye_publisher
@@ -41,7 +45,13 @@ class ApplicationController < ActionController::Base
   end
 
   def create_or_update_device
-    IosDevice.create_or_assign!(current_user, ios_device_params) if current_user && ios_device_params.include?(:device_id)
+    return unless current_user
+
+    if ios_device_params[:device_id].present?
+      IosDevice.create_or_assign!(current_user, ios_device_params)
+    elsif android_device_params[:android_id].present?
+      AndroidDevice.create_or_assign!(current_user, android_device_params)
+    end
   end
 
   def set_client
@@ -58,6 +68,10 @@ class ApplicationController < ActionController::Base
 
   def ios_device_params
     params.permit(:device_id, :client_version, :os_version)
+  end
+
+  def android_device_params
+    params.permit(:android_id, :v, :os_version)
   end
 
   def render_json(objects, options = {})

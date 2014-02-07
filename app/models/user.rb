@@ -19,6 +19,7 @@ class User < ActiveRecord::Base
   has_one :avatar_image, -> { order('avatar_images.id DESC') }
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
   has_many :ios_devices
+  has_many :android_devices
   has_many :emails
   has_many :phones
   has_many :received_invites, class_name: 'Invite', foreign_key: 'recipient_id'
@@ -178,8 +179,8 @@ class User < ActiveRecord::Base
     UserPreferences.new(id: id)
   end
 
-  def ios_notifier
-    @ios_notifier ||= IosNotifier.new(self)
+  def mobile_notifier
+    @mobile_notifier ||= MobileNotifier.new(self)
   end
 
   def email_notifier
@@ -190,7 +191,7 @@ class User < ActiveRecord::Base
   def send_notifications(message)
     return unless away_idle_or_unavailable?
 
-    ios_notifier.notify(message)
+    mobile_notifier.notify(message)
     email_notifier.notify(message)
   end
 
@@ -259,7 +260,7 @@ class User < ActiveRecord::Base
     # Delete only the few most recent job keys (the rest should have already expired)
     # So we're not deleting potentially hundreds of keys for lost users
     mobile_sent = mobile_digests_sent.value
-    ([mobile_sent - 3, 1].max).upto(mobile_sent + 1){ |i| keys << IosNotifier.job_token_key(id, mobile_sent) }
+    ([mobile_sent - 3, 1].max).upto(mobile_sent + 1){ |i| keys << MobileNotifier.job_token_key(id, mobile_sent) }
 
     email_sent = email_digests_sent.value
     ([email_sent - 3, 1].max).upto(email_sent + 1){ |i| keys << EmailNotifier.job_token_key(id, email_sent) }
@@ -280,7 +281,7 @@ class User < ActiveRecord::Base
 
   def mobile_digest_data_keys
     [mobile_digest_group_ids.key] + mobile_digest_group_ids.members.map do |group_id|
-      IosNotifier.group_chatting_member_ids_key(id, group_id)
+      MobileNotifier.group_chatting_member_ids_key(id, group_id)
     end
   end
 

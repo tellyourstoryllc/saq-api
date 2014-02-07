@@ -38,6 +38,28 @@ CREATE TABLE `accounts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `android_devices`
+--
+
+DROP TABLE IF EXISTS `android_devices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `android_devices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `device_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `client_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
+  `os_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
+  `registration_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_android_devices_on_device_id` (`device_id`),
+  KEY `index_android_devices_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `avatar_images`
 --
 
@@ -425,7 +447,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-02-03 14:58:12
+-- Dump completed on 2014-02-05 15:31:02
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -523,6 +545,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140109192600');
 INSERT INTO schema_migrations (version) VALUES ('20140117145107');
 
 INSERT INTO schema_migrations (version) VALUES ('20140120202824');
+
+INSERT INTO schema_migrations (version) VALUES ('20140121153729');
 
 INSERT INTO schema_migrations (version) VALUES ('20140128220106');
 

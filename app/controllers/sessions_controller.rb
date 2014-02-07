@@ -7,7 +7,8 @@ class SessionsController < ApplicationController
 
     if @account
       @current_user = @account.user
-      IosDevice.create_or_assign!(@current_user, ios_device_params)
+      create_or_update_device
+
       render_json [current_user, @account]
     else
       render_error('Incorrect credentials.', nil, {status: :unauthorized})
