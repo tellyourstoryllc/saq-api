@@ -64,6 +64,10 @@ class Account < ActiveRecord::Base
     password_digest.blank? && facebook_id.blank?
   end
 
+  def can_log_in?
+    !no_login_credentials?
+  end
+
   def send_missing_password_email
     return unless no_login_credentials?
 
