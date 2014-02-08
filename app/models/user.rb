@@ -151,20 +151,26 @@ class User < ActiveRecord::Base
     @dynamic_contacts_memoizer[user.id] = dynamic_contact_ids.include?(user.id)
   end
 
-  # Did the user join his first group (not including creating a group)
+  # Did another user send an email or SMS invite to this person before he registered?
+  # Or did the user join his first group (not including creating a group)
   # within 5 minutes of registering?
   def invited?
-    invited_period = 5.minutes
     was_invited = invited.get
 
     if was_invited.nil?
-      joined_group_ids = groups.where('creator_id != ?', id).pluck(:id)
-      join_times = group_join_times.members(with_scores: true)
-      joined_first_group_at = join_times.detect{ |group_id, time| joined_group_ids.include?(group_id) }.try(:last)
+      if received_invites.exists?
+        self.invited = 1
+        true
+      else
+        invited_period = 5.minutes
+        joined_group_ids = groups.where('creator_id != ?', id).pluck(:id)
+        join_times = group_join_times.members(with_scores: true)
+        joined_first_group_at = join_times.detect{ |group_id, time| joined_group_ids.include?(group_id) }.try(:last)
 
-      invited_val = (joined_first_group_at && joined_first_group_at <= (created_at + invited_period).to_i) ? 1 : 0
-      self.invited = invited_val if invited_val == 1 || created_at < invited_period.ago
-      self.class.to_bool(invited_val)
+        invited_val = (joined_first_group_at && joined_first_group_at <= (created_at + invited_period).to_i) ? 1 : 0
+        self.invited = invited_val if invited_val == 1 || created_at < invited_period.ago # Keep checking for the first 5 mins
+        self.class.to_bool(invited_val)
+      end
     else
       self.class.to_bool(was_invited)
     end
