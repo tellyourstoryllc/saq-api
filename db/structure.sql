@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.5.29, for osx10.8 (i386)
 --
--- Host: localhost    Database: chat_app_dev
+-- Host: localhost    Database: krazychat_dev
 -- ------------------------------------------------------
 -- Server version	5.5.29
 
