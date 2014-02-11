@@ -41,6 +41,7 @@ class ApplicationController < ActionController::Base
   private
 
   def require_token
+    # Note: Android depends on this error message, so don't change it
     render_error('Invalid token.', nil, status: :unauthorized) if current_user.nil?
   end
 
