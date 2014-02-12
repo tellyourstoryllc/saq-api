@@ -50,7 +50,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.permit(:name, :avatar_image_url, :avatar_video_file)
+    params.permit(:name, :username, :avatar_image_url, :avatar_video_file)
   end
 
   def update_user_params

@@ -446,7 +446,7 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` char(8) COLLATE utf8_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `status` enum('available','away','do_not_disturb') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'available',
   `status_text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -580,5 +580,7 @@ INSERT INTO schema_migrations (version) VALUES ('20140131164058');
 INSERT INTO schema_migrations (version) VALUES ('20140203154504');
 
 INSERT INTO schema_migrations (version) VALUES ('20140212154758');
+
+INSERT INTO schema_migrations (version) VALUES ('20140212182237');
 
 INSERT INTO schema_migrations (version) VALUES ('20140213224056');
