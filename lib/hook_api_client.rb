@@ -4,7 +4,7 @@ class HookApiClient
   MAX_LENGTH = 140
 
   cattr_accessor :logger
-  self.logger = Logger.new('/dev/null')
+  self.logger = ::Logger.new('/dev/null')
 
 
   def self.post_to(endpoint, body)
