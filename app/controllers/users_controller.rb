@@ -7,9 +7,17 @@ class UsersController < ApplicationController
   end
 
   def index
+    limit = 20 # Max of 20 users at a time
+
     ids = split_param(:ids)
-    ids = ids.first(20) # Max of 20 users at a time
-    render_json User.find(ids)
+    ids = ids.first(limit)
+    usernames = split_param(:usernames)
+    usernames = usernames.first(limit)
+
+    users = []
+    users += User.includes(:avatar_image, :avatar_video).where(id: ids) if ids.present?
+    users += User.includes(:avatar_image, :avatar_video).where(username: usernames) if usernames.present?
+    render_json users.uniq.first(limit)
   end
 
   def create
