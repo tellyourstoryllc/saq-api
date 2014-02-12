@@ -1,4 +1,4 @@
-ChatApp::Application.routes.draw do
+KrazyChat::Application.routes.draw do
   scope via: :all do
     match '/health_check' => 'monitor#health_check'
     match '/me', to: 'users#me', as: 'me'
