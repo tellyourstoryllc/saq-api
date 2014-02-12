@@ -79,6 +79,25 @@ CREATE TABLE `avatar_images` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `avatar_videos`
+--
+
+DROP TABLE IF EXISTS `avatar_videos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `avatar_videos` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `video` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_avatar_videos_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `emails`
 --
 
@@ -559,5 +578,7 @@ INSERT INTO schema_migrations (version) VALUES ('20140130222415');
 INSERT INTO schema_migrations (version) VALUES ('20140131164058');
 
 INSERT INTO schema_migrations (version) VALUES ('20140203154504');
+
+INSERT INTO schema_migrations (version) VALUES ('20140212154758');
 
 INSERT INTO schema_migrations (version) VALUES ('20140213224056');

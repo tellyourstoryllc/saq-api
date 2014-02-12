@@ -109,7 +109,7 @@ class Message
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
-      User.includes(:avatar_image).where(id: user_ids).order("FIELD(id, #{field_order})")
+      User.includes(:avatar_image, :avatar_video).where(id: user_ids).order("FIELD(id, #{field_order})")
     else
       []
     end
