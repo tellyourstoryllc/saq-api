@@ -1,7 +1,6 @@
 class HookApiClient
   include HTTParty
-  # TODO: request https for prod?
-  base_uri 'http://api.hookmobile.com:8011/api'
+  base_uri 'https://api.hookmobile.com:8005/api'
   MAX_LENGTH = 140
 
   cattr_accessor :logger
