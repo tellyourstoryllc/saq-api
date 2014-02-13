@@ -13,9 +13,10 @@ class Account < ActiveRecord::Base
 
   belongs_to :user
   has_many :emails, inverse_of: :account
+  has_many :phones, inverse_of: :account
   has_one :one_to_one_wallpaper_image, -> { order('one_to_one_wallpaper_images.id DESC') }
 
-  accepts_nested_attributes_for :user, :emails
+  accepts_nested_attributes_for :user, :emails, :phones
 
 
   def time_zone=(tz_name)
@@ -82,6 +83,17 @@ class Account < ActiveRecord::Base
     AccountMailer.missing_password(self, generate_password_reset_token).deliver!
   end
 
+  def facebook_user
+    @facebook_user ||= FacebookUser.new(id: facebook_id) if facebook_id
+  end
+
+  def facebook_friends_with_app
+    return [] unless facebook_user
+
+    uids = facebook_user.friend_uids.members
+    uids.present? ? User.joins(:account).where(accounts: {facebook_id: uids}) : []
+  end
+
 
   private
 
@@ -105,7 +117,7 @@ class Account < ActiveRecord::Base
     profile = Koala::Facebook::API.new(facebook_token).get_object('me')
 
     if profile['id'] == facebook_id
-      FacebookUser.new(id: facebook_id).fetch_profile
+      facebook_user.fetch_profile
       true
     else
       false

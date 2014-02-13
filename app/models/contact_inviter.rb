@@ -28,24 +28,60 @@ class ContactInviter
 
   def add_by_email!(email_address)
     # Look for existing user/account
-    email = Email.get(email_address)
+    address = Email.normalize(email_address)
+    email = Email.find_by(email: address)
+    account = email.try(:account)
+    user = email.try(:user)
+    new_user = user.nil?
 
-    # If it exists, just add him to my contacts
-    if email
-      user = email.user
-
-    # If not, create a user for him, send an invite email, and add him to my contacts
-    else
-      address = Email.normalize(email_address)
+    # If the user doesn't exist, create one
+    unless account
       name = address.split('@').first
       account = Account.create!(user_attributes: {name: name}, emails_attributes: [{email: address}])
       user = account.user
-
-      Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address, new_user: true)
-      # TODO: log to mixpanel
-      #mixpanel.
     end
 
+    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address,
+                   new_user: new_user, can_login: !account.no_login_credentials?)
+
+    # Add the new or existing user to my contacts and vice versa
+    add_with_reciprocal(user)
+  end
+
+  def add_by_phone_numbers(numbers, names)
+    return if numbers.size != names.size
+
+    numbers.each_with_index do |number, i|
+      add_by_phone_number(number, names[i])
+    end
+  end
+
+  def add_by_phone_number(number, name)
+    if Settings.enabled?(:queue)
+      ContactInviterPhoneWorker.perform_async(current_user.id, number, name)
+    else
+      add_by_phone_number!(number, name)
+    end
+  end
+
+  def add_by_phone_number!(number, name)
+    # Look for existing user/account
+    number = Phone.normalize(number)
+    phone = Phone.find_by(number: number)
+    account = phone.try(:account)
+    user = phone.try(:user)
+    new_user = user.nil?
+
+    # If the user doesn't exist, create one
+    unless account
+      account = Account.create!(user_attributes: {name: name}, phones_attributes: [{number: number}])
+      user = account.user
+    end
+
+    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number,
+                   new_user: true, can_login: !account.no_login_credentials?)
+
+    # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)
   end
 
@@ -75,6 +111,45 @@ class ContactInviter
     User.redis.multi do
       user.contact_ids.delete(other_user.id)
       other_user.reciprocal_contact_ids.delete(user.id)
+    end
+  end
+
+  def autoconnect(hashed_emails, hashed_phone_numbers)
+    added_users = []
+
+    # TODO: wait until we verify emails
+    #if hashed_emails.present?
+    #  emails = Email.includes(:user).where(hashed_email: hashed_emails)
+
+    #  emails.each do |email|
+    #    added_users << email.user
+    #    add_with_reciprocal(email.user)
+    #  end
+    #end
+
+    if hashed_phone_numbers.present?
+      phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers, verified: true)
+
+      phones.each do |phone|
+        added_users << phone.user
+        add_with_reciprocal(phone.user)
+      end
+    end
+
+    added_users
+  end
+
+  def facebook_autoconnect
+    if Settings.enabled?(:queue)
+      ContactInviterFacebookAutoconnectWorker.perform_async(current_user.id)
+    else
+      facebook_autoconnect!
+    end
+  end
+
+  def facebook_autoconnect!
+    current_user.account.facebook_friends_with_app.each do |u|
+      add_with_reciprocal(u)
     end
   end
 end

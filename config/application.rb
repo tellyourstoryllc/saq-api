@@ -36,5 +36,7 @@ module ChatApp
     # so it uses the larger instance storage
     tmp_dir = '/mnt/rails'
     ENV['TMPDIR'] = tmp_dir if File.directory?(tmp_dir)
+
+    config.autoload_paths += %W(#{config.root}/lib)
   end
 end

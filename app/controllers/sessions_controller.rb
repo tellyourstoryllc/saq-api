@@ -7,7 +7,8 @@ class SessionsController < ApplicationController
 
     if @account
       @current_user = @account.user
-      IosDevice.create_or_assign!(@current_user, ios_device_params)
+      create_or_update_device
+
       render_json [current_user, @account]
     else
       render_error('Incorrect credentials.', nil, {status: :unauthorized})
@@ -41,9 +42,18 @@ class SessionsController < ApplicationController
 
   def login_via_invite_token
     if params[:invite_token].present?
-      account = Account.joins(user: :received_invites).find_by(invites: {invite_token: params[:invite_token]})
-      account.try(:send_missing_password_email)
-      account
+      invite = Invite.find_by(invite_token: params[:invite_token])
+
+      if invite
+        account = invite.try(:recipient).try(:account)
+
+        if account
+          account.send_missing_password_email
+          invite.phone.try(:verify!)
+
+          account
+        end
+      end
     end
   end
 end

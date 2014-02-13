@@ -1,5 +1,5 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :object_type, :id, :token, :name, :username, :status, :status_text, :idle_duration, :client_type, :avatar_url
+  attributes :object_type, :id, :token, :name, :username, :status, :status_text, :idle_duration, :client_type, :avatar_url, :phone_verification_token
 
   def status
     if contacts?
@@ -26,11 +26,23 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def include_token?
-    respond_to?(:current_user) && current_user.try(:id) == id
+    owner?
+  end
+
+  def include_phone_verification_token?
+    owner? && !current_user.phones.where(verified: true).exists? && !Rails.env.test?
+  end
+
+  def phone_verification_token
+    object.fetch_phone_verification_token
   end
 
 
   private
+
+  def owner?
+    respond_to?(:current_user) && current_user.try(:id) == id
+  end
 
   def contacts?
     current_user && (current_user.id == object.id || object.dynamic_contact?(current_user))

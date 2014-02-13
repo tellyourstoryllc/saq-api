@@ -5,7 +5,7 @@ Hi <%= @recipient.first_name %>,
 <% else -%>
 <%= @user.name %> is chatting in the room "<%= @group.name %>":
 
-<%= @user.name %>: <%= @message.text %> | <%= Time.zone.at(@message.created_at).strftime('%-I:%M %p %Z') %>
+<%= email_quote(@user, @message) %>
 <% end -%>
 
 Join the conversation: <%= @url %>
