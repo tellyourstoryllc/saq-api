@@ -10,7 +10,8 @@ ChatApp::Application.routes.draw do
     match '/password/reset/:token' => 'accounts#reset_password', :as => 'reset_password'
 
     match '/preferences/update', to: 'user_preferences#update', as: 'update_user_preferences'
-    match '/ios_device_preferences/update', to: 'ios_device_preferences#update', as: 'update_ios_device_preferences'
+    match '/ios_device_preferences/update', to: 'device_preferences#update', as: 'update_ios_device_preferences'
+    match '/android_device_preferences/update', to: 'device_preferences#update', as: 'update_android_device_preferences'
     match '/groups/:group_id/user_group_preferences', to: 'user_group_preferences#show', as: 'show_user_group_preferences'
     match '/groups/:group_id/user_group_preferences/update', to: 'user_group_preferences#update', as: 'update_user_group_preferences'
 
@@ -50,6 +51,9 @@ ChatApp::Application.routes.draw do
     match '/ios/apn/set', to: 'ios/apn#set', as: 'set_apn'
     match '/ios/apn/reset', to: 'ios/apn#reset', as: 'reset_apn'
 
+    match '/android/gcm/set', to: 'android/gcm#set', as: 'set_gcm'
+    match '/android/gcm/reset', to: 'android/gcm#reset', as: 'reset_gcm'
+
     match '/blocked_users', to: 'blocked_users#index', as: 'blocked_users'
     match '/users/:id/block', to: 'blocked_users#create', as: 'block_user'
     match '/users/:id/unblock', to: 'blocked_users#destroy', as: 'unblock_user'
@@ -62,6 +66,7 @@ ChatApp::Application.routes.draw do
     match '/contacts', to: 'contacts#index', as: 'contacts'
     match '/contacts/add', to: 'contacts#add', as: 'add_contacts'
     match '/contacts/remove', to: 'contacts#remove', as: 'remove_contacts'
+    match '/contacts/autoconnect', to: 'contacts#autoconnect', as: 'remove_autoconnect'
     match '/groups/:id/add_users', to: 'groups#add_users', as: 'groups_add_users'
 
     match '/hook/callback', to: 'hook#callback', as: 'hook_callback'

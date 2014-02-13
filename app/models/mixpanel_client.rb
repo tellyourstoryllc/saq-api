@@ -15,7 +15,8 @@ class MixpanelClient
     {
       'distinct_id' => user.id, '$created' => user.created_at, 'Client' => Thread.current[:client],
       'OS' => Thread.current[:os], 'Name' => user.name, '$username' => user.username,
-      'Time Zone' => user.account.time_zone, 'Status' => user.computed_status, 'Invited' => user.invited?,
+      'Can Log In' => user.account.can_log_in?, 'Time Zone' => user.account.time_zone,
+      'Status' => user.computed_status, 'Invited' => user.invited?,
       'Groups' => user.group_ids.size, 'Created Groups' => user.live_created_groups_count,
       'Sent Messages' => user.metrics[:sent_messages_count].to_i,
       'Received Messages' => user.metrics[:received_messages_count].to_i

@@ -19,6 +19,7 @@ class User < ActiveRecord::Base
   has_one :avatar_image, -> { order('avatar_images.id DESC') }
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
   has_many :ios_devices
+  has_many :android_devices
   has_many :emails
   has_many :phones
   has_many :received_invites, class_name: 'Invite', foreign_key: 'recipient_id'
@@ -150,20 +151,26 @@ class User < ActiveRecord::Base
     @dynamic_contacts_memoizer[user.id] = dynamic_contact_ids.include?(user.id)
   end
 
-  # Did the user join his first group (not including creating a group)
+  # Did another user send an email or SMS invite to this person before he registered?
+  # Or did the user join his first group (not including creating a group)
   # within 5 minutes of registering?
   def invited?
-    invited_period = 5.minutes
     was_invited = invited.get
 
     if was_invited.nil?
-      joined_group_ids = groups.where('creator_id != ?', id).pluck(:id)
-      join_times = group_join_times.members(with_scores: true)
-      joined_first_group_at = join_times.detect{ |group_id, time| joined_group_ids.include?(group_id) }.try(:last)
+      if received_invites.exists?
+        self.invited = 1
+        true
+      else
+        invited_period = 5.minutes
+        joined_group_ids = groups.where('creator_id != ?', id).pluck(:id)
+        join_times = group_join_times.members(with_scores: true)
+        joined_first_group_at = join_times.detect{ |group_id, time| joined_group_ids.include?(group_id) }.try(:last)
 
-      invited_val = (joined_first_group_at && joined_first_group_at <= (created_at + invited_period).to_i) ? 1 : 0
-      self.invited = invited_val if invited_val == 1 || created_at < invited_period.ago
-      self.class.to_bool(invited_val)
+        invited_val = (joined_first_group_at && joined_first_group_at <= (created_at + invited_period).to_i) ? 1 : 0
+        self.invited = invited_val if invited_val == 1 || created_at < invited_period.ago # Keep checking for the first 5 mins
+        self.class.to_bool(invited_val)
+      end
     else
       self.class.to_bool(was_invited)
     end
@@ -178,8 +185,8 @@ class User < ActiveRecord::Base
     UserPreferences.new(id: id)
   end
 
-  def ios_notifier
-    @ios_notifier ||= IosNotifier.new(self)
+  def mobile_notifier
+    @mobile_notifier ||= MobileNotifier.new(self)
   end
 
   def email_notifier
@@ -190,7 +197,7 @@ class User < ActiveRecord::Base
   def send_notifications(message)
     return unless away_idle_or_unavailable?
 
-    ios_notifier.notify(message)
+    mobile_notifier.notify(message)
     email_notifier.notify(message)
   end
 
@@ -259,7 +266,7 @@ class User < ActiveRecord::Base
     # Delete only the few most recent job keys (the rest should have already expired)
     # So we're not deleting potentially hundreds of keys for lost users
     mobile_sent = mobile_digests_sent.value
-    ([mobile_sent - 3, 1].max).upto(mobile_sent + 1){ |i| keys << IosNotifier.job_token_key(id, mobile_sent) }
+    ([mobile_sent - 3, 1].max).upto(mobile_sent + 1){ |i| keys << MobileNotifier.job_token_key(id, mobile_sent) }
 
     email_sent = email_digests_sent.value
     ([email_sent - 3, 1].max).upto(email_sent + 1){ |i| keys << EmailNotifier.job_token_key(id, email_sent) }
@@ -280,7 +287,7 @@ class User < ActiveRecord::Base
 
   def mobile_digest_data_keys
     [mobile_digest_group_ids.key] + mobile_digest_group_ids.members.map do |group_id|
-      IosNotifier.group_chatting_member_ids_key(id, group_id)
+      MobileNotifier.group_chatting_member_ids_key(id, group_id)
     end
   end
 
@@ -304,7 +311,7 @@ class User < ActiveRecord::Base
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
-      User.includes(:avatar_image).where(id: user_ids).order("FIELD(id, #{field_order})")
+      User.includes(:avatar_image, :emails, :phones).where(id: user_ids).order("FIELD(id, #{field_order})")
     else
       []
     end

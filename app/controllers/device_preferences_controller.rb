@@ -1,7 +1,7 @@
-class IosDevicePreferencesController < ApplicationController
+class DevicePreferencesController < ApplicationController
 
   def update
-    raise Peanut::Redis::RecordNotFound if current_device.nil?
+    raise ActiveRecord::RecordNotFound if current_device.nil?
 
     @preferences = current_device.preferences
 

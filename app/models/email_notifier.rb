@@ -45,7 +45,7 @@ class EmailNotifier
                         end
 
     if notification_type == :all
-      notify_or_add_to_digest(message)
+      notify_or_add_to_digest(message) if UserGroupPreferences.find(user, convo).server_all_messages_email
     elsif user.preferences.send("server_#{notification_type}_email")
       send_notification(notification_type, message)
     end

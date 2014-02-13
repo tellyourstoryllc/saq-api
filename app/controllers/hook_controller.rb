@@ -38,7 +38,7 @@ class HookController < ApplicationController
     return @from_phone if defined?(@from_phone)
 
     number = Phone.normalize(parsed_body['from'])
-    @from_phone = Phone.create_with(user: user).find_or_create_by(number: number) if number && user
+    @from_phone = Phone.create_with(user: user).find_or_create_by(number: number) if number
   end
 
   def user

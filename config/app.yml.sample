@@ -19,13 +19,14 @@ development:
     url: https://local.skymob.co:8080/faye
     server_secret: SECRET
   hook:
-    passcode: '37e38420-5f61-11e2-bcfd-0800200c9a66'
-    invite_from: '+13025175920'
+    passcode: PASSCODE
+    invite_from: PHONE_NUMBER
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
   rapns:
     db_ios_app_name: skymob_ios
+    db_android_app_name: skymob_android
   redis:
     persisted:
       host: 127.0.0.1
@@ -68,6 +69,7 @@ test:
     group_token: GROUP_TOKEN
   rapns:
     db_ios_app_name: ~
+    db_android_app_name: ~
   redis:
     persisted:
       host: 127.0.0.1

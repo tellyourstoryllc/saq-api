@@ -1,9 +1,19 @@
 rapns_config = Rails.configuration.app['rapns']
 
-Rails.configuration.app['rapns']['app'] = Rapns::Apns::App.find_by(name: rapns_config['db_ios_app_name']) if !Rails.configuration.app['rapns']['app'] && Rapns::Apns::App && Rapns::Apns::App.table_exists?
+if Rapns::Apns::App && Rapns::Apns::App.table_exists? && !Rails.configuration.app['rapns']['ios_app']
+  Rails.configuration.app['rapns']['ios_app'] = Rapns::Apns::App.find_by(name: rapns_config['db_ios_app_name'])
+end
 
-if Rails.configuration.app['rapns']['app'].nil?
-  Rails.logger.warn "Could not find Rapns app #{rapns_config['db_ios_app_name']}. iOS Push Notifications will not work."
+if Rapns::Gcm::App && Rapns::Gcm::App.table_exists? && !Rails.configuration.app['rapns']['android_app']
+  Rails.configuration.app['rapns']['android_app'] = Rapns::Gcm::App.find_by(name: rapns_config['db_android_app_name'])
+end
+
+if Rails.configuration.app['rapns']['ios_app'].nil?
+  Rails.logger.warn "WARN: Could not find Rapns app #{rapns_config['db_ios_app_name']}. iOS Push Notifications will not work."
+end
+
+if Rails.configuration.app['rapns']['android_app'].nil?
+  Rails.logger.warn "WARN: Could not find Rapns app #{rapns_config['db_android_app_name']}. Android Push Notifications will not work."
 end
 
 

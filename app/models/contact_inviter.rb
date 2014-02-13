@@ -42,7 +42,7 @@ class ContactInviter
     end
 
     Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address,
-                   new_user: new_user, can_login: !account.no_login_credentials?)
+                   new_user: new_user, can_log_in: account.can_log_in?)
 
     # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)
@@ -79,7 +79,7 @@ class ContactInviter
     end
 
     Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number,
-                   new_user: true, can_login: !account.no_login_credentials?)
+                   new_user: true, can_log_in: account.can_log_in?)
 
     # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)
@@ -111,6 +111,45 @@ class ContactInviter
     User.redis.multi do
       user.contact_ids.delete(other_user.id)
       other_user.reciprocal_contact_ids.delete(user.id)
+    end
+  end
+
+  def autoconnect(hashed_emails, hashed_phone_numbers)
+    added_users = []
+
+    # TODO: wait until we verify emails
+    #if hashed_emails.present?
+    #  emails = Email.includes(:user).where(hashed_email: hashed_emails)
+
+    #  emails.each do |email|
+    #    added_users << email.user
+    #    add_with_reciprocal(email.user)
+    #  end
+    #end
+
+    if hashed_phone_numbers.present?
+      phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers, verified: true)
+
+      phones.each do |phone|
+        added_users << phone.user
+        add_with_reciprocal(phone.user)
+      end
+    end
+
+    added_users
+  end
+
+  def facebook_autoconnect
+    if Settings.enabled?(:queue)
+      ContactInviterFacebookAutoconnectWorker.perform_async(current_user.id)
+    else
+      facebook_autoconnect!
+    end
+  end
+
+  def facebook_autoconnect!
+    current_user.account.facebook_friends_with_app.each do |u|
+      add_with_reciprocal(u)
     end
   end
 end

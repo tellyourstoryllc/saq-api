@@ -65,6 +65,10 @@ class Account < ActiveRecord::Base
     password_digest.blank? && facebook_id.blank?
   end
 
+  def can_log_in?
+    !no_login_credentials?
+  end
+
   def send_missing_password_email
     return unless no_login_credentials?
 
@@ -77,6 +81,17 @@ class Account < ActiveRecord::Base
 
   def send_missing_password_email!
     AccountMailer.missing_password(self, generate_password_reset_token).deliver!
+  end
+
+  def facebook_user
+    @facebook_user ||= FacebookUser.new(id: facebook_id) if facebook_id
+  end
+
+  def facebook_friends_with_app
+    return [] unless facebook_user
+
+    uids = facebook_user.friend_uids.members
+    uids.present? ? User.joins(:account).where(accounts: {facebook_id: uids}) : []
   end
 
 
@@ -102,7 +117,7 @@ class Account < ActiveRecord::Base
     profile = Koala::Facebook::API.new(facebook_token).get_object('me')
 
     if profile['id'] == facebook_id
-      FacebookUser.new(id: facebook_id).fetch_profile
+      facebook_user.fetch_profile
       true
     else
       false
