@@ -3,7 +3,7 @@ class Invite < ActiveRecord::Base
 
   before_validation :set_invite_token, on: :create
   validates :sender_id, :recipient_id, presence: true
-  validates :new_user, :can_login, inclusion: [true, false]
+  validates :new_user, :can_log_in, inclusion: [true, false]
   after_create :send_invite
 
   belongs_to :sender, class_name: 'User', foreign_key: 'sender_id'
@@ -14,7 +14,7 @@ class Invite < ActiveRecord::Base
   # Send an invite if the recipient can't yet log in to the app
   # This way the person can get invites from multiple friends
   def send_invite?
-    !can_login? && (invited_email.present? || invited_phone.present?)
+    !can_log_in? && (invited_email.present? || invited_phone.present?)
   end
 
   def phone

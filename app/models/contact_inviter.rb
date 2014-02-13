@@ -42,7 +42,7 @@ class ContactInviter
     end
 
     Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address,
-                   new_user: new_user, can_login: !account.no_login_credentials?)
+                   new_user: new_user, can_log_in: account.can_log_in?)
 
     # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)
@@ -79,7 +79,7 @@ class ContactInviter
     end
 
     Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number,
-                   new_user: true, can_login: !account.no_login_credentials?)
+                   new_user: true, can_log_in: account.can_log_in?)
 
     # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)
