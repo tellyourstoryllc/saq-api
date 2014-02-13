@@ -5,7 +5,7 @@ class Message
   attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
-    :client_metadata, :created_at, :created_at_precise, :expires_in, :expires_at
+    :client_metadata, :created_at, :expires_in, :expires_at
   hash_key :attrs
   sorted_set :likes
 
@@ -26,22 +26,20 @@ class Message
     generate_id
     sanitize_mentioned_user_ids
     save_message_attachment
-    write_attrs
-    add_to_conversation
-    set_rank
+
+    redis.multi do
+      write_attrs
+      add_to_conversation
+    end
+
     increment_user_stats
     increment_stats
 
     true
   end
 
-  def set_rank
-    @rank = attrs[:rank] = conversation.rank.incr
-  end
-
-  # In case a request for messages comes in between write_attrs and add_to_conversation
   def rank
-    @rank ||= set_rank
+   @rank ||= attrs[:rank].to_i
   end
 
   def user
@@ -173,8 +171,7 @@ class Message
   end
 
   def write_attrs
-    self.created_at_precise = Time.current.to_f
-    self.created_at = created_at_precise.to_i
+    self.created_at = Time.current.to_i
     self.expires_at = (Time.current + expires_in).to_i if expires_in.present?
 
     if @message_attachment && @message_attachment.attachment.present?
@@ -201,9 +198,14 @@ class Message
     end
   end
 
+  # Atomically set the rank and add it to the conversation's message list
   def add_to_conversation
     convo = conversation
-    convo.message_ids[id] = created_at_precise if convo
+
+    if convo
+      lua_script = %{local rank = redis.call('INCR', KEYS[1]); redis.call('HSET', KEYS[2], 'rank', rank); redis.call('ZADD', KEYS[3], rank, ARGV[1])}
+      redis.eval lua_script, {keys: [convo.rank.key, attrs.key, convo.message_ids.key], argv: [id]}
+    end
   end
 
   def increment_user_stats

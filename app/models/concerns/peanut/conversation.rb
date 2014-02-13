@@ -28,7 +28,7 @@ module Peanut::Conversation
     return [] if below_rank && below_rank <= 0
 
     ids = if below_rank
-      message_ids.range([below_rank - limit, 0].max, below_rank - 1)
+      message_ids.revrangebyscore(below_rank - 1, '-inf', {limit: limit}).reverse
     else
       message_ids.range(-limit, -1)
     end
@@ -43,7 +43,7 @@ module Peanut::Conversation
   end
 
   def last_message_at
-    @last_message_at ||= message_ids.range(-1, -1, with_scores: true).first.try(:last).try(:round)
+    @last_message_at ||= Message.redis.hget("message:#{message_ids.last}:attrs", :created_at)
   end
 
   def metadata_key
