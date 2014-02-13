@@ -36,7 +36,7 @@ class Message
   end
 
   def set_rank
-    @rank = attrs[:rank] = conversation.message_ids.rank(id)
+    @rank = attrs[:rank] = conversation.rank.incr
   end
 
   # In case a request for messages comes in between write_attrs and add_to_conversation
