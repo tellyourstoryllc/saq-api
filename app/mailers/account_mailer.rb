@@ -1,6 +1,6 @@
 class AccountMailer < BaseMailer
   def welcome(account)
-    mail(to: account.emails.map(&:email), subject: 'Welcome to skymob')
+    mail(to: account.emails.map(&:email), subject: 'Welcome to krazychat')
   end
 
   def password_reset(account, token)

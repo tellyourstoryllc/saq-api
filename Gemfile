@@ -32,6 +32,7 @@ gem 'bcrypt-ruby', '~> 3.0.0'
 gem 'unicorn'
 gem 'mysql2'
 gem 'active_model_serializers', '0.8.1'
+gem 'faraday', '0.8.8'
 
 gem 'hiredis'
 gem 'redis', '3.0.5', require: ['redis', 'redis/connection/hiredis']
