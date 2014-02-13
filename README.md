@@ -2,12 +2,19 @@
 
 Copy all `config/[name].yml.sample` files to `config/[name].yml` and configure accordingly.
 
-Set up the db:
+Create the dbs:
 
     rake db:create
+
+Update the db to *not* add all new columns as utf8mb4:
+
+    ALTER DATABASE chat_app_dev DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+Migrate db:
+
     rake db:migrate
 
-Install Redis if not already installed:
+Install Redis (>= 2.6.12) if not already installed:
 
     brew install redis
     # Start redis-server however you like

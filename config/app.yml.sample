@@ -18,11 +18,15 @@ development:
   faye:
     url: https://local.skymob.co:8080/faye
     server_secret: SECRET
+  hook:
+    passcode: PASSCODE
+    invite_from: PHONE_NUMBER
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
   rapns:
     db_ios_app_name: skymob_ios
+    db_android_app_name: skymob_android
   redis:
     persisted:
       host: 127.0.0.1
@@ -57,11 +61,15 @@ test:
   faye:
     url: https://local.skymob.co:8080/faye_TEST
     server_secret: SECRET
+  hook:
+    passcode: 'invalid'
+    invite_from: 'invalid'
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
   rapns:
     db_ios_app_name: ~
+    db_android_app_name: ~
   redis:
     persisted:
       host: 127.0.0.1

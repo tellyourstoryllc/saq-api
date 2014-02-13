@@ -15,7 +15,8 @@ class UsersController < ApplicationController
   def create
     @account = Account.create!(account_params.merge(user_attributes: user_params, emails_attributes: [{email: params[:email]}]))
     @current_user = @account.user
-    IosDevice.create_or_assign!(@current_user, ios_device_params)
+    create_or_update_device
+
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
     mixpanel.user_registered(@current_user)
@@ -24,7 +25,8 @@ class UsersController < ApplicationController
     @account.send_welcome_email
     @account.send_missing_password_email
 
-    FacebookUser.new(id: @account.facebook_id).fetch_friends if @account.facebook_id
+    @account.facebook_user.try(:fetch_friends)
+    ContactInviter.new(@current_user).facebook_autoconnect
 
     render_json [@current_user, @account, @group].compact
   end

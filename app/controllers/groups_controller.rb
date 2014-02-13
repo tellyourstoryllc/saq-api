@@ -21,7 +21,6 @@ class GroupsController < ApplicationController
     objects = [@group, @group.members]
     objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
     render_json objects
-
   end
 
   def find
@@ -77,13 +76,22 @@ class GroupsController < ApplicationController
   def add_users
     user_ids = split_param(:user_ids)
     emails = split_param(:emails)
+    phone_numbers = split_param(:phone_numbers)
+    phone_names = split_param(:phone_names)
 
     group_inviter = GroupInviter.new(current_user, @group)
     group_inviter.add_users(user_ids)
     group_inviter.add_by_emails(emails)
-    # TODO: phone_numbers as well
+    group_inviter.add_by_phone_numbers(phone_numbers, phone_names)
 
-    users = User.where(id: user_ids) | User.joins(:emails).where(emails: {email: emails})
+    normalized_emails = emails.map {|e| Email.normalize(e) }.compact
+    normalized_numbers = phone_numbers.map {|n| Phone.normalize(n) }.compact
+
+    users = []
+    users = users | User.where(id: user_ids) if user_ids.present?
+    users = users | User.joins(:emails).where(emails: {email: normalized_emails}) if normalized_emails.present?
+    users = users | User.joins(:phones).where(phones: {number: normalized_numbers}) if normalized_numbers.present?
+
     render_json [@group] + users
   end
 
@@ -198,7 +206,7 @@ class GroupsController < ApplicationController
 
   def notify_admins
     @group.admins.each do |user|
-      user.ios_notifier.notify_new_member(current_user, @group)
+      user.mobile_notifier.notify_new_member(current_user, @group)
       user.email_notifier.notify_new_member(current_user, @group)
     end
   end

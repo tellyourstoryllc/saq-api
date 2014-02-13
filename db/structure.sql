@@ -38,6 +38,28 @@ CREATE TABLE `accounts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `android_devices`
+--
+
+DROP TABLE IF EXISTS `android_devices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `android_devices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `device_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `client_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
+  `os_version` varchar(5) COLLATE utf8_unicode_ci NOT NULL,
+  `registration_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_android_devices_on_device_id` (`device_id`),
+  KEY `index_android_devices_on_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `avatar_images`
 --
 
@@ -68,10 +90,12 @@ CREATE TABLE `emails` (
   `account_id` int(11) NOT NULL,
   `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `hashed_email` char(64) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_emails_on_email` (`email`),
+  UNIQUE KEY `index_emails_on_hashed_email` (`hashed_email`),
   KEY `index_emails_on_account_id` (`account_id`),
   KEY `index_emails_on_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -161,6 +185,27 @@ CREATE TABLE `groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `incoming_texts`
+--
+
+DROP TABLE IF EXISTS `incoming_texts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `incoming_texts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `raw_body` text COLLATE utf8_unicode_ci,
+  `from` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `recipient` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `text` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `message_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `timestamp` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `invites`
 --
 
@@ -172,7 +217,9 @@ CREATE TABLE `invites` (
   `sender_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `recipient_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
   `invited_email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `invited_phone` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `new_user` tinyint(1) NOT NULL,
+  `can_login` tinyint(1) NOT NULL,
   `group_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
   `invite_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -252,6 +299,32 @@ CREATE TABLE `one_to_one_wallpaper_images` (
   `active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `index_one_to_one_wallpaper_images_on_account_id` (`account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `phones`
+--
+
+DROP TABLE IF EXISTS `phones`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `phones` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL,
+  `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `number` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `hashed_number` char(64) COLLATE utf8_unicode_ci NOT NULL,
+  `verified` tinyint(1) NOT NULL DEFAULT '0',
+  `unsubscribed` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_phones_on_number` (`number`),
+  UNIQUE KEY `index_phones_on_hashed_number` (`hashed_number`),
+  KEY `index_phones_on_account_id` (`account_id`),
+  KEY `index_phones_on_user_id` (`user_id`),
+  KEY `index_phones_on_verified` (`verified`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -374,7 +447,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-01-20 15:29:34
+-- Dump completed on 2014-02-05 15:31:02
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -472,3 +545,17 @@ INSERT INTO schema_migrations (version) VALUES ('20140109192600');
 INSERT INTO schema_migrations (version) VALUES ('20140117145107');
 
 INSERT INTO schema_migrations (version) VALUES ('20140120202824');
+
+INSERT INTO schema_migrations (version) VALUES ('20140121153729');
+
+INSERT INTO schema_migrations (version) VALUES ('20140128220106');
+
+INSERT INTO schema_migrations (version) VALUES ('20140129153001');
+
+INSERT INTO schema_migrations (version) VALUES ('20140130183911');
+
+INSERT INTO schema_migrations (version) VALUES ('20140130222415');
+
+INSERT INTO schema_migrations (version) VALUES ('20140131164058');
+
+INSERT INTO schema_migrations (version) VALUES ('20140203154504');

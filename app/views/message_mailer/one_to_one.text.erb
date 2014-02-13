@@ -2,7 +2,7 @@ Hi <%= @recipient.first_name %>,
 
 <%= @user.name %> just sent you a 1-1 message but you're <%= @status %>:
 
-<%= @user.name %>: <%= @message.text %> | <%= Time.zone.at(@message.created_at).strftime('%-I:%M %p %Z') %>
+<%= email_quote(@user, @message) %>
 
 Join the conversation: <%= @url %>
 

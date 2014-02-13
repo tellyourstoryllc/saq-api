@@ -19,7 +19,9 @@ class User < ActiveRecord::Base
   has_one :avatar_image, -> { order('avatar_images.id DESC') }
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
   has_many :ios_devices
+  has_many :android_devices
   has_many :emails
+  has_many :phones
   has_many :received_invites, class_name: 'Invite', foreign_key: 'recipient_id'
 
   set :group_ids
@@ -38,6 +40,8 @@ class User < ActiveRecord::Base
   sorted_set :blocked_user_ids
   hash_key :group_last_seen_ranks
   hash_key :one_to_one_last_seen_ranks
+  hash_key :phone_verification_tokens, global: true
+  hash_key :user_ids_by_phone_verification_token, global: true
 
   value :last_mobile_digest_notification_at
   counter :mobile_digests_sent
@@ -56,6 +60,10 @@ class User < ActiveRecord::Base
 
   def token
     @token ||= User.api_tokens[id] if id
+  end
+
+  def fetch_phone_verification_token
+    @phone_verification_token ||= User.phone_verification_tokens[id] || create_phone_verification_token if id
   end
 
   def avatar_url
@@ -177,8 +185,8 @@ class User < ActiveRecord::Base
     UserPreferences.new(id: id)
   end
 
-  def ios_notifier
-    @ios_notifier ||= IosNotifier.new(self)
+  def mobile_notifier
+    @mobile_notifier ||= MobileNotifier.new(self)
   end
 
   def email_notifier
@@ -189,7 +197,7 @@ class User < ActiveRecord::Base
   def send_notifications(message)
     return unless away_idle_or_unavailable?
 
-    ios_notifier.notify(message)
+    mobile_notifier.notify(message)
     email_notifier.notify(message)
   end
 
@@ -258,7 +266,7 @@ class User < ActiveRecord::Base
     # Delete only the few most recent job keys (the rest should have already expired)
     # So we're not deleting potentially hundreds of keys for lost users
     mobile_sent = mobile_digests_sent.value
-    ([mobile_sent - 3, 1].max).upto(mobile_sent + 1){ |i| keys << IosNotifier.job_token_key(id, mobile_sent) }
+    ([mobile_sent - 3, 1].max).upto(mobile_sent + 1){ |i| keys << MobileNotifier.job_token_key(id, mobile_sent) }
 
     email_sent = email_digests_sent.value
     ([email_sent - 3, 1].max).upto(email_sent + 1){ |i| keys << EmailNotifier.job_token_key(id, email_sent) }
@@ -279,7 +287,7 @@ class User < ActiveRecord::Base
 
   def mobile_digest_data_keys
     [mobile_digest_group_ids.key] + mobile_digest_group_ids.members.map do |group_id|
-      IosNotifier.group_chatting_member_ids_key(id, group_id)
+      MobileNotifier.group_chatting_member_ids_key(id, group_id)
     end
   end
 
@@ -303,7 +311,7 @@ class User < ActiveRecord::Base
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
-      User.includes(:avatar_image).where(id: user_ids).order("FIELD(id, #{field_order})")
+      User.includes(:avatar_image, :emails, :phones).where(id: user_ids).order("FIELD(id, #{field_order})")
     else
       []
     end
@@ -350,6 +358,16 @@ class User < ActiveRecord::Base
     end
 
     User.api_tokens[id] = @token
+  end
+
+  def create_phone_verification_token
+    loop do
+      @phone_verification_token = SecureRandom.hex
+      saved = redis.hsetnx(User.user_ids_by_phone_verification_token.key, @phone_verification_token, id)
+      break if saved
+    end
+
+    User.phone_verification_tokens[id] = @phone_verification_token
   end
 
   def update_sorting_name

@@ -3,15 +3,17 @@ class CheckinController < ApplicationController
 
   def index
     mixpanel.checked_in if current_user
-
     objects = []
 
     config_class = case params[:client]
                    when 'web' then WebConfiguration
                    when 'ios' then IosConfiguration
+                   when 'android' then AndroidConfiguration
                    else ClientConfiguration
                    end
+
     client_config = {object_type: 'configuration'}.merge(config_class.config)
+    client_config.merge!(phone_verification_destination: Rails.configuration.app['hook']['invite_from']) if params[:client] == 'ios'
 
     objects << client_config
 
