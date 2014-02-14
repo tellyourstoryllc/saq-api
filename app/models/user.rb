@@ -3,9 +3,9 @@ class User < ActiveRecord::Base
   include Redis::Objects
   attr_accessor :avatar_image_file, :avatar_image_url, :avatar_video_file
 
-  before_validation :set_id, :set_username, on: :create
+  before_validation :set_id, on: :create
 
-  validates :name, :username, presence: true
+  validates :username, presence: true
   validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
@@ -56,7 +56,12 @@ class User < ActiveRecord::Base
 
 
   def first_name
-    name.split(' ').first
+    name.present? ? name.split(' ').first : username
+  end
+
+  # Don't use name for anything...
+  def name
+    username
   end
 
   def token
@@ -335,23 +340,9 @@ class User < ActiveRecord::Base
     end
   end
 
-  def set_username
-    return if username.present?
-
-    # Lowercase alpha chars only to make it easier to type on mobile
-    # Exclude L to avoid any confusion
-    chars = [*'a'..'k', *'m'..'z']
-
-    loop do
-      self.username = 'user_' + Array.new(6){ chars.sample }.join
-      break unless User.where(username: username).exists?
-    end
-  end
-
   def username_format?
     return if username.blank?
-    valid = username =~ /\Auser_[a-km-z]{6}\Z/ # system username
-    valid ||= username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9]{2,16}\Z/
+    valid = username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9]{2,16}\Z/
     errors.add(:username, "must be 2-16 characters, include at least one letter, and contain only letters and numbers") unless valid
   end
 
@@ -376,7 +367,7 @@ class User < ActiveRecord::Base
   end
 
   def update_sorting_name
-    self.sorting_name = name if name_changed?
+    self.sorting_name = username if username_changed?
   end
 
   def create_new_avatar_image
