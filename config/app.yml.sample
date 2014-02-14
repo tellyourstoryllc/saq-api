@@ -16,7 +16,7 @@ development:
   facebook:
     app_access_token: TOKEN
   faye:
-    url: https://local.skymob.co:8080/faye
+    url: https://local.krazychat.co:8080/faye
     server_secret: SECRET
   hook:
     passcode: PASSCODE
@@ -24,13 +24,13 @@ development:
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
-  rapns:
-    db_ios_app_name: skymob_ios
-    db_android_app_name: skymob_android
+  rpush:
+    db_ios_app_name: krazychat_ios
+    db_android_app_name: krazychat_android
   redis:
     persisted:
       host: 127.0.0.1
-      port: 6380
+      port: 6381
       db: 0
   sendgrid:
     username: USERNAME
@@ -59,7 +59,7 @@ test:
   facebook:
     app_access_token: TOKEN
   faye:
-    url: https://local.skymob.co:8080/faye_TEST
+    url: https://local.krazychat.co:8080/faye_TEST
     server_secret: SECRET
   hook:
     passcode: 'invalid'
@@ -67,13 +67,13 @@ test:
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
-  rapns:
+  rpush:
     db_ios_app_name: ~
     db_android_app_name: ~
   redis:
     persisted:
       host: 127.0.0.1
-      port: 6380
+      port: 6381
       db: 10
   sendgrid:
     username: USERNAME

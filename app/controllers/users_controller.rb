@@ -7,14 +7,35 @@ class UsersController < ApplicationController
   end
 
   def index
+    limit = 20 # Max of 20 users at a time
+
     ids = split_param(:ids)
-    ids = ids.first(20) # Max of 20 users at a time
-    render_json User.find(ids)
+    ids = ids.first(limit)
+    usernames = split_param(:usernames)
+    usernames = usernames.first(limit)
+
+    users = []
+    users += User.includes(:avatar_image, :avatar_video).where(id: ids) if ids.present?
+    users += User.includes(:avatar_image, :avatar_video).where(username: usernames) if usernames.present?
+    render_json users.uniq.first(limit)
   end
 
   def create
-    @account = Account.create!(account_params.merge(user_attributes: user_params, emails_attributes: [{email: params[:email]}]))
-    @current_user = @account.user
+    @invite = Invite.find_by(invite_token: params[:invite_token]) if params[:invite_token].present?
+    @current_user = @invite.try(:recipient)
+    @account = @current_user.try(:account)
+
+    # If an invite_token is included, just update that user
+    if @current_user && @account && @account.no_login_credentials?
+      @current_user.update!(user_params)
+      @account.update!(account_params.merge(emails_attributes: [{email: params[:email]}]))
+
+    # Otherwise, create a new user, account, etc.
+    else
+      @account = Account.create!(account_params.merge(user_attributes: user_params, emails_attributes: [{email: params[:email]}]))
+      @current_user = @account.user
+    end
+
     create_or_update_device
 
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
@@ -50,11 +71,11 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.permit(:name, :avatar_image_url)
+    params.permit(:name, :username, :avatar_image_url, :avatar_video_file)
   end
 
   def update_user_params
-    params.permit(:name, :username, :status, :status_text, :avatar_image_file, :avatar_image_url)
+    params.permit(:name, :username, :status, :status_text, :avatar_image_file, :avatar_image_url, :avatar_video_file)
   end
 
   def group_params

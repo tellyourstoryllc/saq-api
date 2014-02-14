@@ -3,4 +3,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-ChatApp::Application.load_tasks
+KrazyChat::Application.load_tasks

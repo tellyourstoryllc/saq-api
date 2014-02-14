@@ -1,22 +1,23 @@
 class User < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
-  attr_accessor :avatar_image_file, :avatar_image_url
+  attr_accessor :avatar_image_file, :avatar_image_url, :avatar_video_file
 
-  before_validation :set_id, :set_username, on: :create
+  before_validation :set_id, on: :create
 
-  validates :name, :username, presence: true
+  validates :username, presence: true
   validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
   validate :username_format?
 
   after_save :update_sorting_name
-  after_save :create_new_avatar_image, on: :update
+  after_save :create_new_avatar_image, :create_new_avatar_video, on: :update
   after_create :create_api_token
 
   has_one :account
   has_one :avatar_image, -> { order('avatar_images.id DESC') }
+  has_one :avatar_video, -> { order('avatar_videos.id DESC') }
   has_many :created_groups, class_name: 'Group', foreign_key: 'creator_id'
   has_many :ios_devices
   has_many :android_devices
@@ -55,7 +56,12 @@ class User < ActiveRecord::Base
 
 
   def first_name
-    name.split(' ').first
+    name.present? ? name.split(' ').first : username
+  end
+
+  # Don't use name for anything...
+  def name
+    username
   end
 
   def token
@@ -68,6 +74,10 @@ class User < ActiveRecord::Base
 
   def avatar_url
     @avatar_url ||= avatar_image.image.thumb.url if avatar_image
+  end
+
+  def avatar_video_url
+    @avatar_video_url ||= avatar_video.video.url if avatar_video
   end
 
   def groups
@@ -245,7 +255,7 @@ class User < ActiveRecord::Base
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
-      User.includes(:avatar_image).where(id: user_ids).order("FIELD(id, #{field_order})")
+      User.includes(:avatar_image, :avatar_video).where(id: user_ids).order("FIELD(id, #{field_order})")
     else
       []
     end
@@ -311,7 +321,7 @@ class User < ActiveRecord::Base
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
-      User.includes(:avatar_image, :emails, :phones).where(id: user_ids).order("FIELD(id, #{field_order})")
+      User.includes(:avatar_image, :avatar_video, :emails, :phones).where(id: user_ids).order("FIELD(id, #{field_order})")
     else
       []
     end
@@ -330,23 +340,9 @@ class User < ActiveRecord::Base
     end
   end
 
-  def set_username
-    return if username.present?
-
-    # Lowercase alpha chars only to make it easier to type on mobile
-    # Exclude L to avoid any confusion
-    chars = [*'a'..'k', *'m'..'z']
-
-    loop do
-      self.username = 'user_' + Array.new(6){ chars.sample }.join
-      break unless User.where(username: username).exists?
-    end
-  end
-
   def username_format?
     return if username.blank?
-    valid = username =~ /\Auser_[a-km-z]{6}\Z/ # system username
-    valid ||= username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9]{2,16}\Z/
+    valid = username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9]{2,16}\Z/
     errors.add(:username, "must be 2-16 characters, include at least one letter, and contain only letters and numbers") unless valid
   end
 
@@ -371,7 +367,7 @@ class User < ActiveRecord::Base
   end
 
   def update_sorting_name
-    self.sorting_name = name if name_changed?
+    self.sorting_name = username if username_changed?
   end
 
   def create_new_avatar_image
@@ -380,6 +376,10 @@ class User < ActiveRecord::Base
     elsif avatar_image_url.present?
       create_avatar_image(remote_image_url: avatar_image_url)
     end
+  end
+
+  def create_new_avatar_video
+    create_avatar_video(video: avatar_video_file) if avatar_video_file.present?
   end
 
   def get_most_recent_faye_client

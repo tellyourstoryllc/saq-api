@@ -9,4 +9,4 @@
 
 # Make sure your secret_key_base is kept private
 # if you're sharing your code publicly.
-ChatApp::Application.config.secret_key_base = '179ce78fa3084f5e5930f0af9a46a11b176fee7b0a586691267fd2c019a8607fc8709d02147e3cbcd5b5cc0ac3b266dbf6ea6bec3010ab93eb1760b8bddce7b5'
+KrazyChat::Application.config.secret_key_base = 'vwx9e78fa3084f5e5930f0af9a46a11b176fee7b0a586691267fd2c019a8607fc8709d02147e3cbcd5b5cc0ac3b266dbf6ea6bec3010ab93eb1760b8bddce7b5'

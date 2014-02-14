@@ -86,4 +86,14 @@ describe SessionsController do
         'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
     ]
   end
+
+  it "must not log in account when the invite token correct but the account has login credentials" do
+    user = FactoryGirl.create(:user)
+    sender = FactoryGirl.create(:user)
+    account = FactoryGirl.create(:account, user_id: user.id, password: 'asdf1234')
+    invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'test@example.com')
+
+    post :create, {invite_token: invite.invite_token}
+    result.must_equal('error' => {'message' => 'Incorrect credentials.'})
+  end
 end

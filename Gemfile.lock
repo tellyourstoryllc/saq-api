@@ -1,19 +1,19 @@
 GIT
-  remote: git://github.com/bray/rapns.git
-  revision: a05be2f7e7a8e7ce4b35c18d25ad26a1ba89275a
-  branch: ar_logger_config
-  specs:
-    rapns (3.4.1)
-      multi_json (~> 1.0)
-      net-http-persistent
-
-GIT
   remote: git://github.com/bray/redis_logger.git
   revision: a586282ab8a6c2f23b78a57e6ce27809387b10a2
   specs:
     redis_logger (0.0.2)
       rails (> 3.2.0)
       redis
+
+GIT
+  remote: git://github.com/bray/rpush.git
+  revision: 633a3ecf36595d75ecb006ecb25f80bc68c8a335
+  branch: ar_logger_config
+  specs:
+    rpush (1.0.0)
+      multi_json (~> 1.0)
+      net-http-persistent
 
 GEM
   remote: https://rubygems.org/
@@ -148,7 +148,7 @@ GEM
     multi_xml (0.5.3)
     multipart-post (1.2.0)
     mysql2 (0.3.14)
-    net-http-persistent (2.9.1)
+    net-http-persistent (2.9.4)
     net-scp (1.1.2)
       net-ssh (>= 2.6.5)
     net-ssh (2.7.0)
@@ -265,6 +265,7 @@ DEPENDENCIES
   carrierwave (= 0.9.0)
   coffee-rails (~> 4.0.0)
   factory_girl_rails
+  faraday (= 0.8.8)
   faye (= 1.0.0)
   fog (= 1.19.0)
   hiredis
@@ -281,10 +282,10 @@ DEPENDENCIES
   oj
   phony
   rails (= 4.0.0)
-  rapns!
   redis (= 3.0.5)
   redis-objects (= 0.7.0)
   redis_logger!
+  rpush!
   sass-rails (~> 4.0.0)
   sdoc
   sidekiq (= 2.17.0)
