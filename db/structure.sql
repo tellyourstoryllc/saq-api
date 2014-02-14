@@ -329,13 +329,13 @@ CREATE TABLE `phones` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `rapns_apps`
+-- Table structure for table `rpush_apps`
 --
 
-DROP TABLE IF EXISTS `rapns_apps`;
+DROP TABLE IF EXISTS `rpush_apps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `rapns_apps` (
+CREATE TABLE `rpush_apps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `environment` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -346,18 +346,22 @@ CREATE TABLE `rapns_apps` (
   `updated_at` datetime DEFAULT NULL,
   `type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `auth_key` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `client_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `client_secret` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `access_token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `access_token_expiration` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `rapns_feedback`
+-- Table structure for table `rpush_feedback`
 --
 
-DROP TABLE IF EXISTS `rapns_feedback`;
+DROP TABLE IF EXISTS `rpush_feedback`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `rapns_feedback` (
+CREATE TABLE `rpush_feedback` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `device_token` varchar(64) COLLATE utf8_unicode_ci NOT NULL,
   `failed_at` datetime NOT NULL,
@@ -365,18 +369,18 @@ CREATE TABLE `rapns_feedback` (
   `updated_at` datetime DEFAULT NULL,
   `app` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_rapns_feedback_on_device_token` (`device_token`)
+  KEY `index_rpush_feedback_on_device_token` (`device_token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `rapns_notifications`
+-- Table structure for table `rpush_notifications`
 --
 
-DROP TABLE IF EXISTS `rapns_notifications`;
+DROP TABLE IF EXISTS `rpush_notifications`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `rapns_notifications` (
+CREATE TABLE `rpush_notifications` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `badge` int(11) DEFAULT NULL,
   `device_token` varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -400,6 +404,8 @@ CREATE TABLE `rapns_notifications` (
   `registration_ids` mediumtext COLLATE utf8_unicode_ci,
   `app_id` int(11) NOT NULL,
   `retries` int(11) DEFAULT '0',
+  `uri` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `fail_after` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_rapns_notifications_multi` (`app_id`,`delivered`,`failed`,`deliver_after`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -447,7 +453,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-02-13 17:43:14
+-- Dump completed on 2014-02-14  0:05:04
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -561,3 +567,11 @@ INSERT INTO schema_migrations (version) VALUES ('20140131164058');
 INSERT INTO schema_migrations (version) VALUES ('20140203154504');
 
 INSERT INTO schema_migrations (version) VALUES ('20140213224056');
+
+INSERT INTO schema_migrations (version) VALUES ('20140214050049');
+
+INSERT INTO schema_migrations (version) VALUES ('20140214050050');
+
+INSERT INTO schema_migrations (version) VALUES ('20140214050051');
+
+INSERT INTO schema_migrations (version) VALUES ('20140214050052');

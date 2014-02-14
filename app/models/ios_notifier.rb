@@ -1,7 +1,7 @@
 class IosNotifier < MobileNotifier
   def build_notification(alert, custom_data = {})
-    attrs = {app: Rails.configuration.app['rapns']['ios_app'], alert: alert, data: custom_data}
-    notification = Rapns::Apns::Notification.new(attrs)
+    attrs = {app: Rails.configuration.app['rpush']['ios_app'], alert: alert, data: custom_data}
+    notification = Rpush::Apns::Notification.new(attrs)
     Rails.logger.debug "Notification: #{notification.inspect}; payload_size: #{notification.payload_size}"
 
     # Truncate the alert if the total payload size is too big
