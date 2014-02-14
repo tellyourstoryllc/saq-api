@@ -93,6 +93,55 @@ describe UsersController do
           ]
         end
       end
+
+      it "must update an existing user and account via invite_token" do
+        sender = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:user)
+        account = FactoryGirl.create(:account, user_id: user.id)
+        invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'bruce@example.com')
+        user_count = User.count
+
+        post :create, {name: 'Bruce Lee', email: 'bruce@example.com', password: 'asdf', invite_token: invite.invite_token}
+
+        result.must_equal [
+          {'object_type' => 'user', 'id' => user.id, 'name' => 'Bruce Lee', 'username' => user.username,
+            'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+            'client_type' => nil, 'avatar_url' => nil},
+          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+            'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+        ]
+
+        User.count.must_equal user_count
+
+        user.account.password_digest.wont_be_nil
+
+        emails = user.emails
+        emails.size.must_equal 2
+        emails.last.email.must_equal 'bruce@example.com'
+      end
+
+      it "must not update an existing user and account via invite_token if the user has login credentials" do
+        sender = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:user)
+        account = FactoryGirl.create(:account, user_id: user.id, password: 'asdf1234')
+        invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'bruce@example.com')
+        user_count = User.count
+
+        post :create, {name: 'Bruce Lee', email: 'bruce@example.com', password: 'asdf', invite_token: invite.invite_token}
+
+        user = User.find_by(name: 'Bruce Lee')
+        account = user.account
+
+        result.must_equal [
+          {'object_type' => 'user', 'id' => user.id, 'name' => 'Bruce Lee', 'username' => user.username,
+            'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+            'client_type' => nil, 'avatar_url' => nil},
+          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+            'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+        ]
+
+        User.count.must_equal user_count + 1
+      end
     end
   end
 
