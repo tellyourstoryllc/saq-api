@@ -48,7 +48,7 @@ gem 'faye', '1.0.0'
 gem 'koala', '1.6.0'
 gem 'newrelic_rpm', '3.6.9.171'
 gem 'newrelic-redis'
-gem 'rapns', git: 'git://github.com/bray/rapns.git', branch: 'ar_logger_config'
+gem 'rpush', git: 'git://github.com/bray/rpush.git', branch: 'ar_logger_config'
 
 gem 'statsd-instrument', '1.5.0'
 gem 'sinatra', '>= 1.3.0', require: nil
