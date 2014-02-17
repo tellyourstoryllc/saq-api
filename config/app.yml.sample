@@ -24,7 +24,7 @@ development:
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
-  rapns:
+  rpush:
     db_ios_app_name: skymob_ios
     db_android_app_name: skymob_android
   redis:
@@ -67,7 +67,7 @@ test:
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
-  rapns:
+  rpush:
     db_ios_app_name: ~
     db_android_app_name: ~
   redis:

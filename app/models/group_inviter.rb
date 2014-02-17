@@ -97,7 +97,7 @@ class GroupInviter
 
   def create_group_invite(user, attrs = {})
     default_attrs = {sender_id: current_user.id, recipient_id: user.id,
-      new_user: false, can_login: !user.account.no_login_credentials?, group_id: group.id}
+      new_user: false, can_log_in: user.account.can_log_in?, group_id: group.id}
     attrs.reverse_merge!(default_attrs)
     Invite.create!(attrs)
   end

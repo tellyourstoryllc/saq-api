@@ -47,7 +47,7 @@ class SessionsController < ApplicationController
       if invite
         account = invite.try(:recipient).try(:account)
 
-        if account
+        if account && account.no_login_credentials?
           account.send_missing_password_email
           invite.phone.try(:verify!)
 
