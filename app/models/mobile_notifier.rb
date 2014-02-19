@@ -101,6 +101,32 @@ class MobileNotifier
     end
   end
 
+  def create_ios_notification(ios_device, alert, custom_data)
+    n = ios_notifier.build_notification(alert, custom_data)
+    n.device_token = ios_device.push_token
+    n.save!
+  end
+
+  def create_android_notification(android_device, alert, custom_data)
+    n = android_notifier.build_notification(alert, custom_data)
+    n.registration_ids = android_device.registration_id
+    n.save!
+  end
+
+  # Send to all iOS devices for which the given block is true
+  def create_ios_notifications(alert, custom_data, &block)
+    user.ios_devices.each do |ios_device|
+      create_ios_notification(ios_device, alert, custom_data) if block.call(ios_device)
+    end
+  end
+
+  # Send to all Android devices for which the given block is true
+  def create_android_notifications(alert, custom_data, &block)
+    user.android_devices.each do |android_device|
+      create_android_notification(android_device, alert, custom_data) if block.call(android_device)
+    end
+  end
+
   def send_notification(message, notification_type)
     convo = message.conversation
     custom_data = {}
@@ -117,10 +143,7 @@ class MobileNotifier
     # Send to all iOS devices
     user.ios_devices.each do |ios_device|
       if ios_device.notify?(user, convo, message, notification_type)
-        n = ios_notifier.build_notification(alert, custom_data)
-        n.device_token = ios_device.push_token
-        n.save!
-
+        create_ios_notification(alert, custom_data)
         notified = true
       end
     end
@@ -128,10 +151,7 @@ class MobileNotifier
     # Send to all Android devices
     user.android_devices.each do |android_device|
       if android_device.notify?(user, convo, message, notification_type)
-        n = android_notifier.build_notification(alert, custom_data)
-        n.registration_ids = android_device.registration_id
-        n.save!
-
+        create_android_notification(alert, custom_data)
         notified = true
       end
     end
@@ -208,22 +228,12 @@ class MobileNotifier
     alert = "#{member.name} just joined the room #{group.name}. Go say hi!"
     custom_data = {gid: group.id}
 
-    # Send to all iOS devices
-    user.ios_devices.each do |ios_device|
-      if ios_device.notify_new_member?(user)
-        n = ios_notifier.build_notification(alert, custom_data)
-        n.device_token = ios_device.push_token
-        n.save!
-      end
+    create_ios_notifications(alert, custom_data) do |ios_device|
+      ios_device.notify_new_member?(user)
     end
 
-    # Send to all Android devices
-    user.android_devices.each do |android_device|
-      if android_device.notify_new_member?(user)
-        n = android_notifier.build_notification(alert, custom_data)
-        n.registration_ids = android_device.registration_id
-        n.save!
-      end
+    create_android_notifications(alert, custom_data) do |android_device|
+      android_device.notify_new_member?(user)
     end
   end
 end
