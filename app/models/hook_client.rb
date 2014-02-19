@@ -1,8 +1,13 @@
 class HookClient
   include Redis::Objects
 
-  hash_key :sent_sms_counts, global: true
-  hash_key :received_sms_counts, global: true
+  hash_key :daily_sent_sms_counts, global: true
+  hash_key :monthly_sent_sms_counts, global: true
+  counter :all_time_sent_sms_count, global: true
+
+  hash_key :daily_received_sms_counts, global: true
+  hash_key :monthly_received_sms_counts, global: true
+  counter :all_time_received_sms_count, global: true
 
   CANCEL_TEXT = ' Reply NOOOO to cancel'
   MAX_CONTENT_LENGTH = HookApiClient::MAX_LENGTH - CANCEL_TEXT.size
@@ -33,11 +38,23 @@ class HookClient
   end
 
   def self.increment_sent_sms_counts
-    sent_sms_counts.incrby(Time.zone.today.to_s)
+    today = Time.zone.today
+
+    redis.multi do
+      redis.hincrby(daily_sent_sms_counts.key, today.to_s, 1)
+      redis.hincrby(monthly_sent_sms_counts.key, today.strftime('%Y-%m'), 1)
+      redis.incr(all_time_sent_sms_count.key)
+    end
   end
 
   def self.increment_received_sms_counts
-    received_sms_counts.incrby(Time.zone.today.to_s)
+    today = Time.zone.today
+
+    redis.multi do
+      redis.hincrby(daily_received_sms_counts.key, today.to_s, 1)
+      redis.hincrby(monthly_received_sms_counts.key, today.strftime('%Y-%m'), 1)
+      redis.incr(all_time_received_sms_count.key)
+    end
   end
 
 
