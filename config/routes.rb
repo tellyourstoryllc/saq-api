@@ -70,6 +70,8 @@ ChatApp::Application.routes.draw do
     match '/groups/:id/add_users', to: 'groups#add_users', as: 'groups_add_users'
 
     match '/hook/callback', to: 'hook#callback', as: 'hook_callback'
+
+    match '/admin/sms_stats', to: 'admin#sms_stats', as: 'admin_sms_stats'
   end
 
   require 'sidekiq/web'
