@@ -1,6 +1,6 @@
 class HookController < ApplicationController
   skip_before_action :require_token
-  before_action :restrict_domain, :validate_body
+  before_action :restrict_domain, :increment_stats, :validate_body
 
 
   def callback
@@ -20,6 +20,10 @@ class HookController < ApplicationController
 
     domain = Resolv.getname(request.remote_ip) rescue ''
     raise "Hook callback attempt from non-Hook domain!" unless domain.ends_with?('hookmobile.com')
+  end
+
+  def increment_stats
+    HookClient.increment_received_sms_counts
   end
 
   def validate_body
