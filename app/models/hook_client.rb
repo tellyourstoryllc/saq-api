@@ -9,7 +9,7 @@ class HookClient
   hash_key :monthly_received_sms_counts, global: true
   counter :all_time_received_sms_count, global: true
 
-  CANCEL_TEXT = ' Reply NOOOO to cancel'
+  CANCEL_TEXT = ''
   MAX_CONTENT_LENGTH = HookApiClient::MAX_LENGTH - CANCEL_TEXT.size
 
 
