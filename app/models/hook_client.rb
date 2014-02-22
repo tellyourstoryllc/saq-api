@@ -23,7 +23,7 @@ class HookClient
 
   def self.invite_to_contacts(sender, recipient, recipient_number, invite_token)
     from = Rails.configuration.app['hook']['invite_from']
-    url = Rails.configuration.app['web']['domain'] + "/i/#{invite_token}"
+    url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
     text = render_text_with_name(sender.name, " wants to chat with you on the new app: #{url}")
 
     send_sms(from, recipient_number, text)
@@ -31,8 +31,11 @@ class HookClient
 
   def self.invite_to_group(sender, recipient, group, recipient_number, invite_token)
     from = Rails.configuration.app['hook']['invite_from']
-    url = Rails.configuration.app['web']['domain'] + "/i/#{invite_token}"
-    text = render_text_with_name(sender.name, " added you to the room \"#{group.name.truncate(30)}\" on the new app: #{url}")
+    url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
+
+    members_count = group.member_ids.size
+    other_people_text = " and #{members_count - 1} other #{members_count - 1 == 1 ? 'person' : 'people'}" if members_count > 1
+    text = render_text_with_name(sender.name, " started a group chat with you#{other_people_text} in skymob. Click here to chat: #{url}")
 
     send_sms(from, recipient_number, text)
   end
