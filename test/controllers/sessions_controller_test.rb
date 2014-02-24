@@ -73,6 +73,7 @@ describe SessionsController do
   it "must log in account when the invite token correct" do
     user = FactoryGirl.create(:user)
     sender = FactoryGirl.create(:user)
+    FactoryGirl.create(:account, user_id: sender.id)
     account = FactoryGirl.create(:account, user_id: user.id)
     invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'test@example.com')
 
@@ -90,6 +91,7 @@ describe SessionsController do
   it "must not log in account when the invite token correct but the account has login credentials" do
     user = FactoryGirl.create(:user)
     sender = FactoryGirl.create(:user)
+    FactoryGirl.create(:account, user_id: sender.id, password: 'asdf1234')
     account = FactoryGirl.create(:account, user_id: user.id, password: 'asdf1234')
     invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'test@example.com')
 
