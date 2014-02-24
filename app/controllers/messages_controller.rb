@@ -58,7 +58,7 @@ class MessagesController < ApplicationController
   private
 
   def message_params
-    params.permit(:text, :attachment_file, :client_metadata).merge(user_id: current_user.id)
+    params.permit(:text, :attachment_file, :client_metadata, :expires_in).merge(user_id: current_user.id)
   end
 
   def load_one_to_one(one_to_one_id)

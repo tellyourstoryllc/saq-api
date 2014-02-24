@@ -172,7 +172,11 @@ class Message
 
   def write_attrs
     self.created_at = Time.current.to_i
-    self.expires_at = (Time.current + expires_in).to_i if expires_in.present?
+
+    if expires_in.present?
+      self.expires_in = expires_in.to_i
+      self.expires_at = (Time.current + expires_in).to_i
+    end
 
     if @message_attachment && @message_attachment.attachment.present?
       self.attachment_url = @message_attachment.attachment.url
