@@ -1,7 +1,7 @@
 class Invite < ActiveRecord::Base
   include Peanut::Model
 
-  before_validation :set_invite_token, on: :create
+  before_validation :set_invite_token, :normalize_invited_phone, on: :create
   validates :sender_id, :recipient_id, presence: true
   validates :new_user, :can_log_in, inclusion: [true, false]
   after_create :send_invite
@@ -33,6 +33,10 @@ class Invite < ActiveRecord::Base
       self.invite_token = invited_phone.present? ? Array.new(8){ chars.sample }.join : SecureRandom.hex
       break unless Invite.where(invite_token: invite_token).exists?
     end
+  end
+
+  def normalize_invited_phone
+    self.invited_phone = Phone.normalize(invited_phone)
   end
 
   def send_invite
