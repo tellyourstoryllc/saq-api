@@ -65,6 +65,10 @@ class MixpanelClient
     track('Joined Group', group_properties(group))
   end
 
+  def verified_phone(phone)
+    track('Verified Phone', {'Phone ID' => phone.id})
+  end
+
 
   private
 
