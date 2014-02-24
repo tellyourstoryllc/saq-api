@@ -16,9 +16,9 @@ class Phone < ActiveRecord::Base
 
 
   def self.normalize(number)
-    # Remove the optional +1 country code for US
+    # Remove any non-digit chars and the optional +1 country code for US
     # TODO: Other country codes & formats
-    number.gsub(/^\+?1(\d{10})$/, '\1') if number
+    number.gsub(/\D/, '').gsub(/^\+?1(\d{10})$/, '\1') if number
   end
 
   def self.get(number)
