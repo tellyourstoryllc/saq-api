@@ -9,7 +9,7 @@ class SessionsController < ApplicationController
       @current_user = @account.user
       create_or_update_device
 
-      render_json [current_user, @account]
+      render_json [current_user, @account, @group].compact
     else
       render_error('Incorrect credentials.', nil, {status: :unauthorized})
     end
@@ -50,6 +50,7 @@ class SessionsController < ApplicationController
         if account && account.no_login_credentials?
           account.send_missing_password_email
           invite.phone.try(:verify!)
+          @group = invite.group
 
           account
         end
