@@ -61,6 +61,10 @@ class MixpanelClient
     track('Clicked Invite Link', invite_properties(invite))
   end
 
+  def joined_group(group)
+    track('Joined Group', group_properties(group))
+  end
+
 
   private
 
@@ -72,6 +76,13 @@ class MixpanelClient
       'Invite ID' => invite.id, 'Invite Channel' => channel, 'Recipient ID' => invite.recipient_id,
       'Recipient New User' => invite.new_user?, 'Recipient Can Log In' => invite.can_log_in?,
       'Group ID' => invite.group_id
+    }
+  end
+
+  def group_properties(group)
+    {
+      'Group ID' => group.id, 'Group Created At' => group.created_at, 'Group Name' => group.name,
+      'Group Creator ID' => group.creator_id, 'Group Members' => group.member_ids.size, 'Group Messages' => group.message_ids.size
     }
   end
 end
