@@ -22,6 +22,10 @@ class HookController < ApplicationController
     raise "Hook callback attempt from non-Hook domain!" unless domain.ends_with?('hookmobile.com')
   end
 
+  def mixpanel
+    @mixpanel ||= MixpanelClient.new(user)
+  end
+
   def increment_stats
     HookClient.increment_received_sms_counts
   end
@@ -71,5 +75,7 @@ class HookController < ApplicationController
 
     from_phone.verified = true
     from_phone.save!
+
+    mixpanel.verified_phone(from_phone)
   end
 end

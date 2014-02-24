@@ -33,9 +33,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    members_count = group.member_ids.size
-    other_people_text = " and #{members_count - 1} other #{members_count - 1 == 1 ? 'person' : 'people'}" if members_count > 1
-    text = render_text_with_name(sender.name, " started a group chat with you#{other_people_text} in skymob. Click here to chat: #{url}")
+    text = render_text_with_name(sender.name, " sent you a message on skymob. Click here to view it: #{url}")
 
     send_sms(from, recipient_number, text)
   end

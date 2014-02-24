@@ -104,6 +104,7 @@ describe GroupsController do
 
     it "must join the group and return the group, its users, and its most recent page of messages" do
       now = Time.parse('2013-12-26 15:08')
+      FactoryGirl.create(:account, user_id: current_user.id)
       group = FactoryGirl.create(:group, created_at: now)
       member = FactoryGirl.create(:user, name: 'Jane Doe', status: 'available', status_text: 'around')
       account = FactoryGirl.create(:account, user_id: member.id)
