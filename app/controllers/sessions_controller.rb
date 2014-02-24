@@ -52,6 +52,12 @@ class SessionsController < ApplicationController
           invite.phone.try(:verify!)
           @group = invite.group
 
+          unless invite.clicked?
+            invite.update!(clicked: true)
+            mixpanel = MixpanelClient.new(account.user)
+            mixpanel.clicked_invite_link(invite)
+          end
+
           account
         end
       end

@@ -54,11 +54,24 @@ class MixpanelClient
   end
 
   def sent_invite(invite)
+    track('Sent Invite', invite_properties(invite))
+  end
+
+  def clicked_invite_link(invite)
+    track('Clicked Invite Link', invite_properties(invite))
+  end
+
+
+  private
+
+  def invite_properties(invite)
     channel = 'email' if invite.invited_email.present?
-    channel = 'phone' if invite.invited_phone.present?
-    properties = {'Invite Channel' => channel, 'Recipient ID' => invite.recipient_id,
+    channel = 'sms' if invite.invited_phone.present?
+
+    {
+      'Invite ID' => invite.id, 'Invite Channel' => channel, 'Recipient ID' => invite.recipient_id,
       'Recipient New User' => invite.new_user?, 'Recipient Can Log In' => invite.can_log_in?,
-      'Group ID' => invite.group_id}
-    track('Sent Invite', properties)
+      'Group ID' => invite.group_id
+    }
   end
 end

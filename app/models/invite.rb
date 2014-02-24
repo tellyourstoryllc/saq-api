@@ -64,6 +64,6 @@ class Invite < ActiveRecord::Base
   end
 
   def send_mixpanel_event
-    mixpanel.sent_invite(self)
+    mixpanel.sent_invite(self) if send_invite?
   end
 end
