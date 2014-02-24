@@ -4,7 +4,7 @@ class Invite < ActiveRecord::Base
   before_validation :set_invite_token, :normalize_invited_phone, on: :create
   validates :sender_id, :recipient_id, presence: true
   validates :new_user, :can_log_in, inclusion: [true, false]
-  after_create :send_invite
+  after_create :send_invite, :send_mixpanel_event
 
   belongs_to :sender, class_name: 'User', foreign_key: 'sender_id'
   belongs_to :recipient, class_name: 'User', foreign_key: 'recipient_id'
@@ -19,6 +19,10 @@ class Invite < ActiveRecord::Base
 
   def phone
     @phone ||= Phone.find_by(number: invited_phone) if invited_phone.present?
+  end
+
+  def mixpanel
+    @mixpanel ||= MixpanelClient.new(sender)
   end
 
 
@@ -57,5 +61,9 @@ class Invite < ActiveRecord::Base
         HookClient.invite_to_contacts(sender, recipient, invited_phone, invite_token)
       end
     end
+  end
+
+  def send_mixpanel_event
+    mixpanel.sent_invite(self)
   end
 end

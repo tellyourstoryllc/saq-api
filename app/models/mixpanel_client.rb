@@ -52,4 +52,13 @@ class MixpanelClient
       track('Checked In')
     end
   end
+
+  def sent_invite(invite)
+    channel = 'email' if invite.invited_email.present?
+    channel = 'phone' if invite.invited_phone.present?
+    properties = {'Invite Channel' => channel, 'Recipient ID' => invite.recipient_id,
+      'Recipient New User' => invite.new_user?, 'Recipient Can Log In' => invite.can_log_in?,
+      'Group ID' => invite.group_id}
+    track('Sent Invite', properties)
+  end
 end
