@@ -33,7 +33,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    text = render_text_with_name(sender.name, " sent you a message on skymob. Click here to view it: #{url}")
+    text = render_text_with_name(sender.name, " sent you a message on krazychat. Click here to view it: #{url}")
 
     send_sms(from, recipient_number, text)
   end
