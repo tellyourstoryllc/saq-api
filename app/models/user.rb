@@ -342,15 +342,26 @@ class User < ActiveRecord::Base
   end
 
   def fix_username
-    self.username = username.gsub(/[+\- ]/, '_') if username.present?
+    if username.blank?
+      # Lowercase alpha chars only to make it easier to type on mobile
+      # Exclude L to avoid any confusion
+      chars = [*'a'..'k', *'m'..'z']
 
-    base_username = username
-    i = 0
+      loop do
+        self.username = 'user_' + Array.new(6){ chars.sample }.join
+        break unless User.where(username: username).exists?
+      end
+    else
+      self.username = username.gsub(/[+\- ]/, '_')
 
-    loop do
-      break unless User.where(username: username).exists?
-      i += 1
-      self.username = "#{base_username}_#{i}"
+      base_username = username
+      i = 0
+
+      loop do
+        break unless User.where(username: username).exists?
+        i += 1
+        self.username = "#{base_username}_#{i}"
+      end
     end
   end
 

@@ -48,23 +48,23 @@ class ContactInviter
     add_with_reciprocal(user)
   end
 
-  def add_by_phone_numbers(numbers, names)
-    return if numbers.size != names.size
+  def add_by_phone_numbers(numbers, usernames)
+    return if numbers.size != usernames.size
 
     numbers.each_with_index do |number, i|
-      add_by_phone_number(number, names[i])
+      add_by_phone_number(number, usernames[i])
     end
   end
 
-  def add_by_phone_number(number, name)
+  def add_by_phone_number(number, username)
     if Settings.enabled?(:queue)
-      ContactInviterPhoneWorker.perform_async(current_user.id, number, name)
+      ContactInviterPhoneWorker.perform_async(current_user.id, number, username)
     else
-      add_by_phone_number!(number, name)
+      add_by_phone_number!(number, username)
     end
   end
 
-  def add_by_phone_number!(number, name)
+  def add_by_phone_number!(number, username)
     # Look for existing user/account
     number = Phone.normalize(number)
     phone = Phone.find_by(number: number)
@@ -74,7 +74,7 @@ class ContactInviter
 
     # If the user doesn't exist, create one
     unless account
-      account = Account.create!(user_attributes: {name: name}, phones_attributes: [{number: number}])
+      account = Account.create!(user_attributes: {username: username}, phones_attributes: [{number: number}])
       user = account.user
     end
 

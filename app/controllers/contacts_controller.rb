@@ -7,12 +7,12 @@ class ContactsController < ApplicationController
     user_ids = split_param(:user_ids)
     emails = split_param(:emails)
     phone_numbers = split_param(:phone_numbers)
-    phone_names = split_param(:phone_names)
+    phone_usernames = split_param(:phone_usernames)
 
     contact_inviter = ContactInviter.new(current_user)
     contact_inviter.add_users(user_ids)
     contact_inviter.add_by_emails(emails)
-    contact_inviter.add_by_phone_numbers(phone_numbers, phone_names)
+    contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames)
 
     normalized_emails = emails.map {|e| Email.normalize(e) }.compact
     normalized_numbers = phone_numbers.map {|n| Phone.normalize(n) }.compact
