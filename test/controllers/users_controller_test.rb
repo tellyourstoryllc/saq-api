@@ -96,6 +96,7 @@ describe UsersController do
 
       it "must update an existing user and account via invite_token" do
         sender = FactoryGirl.create(:user)
+        FactoryGirl.create(:account, user_id: sender.id)
         user = FactoryGirl.create(:user)
         account = FactoryGirl.create(:account, user_id: user.id)
         invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'bruce@example.com')
@@ -122,6 +123,7 @@ describe UsersController do
 
       it "must not update an existing user and account via invite_token if the user has login credentials" do
         sender = FactoryGirl.create(:user)
+        FactoryGirl.create(:account, user_id: sender.id)
         user = FactoryGirl.create(:user)
         account = FactoryGirl.create(:account, user_id: user.id, password: 'asdf1234')
         invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'bruce@example.com')

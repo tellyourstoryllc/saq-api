@@ -53,7 +53,11 @@ class GroupsController < ApplicationController
     result = @group.add_member(current_user)
 
     if result
-      notify_admins unless result == :already_member
+      unless result == :already_member
+        notify_admins
+        mixpanel.joined_group(@group)
+      end
+
       render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
     else
       render_error "Sorry, you cannot join that group at this time."

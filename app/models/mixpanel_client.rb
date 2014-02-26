@@ -52,4 +52,41 @@ class MixpanelClient
       track('Checked In')
     end
   end
+
+  def sent_invite(invite)
+    track('Sent Invite', invite_properties(invite))
+  end
+
+  def clicked_invite_link(invite)
+    track('Clicked Invite Link', invite_properties(invite))
+  end
+
+  def joined_group(group)
+    track('Joined Group', group_properties(group))
+  end
+
+  def verified_phone(phone)
+    track('Verified Phone', {'Phone ID' => phone.id})
+  end
+
+
+  private
+
+  def invite_properties(invite)
+    channel = 'email' if invite.invited_email.present?
+    channel = 'sms' if invite.invited_phone.present?
+
+    {
+      'Invite ID' => invite.id, 'Invite Channel' => channel, 'Recipient ID' => invite.recipient_id,
+      'Recipient New User' => invite.new_user?, 'Recipient Can Log In' => invite.can_log_in?,
+      'Group ID' => invite.group_id
+    }
+  end
+
+  def group_properties(group)
+    {
+      'Group ID' => group.id, 'Group Created At' => group.created_at, 'Group Name' => group.name,
+      'Group Creator ID' => group.creator_id, 'Group Members' => group.member_ids.size, 'Group Messages' => group.message_ids.size
+    }
+  end
 end

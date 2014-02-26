@@ -1,10 +1,10 @@
 class Invite < ActiveRecord::Base
   include Peanut::Model
 
-  before_validation :set_invite_token, on: :create
+  before_validation :set_invite_token, :normalize_invited_phone, on: :create
   validates :sender_id, :recipient_id, presence: true
   validates :new_user, :can_log_in, inclusion: [true, false]
-  after_create :send_invite
+  after_create :send_invite, :send_mixpanel_event
 
   belongs_to :sender, class_name: 'User', foreign_key: 'sender_id'
   belongs_to :recipient, class_name: 'User', foreign_key: 'recipient_id'
@@ -21,6 +21,10 @@ class Invite < ActiveRecord::Base
     @phone ||= Phone.find_by(number: invited_phone) if invited_phone.present?
   end
 
+  def mixpanel
+    @mixpanel ||= MixpanelClient.new(sender)
+  end
+
 
   private
 
@@ -33,6 +37,10 @@ class Invite < ActiveRecord::Base
       self.invite_token = invited_phone.present? ? Array.new(8){ chars.sample }.join : SecureRandom.hex
       break unless Invite.where(invite_token: invite_token).exists?
     end
+  end
+
+  def normalize_invited_phone
+    self.invited_phone = Phone.normalize(invited_phone)
   end
 
   def send_invite
@@ -53,5 +61,9 @@ class Invite < ActiveRecord::Base
         HookClient.invite_to_contacts(sender, recipient, invited_phone, invite_token)
       end
     end
+  end
+
+  def send_mixpanel_event
+    mixpanel.sent_invite(self) if send_invite?
   end
 end
