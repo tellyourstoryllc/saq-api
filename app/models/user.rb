@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   attr_accessor :avatar_image_file, :avatar_image_url, :avatar_video_file
 
   before_validation :set_id, on: :create
+  before_validation :fix_username
 
   validates :username, presence: true
   validates :username, uniqueness: true
@@ -340,10 +341,23 @@ class User < ActiveRecord::Base
     end
   end
 
+  def fix_username
+    self.username = username.gsub(/[+\- ]/, '_') if username.present?
+
+    base_username = username
+    i = 0
+
+    loop do
+      break unless User.where(username: username).exists?
+      i += 1
+      self.username = "#{base_username}_#{i}"
+    end
+  end
+
   def username_format?
     return if username.blank?
-    valid = username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9]{2,16}\Z/
-    errors.add(:username, "must be 2-16 characters, include at least one letter, and contain only letters and numbers") unless valid
+    valid = username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9_.]{2,16}\Z/
+    errors.add(:username, "must be 2-16 characters, include at least one letter, and contain only letters, numbers, _, and .") unless valid
   end
 
   def create_api_token
