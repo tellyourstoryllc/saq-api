@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  skip_before_action :require_token, :create_or_update_device, only: :create
+  skip_before_action :require_token, :create_or_update_device, only: [:index, :create]
 
 
   def me

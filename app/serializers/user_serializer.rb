@@ -25,6 +25,14 @@ class UserSerializer < ActiveModel::Serializer
     end
   end
 
+  def avatar_url
+    object.avatar_url if contacts?
+  end
+
+  def avatar_video_url
+    object.avatar_video_url if contacts?
+  end
+
   def include_token?
     owner?
   end
