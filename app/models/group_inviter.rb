@@ -45,7 +45,7 @@ class GroupInviter
 
     # If the user doesn't exist, create one
     unless account
-      username = address.split('@').first
+      username = address.split('@').first + '_temp'
       account = Account.create!(user_attributes: {username: username}, emails_attributes: [{email: address}])
       user = account.user
     end
