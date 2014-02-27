@@ -13,7 +13,7 @@ class InviteMailer < BaseMailer
     @sender = sender
     @recipient = recipient
     @group = group
-    @url = Rails.configuration.app['web']['url']
+    @url = Rails.configuration.app['web']['url'].dup
     @url << (invite_token.present? ? "/i/#{invite_token}" : "/rooms/#{@group.id}")
 
     to = email.present? ? email : @recipient.emails.map(&:email)
