@@ -1,4 +1,5 @@
 class ContactInviter
+  include Peanut::Model
   attr_accessor :current_user
 
 
@@ -12,21 +13,23 @@ class ContactInviter
     end
   end
 
-  def add_by_emails(emails_addresses)
+  def add_by_emails(emails_addresses, options = {})
     emails_addresses.each do |email_address|
-      add_by_email(email_address)
+      add_by_email(email_address, options)
     end
   end
 
-  def add_by_email(email_address)
+  def add_by_email(email_address, options = {})
     if Settings.enabled?(:queue)
-      ContactInviterEmailWorker.perform_async(current_user.id, email_address)
+      ContactInviterEmailWorker.perform_async(current_user.id, email_address, options)
     else
-      add_by_email!(email_address)
+      add_by_email!(email_address, options)
     end
   end
 
-  def add_by_email!(email_address)
+  def add_by_email!(email_address, options = {})
+    options = options.with_indifferent_access
+
     # Look for existing user/account
     address = Email.normalize(email_address)
     email = Email.find_by(email: address)
@@ -42,29 +45,31 @@ class ContactInviter
     end
 
     Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address,
-                   new_user: new_user, can_log_in: account.can_log_in?)
+                   new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]))
 
     # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)
   end
 
-  def add_by_phone_numbers(numbers, usernames)
-    return if numbers.size != usernames.size
+  def add_by_phone_numbers(numbers, usernames, options = {})
+    return if usernames.present? && numbers.size != usernames.size
 
     numbers.each_with_index do |number, i|
-      add_by_phone_number(number, usernames[i])
+      add_by_phone_number(number, usernames[i], options)
     end
   end
 
-  def add_by_phone_number(number, username)
+  def add_by_phone_number(number, username, options = {})
     if Settings.enabled?(:queue)
-      ContactInviterPhoneWorker.perform_async(current_user.id, number, username)
+      ContactInviterPhoneWorker.perform_async(current_user.id, number, username, options)
     else
-      add_by_phone_number!(number, username)
+      add_by_phone_number!(number, username, options)
     end
   end
 
-  def add_by_phone_number!(number, username)
+  def add_by_phone_number!(number, username, options = {})
+    options = options.with_indifferent_access
+
     # Look for existing user/account
     number = Phone.normalize(number)
     phone = Phone.find_by(number: number)
@@ -79,7 +84,7 @@ class ContactInviter
     end
 
     Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number,
-                   new_user: true, can_log_in: account.can_log_in?)
+                   new_user: true, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]))
 
     # Add the new or existing user to my contacts and vice versa
     add_with_reciprocal(user)

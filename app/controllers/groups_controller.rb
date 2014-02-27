@@ -85,8 +85,8 @@ class GroupsController < ApplicationController
 
     group_inviter = GroupInviter.new(current_user, @group)
     group_inviter.add_users(user_ids)
-    group_inviter.add_by_emails(emails)
-    group_inviter.add_by_phone_numbers(phone_numbers, phone_usernames)
+    group_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite]})
+    group_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite]})
 
     normalized_emails = emails.map {|e| Email.normalize(e) }.compact
     normalized_numbers = phone_numbers.map {|n| Phone.normalize(n) }.compact

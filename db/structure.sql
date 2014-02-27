@@ -244,6 +244,7 @@ CREATE TABLE `invites` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `clicked` tinyint(1) NOT NULL DEFAULT '0',
+  `skip_sending` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `index_invites_on_sender_id` (`sender_id`),
   KEY `index_invites_on_recipient_id` (`recipient_id`),
@@ -473,7 +474,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-02-24 15:37:56
+-- Dump completed on 2014-02-26 10:55:49
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -601,3 +602,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140214050051');
 INSERT INTO schema_migrations (version) VALUES ('20140214050052');
 
 INSERT INTO schema_migrations (version) VALUES ('20140224203738');
+
+INSERT INTO schema_migrations (version) VALUES ('20140226155522');

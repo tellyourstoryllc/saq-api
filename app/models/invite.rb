@@ -14,7 +14,7 @@ class Invite < ActiveRecord::Base
   # Send an invite if the recipient can't yet log in to the app
   # This way the person can get invites from multiple friends
   def send_invite?
-    !can_log_in? && (invited_email.present? || invited_phone.present?)
+    !can_log_in? && (invited_email.present? || invited_phone.present?) && !skip_sending?
   end
 
   def phone
