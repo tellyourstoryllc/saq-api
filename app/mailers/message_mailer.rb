@@ -59,7 +59,7 @@ class MessageMailer < BaseMailer
                         else "#{@names.shift}, #{@names.shift}, and #{@names.size} other#{'s' unless @names.size == 1} are chatting in the room \"#{@group_name}\""
                         end
     else
-      @url = Rails.configuration.app['web']['url']
+      @url = Rails.configuration.app['web']['url'].dup
       @users_count = data[:users_count]
       @group_names = data[:group_names]
 
