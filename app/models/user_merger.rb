@@ -10,6 +10,10 @@ class UserMerger
     @faye_publisher ||= FayePublisher.new(new_user.token)
   end
 
+  def old_faye_publisher
+    @old_faye_publisher ||= FayePublisher.new(old_user.token)
+  end
+
   def self.merge(old_user, new_user)
     new(old_user, new_user).merge
   end
@@ -94,6 +98,13 @@ class UserMerger
   end
 
   def set_replacement_references
+    User.redis.multi do
+      new_user.replaced_user_ids[old_user.id] = Time.current.to_i
+      old_user.replaced_by_user_id = new_user.id
+    end
+
+    faye_publisher.broadcast_to_contacts
+    old_faye_publisher.broadcast_to_contacts
   end
 
   def deactivate_old_user
