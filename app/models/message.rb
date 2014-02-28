@@ -160,14 +160,17 @@ class Message
   end
 
   def text_or_attachment_set?
-    errors.add(:base, "Either text or an attachment is required.") unless text.present? || attachment_file.present?
+    errors.add(:base, "Either text or an attachment is required.") unless text.present? || attachment_file.present? || attachment_url.present?
   end
 
   def save_message_attachment
-    return if attachment_file.blank?
-
-    @message_attachment = MessageAttachment.new(message_id: id, message: self, attachment: attachment_file)
-    @message_attachment.save!
+    if attachment_file.present?
+      @message_attachment = MessageAttachment.new(message_id: id, message: self, attachment: attachment_file)
+      @message_attachment.save!
+    elsif attachment_url.present?
+      @message_attachment = MessageAttachment.new(message_id: id, message: self, remote_attachment_url: attachment_url)
+      @message_attachment.save!
+    end
   end
 
   def write_attrs
