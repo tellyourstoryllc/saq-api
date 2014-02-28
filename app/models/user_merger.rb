@@ -26,6 +26,8 @@ class UserMerger
     replace_old_with_new_in_groups
     set_replacement_references
     deactivate_old_user
+    faye_publisher.broadcast_to_contacts
+    old_faye_publisher.broadcast_to_contacts
   end
 
   # Copy all 1-1s (and their messages) from the old user to the
@@ -102,11 +104,9 @@ class UserMerger
       new_user.replaced_user_ids[old_user.id] = Time.current.to_i
       old_user.replaced_by_user_id = new_user.id
     end
-
-    faye_publisher.broadcast_to_contacts
-    old_faye_publisher.broadcast_to_contacts
   end
 
   def deactivate_old_user
+    old_user.deactivate!
   end
 end

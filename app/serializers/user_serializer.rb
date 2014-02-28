@@ -1,5 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :object_type, :id, :token, :name, :username, :status, :status_text, :idle_duration, :client_type, :avatar_url, :phone_verification_token, :replaced_user_ids, :replaced_by_user_id
+  attributes :object_type, :id, :token, :name, :username, :status, :status_text,
+    :idle_duration, :client_type, :avatar_url, :phone_verification_token,
+    :replaced_user_ids, :replaced_by_user_id, :deactivated
 
   def status
     if contacts?

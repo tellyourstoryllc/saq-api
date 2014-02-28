@@ -319,6 +319,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def deactivate!
+    update!(deactivated: true)
+  end
+
 
   private
 
