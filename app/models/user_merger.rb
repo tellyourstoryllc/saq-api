@@ -61,7 +61,36 @@ class UserMerger
     end
   end
 
+  # Add new user to groups old user was in, and remove
+  # old user from all his groups
   def replace_old_with_new_in_groups
+    old_user.groups.each do |group|
+      # Add new user to group if needed
+      if !group.member?(new_user) && !group.banned?(new_user)
+        group.redis.multi do
+          group.member_ids << new_user.id
+          new_user.group_ids << group.id
+          new_user.group_join_times[group.id] = Time.current.to_i
+        end
+
+        # Make new user an admin if needed
+        group.admin_ids << new_user.id if group.admin?(old_user)
+      end
+
+      # Remove old user from group and admin if needed
+      group.redis.multi do
+        group.admin_ids.delete(old_user.id)
+        group.member_ids.delete(old_user.id)
+        old_user.group_ids.delete(group.id)
+      end
+
+      # Publish group once after all changes
+      faye_publisher.publish_to_group(group, PublishGroupSerializer.new(group).as_json)
+
+      group_data = GroupSerializer.new(group).as_json
+      faye_publisher.publish_group_to_user(new_user, group_data)
+      faye_publisher.publish_group_to_user(old_user, group_data)
+    end
   end
 
   def set_replacement_references
