@@ -65,6 +65,7 @@ class HookController < ApplicationController
                          message_id: parsed_body['messageId'], timestamp: parsed_body['timestamp'])
 
     return if from_phone.nil?
+    old_user_id = from_phone.user_id_was if from_phone.user_id_changed?
 
     case content
     when /^(NO+|STOP|UNSUBSCRIBE|CANCEL)$/i
@@ -77,5 +78,10 @@ class HookController < ApplicationController
     from_phone.save!
 
     mixpanel.verified_phone(from_phone)
+
+    if old_user_id
+      old_user = User.find_by(id: old_user_id)
+      UserMerger.merge(old_user, user)
+    end
   end
 end

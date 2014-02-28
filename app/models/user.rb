@@ -52,6 +52,8 @@ class User < ActiveRecord::Base
 
   set :contact_ids
   set :reciprocal_contact_ids
+  sorted_set :replaced_user_ids
+  value :replaced_by_user_id
 
 
   def first_name
@@ -315,6 +317,10 @@ class User < ActiveRecord::Base
     else
       []
     end
+  end
+
+  def deactivate!
+    update!(deactivated: true)
   end
 
 
