@@ -1,6 +1,8 @@
 class Invite < ActiveRecord::Base
   include Peanut::Model
 
+  attr_accessor :message
+
   before_validation :set_invite_token, :normalize_invited_phone, on: :create
   validates :sender_id, :recipient_id, presence: true
   validates :new_user, :can_log_in, inclusion: [true, false]
@@ -25,6 +27,10 @@ class Invite < ActiveRecord::Base
     @mixpanel ||= MixpanelClient.new(sender)
   end
 
+  def skip_sending=(skip)
+    self[:skip_sending] = !!self.class.to_bool(skip)
+  end
+
 
   private
 
@@ -46,19 +52,24 @@ class Invite < ActiveRecord::Base
   def send_invite
     return unless invite_token? && send_invite?
 
-    if invited_email.present?
-      if group
-        InviteMailer.invite_to_group(sender, recipient, group, invited_email, invite_token).deliver!
-      else
-        InviteMailer.invite_to_contacts(sender, recipient, invited_email, invite_token).deliver!
+    if message
+      InviteMailer.invite_via_message(sender, recipient, message, invited_email, invite_token).deliver! if invited_email.present?
+      HookClient.invite_via_message(sender, recipient, message, invited_phone, invite_token) if invited_phone.present?
+    else
+      if invited_email.present?
+        if group
+          InviteMailer.invite_to_group(sender, recipient, group, invited_email, invite_token).deliver!
+        else
+          InviteMailer.invite_to_contacts(sender, recipient, invited_email, invite_token).deliver!
+        end
       end
-    end
 
-    if invited_phone.present?
-      if group
-        HookClient.invite_to_group(sender, recipient, group, invited_phone, invite_token)
-      else
-        HookClient.invite_to_contacts(sender, recipient, invited_phone, invite_token)
+      if invited_phone.present?
+        if group
+          HookClient.invite_to_group(sender, recipient, group, invited_phone, invite_token)
+        else
+          HookClient.invite_to_contacts(sender, recipient, invited_phone, invite_token)
+        end
       end
     end
   end

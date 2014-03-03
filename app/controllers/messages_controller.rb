@@ -6,7 +6,7 @@ class MessagesController < ApplicationController
 
     # Create a message for each group
     valid_group_ids = group_ids & current_user.group_ids.members
-    groups = Group.where(id: valid_group_ids) if valid_group_ids.present?
+    groups = valid_group_ids.present? ? Group.where(id: valid_group_ids) : []
 
     groups.each do |group|
       message = Message.new(message_params.merge(group_id: group.id))
@@ -34,18 +34,22 @@ class MessagesController < ApplicationController
       message = Message.new(message_params.merge(one_to_one_id: one_to_one.id))
 
       if message.save
+        other_user = one_to_one.other_user(current_user)
+
         unless params[:skip_publish]
           data = MessageSerializer.new(message).as_json
-          users = [current_user, one_to_one.other_user(current_user)]
 
-          users.each do |user|
+          [current_user, other_user].each do |user|
             faye_publisher.publish_one_to_one_message(user, data)
           end
         end
 
-        # Potentially notify the other user, according to his status and preferences
-        recipient = one_to_one.other_user(current_user)
-        recipient.send_notifications(message)
+        if other_user.account.no_login_credentials?
+          send_invites(message, other_user)
+        else
+          # Potentially notify the other user, according to his status and preferences
+          other_user.send_notifications(message)
+        end
 
         messages << message
       end
@@ -68,6 +72,20 @@ class MessagesController < ApplicationController
       one_to_one if one_to_one.save
     else
       one_to_one if one_to_one.authorized?(current_user)
+    end
+  end
+
+  def send_invites(message, other_user)
+    other_user.emails.each do |email|
+      Invite.create!(sender_id: current_user.id, recipient_id: other_user.id, invited_email: email.email,
+                     new_user: false, can_log_in: other_user.account.can_log_in?, message: message,
+                     skip_sending: params[:omit_email_invite])
+    end
+
+    other_user.phones.each do |phone|
+      Invite.create!(sender_id: current_user.id, recipient_id: other_user.id, invited_phone: phone.number,
+                     new_user: false, can_log_in: other_user.account.can_log_in?, message: message,
+                     skip_sending: params[:omit_sms_invite])
     end
   end
 end

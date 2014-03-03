@@ -1,5 +1,6 @@
 class HookClient
   include Redis::Objects
+  extend ActionView::Helpers::DateHelper
 
   hash_key :daily_sent_sms_counts, global: true
   hash_key :monthly_sent_sms_counts, global: true
@@ -24,8 +25,8 @@ class HookClient
   def self.invite_to_contacts(sender, recipient, recipient_number, invite_token)
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
-    text = render_text_with_name(sender.name, " wants to chat with you on the new app: #{url}")
 
+    text = render_text_with_name(sender.name, " wants to chat with you on the new app: #{url}")
     send_sms(from, recipient_number, text)
   end
 
@@ -34,7 +35,16 @@ class HookClient
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
     text = render_text_with_name(sender.name, " sent you a message on krazychat. Click here to view it: #{url}")
+    send_sms(from, recipient_number, text)
+  end
 
+  def self.invite_via_message(sender, recipient, message, recipient_number, invite_token)
+    from = Rails.configuration.app['hook']['invite_from']
+    url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
+    media_type = message.message_attachment.try(:friendly_media_type) || 'a message'
+    expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(message.expires_at))}" if message.expires_at
+
+    text = render_text_with_name(sender.name, " sent you #{media_type} on krazychat#{expires_text}. Click here to view it: #{url}")
     send_sms(from, recipient_number, text)
   end
 

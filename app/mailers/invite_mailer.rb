@@ -20,4 +20,17 @@ class InviteMailer < BaseMailer
 
     mail(to: to, subject: "#{@sender.name} added you to the room \"#{@group.name}\"")
   end
+
+  def invite_via_message(sender, recipient, message, email, invite_token)
+    @sender = sender
+    @recipient = recipient
+    @message = message
+    @media_type = @message.message_attachment.try(:friendly_media_type) || 'a message'
+    @expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(@message.expires_at))}" if @message.expires_at
+
+    one_to_one_id = OneToOne.id_for_user_ids(sender.id, recipient.id)
+    @url = Rails.configuration.app['web']['url'] + "/rooms/#{one_to_one_id}?invite_token=#{invite_token}"
+
+    mail(to: email, subject: "#{@sender.name} just sent you #{@media_type}#{@expires_text}")
+  end
 end
