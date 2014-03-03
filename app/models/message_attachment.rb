@@ -19,6 +19,17 @@ class MessageAttachment < ActiveRecord::Base
     end
   end
 
+  def friendly_media_type
+    return unless media_type.present?
+
+    case media_type
+    when 'image' then 'an image'
+    when 'video' then 'a video'
+    when 'audio' then 'an audio clip'
+    else 'a file'
+    end
+  end
+
 
   private
 

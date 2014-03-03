@@ -107,16 +107,7 @@ class EmailNotifier
       # If this is the first digest since going unavailable, send the actual message content
       if digests_sent < 1
         notification_subtype = :content
-        media_type = message.message_attachment.try(:media_type)
-
-        data[:media_description] = if media_type.present?
-                                     case media_type
-                                     when 'image' then 'an image'
-                                     when 'video' then 'a video'
-                                     when 'audio' then 'an audio clip'
-                                     else 'a file'
-                                     end
-                                   end
+        data[:media_description] = message.message_attachment.try(:friendly_media_type)
       else
         notification_subtype = :digest
 

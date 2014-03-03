@@ -154,16 +154,10 @@ class MobileNotifier
     when :all
       # If this is the first digest since going unavailable, send the actual message content
       if digests_sent < 1
-        media_type = message.message_attachment.try(:media_type)
+        friendly_media_type = message.message_attachment.try(:friendly_media_type)
 
-        if media_type.present?
-          media_desc = case media_type
-                       when 'image' then 'an image'
-                       when 'video' then 'a video'
-                       when 'audio' then 'an audio clip'
-                       else 'a file'
-                       end
-          "#{message.user.name} shared #{media_desc} in the room \"#{message.group.name}\""
+        if friendly_media_type.present?
+          "#{message.user.name} shared #{friendly_media_type} in the room \"#{message.group.name}\""
         elsif message.text.present?
           "#{message.user.name} said \"#{message.text}\" in the room \"#{message.group.name}\""
         end
