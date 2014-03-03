@@ -16,7 +16,7 @@ development:
   facebook:
     app_access_token: TOKEN
   faye:
-    url: https://local.krazychat.co:8080/faye
+    url: https://local.krazychat.com:8080/faye
     server_secret: SECRET
   hook:
     passcode: PASSCODE
@@ -59,7 +59,7 @@ test:
   facebook:
     app_access_token: TOKEN
   faye:
-    url: https://local.krazychat.co:8080/faye_TEST
+    url: https://local.krazychat.com:8080/faye_TEST
     server_secret: SECRET
   hook:
     passcode: 'invalid'
