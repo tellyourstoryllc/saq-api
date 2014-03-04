@@ -84,19 +84,12 @@ class GroupsController < ApplicationController
     phone_usernames = split_param(:phone_usernames)
 
     group_inviter = GroupInviter.new(current_user, @group)
-    group_inviter.add_users(user_ids)
-    group_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite]})
-    group_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite]})
+    invited_users = group_inviter.add_users(user_ids)
+    invited_emails = group_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite]})
+    invited_phones = group_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite]})
 
-    normalized_emails = emails.map {|e| Email.normalize(e) }.compact
-    normalized_numbers = phone_numbers.map {|n| Phone.normalize(n) }.compact
-
-    users = []
-    users = users | User.where(id: user_ids) if user_ids.present?
-    users = users | User.joins(:emails).where(emails: {email: normalized_emails}) if normalized_emails.present?
-    users = users | User.joins(:phones).where(phones: {number: normalized_numbers}) if normalized_numbers.present?
-
-    render_json [@group] + users
+    users = invited_users | invited_emails.map(&:user) | invited_phones.map(&:user)
+    render_json [GroupSerializer.new(@group).as_json] + users.map{ |u| UserWithEmailsAndPhonesSerializer.new(u).as_json }
   end
 
 

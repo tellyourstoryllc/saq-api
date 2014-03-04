@@ -13,20 +13,22 @@ class GroupInviter
   end
 
   def add_users(user_ids)
-    User.where(id: user_ids.map(&:to_s)).find_each do |user|
+    User.where(id: user_ids.map(&:to_s)).each do |user|
       add_to_group(user)
       contact_inviter.add_with_reciprocal(user)
     end
   end
 
   def add_by_emails(emails_addresses, options = {})
+    emails = []
     emails_addresses.each do |email_address|
-      add_by_email(email_address, options)
+      emails << add_by_email(email_address, options)
     end
+    emails
   end
 
   def add_by_email(email_address, options = {})
-    if Settings.enabled?(:queue)
+    if Settings.enabled?(:queue) && Settings.enabled?(:background_invites)
       GroupInviterEmailWorker.perform_async(current_user.id, group.id, email_address, options)
     else
       add_by_email!(email_address, options)
@@ -48,24 +50,29 @@ class GroupInviter
       username = address.split('@').first + '_temp'
       account = Account.create!(user_attributes: {username: username}, emails_attributes: [{email: address}])
       user = account.user
+      email = user.emails.find_by(email: address)
     end
 
     add_to_group(user, {invited_email: address, new_user: new_user, skip_sending: !!self.class.to_bool(options[:skip_sending])})
 
     # Add the new or existing user to my contacts and vice versa
     contact_inviter.add_with_reciprocal(user)
+
+    email
   end
 
   def add_by_phone_numbers(numbers, usernames, options = {})
-    return if numbers.size != usernames.size
+    return [] if usernames.present? && numbers.size != usernames.size
 
+    phones = []
     numbers.each_with_index do |number, i|
-      add_by_phone_number(number, usernames[i], options)
+      phones << add_by_phone_number(number, usernames[i], options)
     end
+    phones
   end
 
   def add_by_phone_number(number, username, options = {})
-    if Settings.enabled?(:queue)
+    if Settings.enabled?(:queue) && Settings.enabled?(:background_invites)
       GroupInviterPhoneWorker.perform_async(current_user.id, group.id, number, username, options)
     else
       add_by_phone_number!(number, username, options)
@@ -86,12 +93,15 @@ class GroupInviter
     unless account
       account = Account.create!(user_attributes: {username: username}, phones_attributes: [{number: number}])
       user = account.user
+      phone = user.phones.find_by(number: number)
     end
 
     add_to_group(user, {invited_phone: number, new_user: new_user, skip_sending: !!self.class.to_bool(options[:skip_sending])})
 
     # Add the new or existing user to my contacts and vice versa
     contact_inviter.add_with_reciprocal(user)
+
+    phone
   end
 
   def add_to_group(user, invite_attrs = {})

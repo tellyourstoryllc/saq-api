@@ -59,6 +59,6 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def contacts?
-    current_user && (current_user.id == object.id || object.dynamic_contact?(current_user))
+    scope && (scope.id == object.id || object.dynamic_contact?(scope))
   end
 end

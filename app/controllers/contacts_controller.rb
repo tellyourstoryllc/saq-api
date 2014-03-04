@@ -10,19 +10,12 @@ class ContactsController < ApplicationController
     phone_usernames = split_param(:phone_usernames)
 
     contact_inviter = ContactInviter.new(current_user)
-    contact_inviter.add_users(user_ids)
-    contact_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite]})
-    contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite]})
+    invited_users = contact_inviter.add_users(user_ids)
+    invited_emails = contact_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite]})
+    invited_phones = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite]})
 
-    normalized_emails = emails.map {|e| Email.normalize(e) }.compact
-    normalized_numbers = phone_numbers.map {|n| Phone.normalize(n) }.compact
-
-    users = []
-    users = users | User.where(id: user_ids) if user_ids.present?
-    users = users | User.joins(:emails).where(emails: {email: normalized_emails}) if normalized_emails.present?
-    users = users | User.joins(:phones).where(phones: {number: normalized_numbers}) if normalized_numbers.present?
-
-    render_json users
+    users = invited_users | invited_emails.map(&:user) | invited_phones.map(&:user)
+    render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
   def remove
