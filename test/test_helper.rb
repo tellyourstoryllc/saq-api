@@ -39,6 +39,15 @@ Spork.prefork do
     def current_user
       @current_user ||= FactoryGirl.create(:user)
     end
+
+    def hash_must_include(actual, expected)
+      (expected.to_a - actual.to_a).must_be_empty
+    end
+
+    def result_must_include(object_type, object_id, expected)
+      actual = result.detect{ |obj| obj['object_type'] == object_type && obj['id'] == object_id }
+      hash_must_include actual, expected
+    end
   end
 end
 
