@@ -4,7 +4,7 @@ development:
     password: PASSWORD
   api:
     request_secret: SECRET
-  app_name: skymob
+  app_name: krazychat
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -36,7 +36,7 @@ development:
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: skymob.co
+    domain: krazychat.com
   statsd:
     server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
   web:
@@ -49,7 +49,7 @@ test:
     password: PASSWORD
   api:
     request_secret: SECRET
-  app_name: skymob
+  app_name: krazychat
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -81,7 +81,7 @@ test:
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: skymob.co
+    domain: krazychat.com
   statsd:
     server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
   web:
