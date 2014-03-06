@@ -41,8 +41,7 @@ class ContactInviter
 
     # If the user doesn't exist, create one
     unless account
-      username = address.split('@').first + '_temp'
-      account = Account.create!(user_attributes: {username: username}, emails_attributes: [{email: address}])
+      account = Account.create!(user_attributes: {invite_type: :email}, emails_attributes: [{email: address}])
       user = account.user
       email = user.emails.find_by(email: address)
     end
@@ -86,7 +85,7 @@ class ContactInviter
 
     # If the user doesn't exist, create one
     unless account
-      account = Account.create!(user_attributes: {username: username}, phones_attributes: [{number: number}])
+      account = Account.create!(user_attributes: {username: username, invite_type: :sms}, phones_attributes: [{number: number}])
       user = account.user
       phone = user.phones.find_by(number: number)
     end

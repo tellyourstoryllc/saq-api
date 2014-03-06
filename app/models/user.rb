@@ -1,7 +1,7 @@
 class User < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
-  attr_accessor :avatar_image_file, :avatar_image_url, :avatar_video_file
+  attr_accessor :avatar_image_file, :avatar_image_url, :avatar_video_file, :invite_type
 
   before_validation :set_id, on: :create
   before_validation :fix_username
@@ -352,9 +352,10 @@ class User < ActiveRecord::Base
       # Lowercase alpha chars only to make it easier to type on mobile
       # Exclude L to avoid any confusion
       chars = [*'a'..'k', *'m'..'z']
+      prefix = "_#{invite_type || 'user'}_"
 
       loop do
-        self.username = 'user_' + Array.new(6){ chars.sample }.join
+        self.username = prefix + Array.new(6){ chars.sample }.join
         break unless User.where(username: username).exists?
       end
     else
