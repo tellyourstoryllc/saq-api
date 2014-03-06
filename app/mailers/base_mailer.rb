@@ -1,5 +1,5 @@
 class BaseMailer < ActionMailer::Base
-  default from: 'skymob <info@skymob.co>'
+  default from: "#{Rails.configuration.app['app_name']} <info@#{Rails.configuration.app['sendgrid']['domain']}>"
   add_template_helper ApplicationHelper
 
   def mail(options)
