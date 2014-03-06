@@ -1,7 +1,8 @@
 class Phone < ActiveRecord::Base
   include Peanut::Model
 
-  before_validation :normalize_number, :set_hashed_number, :set_user, :set_account
+  before_validation :normalize_number, :set_hashed_number, :set_user,
+    :set_account, :set_verification_code
 
   validates :account, :user, :hashed_number, presence: true
   validates :number, format: /\d+/
@@ -26,6 +27,10 @@ class Phone < ActiveRecord::Base
     find_by(number: normalized_number) if normalized_number
   end
 
+  def verify_by_code!(code)
+    verify! if verification_code.present? && verification_code == code
+  end
+
   def verify!
     self.verified = true
     save!
@@ -48,6 +53,13 @@ class Phone < ActiveRecord::Base
 
   def set_account
     self.account ||= user.try(:account)
+  end
+
+  def set_verification_code
+    return if verification_code.present?
+
+    chars = [*0..9]
+    self.verification_code = Array.new(4){ chars.sample }.join
   end
 
   def delete_verification_token

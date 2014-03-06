@@ -340,6 +340,7 @@ CREATE TABLE `phones` (
   `unsubscribed` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `verification_code` char(4) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_phones_on_number` (`number`),
   UNIQUE KEY `index_phones_on_hashed_number` (`hashed_number`),
@@ -475,7 +476,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-02-28 11:47:12
+-- Dump completed on 2014-03-06 18:43:50
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -607,3 +608,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140224203738');
 INSERT INTO schema_migrations (version) VALUES ('20140226155522');
 
 INSERT INTO schema_migrations (version) VALUES ('20140228164658');
+
+INSERT INTO schema_migrations (version) VALUES ('20140306223147');

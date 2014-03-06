@@ -65,6 +65,9 @@ KrazyChat::Application.routes.draw do
     match '/emails/:id/update', to: 'emails#update', as: 'update_email'
     match '/emails/:id/destroy', to: 'emails#destroy', as: 'destroy_email'
 
+    match '/phones/create', to: 'phones#create', as: 'create_phone'
+    match '/phones/verify', to: 'phones#verify', as: 'verify_phone'
+
     match '/contacts', to: 'contacts#index', as: 'contacts'
     match '/contacts/add', to: 'contacts#add', as: 'add_contacts'
     match '/contacts/remove', to: 'contacts#remove', as: 'remove_contacts'

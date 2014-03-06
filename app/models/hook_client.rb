@@ -48,6 +48,13 @@ class HookClient
     send_sms(from, recipient_number, text)
   end
 
+  def self.send_verification(recipient_number, verification_code)
+    from = Rails.configuration.app['hook']['invite_from']
+
+    text = render_text("Here's your #{Rails.configuration.app['app_name']} mobile confirmation code: #{verification_code}. Enter this in the app to verify your mobile number!")
+    send_sms(from, recipient_number, text)
+  end
+
   def self.increment_sent_sms_counts
     today = Time.zone.today
 
