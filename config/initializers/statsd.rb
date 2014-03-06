@@ -4,6 +4,6 @@ StatsD.server = statsd['server']
 StatsD.logger = Rails.logger
 StatsD.mode = :production
 
-prefix = 'krazychat'
+prefix = Rails.configuration.app['app_name'].dup
 prefix << "_#{Rails.env}" unless Rails.env.production?
 StatsD.prefix = prefix

@@ -1,5 +1,5 @@
 class BaseMailer < ActionMailer::Base
-  default from: 'krazychat <info@krazychat.com>'
+  default from: "#{Rails.configuration.app['app_name']} <info@#{Rails.configuration.app['sendgrid']['domain']}>"
   include ActionView::Helpers::DateHelper
   add_template_helper ApplicationHelper
 

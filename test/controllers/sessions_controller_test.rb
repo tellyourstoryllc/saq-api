@@ -23,13 +23,12 @@ describe SessionsController do
 
       post :create, {email: 'login_test@example.com', password: 'asdf'}
 
-      result.must_equal [
-        {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
-          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-          'avatar_url' => nil},
-        {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-          'facebook_id' => nil, 'time_zone' => 'America/New_York'}
-      ]
+      result.size.must_equal 2
+      result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
+        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
+        'avatar_url' => nil}
+      result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+        'facebook_id' => nil, 'time_zone' => 'America/New_York'}
     end
 
     it "must log in account when password and any of the user's emails are correct" do
@@ -39,13 +38,12 @@ describe SessionsController do
 
       post :create, {email: 'login_test2@example.com', password: 'asdf'}
 
-      result.must_equal [
-        {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
-          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-          'avatar_url' => nil},
-        {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-          'facebook_id' => nil, 'time_zone' => 'America/New_York'}
-      ]
+      result.size.must_equal 2
+      result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
+        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
+        'avatar_url' => nil}
+      result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+        'facebook_id' => nil, 'time_zone' => 'America/New_York'}
     end
 
     it "must log in account when Facebook credentials are correct" do
@@ -59,13 +57,12 @@ describe SessionsController do
 
         post :create, {facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
 
-        result.must_equal [
-          {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
-            'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-            'avatar_url' => nil},
-          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-            'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
-        ]
+        result.size.must_equal 2
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
+          'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
+          'avatar_url' => nil}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+          'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
       end
     end
   end
@@ -79,13 +76,12 @@ describe SessionsController do
 
     post :create, {invite_token: invite.invite_token}
 
-    result.must_equal [
-      {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
-        'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-        'avatar_url' => nil},
-      {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-        'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
-    ]
+    result.size.must_equal 2
+    result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
+      'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
+      'avatar_url' => nil}
+    result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+      'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
   end
 
   it "must not log in account when the invite token correct but the account has login credentials" do

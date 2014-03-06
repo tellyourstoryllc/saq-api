@@ -119,33 +119,33 @@ describe GroupsController do
 
       result.size.must_equal 4
 
-      result.must_include({
+      result_must_include 'group', group.id, {
         'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
         'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
         'wallpaper_url' => nil, 'admin_ids' => [member.id], 'member_ids' => [member.id, current_user.id].sort,
         'last_message_at' => group.last_message_at, 'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i
-      })
+      }
 
-      result.must_include({
+      result_must_include 'user', member.id, {
         'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
         'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
         'avatar_url' => nil
-      })
+      }
 
-      result.must_include({
+      result_must_include 'user', current_user.id, {
         'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
         'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
         'token' => current_user.token, 'client_type' => nil,
         'avatar_url' => nil
-      })
+      }
 
-      result.must_include({
+      result_must_include 'message', message.id, {
         'object_type' => 'message', 'id' => message.id, 'group_id' => group.id,
         'one_to_one_id' => nil, 'user_id' => member.id, 'rank' => 0, 'text' => 'hey guys',
         'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
         'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
         'client_metadata' => nil, 'likes_count' => 0, 'created_at' => message.created_at
-      })
+      }
     end
   end
 
@@ -199,28 +199,28 @@ describe GroupsController do
 
         result.size.must_equal 5
 
-        result.must_include({
+        result_must_include 'group', group.id, {
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
           'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
           'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort,
           'last_message_at' => group.last_message_at, 'last_seen_rank' => nil, 'hidden' => false,
           'created_at' => now.to_i
-        })
+        }
 
-        result.must_include({
+        result_must_include 'user', member.id, {
           'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
           'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
           'avatar_url' => nil
-        })
+        }
 
-        result.must_include({
+        result_must_include 'user', current_user.id, {
           'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
           'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
           'token' => current_user.token, 'client_type' => 'phone',
           'avatar_url' => nil
-        })
+        }
 
-        result.must_include({
+        result_must_include 'message', m2.id, {
           'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
           'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1,
           'text' => 'oh hai', 'mentioned_user_ids' => [],
@@ -228,15 +228,15 @@ describe GroupsController do
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
           'client_metadata' => nil, 'likes_count' => 0,
           'created_at' => m2.created_at
-        })
+        }
 
-        result.must_include({
+        result_must_include 'message', m3.id, {
           'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
           'one_to_one_id' => nil, 'user_id' => member.id, 'rank' => 2, 'text' => 'hey!',
           'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
           'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
-        })
+        }
       end
     end
 
@@ -266,49 +266,49 @@ describe GroupsController do
 
         result.size.must_equal 6
 
-        result.must_include({
+        result_must_include 'group', group.id, {
           'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
           'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil, 'avatar_url' => nil,
           'wallpaper_url' => nil, 'admin_ids' => [current_user.id], 'member_ids' => [member.id, current_user.id].sort,
           'last_message_at' => group.last_message_at, 'last_seen_rank' => nil, 'hidden' => false, 'created_at' => now.to_i
-        })
+        }
 
-        result.must_include({
+        result_must_include 'user', member.id, {
           'object_type' => 'user', 'id' => member.id, 'name' => 'Jane Doe', 'username' => member.username,
           'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
           'avatar_url' => nil
-        })
+        }
 
-        result.must_include({
+        result_must_include 'user', current_user.id, {
           'object_type' => 'user', 'id' => current_user.id, 'name' => 'John Doe', 'username' => current_user.username,
           'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
           'token' => current_user.token, 'client_type' => 'web',
           'avatar_url' => nil
-        })
+        }
 
-        result.must_include({
+        result_must_include 'message', m1.id, {
           'object_type' => 'message', 'id' => m1.id, 'group_id' => group.id,
           'one_to_one_id' => nil, 'user_id' => member.id, 'rank' => 0, 'text' => 'hey guys',
           'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
           'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m1.created_at
-        })
+        }
 
-        result.must_include({
+        result_must_include 'message', m2.id, {
           'object_type' => 'message', 'id' => m2.id, 'group_id' => group.id,
           'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1, 'text' => 'oh hai',
           'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
           'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at
-        })
+        }
 
-        result.must_include({
+        result_must_include 'message', m3.id, {
           'object_type' => 'message', 'id' => m3.id, 'group_id' => group.id,
           'one_to_one_id' => nil, 'user_id' => member.id, 'rank' => 2, 'text' => 'hey!',
           'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
           'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at
-        })
+        }
       end
     end
 

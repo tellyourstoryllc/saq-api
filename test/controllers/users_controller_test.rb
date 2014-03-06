@@ -28,13 +28,12 @@ describe UsersController do
         user = User.last
         account = Account.last
 
-        result.must_equal [
-          {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
-            'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-            'client_type' => nil, 'avatar_url' => nil},
-          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-            'facebook_id' => nil, 'time_zone' => 'America/New_York'}
-        ]
+        result.size.must_equal 2
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
+          'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+          'client_type' => nil, 'avatar_url' => nil}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+          'facebook_id' => nil, 'time_zone' => 'America/New_York'}
       end
 
       it "must create a user and account without a password" do
@@ -43,13 +42,12 @@ describe UsersController do
         user = User.last
         account = Account.last
 
-        result.must_equal [
-          {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
-            'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-            'client_type' => nil, 'avatar_url' => nil},
-          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-            'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
-        ]
+        result.size.must_equal 2
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
+          'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+          'client_type' => nil, 'avatar_url' => nil}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+          'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
       end
 
       it "must create a user and a group" do
@@ -60,16 +58,18 @@ describe UsersController do
           account = Account.last
           group = Group.order('created_at DESC').last
 
-          result.must_equal [
-            {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username, 'token' => user.token,
-              'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-              'avatar_url' => nil},
-            {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-              'facebook_id' => nil, 'time_zone' => 'America/New_York'},
-            {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes', 'join_url' => "http://test.host/join/#{group.join_code}",
-              'topic' => nil, 'avatar_url' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id], 'last_message_at' => nil,
-              'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i}
-          ]
+          result.size.must_equal 3
+          result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe',
+            'username' => user.username, 'token' => user.token, 'status' => 'unavailable',
+            'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil, 'avatar_url' => nil}
+
+          result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
+            'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+
+          result_must_include 'group', group.id, {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
+            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+            'avatar_url' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id],
+            'last_message_at' => nil, 'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i}
         end
       end
 
@@ -84,13 +84,12 @@ describe UsersController do
           user = User.last
           account = Account.last
 
-          result.must_equal [
-            {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
-              'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-              'client_type' => nil, 'avatar_url' => nil},
-            {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-              'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
-          ]
+          result.size.must_equal 2
+          result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
+            'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+            'client_type' => nil, 'avatar_url' => nil}
+          result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+            'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
         end
       end
 
@@ -104,13 +103,12 @@ describe UsersController do
 
         post :create, {name: 'Bruce Lee', email: 'bruce@example.com', password: 'asdf', invite_token: invite.invite_token}
 
-        result.must_equal [
-          {'object_type' => 'user', 'id' => user.id, 'name' => 'Bruce Lee', 'username' => user.username,
-            'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-            'client_type' => nil, 'avatar_url' => nil},
-          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-            'facebook_id' => nil, 'time_zone' => 'America/New_York'}
-        ]
+        result.size.must_equal 2
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'Bruce Lee', 'username' => user.username,
+          'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+          'client_type' => nil, 'avatar_url' => nil}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+          'facebook_id' => nil, 'time_zone' => 'America/New_York'}
 
         User.count.must_equal user_count
 
@@ -134,13 +132,12 @@ describe UsersController do
         user = User.find_by(name: 'Bruce Lee')
         account = user.account
 
-        result.must_equal [
-          {'object_type' => 'user', 'id' => user.id, 'name' => 'Bruce Lee', 'username' => user.username,
-            'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
-            'client_type' => nil, 'avatar_url' => nil},
-          {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-            'facebook_id' => nil, 'time_zone' => 'America/New_York'}
-        ]
+        result.size.must_equal 2
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'Bruce Lee', 'username' => user.username,
+          'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
+          'client_type' => nil, 'avatar_url' => nil}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
+          'facebook_id' => nil, 'time_zone' => 'America/New_York'}
 
         User.count.must_equal user_count + 1
       end
@@ -153,11 +150,11 @@ describe UsersController do
       FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
       post :update, {name: 'Johnny', status: 'away', status_text: 'be back soon', token: current_user.token}
 
-      result.must_equal [
-        {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny', 'username' => current_user.username, 'token' => current_user.token,
-          'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'client_type' => 'web',
-          'avatar_url' => nil}
-      ]
+      result.size.must_equal 1
+      result_must_include 'user', current_user.id, {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny',
+        'username' => current_user.username, 'token' => current_user.token,
+        'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'client_type' => 'web',
+        'avatar_url' => nil}
     end
 
     it "must not update the user's status to idle" do
