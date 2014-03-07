@@ -434,7 +434,7 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` char(8) COLLATE utf8_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `status` enum('available','away','do_not_disturb') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'available',
   `status_text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -455,7 +455,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-02-28 11:47:12
+-- Dump completed on 2014-03-07 10:51:13
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -581,3 +581,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140214050052');
 INSERT INTO schema_migrations (version) VALUES ('20140224203738');
 
 INSERT INTO schema_migrations (version) VALUES ('20140228164658');
+
+INSERT INTO schema_migrations (version) VALUES ('20140307154517');
