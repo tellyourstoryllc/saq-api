@@ -389,8 +389,10 @@ class User < ActiveRecord::Base
   end
 
   def create_phone_verification_token
+    chars = [*'a'..'z', *0..9]
+
     loop do
-      @phone_verification_token = SecureRandom.hex
+      @phone_verification_token = Array.new(8){ chars.sample }.join
       saved = redis.hsetnx(User.user_ids_by_phone_verification_token.key, @phone_verification_token, id)
       break if saved
     end
