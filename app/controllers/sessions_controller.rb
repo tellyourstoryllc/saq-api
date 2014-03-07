@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
 
 
   def create
-    @account = login_via_email_and_password || login_via_facebook || login_via_invite_token
+    @account = login_via_login_and_password || login_via_facebook || login_via_invite_token
 
     if @account
       @current_user = @account.user
@@ -23,12 +23,16 @@ class SessionsController < ApplicationController
 
   private
 
-  def login_via_email_and_password
-    email = params[:email]
+  def login_via_login_and_password
+    login = params[:login]
     password = params[:password]
 
-    if email.present? && password.present?
-      account = Account.joins(:emails).find_by(emails: {email: email})
+    if login.present? && password.present?
+      account = if login.include?('@')
+                  Account.joins(:emails).find_by(emails: {email: login})
+                else
+                  Account.joins(:user).find_by(users: {username: login})
+                end
       account && account.password_digest.present? && account.authenticate(password)
     end
   end
