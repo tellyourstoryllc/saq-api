@@ -28,11 +28,11 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def avatar_url
-    object.avatar_url if contacts?
+    object.avatar_url
   end
 
   def avatar_video_url
-    object.avatar_video_url if contacts?
+    object.avatar_video_url
   end
 
   def include_token?
