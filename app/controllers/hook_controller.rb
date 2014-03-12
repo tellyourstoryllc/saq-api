@@ -32,7 +32,8 @@ class HookController < ApplicationController
   end
 
   def increment_stats
-    HookClient.increment_received_sms_counts
+    error = parsed_body['errorCode'].to_i >= 2000
+    HookClient.increment_received_sms_counts(error)
   end
 
   def validate_body

@@ -7,11 +7,13 @@
   <tr>
     <th style="text-align: center;">Sent</th>
     <th style="text-align: center;">Received</th>
+    <th style="text-align: center;">Errors</th>
   </tr>
 
   <tr>
     <td align="center"><%= number_with_delimiter(@all_time_sent_sms_count.to_i) %></td>
     <td align="center"><%= number_with_delimiter(@all_time_received_sms_count.to_i) %></td>
+    <td align="center"><%= number_with_delimiter(@all_time_error_count.to_i) %></td>
   </tr>
 </table>
 
@@ -23,6 +25,7 @@
     <th style="text-align: center;">Date</th>
     <th style="text-align: center;">Sent</th>
     <th style="text-align: center;">Received</th>
+    <th style="text-align: center;">Errors</th>
   </tr>
 
   <% 3.times do |i| %>
@@ -31,6 +34,7 @@
     <td align="center"><%= month %></td>
     <td align="center"><%= number_with_delimiter(@monthly_sent_sms_counts[month].to_i) %></td>
     <td align="center"><%= number_with_delimiter(@monthly_received_sms_counts[month].to_i) %></td>
+    <td align="center"><%= number_with_delimiter(@monthly_error_counts[month].to_i) %></td>
   </tr>
   <% end -%>
 </table>
@@ -43,6 +47,7 @@
     <th style="text-align: center;">Date</th>
     <th style="text-align: center;">Sent</th>
     <th style="text-align: center;">Received</th>
+    <th style="text-align: center;">Errors</th>
   </tr>
 
   <% 30.times do |i| %>
@@ -51,6 +56,7 @@
     <td align="center"><%= date %></td>
     <td align="center"><%= number_with_delimiter(@daily_sent_sms_counts[date].to_i) %></td>
     <td align="center"><%= number_with_delimiter(@daily_received_sms_counts[date].to_i) %></td>
+    <td align="center"><%= number_with_delimiter(@daily_error_counts[date].to_i) %></td>
   </tr>
   <% end -%>
 </table>
