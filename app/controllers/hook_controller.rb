@@ -6,7 +6,8 @@ class HookController < ApplicationController
   def callback
     IncomingText.create!(raw_body: request.raw_post, from: parsed_body['from'],
                          recipient: parsed_body['recipient'], text: parsed_body['text'],
-                         message_id: parsed_body['messageId'], timestamp: parsed_body['timestamp'])
+                         message_id: parsed_body['messageId'], timestamp: parsed_body['timestamp'],
+                         callback_type: parsed_body['type'], error_code: parsed_body['errorCode'])
 
     case parsed_body['type']
     when 'incomingSms'
