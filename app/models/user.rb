@@ -210,8 +210,9 @@ class User < ActiveRecord::Base
   def send_notifications(message)
     return unless away_idle_or_unavailable?
 
-    mobile_notifier.notify(message)
-    email_notifier.notify(message)
+    if !mobile_notifier.notify(message)
+      email_notifier.notify(message)  # only send email notification if no mobile notification was sent.
+    end
   end
 
   def block(user)

@@ -26,7 +26,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    text = render_text_with_name(sender.name, " wants to chat with you on the new app: #{url}")
+    text = render_text_with_name(sender.name, " is trying to send you photos and videos on #{Rails.configuration.app['app_name']}: #{url}")
     send_sms(from, recipient_number, text)
   end
 
@@ -34,7 +34,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    text = render_text_with_name(sender.name, " sent you a message on #{Rails.configuration.app['app_name']}. Click here to view it: #{url}")
+    text = render_text_with_name(sender.name, " just sent you a message from #{Rails.configuration.app['app_name']}. See it here: #{url}")
     send_sms(from, recipient_number, text)
   end
 
@@ -42,16 +42,17 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
     media_type = message.message_attachment.try(:friendly_media_type) || 'a message'
-    expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(message.expires_at))}" if message.expires_at
 
-    text = render_text_with_name(sender.name, " sent you #{media_type} on #{Rails.configuration.app['app_name']}#{expires_text}. Click here to view it: #{url}")
+    # expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(message.expires_at))}" if message.expires_at
+    # text = render_text_with_name(sender.name, " sent you #{media_type} on #{Rails.configuration.app['app_name']}#{expires_text}: #{url}")
+    text = render_text_with_name(sender.name, " just sent you #{media_type} from #{Rails.configuration.app['app_name']}. See it here: #{url}")
     send_sms(from, recipient_number, text)
   end
 
   def self.send_verification(recipient_number, verification_code)
     from = Rails.configuration.app['hook']['invite_from']
 
-    text = render_text("Here's your #{Rails.configuration.app['app_name']} mobile confirmation code: #{verification_code}. Enter this in the app to verify your mobile number!")
+    text = render_text("Your #{Rails.configuration.app['app_name']} code is: #{verification_code}.")
     send_sms(from, recipient_number, text)
   end
 
