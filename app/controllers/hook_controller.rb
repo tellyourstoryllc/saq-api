@@ -4,6 +4,11 @@ class HookController < ApplicationController
 
 
   def callback
+    IncomingText.create!(raw_body: request.raw_post, from: parsed_body['from'],
+                         recipient: parsed_body['recipient'], text: parsed_body['text'],
+                         message_id: parsed_body['messageId'], timestamp: parsed_body['timestamp'],
+                         callback_type: parsed_body['type'], error_code: parsed_body['errorCode'])
+
     case parsed_body['type']
     when 'incomingSms'
       handle_incoming_sms
@@ -27,7 +32,8 @@ class HookController < ApplicationController
   end
 
   def increment_stats
-    HookClient.increment_received_sms_counts
+    error = parsed_body['errorCode'].to_i >= 2000
+    HookClient.increment_received_sms_counts(error)
   end
 
   def validate_body
@@ -60,10 +66,6 @@ class HookController < ApplicationController
   end
 
   def handle_incoming_sms
-    IncomingText.create!(raw_body: request.raw_post, from: parsed_body['from'],
-                         recipient: parsed_body['recipient'], text: parsed_body['text'],
-                         message_id: parsed_body['messageId'], timestamp: parsed_body['timestamp'])
-
     return if from_phone.nil?
     old_user_id = from_phone.user_id_was if from_phone.user_id_changed?
 

@@ -11,5 +11,9 @@ class AdminController < ActionController::Base
     @daily_received_sms_counts = HookClient.daily_received_sms_counts.all
     @monthly_received_sms_counts = HookClient.monthly_received_sms_counts.all
     @all_time_received_sms_count = HookClient.all_time_received_sms_count.get
+
+    @daily_error_counts = HookClient.daily_error_counts.all
+    @monthly_error_counts = HookClient.monthly_error_counts.all
+    @all_time_error_count = HookClient.all_time_error_count.get
   end
 end

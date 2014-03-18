@@ -220,6 +220,8 @@ CREATE TABLE `incoming_texts` (
   `timestamp` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `callback_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `error_code` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -455,7 +457,7 @@ DROP TABLE IF EXISTS `users`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` char(8) COLLATE utf8_unicode_ci NOT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `status` enum('available','away','do_not_disturb') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'available',
   `status_text` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -476,7 +478,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-03-06 18:43:50
+-- Dump completed on 2014-03-12 12:03:52
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -610,3 +612,7 @@ INSERT INTO schema_migrations (version) VALUES ('20140226155522');
 INSERT INTO schema_migrations (version) VALUES ('20140228164658');
 
 INSERT INTO schema_migrations (version) VALUES ('20140306223147');
+
+INSERT INTO schema_migrations (version) VALUES ('20140307154517');
+
+INSERT INTO schema_migrations (version) VALUES ('20140312155807');
