@@ -1,12 +1,12 @@
 class MessageMailerWorker < BaseWorker
   def self.category; :notification end
-  def self.metric; :email_content_or_digest end
+  def self.metric; :email end
 
-  def perform(notification_subtype, user_id, message_id, data)
-    perform_with_tracking(notification_subtype, user_id, message_id, data) do
+  def perform(notification_type, user_id, message_id, data)
+    perform_with_tracking(notification_type, user_id, message_id, data) do
       user = User.find(user_id)
-      message = Message.new(id: message_id) if notification_subtype.to_sym == :content
-      user.email_notifier.send_digest_notification!(notification_subtype, data, message)
+      message = Message.new(id: message_id)
+      user.email_notifier.send_notification!(notification_type, message, data) if user.away_idle_or_unavailable?
 
       true
     end

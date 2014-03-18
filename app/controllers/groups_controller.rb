@@ -202,9 +202,6 @@ class GroupsController < ApplicationController
   end
 
   def notify_admins
-    @group.admins.each do |user|
-      user.mobile_notifier.notify_new_member(current_user, @group)
-      user.email_notifier.notify_new_member(current_user, @group)
-    end
+    # Don't do it
   end
 end
