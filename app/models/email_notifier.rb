@@ -47,15 +47,18 @@ class EmailNotifier
   end
 
   def send_notification(notification_type, message = nil, options = {})
+    data = {}
+    data[:media_description] = message.message_attachment.try(:friendly_media_type)
+
     if Settings.enabled?(:queue) && options[:skip_queue].blank?
-      EmailNotificationWorker.perform_in(1.minute, notification_type, message.id, user.id, user.computed_status)
+      MessageMailerWorker.perform_async(notification_type, user.id, message.id, data)
     else
-      send_notification!(notification_type, message, user.computed_status)
+      send_notification!(notification_type, message, data)
     end
   end
 
-  def send_notification!(notification_type, message, status)
-    MessageMailer.send(notification_type, message, user, status).deliver!
+  def send_notification!(notification_type, message, data)
+    MessageMailer.send(notification_type, message, user, data).deliver!
   end
 
   def notify_new_member(new_member, group)
