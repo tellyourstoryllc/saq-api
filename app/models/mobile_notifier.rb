@@ -46,6 +46,8 @@ class MobileNotifier
     return if message.user_id == user.id
 
     convo = message.conversation
+    user.unread_convo_ids << convo.id
+
     notification_type = if convo.is_a?(Group)
                           message.mentioned?(user) ? :mention : :all
                         elsif convo.is_a?(OneToOne)
@@ -104,12 +106,14 @@ class MobileNotifier
   def create_ios_notification(ios_device, alert, custom_data)
     n = ios_notifier.build_notification(alert, custom_data)
     n.device_token = ios_device.push_token
+    n.badge = user.unread_convo_ids.size
     n.save!
   end
 
   def create_android_notification(android_device, alert, custom_data)
     n = android_notifier.build_notification(alert, custom_data)
     n.registration_ids = android_device.registration_id
+    n.badge = user.unread_convo_ids.size
     n.save!
   end
 
