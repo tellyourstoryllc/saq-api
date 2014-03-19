@@ -143,7 +143,7 @@ class MobileNotifier
     # Send to all iOS devices
     user.ios_devices.each do |ios_device|
       if ios_device.notify?(user, convo, message, notification_type)
-        create_ios_notification(alert, custom_data)
+        create_ios_notification(ios_device, alert, custom_data)
         notified = true
       end
     end
@@ -151,7 +151,7 @@ class MobileNotifier
     # Send to all Android devices
     user.android_devices.each do |android_device|
       if android_device.notify?(user, convo, message, notification_type)
-        create_android_notification(alert, custom_data)
+        create_android_notification(android_device, alert, custom_data)
         notified = true
       end
     end
