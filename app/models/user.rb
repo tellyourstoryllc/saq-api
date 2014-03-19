@@ -57,6 +57,8 @@ class User < ActiveRecord::Base
   sorted_set :replaced_user_ids
   value :replaced_by_user_id
 
+  set :unread_convo_ids
+
 
   def first_name
     name.present? ? name.split(' ').first : username
@@ -289,6 +291,13 @@ class User < ActiveRecord::Base
     keys += email_digest_data_keys
 
     redis.del(keys)
+  end
+
+  # Reset badge count if the user just went from not available to available
+  def reset_badge_count_if_needed(old_status, new_status)
+    if self.class.away_idle_or_unavailable?(old_status) && !self.class.away_idle_or_unavailable?(new_status)
+      unread_convo_ids.del
+    end
   end
 
   def delete_mobile_digest_data

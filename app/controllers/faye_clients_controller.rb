@@ -13,6 +13,7 @@ class FayeClientsController < ApplicationController
     if @faye_client.save
       new_status = current_user.computed_status(true)
       current_user.reset_digests_if_needed(old_status, new_status)
+      current_user.reset_badge_count_if_needed(old_status, new_status)
 
       render_json current_user
     else
