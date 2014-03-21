@@ -23,15 +23,18 @@ class MixpanelClient
     }
   end
 
-  def track(event_name, properties = {}, options = {})
-    properties.reverse_merge!(default_properties)
-
+  def track_without_defaults(event_name, properties = {}, options = {})
     if Settings.enabled?(:queue)
       properties['time'] ||= Time.current.to_i
       MixpanelWorker.perform_async(event_name, properties, options)
     else
       track!(event_name, properties, options)
     end
+  end
+
+  def track(event_name, properties = {}, options = {})
+    properties.reverse_merge!(default_properties)
+    track_without_defaults(event_name, properties, options)
   end
 
   def track!(event_name, properties = {}, options = {})
@@ -69,6 +72,10 @@ class MixpanelClient
     track('Verified Phone', {'Phone ID' => phone.id})
   end
 
+  def mobile_install(device_id)
+    track_without_defaults('Mobile Install', mobile_install_properties(device_id))
+  end
+
 
   private
 
@@ -87,6 +94,15 @@ class MixpanelClient
     {
       'Group ID' => group.id, 'Group Created At' => group.created_at, 'Group Name' => group.name,
       'Group Creator ID' => group.creator_id, 'Group Members' => group.member_ids.size, 'Group Messages' => group.message_ids.size
+    }
+  end
+
+  def mobile_install_properties(device_id)
+    client = Thread.current[:client]
+    distinct_id = "#{client}-#{device_id}"
+
+    {
+      'distinct_id' => distinct_id, '$created' => Time.zone.now, 'Client' => client, 'OS' => Thread.current[:os]
     }
   end
 end

@@ -1,4 +1,5 @@
 class BaseDevice < ActiveRecord::Base
+  include Redis::Objects
   self.abstract_class = true
 
   def self.create_or_assign!(user, attrs)

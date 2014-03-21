@@ -6,6 +6,8 @@ class IosDevice < BaseDevice
 
   after_save :remove_old_push_tokens
 
+  set :mixpanel_installed_device_ids, global: true
+
 
   def preferences
     @preferences ||= IosDevicePreferences.new(id: id)

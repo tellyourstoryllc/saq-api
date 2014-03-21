@@ -4,6 +4,8 @@ class AndroidDevice < BaseDevice
 
   belongs_to :user
 
+  set :mixpanel_installed_device_ids, global: true
+
 
   def v=(version)
     self.client_version = version
