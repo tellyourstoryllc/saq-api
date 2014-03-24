@@ -1,4 +1,5 @@
 class GroupMessagesController < ApplicationController
+  skip_before_action :require_token, only: :index
   before_action :load_group
 
 
@@ -30,7 +31,7 @@ class GroupMessagesController < ApplicationController
   private
 
   def load_group
-    @group = current_user.groups.find(params[:group_id])
+    @group = Group.find(params[:group_id])
   end
 
   def message_params

@@ -19,7 +19,7 @@ class GroupsController < ApplicationController
 
     @group.viewer = current_user
     objects = [@group, @group.members]
-    objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
+    objects += @group.paginate_messages(pagination_params)
     render_json objects
   end
 
