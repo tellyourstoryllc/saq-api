@@ -68,8 +68,13 @@ class MixpanelClient
     track('Joined Group', group_properties(group))
   end
 
-  def verified_phone(phone)
-    track('Verified Phone', {'Phone ID' => phone.id})
+  def verified_phone(phone, method_name)
+    method = case method_name
+             when :sent_sms then 'Sent SMS'
+             when :entered_phone then 'Entered Phone'
+             end
+
+    track('Verified Phone', {'Phone ID' => phone.id, 'Verification Method' => method})
   end
 
   def mobile_install(device_id)

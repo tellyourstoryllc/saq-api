@@ -13,7 +13,7 @@ class PhonesController < ApplicationController
 
   def verify
     if @phone.verify_by_code!(params[:phone_verification_code])
-      mixpanel.verified_phone(@phone)
+      mixpanel.verified_phone(@phone, :entered_phone)
       render_json current_user
     else
       render_error

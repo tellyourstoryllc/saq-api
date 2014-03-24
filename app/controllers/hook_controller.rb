@@ -79,7 +79,7 @@ class HookController < ApplicationController
     from_phone.verified = true
     from_phone.save!
 
-    mixpanel.verified_phone(from_phone)
+    mixpanel.verified_phone(from_phone, :sent_sms)
 
     if old_user_id
       old_user = User.find_by(id: old_user_id)
