@@ -39,6 +39,7 @@ development:
     domain: krazychat.com
   statsd:
     server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
+    prefix: krazykam
   web:
     domain: localhost:3001
     url: http://localhost:3001
@@ -84,6 +85,7 @@ test:
     domain: krazychat.com
   statsd:
     server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
+    prefix: krazykam
   web:
     domain: test.host
     url: http://test.host
