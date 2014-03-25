@@ -69,6 +69,16 @@ class MixpanelClient
     track('Verified Phone', {'Phone ID' => phone.id})
   end
 
+  def sent_daily_message
+    last_message = user.last_mixpanel_message_at.get
+    last_message = Time.zone.at(last_message.to_i) if last_message
+
+    if last_message.nil? || last_message < 24.hours.ago
+      user.last_mixpanel_message_at = Time.current.to_i
+      track('Sent Daily Message')
+    end
+  end
+
 
   private
 

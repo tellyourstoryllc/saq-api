@@ -19,6 +19,7 @@ class GroupMessagesController < ApplicationController
 
       # Track activity in Mixpanel
       group_mixpanel.sent_daily_message(@group)
+      mixpanel.sent_daily_message
 
       render_json @message
     else

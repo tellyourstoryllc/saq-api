@@ -26,6 +26,9 @@ class OneToOneMessagesController < ApplicationController
       recipient = @one_to_one.other_user(current_user)
       recipient.send_notifications(@message)
 
+      # Track activity in Mixpanel
+      mixpanel.sent_daily_message
+
       render_json @message
     else
       render_error @message.errors.full_messages
