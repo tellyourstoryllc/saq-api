@@ -3,6 +3,6 @@ class IosConfiguration < ClientConfiguration
   hash_key :attrs, global: true
 
   def self.config
-    ClientConfiguration.config.merge(attrs.all).reject{ |k,v| v == '_nil' }
+    ClientConfiguration.config.merge(fetch_config)
   end
 end

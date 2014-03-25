@@ -3,19 +3,20 @@ class Settings
 
   hash_key :attrs, global: true
   FEATURES = [:queue]
+  PREFIX = Rails.configuration.app['client']['config_prefix'] + '_'
 
 
   def self.get(key)
-    val = attrs[key]
+    val = attrs[PREFIX + key]
     val == '_nil' ? nil : val
   end
 
   def self.set(key, value)
-    attrs[key] = value.nil? ? '_nil' : value
+    attrs[PREFIX + key] = value.nil? ? '_nil' : value
   end
 
   def self.delete(key)
-    attrs.delete(key)
+    attrs.delete(PREFIX + key)
   end
 
   def self.feature_toggle_key(feature)
