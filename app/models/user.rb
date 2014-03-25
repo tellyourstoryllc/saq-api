@@ -36,6 +36,7 @@ class User < ActiveRecord::Base
   value :idle_since
   value :last_client_disconnect_at
   value :last_mixpanel_checkin_at
+  value :last_mixpanel_message_at
   value :invited
   value :sorting_name # Used for sorting contacts lists
   hash_key :metrics

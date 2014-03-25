@@ -81,6 +81,16 @@ class MixpanelClient
     track_without_defaults('Mobile Install', mobile_install_properties(device_id))
   end
 
+  def sent_daily_message
+    last_message = user.last_mixpanel_message_at.get
+    last_message = Time.zone.at(last_message.to_i) if last_message
+
+    if last_message.nil? || last_message < 24.hours.ago
+      user.last_mixpanel_message_at = Time.current.to_i
+      track('Sent Daily Message')
+    end
+  end
+
 
   private
 

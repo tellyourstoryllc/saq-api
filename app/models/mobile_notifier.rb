@@ -52,16 +52,14 @@ class MobileNotifier
   end
 
   def create_ios_notification(ios_device, alert, custom_data)
-    n = ios_notifier.build_notification(alert, custom_data)
-    n.device_token = ios_device.push_token
-    n.badge = user.unread_convo_ids.size
+    options = {device_token: ios_device.push_token, badge: user.unread_convo_ids.size}
+    n = ios_notifier.build_notification(alert, options, custom_data)
     n.save!
   end
 
   def create_android_notification(android_device, alert, custom_data)
-    n = android_notifier.build_notification(alert, custom_data)
-    n.registration_ids = android_device.registration_id
-    n.badge = user.unread_convo_ids.size
+    options = {registration_ids: android_device.registration_id, badge: user.unread_convo_ids.size}
+    n = android_notifier.build_notification(alert, options, custom_data)
     n.save!
   end
 
