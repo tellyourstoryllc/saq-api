@@ -2,7 +2,7 @@ class BaseWorker
   include Sidekiq::Worker
   extend StatsD::Instrument
 
-  sidekiq_options queue: :default, retry: true, backtrace: 10
+  sidekiq_options queue: Rails.configuration.app['sidekiq']['queues'].first, retry: true, backtrace: 10
 
 
   # The child class' perform method should return false or nil (or raise an exception)
