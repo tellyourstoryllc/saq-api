@@ -21,6 +21,7 @@ class MessagesController < ApplicationController
 
         # Track activity in Mixpanel
         group_mixpanel.sent_daily_message(group)
+        mixpanel.sent_daily_message
 
         messages << message
       end
@@ -50,6 +51,9 @@ class MessagesController < ApplicationController
           # Potentially notify the other user, according to his status and preferences
           other_user.send_notifications(message)
         end
+
+        # Track activity in Mixpanel
+        mixpanel.sent_daily_message
 
         messages << message
       end
