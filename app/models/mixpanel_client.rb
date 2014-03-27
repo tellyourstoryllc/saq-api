@@ -61,6 +61,10 @@ class MixpanelClient
     track('Sent Invite', native_invite_properties(properties))
   end
 
+  def cancelled_native_invite(properties)
+    track('Cancelled Invite', native_invite_properties(properties))
+  end
+
   def clicked_invite_link(invite)
     track('Clicked Invite Link', invite_properties(invite))
   end
