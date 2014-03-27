@@ -57,6 +57,10 @@ class MixpanelClient
     track('Sent Invite', invite_properties(invite))
   end
 
+  def sent_native_invite(properties)
+    track('Sent Invite', native_invite_properties(properties))
+  end
+
   def clicked_invite_link(invite)
     track('Clicked Invite Link', invite_properties(invite))
   end
@@ -87,9 +91,18 @@ class MixpanelClient
     channel = 'sms' if invite.invited_phone.present?
 
     {
-      'Invite ID' => invite.id, 'Invite Channel' => channel, 'Recipient ID' => invite.recipient_id,
-      'Recipient New User' => invite.new_user?, 'Recipient Can Log In' => invite.can_log_in?,
-      'Group ID' => invite.group_id
+      'Invite ID' => invite.id, 'Invite Method' => 'api', 'Invite Channel' => channel,
+      'Recipient ID' => invite.recipient_id, 'Recipient New User' => invite.new_user?,
+      'Recipient Can Log In' => invite.can_log_in?, 'Group ID' => invite.group_id
+    }
+  end
+
+  def native_invite_properties(properties)
+    invite_method = properties[:invite_method] if %w(api native).include?(properties[:invite_method])
+    invite_channel = properties[:invite_channel] if %w(email sms).include?(properties[:invite_channel])
+
+    {
+      'Invite Method' => invite_method, 'Invite Channel' => invite_channel, 'Recipients' => properties[:recipients]
     }
   end
 
