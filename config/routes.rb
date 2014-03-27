@@ -77,6 +77,7 @@ KrazyChat::Application.routes.draw do
     match '/hook/callback', to: 'hook#callback', as: 'hook_callback'
 
     match '/admin/sms_stats', to: 'admin#sms_stats', as: 'admin_sms_stats'
+    match '/mixpanel/event', to: 'mixpanel#event', as: 'mixpanel_event'
   end
 
   require 'sidekiq/web'
