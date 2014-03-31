@@ -4,7 +4,7 @@ class GroupSerializer < ActiveModel::Serializer
     :last_seen_rank, :hidden, :created_at
 
   def join_url
-    "#{Rails.configuration.app['web']['url']}/join/#{object.join_code}" if object.join_code.present?
+    "#{Rails.configuration.app['web']['url']}/v/#{object.join_code}" if object.join_code.present?
   end
 
   def admin_ids
