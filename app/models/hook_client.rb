@@ -30,7 +30,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    text = render_text_with_name(sender.name, " wants to share photos with you on #{Rails.configuration.app['app_name_short']} (it's like Snapchat, but the photos don't disappear). Get it here: #{url}")
+    text = render_from_template(ClientConfiguration.get('sms_invite_to_contacts'), {sender_name: sender.name, url: url})
     send_sms(from, recipient_number, text)
   end
 
@@ -38,7 +38,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    text = render_text_with_name(sender.name, " wants to share photos with you on #{Rails.configuration.app['app_name_short']} (it's like Snapchat, but the photos don't disappear). Get it here: #{url}")
+    text = render_from_template(ClientConfiguration.get('sms_invite_to_group'), {sender_name: sender.name, url: url})
     send_sms(from, recipient_number, text)
   end
 
@@ -48,7 +48,7 @@ class HookClient
     media_type = message.message_attachment.try(:friendly_media_type) || 'a message'
 
     # expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(message.expires_at))}" if message.expires_at
-    text = render_text_with_name(sender.name, " wants to share photos with you on #{Rails.configuration.app['app_name_short']} (it's like Snapchat, but the photos don't disappear). Get it here: #{url}")
+    text = render_from_template(ClientConfiguration.get('sms_invite_via_message'), {sender_name: sender.name, url: url, media_type: media_type})
     send_sms(from, recipient_number, text)
   end
 
@@ -86,10 +86,22 @@ class HookClient
 
   private
 
-  # Truncate sender name if needed to ensure our copy fits
-  def self.render_text_with_name(sender_name, text)
-    sender_name = sender_name.truncate(HookApiClient::MAX_LENGTH - (text.size + CANCEL_TEXT.size))
-    render_text(sender_name + text)
+  # Replace placeholder variables and if needed,
+  # truncate sender name to ensure our copy fits
+  def self.render_from_template(text, replacements = {})
+    replacements.each do |placeholder, value|
+      text.gsub!("%#{placeholder}%", value) unless placeholder == :sender_name
+    end
+
+    sender_name = replacements[:sender_name]
+    if sender_name
+      name_placeholder = '%sender_name%'
+      placeholder_size = text.include?(name_placeholder) ? name_placeholder.size : 0
+      sender_name = sender_name.truncate(HookApiClient::MAX_LENGTH - (text.size - placeholder_size + CANCEL_TEXT.size))
+      text.gsub!(name_placeholder, sender_name)
+    end
+
+    render_text(text)
   end
 
   # Truncate the content if needed to ensure the cancel text fits
