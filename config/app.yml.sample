@@ -5,6 +5,7 @@ development:
   api:
     request_secret: SECRET
   app_name: krazychat
+  app_name_short: krazykam
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -53,6 +54,7 @@ test:
   api:
     request_secret: SECRET
   app_name: krazychat
+  app_name_short: krazykam
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
