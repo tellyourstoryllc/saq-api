@@ -48,7 +48,7 @@ class HookClient
     media_type = message.message_attachment.try(:friendly_media_type) || 'a message'
 
     # expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(message.expires_at))}" if message.expires_at
-    text = render_text_with_name(sender.name, " wants to share photos with you on #{Rails.configuration.app['app_name_short']} (it's like Snapchat, but the photos don't disappear). And it has fun filters! Get it here: #{url}")
+    text = render_text_with_name(sender.name, " wants to share photos with you on #{Rails.configuration.app['app_name_short']} (it's like Snapchat, but the photos don't disappear). Get it here: #{url}")
     send_sms(from, recipient_number, text)
   end
 
