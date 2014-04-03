@@ -30,7 +30,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    text = render_text_with_name(sender.name, " is trying to send you photos and videos on #{Rails.configuration.app['app_name']}: #{url}")
+    text = render_text_with_name(sender.name, " wants to share photos with you on #{Rails.configuration.app['app_name_short']} (it's like Snapchat, but the photos don't disappear). Get it here: #{url}")
     send_sms(from, recipient_number, text)
   end
 
@@ -38,7 +38,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    text = render_text_with_name(sender.name, " just sent you a message from #{Rails.configuration.app['app_name']}. See it here: #{url}")
+    text = render_text_with_name(sender.name, " wants to share photos with you on #{Rails.configuration.app['app_name_short']} (it's like Snapchat, but the photos don't disappear). Get it here: #{url}")
     send_sms(from, recipient_number, text)
   end
 
