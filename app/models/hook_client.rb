@@ -29,16 +29,18 @@ class HookClient
   def self.invite_to_contacts(sender, recipient, recipient_number, invite_token)
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
+    sender_phone = sender_phone_text(sender)
 
-    text = render_from_template(ServerConfiguration.get('sms_invite_to_contacts'), {sender_name: sender.name, url: url})
+    text = render_from_template(ServerConfiguration.get('sms_invite_to_contacts'), {sender_name: sender.name, url: url, sender_phone: sender_phone})
     send_sms(from, recipient_number, text)
   end
 
   def self.invite_to_group(sender, recipient, group, recipient_number, invite_token)
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
+    sender_phone = sender_phone_text(sender)
 
-    text = render_from_template(ServerConfiguration.get('sms_invite_to_group'), {sender_name: sender.name, url: url})
+    text = render_from_template(ServerConfiguration.get('sms_invite_to_group'), {sender_name: sender.name, url: url, sender_phone: sender_phone})
     send_sms(from, recipient_number, text)
   end
 
@@ -46,8 +48,7 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
     media_type = message.message_attachment.try(:friendly_media_type) || 'a message'
-    sender_phone = sender.phones.last.try(:pretty)
-    sender_phone = ' (' + sender_phone + ')' if sender_phone.present?
+    sender_phone = sender_phone_text(sender)
 
     # expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(message.expires_at))}" if message.expires_at
     text = render_from_template(ServerConfiguration.get('sms_invite_via_message'), {sender_name: sender.name, url: url, media_type: media_type, sender_phone: sender_phone})
@@ -109,5 +110,10 @@ class HookClient
   # Truncate the content if needed to ensure the cancel text fits
   def self.render_text(text)
     text.truncate(MAX_CONTENT_LENGTH) + CANCEL_TEXT
+  end
+
+  def self.sender_phone_text(sender)
+    sender_phone = sender.phones.last.try(:pretty)
+    sender_phone.present? ? ' (' + sender_phone + ')' : ''
   end
 end
