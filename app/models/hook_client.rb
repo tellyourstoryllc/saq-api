@@ -46,9 +46,11 @@ class HookClient
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
     media_type = message.message_attachment.try(:friendly_media_type) || 'a message'
+    sender_phone = sender.phones.last.try(:pretty)
+    sender_phone = ' (' + sender_phone + ')' if sender_phone.present?
 
     # expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(message.expires_at))}" if message.expires_at
-    text = render_from_template(ServerConfiguration.get('sms_invite_via_message'), {sender_name: sender.name, url: url, media_type: media_type})
+    text = render_from_template(ServerConfiguration.get('sms_invite_via_message'), {sender_name: sender.name, url: url, media_type: media_type, sender_phone: sender_phone})
     send_sms(from, recipient_number, text)
   end
 
@@ -90,7 +92,7 @@ class HookClient
   # truncate sender name to ensure our copy fits
   def self.render_from_template(text, replacements = {})
     replacements.each do |placeholder, value|
-      text.gsub!("%#{placeholder}%", value) unless placeholder == :sender_name
+      text.gsub!("%#{placeholder}%", value.to_s) unless placeholder == :sender_name
     end
 
     sender_name = replacements[:sender_name]
