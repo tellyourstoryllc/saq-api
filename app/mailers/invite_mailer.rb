@@ -4,7 +4,7 @@ class InviteMailer < BaseMailer
     @recipient = recipient
 
     one_to_one_id = OneToOne.id_for_user_ids(sender.id, recipient.id)
-    @url = Rails.configuration.app['web']['url'] + "/rooms/#{one_to_one_id}?invite_token=#{invite_token}"
+    @url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
     mail(to: email, subject: "#{@sender.name} added you as a contact")
   end
@@ -29,7 +29,7 @@ class InviteMailer < BaseMailer
     @expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(@message.expires_at))}" if @message.expires_at
 
     one_to_one_id = OneToOne.id_for_user_ids(sender.id, recipient.id)
-    @url = Rails.configuration.app['web']['url'] + "/rooms/#{one_to_one_id}?invite_token=#{invite_token}"
+    @url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
     mail(to: email, subject: "#{@sender.name} just sent you #{@media_type}#{@expires_text}")
   end
