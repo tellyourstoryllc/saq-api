@@ -12,15 +12,20 @@ class MixpanelClient
   end
 
   def default_properties
-    {
-      'distinct_id' => user.id, '$created' => user.created_at, 'Client' => Thread.current[:client],
-      'OS' => Thread.current[:os], 'Name' => user.name, '$username' => user.username,
-      'Can Log In' => user.account.can_log_in?, 'Time Zone' => user.account.time_zone,
-      'Status' => user.computed_status, 'Invited' => user.invited?,
-      'Groups' => user.group_ids.size, 'Created Groups' => user.live_created_groups_count,
-      'Sent Messages' => user.metrics[:sent_messages_count].to_i,
-      'Received Messages' => user.metrics[:received_messages_count].to_i
-    }
+    properties = {'Client' => Thread.current[:client], 'OS' => Thread.current[:os]}
+
+    if user
+      properties.merge!(
+        'distinct_id' => user.id, '$created' => user.created_at, 'Name' => user.name,
+        '$username' => user.username, 'Can Log In' => user.account.can_log_in?,
+        'Time Zone' => user.account.time_zone, 'Status' => user.computed_status, 'Invited' => user.invited?,
+        'Groups' => user.group_ids.size, 'Created Groups' => user.live_created_groups_count,
+        'Sent Messages' => user.metrics[:sent_messages_count].to_i,
+        'Received Messages' => user.metrics[:received_messages_count].to_i
+      )
+    end
+
+    properties
   end
 
   def track_without_defaults(event_name, properties = {}, options = {})
@@ -31,6 +36,11 @@ class MixpanelClient
       track!(event_name, properties, options)
     end
   end
+
+  #def track_preferrably_with_defaults(event_name, properties = {}, options = {})
+  #  properties.reverse_merge!(default_properties) if user.present?
+  #  track_without_defaults(event_name, properties, options)
+  #end
 
   def track(event_name, properties = {}, options = {})
     properties.reverse_merge!(default_properties)

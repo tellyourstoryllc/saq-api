@@ -1,4 +1,7 @@
 class LogsController < ApplicationController
+  skip_before_action :require_token, only: :event
+
+
   def event
     case params[:event_name]
     when 'sent_invite' then mixpanel.sent_native_invite(property_params)
