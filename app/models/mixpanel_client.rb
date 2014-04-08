@@ -121,16 +121,18 @@ class MixpanelClient
     {
       'Invite ID' => invite.id, 'Invite Method' => 'api', 'Invite Channel' => channel,
       'Recipient ID' => invite.recipient_id, 'Recipient New User' => invite.new_user?,
-      'Recipient Can Log In' => invite.can_log_in?, 'Group ID' => invite.group_id
+      'Recipient Can Log In' => invite.can_log_in?, 'Group ID' => invite.group_id, 'Source' => invite.source
     }
   end
 
   def native_invite_properties(properties)
     invite_method = properties[:invite_method] if %w(api native).include?(properties[:invite_method])
     invite_channel = properties[:invite_channel] if %w(email sms).include?(properties[:invite_channel])
+    source = properties[:source] if %w(signup home).include?(properties[:source])
 
     {
-      'Invite Method' => invite_method, 'Invite Channel' => invite_channel, 'Recipients' => properties[:recipients]
+      'Invite Method' => invite_method, 'Invite Channel' => invite_channel, 'Recipients' => properties[:recipients],
+      'Source' => source
     }
   end
 

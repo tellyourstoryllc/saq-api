@@ -52,7 +52,7 @@ class GroupInviter
       email = user.emails.find_by(email: address)
     end
 
-    add_to_group(user, {invited_email: address, new_user: new_user, skip_sending: !!self.class.to_bool(options[:skip_sending])})
+    add_to_group(user, {invited_email: address, new_user: new_user, skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source]})
 
     # Add the new or existing user to my contacts and vice versa
     contact_inviter.add_with_reciprocal(user)
@@ -95,7 +95,7 @@ class GroupInviter
       phone = user.phones.find_by(number: number)
     end
 
-    add_to_group(user, {invited_phone: number, new_user: new_user, skip_sending: !!self.class.to_bool(options[:skip_sending])})
+    add_to_group(user, {invited_phone: number, new_user: new_user, skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source]})
 
     # Add the new or existing user to my contacts and vice versa
     contact_inviter.add_with_reciprocal(user)

@@ -11,8 +11,8 @@ class ContactsController < ApplicationController
 
     contact_inviter = ContactInviter.new(current_user)
     invited_users = contact_inviter.add_users(user_ids)
-    invited_emails = contact_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite]})
-    invited_phones = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite]})
+    invited_emails = contact_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite], source: params[:source]})
+    invited_phones = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite], source: params[:source]})
 
     users = invited_users | invited_emails.map(&:user) | invited_phones.map(&:user)
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer

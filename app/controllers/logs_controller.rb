@@ -14,6 +14,6 @@ class LogsController < ApplicationController
   private
 
   def property_params
-    params.permit(:invite_method, :invite_channel, :recipients)
+    params.permit(:invite_method, :invite_channel, :recipients, :source)
   end
 end

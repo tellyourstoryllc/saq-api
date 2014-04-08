@@ -85,8 +85,8 @@ class GroupsController < ApplicationController
 
     group_inviter = GroupInviter.new(current_user, @group)
     invited_users = group_inviter.add_users(user_ids)
-    invited_emails = group_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite]})
-    invited_phones = group_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite]})
+    invited_emails = group_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite], source: params[:source]})
+    invited_phones = group_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite], source: params[:source]})
 
     users = invited_users | invited_emails.map(&:user) | invited_phones.map(&:user)
     render_json [GroupSerializer.new(@group).as_json] + users.map{ |u| UserWithEmailsAndPhonesSerializer.new(u).as_json }
