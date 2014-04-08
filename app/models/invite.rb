@@ -75,6 +75,12 @@ class Invite < ActiveRecord::Base
   end
 
   def send_mixpanel_event
-    mixpanel.sent_invite(self) if send_invite?
+    return unless send_invite?
+
+    if message
+      mixpanel.sent_photo_invite(self)
+    else
+      mixpanel.sent_invite(self)
+    end
   end
 end
