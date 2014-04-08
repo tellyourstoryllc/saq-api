@@ -8,10 +8,10 @@ class MessageMailer < BaseMailer
     @user = @message.user
     @group = @message.group
     if @message.conversation.is_a?(Group)
-      @url = Rails.configuration.app['web']['url'] + "/view/#{@group.id}"
+      @url = Rails.configuration.app['web']['url'] + "/view/#{@group.id}?invite_channel=email"
     else
       id = OneToOne.id_for_user_ids(@user.id, @recipient.id)
-      @url = Rails.configuration.app['web']['url'] + "/chat/#{id}"
+      @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
     end
 
     @media_description = data[:media_description]

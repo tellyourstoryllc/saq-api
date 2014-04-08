@@ -72,6 +72,10 @@ class MixpanelClient
     track('Clicked Invite Link', invite_properties(invite))
   end
 
+  def clicked_group_invite_link(properties)
+    track('Clicked Invite Link', native_invite_properties(properties))
+  end
+
   def joined_group(group)
     track('Joined Group', group_properties(group))
   end
