@@ -45,7 +45,7 @@ class MessagesController < ApplicationController
           end
         end
 
-        if other_user.account.no_login_credentials?
+        if !other_user.account.registered?
           send_invites(message, other_user)
         else
           # Potentially notify the other user, according to his status and preferences
