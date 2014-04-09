@@ -65,7 +65,7 @@ class UsersController < ApplicationController
   private
 
   def account_params
-    params.permit(:password, :facebook_id, :facebook_token)
+    params.permit(:password, :facebook_id, :facebook_token).merge(registered: true)
   end
 
   def user_params

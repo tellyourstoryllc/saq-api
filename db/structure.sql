@@ -31,6 +31,7 @@ CREATE TABLE `accounts` (
   `facebook_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `time_zone` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `time_zone_offset` mediumint(9) NOT NULL,
+  `registered` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_accounts_on_user_id` (`user_id`),
   UNIQUE KEY `index_accounts_on_facebook_id` (`facebook_id`)
@@ -479,7 +480,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-08 16:49:25
+-- Dump completed on 2014-04-09  9:46:01
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -619,3 +620,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140307154517');
 INSERT INTO schema_migrations (version) VALUES ('20140312155807');
 
 INSERT INTO schema_migrations (version) VALUES ('20140408204911');
+
+INSERT INTO schema_migrations (version) VALUES ('20140409134155');
