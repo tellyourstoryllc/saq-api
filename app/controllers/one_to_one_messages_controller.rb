@@ -49,7 +49,7 @@ class OneToOneMessagesController < ApplicationController
   end
 
   def message_params
-    params.permit(:text, :mentioned_user_ids, {mentioned_user_ids: []}, :attachment_file, :client_metadata).merge(one_to_one_id: @one_to_one.id, user_id: current_user.id)
+    params.permit(:text, :mentioned_user_ids, {mentioned_user_ids: []}, :attachment_file, :attachment_metadata, :client_metadata).merge(one_to_one_id: @one_to_one.id, user_id: current_user.id)
   end
 
   def pagination_params
