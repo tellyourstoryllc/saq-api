@@ -243,15 +243,18 @@ class Message
 
   def increment_stats
     if group
-      StatsD.increment('messages.group.sent')
+      StatsD.increment('messages.group.nonregistered.sent')
 
       # For each message sent, count all the members in the group,
       # (except the sender) as recipients
       recipients = conversation.fetched_member_ids.size - 1
-      StatsD.increment('messages.group.received', recipients) if recipients > 0
+      StatsD.increment('messages.group.nonregistered.received', recipients) if recipients > 0
     elsif one_to_one
-      StatsD.increment('messages.one_to_one.sent')
-      StatsD.increment('messages.one_to_one.received')
+      recipient = one_to_one.other_user(user)
+
+      registered_qualifier = recipient.account.registered? ? 'registered' : 'nonregistered'
+      StatsD.increment("messages.one_to_one.#{registered_qualifier}.sent")
+      StatsD.increment("messages.one_to_one.#{registered_qualifier}.received")
     end
   end
 end
