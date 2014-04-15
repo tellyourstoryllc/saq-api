@@ -3,7 +3,7 @@ class PhonesController < ApplicationController
 
 
   def create
-    if @phone
+    if @phone.save
       HookClient.send_verification(@phone.number, @phone.verification_code) unless @phone.verified?
       render_json current_user
     else
