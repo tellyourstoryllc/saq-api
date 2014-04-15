@@ -144,11 +144,15 @@ class ContactInviter
     #end
 
     if hashed_phone_numbers.present?
-      phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers, verified: true)
+      phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers)
 
       phones.each do |phone|
-        added_users << phone.user
-        add_with_reciprocal(phone.user)
+        if phone.verified?
+          added_users << phone.user
+          add_with_reciprocal(phone.user)
+        end
+
+        phone.phone_contact_of_user_ids << current_user.id
       end
     end
 

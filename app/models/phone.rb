@@ -1,5 +1,6 @@
 class Phone < ActiveRecord::Base
   include Peanut::Model
+  include Redis::Objects
 
   before_validation :normalize_number, :set_hashed_number, :set_user_and_account,
     :set_verification_code
@@ -8,12 +9,13 @@ class Phone < ActiveRecord::Base
   validates :number, format: /\d+/
   validates :number, :hashed_number, uniqueness: true
 
-  after_save :delete_verification_token
+  after_save :notify_friends, :delete_verification_token
 
   belongs_to :account, inverse_of: :phones
   belongs_to :user
 
   scope :verified, -> { where(verified: true) }
+  set :phone_contact_of_user_ids
 
 
   def self.normalize(number)
@@ -71,6 +73,15 @@ class Phone < ActiveRecord::Base
 
     chars = [*0..9]
     self.verification_code = Array.new(4){ chars.sample }.join
+  end
+
+  def notify_friends
+    return unless !verified_was && verified && user
+
+    # TODO: maybe move to Sidekiq
+    User.where(id: phone_contact_of_user_ids.members).find_each do |friend|
+      friend.mobile_notifier.notify_friend_joined(user)
+    end
   end
 
   def delete_verification_token

@@ -66,7 +66,7 @@ class MobileNotifier
   # Send to all iOS devices for which the given block is true
   def create_ios_notifications(alert, custom_data, &block)
     user.ios_devices.each do |ios_device|
-      create_ios_notification(ios_device, alert, custom_data) if block.call(ios_device)
+      create_ios_notification(ios_device, alert, custom_data) if !block_given? || block.call(ios_device)
     end
   end
 
@@ -131,5 +131,15 @@ class MobileNotifier
 
   def notify_new_member(member, group)
     # Don't send any
+  end
+
+  def notify_friend_joined(friend)
+    return if friend.id == user.id
+
+    alert = "Your friend just joined #{Rails.configuration.app['app_name_short']} as #{friend.username}."
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
   end
 end
