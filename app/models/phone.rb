@@ -15,7 +15,6 @@ class Phone < ActiveRecord::Base
   belongs_to :user
 
   scope :verified, -> { where(verified: true) }
-  set :phone_contact_of_user_ids
 
 
   def self.normalize(number)
@@ -42,6 +41,26 @@ class Phone < ActiveRecord::Base
     case number.size
     when 10 then '1-' + number[0..2] + '-' + number[3..5] + '-' + number[6..9]
     else number
+    end
+  end
+
+  def self.phone_contact_of_user_ids_key(hashed_phone_number)
+    "hashed_phone_number:#{hashed_phone_number}:phone_contact_of_user_ids"
+  end
+
+  def phone_contact_of_user_ids_key
+    self.class.phone_contact_of_user_ids_key(hashed_number)
+  end
+
+  def phone_contact_of_user_ids
+    redis.smembers(phone_contact_of_user_ids_key)
+  end
+
+  def self.add_user_to_phone_contacts(user, hashed_phone_numbers)
+    redis.pipelined do
+      hashed_phone_numbers.each do |hashed_phone_number|
+        redis.sadd(phone_contact_of_user_ids_key(hashed_phone_number), user.id)
+      end
     end
   end
 
@@ -79,7 +98,7 @@ class Phone < ActiveRecord::Base
     return unless !verified_was && verified && user
 
     # TODO: maybe move to Sidekiq
-    User.where(id: phone_contact_of_user_ids.members).find_each do |friend|
+    User.where(id: phone_contact_of_user_ids).find_each do |friend|
       friend.mobile_notifier.notify_friend_joined(user)
     end
   end
