@@ -59,6 +59,7 @@ class User < ActiveRecord::Base
   value :replaced_by_user_id
 
   set :unread_convo_ids
+  set :phone_contacts
 
 
   def first_name

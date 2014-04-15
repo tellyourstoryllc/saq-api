@@ -144,6 +144,7 @@ class ContactInviter
     #end
 
     if hashed_phone_numbers.present?
+      current_user.phone_contacts << hashed_phone_numbers
       Phone.add_user_to_phone_contacts(current_user, hashed_phone_numbers)
       phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers).verified
 
