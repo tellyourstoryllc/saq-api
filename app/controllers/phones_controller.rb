@@ -27,9 +27,8 @@ class PhonesController < ApplicationController
     number = Phone.normalize(params[:phone_number])
 
     if number
-      @phone = Phone.find_or_create_by(number: number) do |p|
-        p.user = current_user
-      end
+      @phone = Phone.find_or_initialize_by(number: number)
+      @phone.user = current_user
     end
   end
 end
