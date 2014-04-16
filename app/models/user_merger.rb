@@ -20,7 +20,7 @@ class UserMerger
 
   # Merge old_user into new_user
   def merge
-    return if old_user.nil? || new_user.nil?
+    return if old_user.nil? || new_user.nil? || old_user.id == new_user.id
 
     copy_missing_one_to_ones
     replace_old_with_new_in_groups

@@ -53,8 +53,6 @@ class HookController < ApplicationController
 
     number = Phone.normalize(parsed_body['from'])
     @from_phone = Phone.find_or_create_by(number: number) if number
-    @from_phone.user = user if @from_phone && user
-    @from_phone
   end
 
   def user
@@ -67,7 +65,6 @@ class HookController < ApplicationController
 
   def handle_incoming_sms
     return if from_phone.nil?
-    old_user_id = from_phone.user_id_was if from_phone.user_id_changed?
 
     case content
     when /^(NO+|STOP|UNSUBSCRIBE|CANCEL)$/i
@@ -76,14 +73,9 @@ class HookController < ApplicationController
       from_phone.unsubscribed = false
     end
 
-    from_phone.verified = true
     from_phone.save!
 
+    from_phone.verify!(user, {notify_friends: true})
     mixpanel.verified_phone(from_phone, :sent_sms)
-
-    if old_user_id
-      old_user = User.find_by(id: old_user_id)
-      UserMerger.merge(old_user, user)
-    end
   end
 end

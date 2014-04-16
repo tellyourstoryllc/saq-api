@@ -49,11 +49,12 @@ class SessionsController < ApplicationController
       invite = Invite.find_by(invite_token: params[:invite_token])
 
       if invite
-        account = invite.try(:recipient).try(:account)
+        recipient = invite.try(:recipient)
+        account = recipient.try(:account)
 
-        if account && account.no_login_credentials?
-          account.send_missing_password_email
-          invite.phone.try(:verify!)
+        if account && !account.registered?
+          account.send_missing_password_email if account.no_login_credentials?
+          invite.phone.try(:verify!, recipient)
           @group = invite.group
 
           unless invite.clicked?

@@ -12,7 +12,7 @@ class PhonesController < ApplicationController
   end
 
   def verify
-    if @phone.verify_by_code!(params[:phone_verification_code])
+    if @phone.verify_by_code!(current_user, params[:phone_verification_code], {notify_friends: true})
       mixpanel.verified_phone(@phone, :entered_phone)
       render_json current_user
     else
@@ -25,10 +25,6 @@ class PhonesController < ApplicationController
 
   def load_phone
     number = Phone.normalize(params[:phone_number])
-
-    if number
-      @phone = Phone.find_or_initialize_by(number: number)
-      @phone.user = current_user
-    end
+    @phone = Phone.find_or_initialize_by(number: number) if number
   end
 end

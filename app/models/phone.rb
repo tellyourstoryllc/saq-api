@@ -9,11 +9,12 @@ class Phone < ActiveRecord::Base
   validates :number, format: /\d+/
   validates :number, :hashed_number, uniqueness: true
 
-  after_save :notify_friends, :delete_verification_token
+  after_save :delete_verification_token
 
   belongs_to :account, inverse_of: :phones
   belongs_to :user
 
+  value :notified_friends
   scope :verified, -> { where(verified: true) }
 
 
@@ -28,13 +29,21 @@ class Phone < ActiveRecord::Base
     find_by(number: normalized_number) if normalized_number
   end
 
-  def verify_by_code!(code)
-    verify! if verification_code.present? && verification_code == code
+  def verify_by_code!(current_user, code, options = {})
+    verify!(current_user, options) if verification_code.present? && verification_code == code
   end
 
-  def verify!
+  def verify!(current_user, options = {})
+    return if current_user.nil?
+
+    self.user = current_user
+    old_user_id = user_id_was if user_id_was && user_id_changed?
+
     self.verified = true
     save!
+
+    merge_users(old_user_id)
+    notify_friends if options[:notify_friends]
   end
 
   def pretty
@@ -61,6 +70,23 @@ class Phone < ActiveRecord::Base
       hashed_phone_numbers.each do |hashed_phone_number|
         redis.sadd(phone_contact_of_user_ids_key(hashed_phone_number), user.id)
       end
+    end
+  end
+
+  def merge_users(old_user_id)
+    return if old_user_id.nil?
+
+    old_user = User.find_by(id: old_user_id)
+    UserMerger.merge(old_user, user)
+  end
+
+  def notify_friends
+    return if notified_friends.get
+    self.notified_friends = '1'
+
+    # TODO: maybe move to Sidekiq
+    User.where(id: phone_contact_of_user_ids).find_each do |friend|
+      friend.mobile_notifier.notify_friend_joined(user)
     end
   end
 
@@ -94,15 +120,6 @@ class Phone < ActiveRecord::Base
     self.verification_code = Array.new(4){ chars.sample }.join
   end
 
-  def notify_friends
-    return unless !verified_was && verified && user
-
-    # TODO: maybe move to Sidekiq
-    User.where(id: phone_contact_of_user_ids).find_each do |friend|
-      friend.mobile_notifier.notify_friend_joined(user)
-    end
-  end
-
   def delete_verification_token
     return unless !verified_was && verified && user
 
@@ -110,7 +127,7 @@ class Phone < ActiveRecord::Base
 
     User.redis.multi do
       User.phone_verification_tokens.delete(user.id)
-      User.user_ids_by_phone_verification_token.delete(token)
+      User.user_ids_by_phone_verification_token.delete(token) if token
     end
   end
 end
