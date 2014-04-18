@@ -5,10 +5,12 @@ class Message
   attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
-    :attachment_metadata, :client_metadata, 
+    :attachment_metadata, :client_metadata, :original_message_id, :forward_message_id,
     :created_at, :expires_in, :expires_at
+
   hash_key :attrs
   sorted_set :likes
+  list :forwards
 
   validates :user_id, presence: true
   validate :group_id_or_one_to_one_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
@@ -33,6 +35,7 @@ class Message
       add_to_conversation
     end
 
+    increment_forward_stats
     increment_user_stats
     increment_stats
 
@@ -118,6 +121,14 @@ class Message
     group || one_to_one
   end
 
+  def original_message
+    @original_message ||= Message.new(id: original_message_id) if original_message_id
+  end
+
+  def forward_message
+    @forward_message ||= Message.new(id: forward_message_id) if forward_message_id
+  end
+
 
   private
 
@@ -197,7 +208,7 @@ class Message
                           attachment_url: attachment_url, attachment_content_type: attachment_content_type,
                           attachment_preview_url: attachment_preview_url, attachment_preview_width: attachment_preview_width,
                           attachment_preview_height: attachment_preview_height, attachment_metadata: attachment_metadata,
-                          client_metadata: client_metadata,
+                          client_metadata: client_metadata, original_message_id: original_message_id, forward_message_id: forward_message_id,
                           created_at: created_at, expires_in: expires_in, expires_at: expires_at)
 
       if expires_in.present?
@@ -214,6 +225,19 @@ class Message
     if convo
       lua_script = %{local rank = redis.call('INCR', KEYS[1]); redis.call('HSET', KEYS[2], 'rank', rank); redis.call('ZADD', KEYS[3], rank, ARGV[1])}
       redis.eval lua_script, {keys: [convo.rank.key, attrs.key, convo.message_ids.key], argv: [id]}
+    end
+  end
+
+  def increment_forward_stats
+    om = original_message
+    fm = forward_message
+    return if om.nil? && fm.nil?
+
+    forward_json = {message_id: id, user_id: user.id, forwarded_at: Time.current.to_i}.to_json
+
+    redis.multi do
+      om.forwards << forward_json if om
+      fm.forwards << forward_json if fm && om.id != fm.id
     end
   end
 
