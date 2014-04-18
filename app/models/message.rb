@@ -13,6 +13,7 @@ class Message
   list :forwards # JSON strings for each forward on this or any forwarded/decendant messages (all levels deep)
   sorted_set :liker_ids # User IDs who have liked this specific message
   list :likes # JSON strings for each like on this or any forwarded/decendant messages (all levels deep)
+  list :exports # JSON strings for each export on this or any forwarded/decendant messages (all levels deep)
 
   validates :user_id, presence: true
   validate :group_id_or_one_to_one_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
@@ -146,6 +147,25 @@ class Message
 
   def forward_message
     @forward_message ||= Message.new(id: forward_message_id) if forward_message_id
+  end
+
+  def record_export(user, method)
+    raise ArgumentError.new('Export method must be one of screenshot, library, or other.') unless %w(screenshot library other).include?(method)
+
+    now = Time.current.to_f
+    export_json = {message_id: id, user_id: user.id, method: method, timestamp: now}.to_json
+
+    if forward_message
+      ancestor_ids = ancestor_message_ids.values
+
+      redis.pipelined do
+        [*ancestor_ids, id].each do |message_id|
+          redis.rpush("message:#{message_id}:exports", export_json)
+        end
+      end
+    else
+      exports << export_json
+    end
   end
 
 

@@ -1,4 +1,7 @@
 class MessagesController < ApplicationController
+  before_action :load_message, only: :export
+
+
   def create
     group_ids = split_param(:group_ids)
     one_to_one_ids = split_param(:one_to_one_ids)
@@ -62,6 +65,11 @@ class MessagesController < ApplicationController
     render_json messages
   end
 
+  def export
+    @message.record_export(current_user, params[:method])
+    render_success
+  end
+
 
   private
 
@@ -92,5 +100,11 @@ class MessagesController < ApplicationController
                      new_user: false, can_log_in: other_user.account.can_log_in?, message: message,
                      skip_sending: params[:omit_sms_invite])
     end
+  end
+
+  def load_message
+    @message = Message.new(id: params[:id])
+    raise Peanut::Redis::RecordNotFound unless @message.attrs.exists? &&
+      @message.conversation && @message.conversation.fetched_member_ids.include?(current_user.id)
   end
 end
