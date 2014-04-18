@@ -9,9 +9,10 @@ class Message
     :created_at, :expires_in, :expires_at
 
   hash_key :attrs
-  sorted_set :likes
   list :ancestor_message_ids
-  list :forwards
+  list :forwards # JSON strings for each forward on this or any forwarded/decendant messages (all levels deep)
+  sorted_set :liker_ids # User IDs who have liked this specific message
+  list :likes # JSON strings for each like on this or any forwarded/decendant messages (all levels deep)
 
   validates :user_id, presence: true
   validate :group_id_or_one_to_one_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
@@ -87,7 +88,23 @@ class Message
   end
 
   def like(user)
-    likes[user.id] = Time.current.to_f unless likes.member?(user.id)
+    return if liker_ids.member?(user.id)
+
+    now = Time.current.to_f
+    liker_ids[user.id] = now
+    like_json = {message_id: id, user_id: user.id, timestamp: now}.to_json
+
+    if forward_message
+      ancestor_ids = ancestor_message_ids.values
+
+      redis.pipelined do
+        [*ancestor_ids, id].each do |message_id|
+          redis.rpush("message:#{message_id}:likes", like_json)
+        end
+      end
+    else
+      likes << like_json
+    end
   end
 
   def unlike(user)
@@ -105,7 +122,7 @@ class Message
     start = options[:offset]
     stop = options[:offset] + options[:limit] - 1
 
-    likes.revrange(start, stop)
+    liker_ids.revrange(start, stop)
   end
 
   def paginated_liked_users(options = {})
@@ -247,7 +264,7 @@ class Message
   def increment_forward_stats
     return if forward_message.nil?
 
-    forward_json = {message_id: id, user_id: user.id, forwarded_at: Time.current.to_i}.to_json
+    forward_json = {message_id: id, user_id: user.id, timestamp: Time.current.to_f}.to_json
     ancestor_ids = ancestor_message_ids.values
 
     redis.pipelined do
