@@ -10,6 +10,7 @@ class Message
 
   hash_key :attrs
   sorted_set :likes
+  list :ancestor_message_ids
   list :forwards
 
   validates :user_id, presence: true
@@ -35,6 +36,7 @@ class Message
       add_to_conversation
     end
 
+    set_ancestor_list
     increment_forward_stats
     increment_user_stats
     increment_stats
@@ -232,16 +234,26 @@ class Message
     end
   end
 
-  def increment_forward_stats
-    om = original_message
-    fm = forward_message
-    return if om.nil? && fm.nil?
-
-    forward_json = {message_id: id, user_id: user.id, forwarded_at: Time.current.to_i}.to_json
+  # Copy the parent's ancestor list and append the parent
+  def set_ancestor_list
+    return if forward_message.nil?
 
     redis.multi do
-      om.forwards << forward_json if om
-      fm.forwards << forward_json if fm && om.id != fm.id
+      redis.sort(forward_message.ancestor_message_ids.key, {by: 'nosort', store: ancestor_message_ids.key})
+      ancestor_message_ids << forward_message.id
+    end
+  end
+
+  def increment_forward_stats
+    return if forward_message.nil?
+
+    forward_json = {message_id: id, user_id: user.id, forwarded_at: Time.current.to_i}.to_json
+    ancestor_ids = ancestor_message_ids.values
+
+    redis.pipelined do
+      ancestor_ids.each do |message_id|
+        redis.rpush("message:#{message_id}:forwards", forward_json)
+      end
     end
   end
 
