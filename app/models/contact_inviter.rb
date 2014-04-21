@@ -104,10 +104,14 @@ class ContactInviter
   def add_with_reciprocal(other_user)
     return if current_user.id == other_user.id || User.blocked?(current_user, other_user)
 
+    already_contacts = other_user.contact?(current_user)
+
     User.redis.multi do
       add_user(current_user, other_user)
       add_user(other_user, current_user)
     end
+
+    other_user.mobile_notifier.create_ios_notifications("#{current_user.name} just added you", {r:'c'}) unless already_contacts
   end
 
   def add_user(user, other_user)
