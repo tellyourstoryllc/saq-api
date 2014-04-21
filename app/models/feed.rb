@@ -2,10 +2,11 @@ class Feed
   include Peanut::Model
   include Redis::Objects
 
-  attr_accessor :current_user
-  attr_accessor :options
+  attr_accessor :current_user, :user_ids, :expanded_radius
+  attr_reader :options
 
   USER_LIMIT = 500
+  RADII = [25, 50, 100, :any]
 
   def self.results_expiration
     1.hour
@@ -27,11 +28,22 @@ class Feed
 
     @options[:latitude] ||= current_user.latitude
     @options[:longitude] ||= current_user.longitude
+    @options[:radius] = @options[:radius].present? ? @options[:radius].to_i : nil
 
     @options[:limit] = (@options[:limit] || 10).to_i
     @options[:limit] = 100 if @options[:limit] > 100
 
     @options[:offset] = @options[:offset].to_i
+  end
+
+  def bound_by_location?
+    current_radius && options[:sort] != 'nearest'
+  end
+
+  def current_radius
+    radius = expanded_radius || options[:radius]
+    radius = false if expanded_radius && expanded_radius == :any
+    radius
   end
 
   def base_users_scope
@@ -40,8 +52,7 @@ class Feed
     scope = User.select('users.id')
     scope = scope.where(deactivated: false)
     scope = scope.joins(:account).where(accounts: { registered: true })
-
-    # TODO: bounding radius.
+    scope = scope.near([o[:latitude], o[:longitude]], current_radius, { select: '1', bearing: false }) if bound_by_location?
 
     # Sort.
     order_by = if o[:sort] == 'nearest' && o[:latitude] && o[:longitude]
@@ -63,14 +74,24 @@ class Feed
       stop = options[:offset] + options[:limit] - 1
 
       if exists?
-        user_ids = redis.lrange(users_key, start, stop)
+        self.user_ids = redis.lrange(users_key, start, stop)
 
         user_ids
       else
         srand 3 if Rails.env.development? # For testing
 
         # Fetch potential feed items.
-        user_ids = base_users_scope.to_a.map(&:id)
+        self.user_ids = fetch_user_ids
+
+        if bound_by_location?
+          RADII.each do |radius|
+            break if user_ids.present?
+            next if radius.is_a?(Fixnum) && radius <= current_radius
+
+            self.expanded_radius = radius
+            self.user_ids = fetch_user_ids
+          end
+        end
 
         return [] if user_ids.empty?
 
@@ -86,6 +107,10 @@ class Feed
         user_ids_page
       end
     end
+  end
+
+  def fetch_user_ids
+    base_users_scope.to_a.map(&:id)
   end
 
   def self.feed_api(current_user, options)

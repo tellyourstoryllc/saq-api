@@ -7,7 +7,7 @@ class FeedController < ApplicationController
   private
 
   def feed_params
-    params.permit(:limit, :offset, :sort, :latitude, :longitude)
+    params.permit(:limit, :offset, :sort, :latitude, :longitude, :radius)
   end
 
 end

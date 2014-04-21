@@ -94,6 +94,8 @@ class User < ActiveRecord::Base
 
   delegate :registered, :registered?, to: :account
 
+  reverse_geocoded_by :latitude, :longitude
+
   COHORT_METRICS_TIME_ZONE = 'America/New_York'
 
 
