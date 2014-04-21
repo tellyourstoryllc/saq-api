@@ -62,6 +62,11 @@ class MessagesController < ApplicationController
       end
     end
 
+    # Send forward meta messages to the most recent and original users
+    if messages.present? && messages.first.forward_message
+      messages.first.send_forward_meta_messages
+    end
+
     render_json messages
   end
 

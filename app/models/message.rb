@@ -5,8 +5,8 @@ class Message
   attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
-    :attachment_metadata, :client_metadata, :original_message_id, :forward_message_id,
-    :created_at, :expires_in, :expires_at
+    :attachment_metadata, :client_metadata, :original_message_id, :forward_message_id, :actor_id,
+    :attachment_message_id, :created_at, :expires_in, :expires_at
 
   hash_key :attrs
   list :ancestor_message_ids
@@ -89,7 +89,7 @@ class Message
   end
 
   def like(user)
-    return if liker_ids.member?(user.id)
+    return if meta_message? || liker_ids.member?(user.id)
 
     now = Time.current.to_f
     liker_ids[user.id] = now
@@ -169,6 +169,26 @@ class Message
     end
   end
 
+  def meta_message?
+    attachment_content_type.starts_with?('meta/')
+  end
+
+  def send_forward_meta_messages
+    return if forward_message.nil?
+
+    attrs = {attachment_content_type: 'meta/forward', actor_id: user.id}
+    alert = "#{user.username} shared your #{message_attachment.media_type_name}"
+    custom_data = {}
+
+    [original_message, forward_message].uniq(&:id).each do |message|
+      m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
+                                  attachment_message_id: message.id))
+      m.save
+
+      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+    end
+  end
+
 
   private
 
@@ -213,7 +233,7 @@ class Message
 
   def text_or_attachment_set?
     errors.add(:base, "Either text or an attachment is required.") unless text.present? || attachment_file.present? ||
-      attachment_url.present? || (forward_message && forward_message.attachment_url.present?)
+      attachment_url.present? || (forward_message && forward_message.attachment_url.present?) || meta_message?
   end
 
   def save_message_attachment
@@ -223,7 +243,7 @@ class Message
     elsif attachment_url.present?
       @message_attachment = MessageAttachment.new(message_id: id, message: self, remote_attachment_url: attachment_url)
       @message_attachment.save!
-    elsif forward_message_id.present?
+    elsif forward_message_id.present? && !forward_message.meta_message?
       @message_attachment = MessageAttachment.new(message_id: id, message: self, remote_attachment_url: forward_message.attachment_url)
       @message_attachment.save!
     end
@@ -253,7 +273,8 @@ class Message
                           attachment_preview_url: attachment_preview_url, attachment_preview_width: attachment_preview_width,
                           attachment_preview_height: attachment_preview_height, attachment_metadata: attachment_metadata,
                           client_metadata: client_metadata, original_message_id: original_message_id, forward_message_id: forward_message_id,
-                          created_at: created_at, expires_in: expires_in, expires_at: expires_at)
+                          actor_id: actor_id, attachment_message_id: attachment_message_id, created_at: created_at, expires_in: expires_in,
+                          expires_at: expires_at)
 
       if expires_in.present?
         redis.expire(attrs.key, expires_in)
