@@ -10,6 +10,14 @@ FactoryGirl.define do
       gender 'female'
     end
 
+    trait :male do
+      gender 'male'
+    end
+
+    trait :female do
+      gender 'female'
+    end
+
     trait :deactivated do
       deactivated true
     end
