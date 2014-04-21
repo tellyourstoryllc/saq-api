@@ -108,8 +108,9 @@ class Message
     end
   end
 
+  # Obsolete?
   def unlike(user)
-    likes.delete(user.id)
+    # likes.delete(user.id)
   end
 
   def paginated_liked_user_ids(options = {})
