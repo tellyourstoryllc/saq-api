@@ -1,6 +1,7 @@
 class User < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
+  include Peanut::Geolocation
   attr_accessor :avatar_image_file, :avatar_image_url, :avatar_video_file, :invite_type
 
   before_validation :set_id, :set_friend_code, on: :create
