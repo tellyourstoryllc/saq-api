@@ -61,7 +61,7 @@ class Feed
       User.coordinate_order_options(o[:latitude], o[:longitude])
     else # newest
       # Use id so that it's stable.
-      'users.created_at DESC, id'
+      'users.created_at DESC, users.id'
     end
     scope = scope.reorder(order_by)
 
