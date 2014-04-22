@@ -179,7 +179,7 @@ class Message
     return if forward_message.nil?
 
     attrs = {attachment_content_type: 'meta/forward', actor_id: user.id}
-    alert = "#{user.username} shared your #{message_attachment.media_type_name}"
+    alert = "#{user.username} forwarded your #{message_attachment.media_type_name}"
     custom_data = {}
 
     [original_message, forward_message].uniq(&:id).each do |message|
