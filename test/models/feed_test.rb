@@ -6,14 +6,17 @@ describe Feed do
       User.destroy_all
     end
 
-    it "must return the first page of feed users" do
+    it "must not return deactivated or unregistered users" do
       current_user = FactoryGirl.create(:registered_user, :female)
       deactivated_user = FactoryGirl.create(:registered_user, :female, :deactivated)
+      unregistered_user = FactoryGirl.create(:user, :female)
+      FactoryGirl.create(:account, :unregistered, user: unregistered_user)
 
       results = Feed.feed_api(current_user, {})
       results.must_be :present?
       results.must_include current_user
       results.wont_include deactivated_user
+      results.wont_include unregistered_user
     end
 
     it "must order by newest" do
