@@ -72,6 +72,10 @@ class MessagesController < ApplicationController
 
   def export
     @message.record_export(current_user, params[:method])
+
+    # Send export meta messages to the most recent and original users
+    @message.send_export_meta_messages(current_user, params[:method])
+
     render_success
   end
 

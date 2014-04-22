@@ -153,7 +153,7 @@ class Message
   end
 
   def record_export(user, method)
-    raise ArgumentError.new('Export method must be one of screenshot, library, or other.') unless %w(screenshot library other).include?(method)
+    raise_if_invalid_method(method)
 
     now = Time.current.to_f
     export_json = {message_id: id, user_id: user.id, method: method, timestamp: now}.to_json
@@ -169,6 +169,10 @@ class Message
     else
       exports << export_json
     end
+  end
+
+  def raise_if_invalid_method(method)
+    raise ArgumentError.new('Export method must be one of screenshot, library, or other.') unless %w(screenshot library other).include?(method)
   end
 
   def meta_message?
@@ -194,6 +198,28 @@ class Message
   def send_like_meta_messages(current_user)
     attrs = {attachment_content_type: 'meta/like', actor_id: current_user.id}
     alert = "#{current_user.username} liked your #{message_attachment.try(:media_type_name) || 'message'}"
+    custom_data = {}
+
+    [original_message, self].compact.uniq(&:id).each do |message|
+      m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
+                                  attachment_message_id: message.id))
+      m.save
+
+      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+    end
+  end
+
+  def send_export_meta_messages(current_user, method)
+    raise_if_invalid_method(method)
+
+    attrs = {attachment_content_type: 'meta/export', actor_id: current_user.id}
+    msg_desc = message_attachment.try(:media_type_name) || 'message'
+    alert = case method
+            when 'screenshot' then "#{current_user.username} took a screenshot of your #{msg_desc}"
+            when 'library' then "#{current_user.username} saved your #{msg_desc} to their camera roll"
+            else "#{current_user.username} shared your #{msg_desc}"
+            end
+
     custom_data = {}
 
     [original_message, self].compact.uniq(&:id).each do |message|
