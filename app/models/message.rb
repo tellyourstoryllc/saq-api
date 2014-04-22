@@ -89,7 +89,7 @@ class Message
   end
 
   def like(user)
-    return if meta_message? || liker_ids.member?(user.id)
+    return false if meta_message? || liker_ids.member?(user.id)
 
     now = Time.current.to_f
     liker_ids[user.id] = now
@@ -106,6 +106,8 @@ class Message
     else
       likes << like_json
     end
+
+    true
   end
 
   # Obsolete?
@@ -170,7 +172,7 @@ class Message
   end
 
   def meta_message?
-    attachment_content_type.starts_with?('meta/')
+    attachment_content_type.present? && attachment_content_type.starts_with?('meta/')
   end
 
   def send_forward_meta_messages
@@ -181,6 +183,20 @@ class Message
     custom_data = {}
 
     [original_message, forward_message].uniq(&:id).each do |message|
+      m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
+                                  attachment_message_id: message.id))
+      m.save
+
+      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+    end
+  end
+
+  def send_like_meta_messages(current_user)
+    attrs = {attachment_content_type: 'meta/like', actor_id: current_user.id}
+    alert = "#{current_user.username} liked your #{message_attachment.try(:media_type_name) || 'message'}"
+    custom_data = {}
+
+    [original_message, self].compact.uniq(&:id).each do |message|
       m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
                                   attachment_message_id: message.id))
       m.save
