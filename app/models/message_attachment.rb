@@ -23,7 +23,7 @@ class MessageAttachment < ActiveRecord::Base
     return unless media_type.present?
 
     case media_type
-    when 'image' then 'image'
+    when 'image' then 'photo'
     when 'video' then 'video'
     when 'audio' then 'audio clip'
     else 'file'
@@ -35,7 +35,7 @@ class MessageAttachment < ActiveRecord::Base
     return unless name.present?
 
     case name
-    when 'image' then 'an image'
+    when 'image' then 'a photo'
     when 'video' then 'a video'
     when 'audio' then 'an audio clip'
     else 'a file'
