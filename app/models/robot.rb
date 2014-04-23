@@ -20,13 +20,15 @@ class Robot
   end
 
   def self.send_messages_by_trigger(current_user, trigger)
-    one_to_one_id = OneToOne.id_for_user_ids(current_user.id, user.id)
+    one_to_one = OneToOne.new(sender_id: current_user.id, recipient_id: user.id)
 
     items = RobotItem.by_trigger(trigger)
     items.each do |item|
-      message = Message.new(one_to_one_id: one_to_one_id, user_id: user.id,
+      message = Message.new(one_to_one_id: one_to_one.id, user_id: user.id,
                             text: item.text, attachment_url: item.attachment_url)
       message.save
+
+      one_to_one.publish_one_to_one_message(message)
     end
   end
 
