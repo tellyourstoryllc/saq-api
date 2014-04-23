@@ -22,6 +22,8 @@ class GroupMessagesController < ApplicationController
       group_mixpanel.sent_daily_message(@group)
       mixpanel.sent_daily_message
 
+      Robot.reply_to(current_user, @message)
+
       render_json @message
     else
       render_error @message.errors.full_messages
