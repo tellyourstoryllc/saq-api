@@ -1,6 +1,10 @@
 class Robot
+  def self.username
+    Rails.configuration.app['app_name_short']
+  end
+
   def self.user
-    @user ||= User.find_by(username: Rails.configuration.app['app_name_short'])
+    @user ||= User.find_by(username: username)
   end
 
   def self.set_up_new_user(current_user)
