@@ -191,6 +191,7 @@ class Message
                                   attachment_message_id: message.id))
       m.save
 
+      message.conversation.publish_one_to_one_message(m)
       message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
     end
   end
@@ -205,6 +206,7 @@ class Message
                                   attachment_message_id: message.id))
       m.save
 
+      message.conversation.publish_one_to_one_message(m)
       message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
     end
   end
@@ -227,6 +229,7 @@ class Message
                                   attachment_message_id: message.id))
       m.save
 
+      message.conversation.publish_one_to_one_message(m)
       message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
     end
   end
