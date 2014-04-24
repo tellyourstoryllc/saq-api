@@ -36,7 +36,7 @@ class GroupsController < ApplicationController
   def update
     @group.viewer = current_user
     @group.update!(update_group_params)
-    publish_updated_group if update_group_params.keys.any?{ |k| ! %w(last_seen_rank hidden).include?(k) }
+    publish_updated_group if update_group_params.keys.any?{ |k| ! %w(last_seen_rank last_deleted_rank hidden).include?(k) }
     group_mixpanel.fetched_daily_messages(@group) if update_group_params.keys.include?('last_seen_rank')
 
     render_json @group
@@ -168,7 +168,7 @@ class GroupsController < ApplicationController
 
   def update_group_params
     permitted = [:name, :topic, :avatar_image_file, :avatar_image_url, :wallpaper_image_file,
-      :wallpaper_image_url, :last_seen_rank, :hidden]
+      :wallpaper_image_url, :last_seen_rank, :last_deleted_rank, :hidden]
     params.permit(permitted).tap do |attrs|
       if @group.admin?(current_user)
         if (attrs.has_key?(:avatar_image_file) && attrs[:avatar_image_file].blank?) ||

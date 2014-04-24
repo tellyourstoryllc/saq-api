@@ -27,12 +27,11 @@ module Peanut::Conversation
     below_rank = below_rank.to_i if below_rank.present?
     return [] if below_rank && below_rank <= 0
 
-    ids = if below_rank
-      message_ids.revrangebyscore(below_rank - 1, '-inf', {limit: limit}).reverse
-    else
-      message_ids.range(-limit, -1)
-    end
+    max = below_rank ? below_rank - 1 : 'inf'
+    deleted_rank = last_deleted_rank
+    min = deleted_rank ? deleted_rank + 1 : '-inf'
 
+    ids = message_ids.revrangebyscore(max, min, {limit: limit}).reverse
     Message.pipelined_find(ids)
   end
 
@@ -61,6 +60,15 @@ module Peanut::Conversation
 
   def last_seen_rank=(rank)
     redis.hset(metadata_key, :last_seen_rank, rank) if viewer
+  end
+
+  def last_deleted_rank
+    data = metadata
+    data['last_deleted_rank'].try(:to_i) if data
+  end
+
+  def last_deleted_rank=(rank)
+    redis.hset(metadata_key, :last_deleted_rank, rank) if viewer
   end
 
   def hidden

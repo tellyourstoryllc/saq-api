@@ -34,7 +34,7 @@ class OneToOnesController < ApplicationController
   end
 
   def update_params
-    params.permit(:last_seen_rank, :hidden)
+    params.permit(:last_seen_rank, :last_deleted_rank, :hidden)
   end
 
   def publish_updated_one_to_one

@@ -3,6 +3,10 @@ class PublishGroupSerializer < GroupSerializer
     false
   end
 
+  def include_last_deleted_rank?
+    false
+  end
+
   def include_hidden?
     false
   end
