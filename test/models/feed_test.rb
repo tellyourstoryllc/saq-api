@@ -1,10 +1,7 @@
 require "test_helper"
 
-describe Feed do
-  describe "#feed_api" do
-    after do
-      User.destroy_all
-    end
+class FeedTest < ActiveSupport::TestCase
+  describe "Feed#feed_api" do
 
     it "must not return deactivated or unregistered users" do
       current_user = FactoryGirl.create(:registered_user, :female)
