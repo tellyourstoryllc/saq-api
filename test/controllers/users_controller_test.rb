@@ -6,14 +6,14 @@ describe UsersController do
       it "must not create a user if it's invalid" do
         post :create
         old_count = User.count
-        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Email is invalid, User name can't be blank."})
+        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Email is invalid."})
         User.count.must_equal old_count
       end
 
       it "must not create a user using Facebook authentication if the given Facebook id and token are not valid" do
         stub_request(:any, /.*facebook.com/).to_return(body: {})
 
-        post :create, {name: 'John Doe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'invalidtoken'}
+        post :create, {username: 'JohnDoe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'invalidtoken'}
         old_count = User.count
         result.must_equal('error' => {'message' => 'Sorry, that could not be saved: Validation failed: Invalid Facebook credentials.'})
         User.count.must_equal old_count
@@ -23,13 +23,13 @@ describe UsersController do
 
     describe "valid" do
       it "must create a user and account" do
-        post :create, {name: 'John Doe', email: 'joe@example.com', password: 'asdf'}
+        post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf'}
 
         user = User.last
         account = Account.last
 
         result.size.must_equal 2
-        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
@@ -37,13 +37,13 @@ describe UsersController do
       end
 
       it "must create a user and account without a password" do
-        post :create, {name: 'John Doe', email: 'joe@example.com'}
+        post :create, {username: 'JohnDoe', email: 'joe@example.com'}
 
         user = User.last
         account = Account.last
 
         result.size.must_equal 2
-        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
@@ -52,22 +52,22 @@ describe UsersController do
 
       it "must create a user and a group" do
         Time.stub :now, now = Time.parse('2013-12-26 15:08') do
-          post :create, {name: 'John Doe', email: 'joe@example.com', password: 'asdf', group_name: 'Cool Dudes'}
+          post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf', group_name: 'Cool Dudes'}
 
           user = User.order('created_at DESC').last
           account = Account.last
           group = Group.order('created_at DESC').last
 
           result.size.must_equal 3
-          result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe',
-            'username' => user.username, 'token' => user.token, 'status' => 'unavailable',
+          result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe',
+            'username' => 'JohnDoe', 'token' => user.token, 'status' => 'unavailable',
             'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil, 'avatar_url' => nil}
 
           result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
             'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
 
           result_must_include 'group', group.id, {'object_type' => 'group', 'id' => group.id, 'name' => 'Cool Dudes',
-            'join_url' => "http://test.host/join/#{group.join_code}", 'topic' => nil,
+            'join_url' => "http://test.host/v/#{group.join_code}", 'topic' => nil,
             'avatar_url' => nil, 'wallpaper_url' => nil, 'admin_ids' => [user.id], 'member_ids' => [user.id],
             'last_message_at' => nil, 'last_seen_rank' => nil, 'hidden' => nil, 'created_at' => now.to_i}
         end
@@ -79,13 +79,13 @@ describe UsersController do
         def api.get_connections(id, connection); [] end
 
         Koala::Facebook::API.stub :new, api do
-          post :create, {name: 'John Doe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
+          post :create, {username: 'JohnDoe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
 
           user = User.last
           account = Account.last
 
           result.size.must_equal 2
-          result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'John Doe', 'username' => user.username,
+          result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
             'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
             'client_type' => nil, 'avatar_url' => nil}
           result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
@@ -101,10 +101,10 @@ describe UsersController do
         invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'bruce@example.com')
         user_count = User.count
 
-        post :create, {name: 'Bruce Lee', email: 'bruce@example.com', password: 'asdf', invite_token: invite.invite_token}
+        post :create, {username: 'BruceLee', email: 'bruce@example.com', password: 'asdf', invite_token: invite.invite_token}
 
         result.size.must_equal 2
-        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'Bruce Lee', 'username' => user.username,
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'BruceLee', 'username' => 'BruceLee',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
@@ -127,13 +127,13 @@ describe UsersController do
         invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'bruce@example.com')
         user_count = User.count
 
-        post :create, {name: 'Bruce Lee', email: 'bruce@example.com', password: 'asdf', invite_token: invite.invite_token}
+        post :create, {username: 'BruceLee', email: 'bruce@example.com', password: 'asdf', invite_token: invite.invite_token}
 
-        user = User.find_by(name: 'Bruce Lee')
+        user = User.find_by(username: 'BruceLee')
         account = user.account
 
         result.size.must_equal 2
-        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'Bruce Lee', 'username' => user.username,
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'BruceLee', 'username' => 'BruceLee',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
@@ -148,11 +148,11 @@ describe UsersController do
   describe "POST /users/update" do
     it "must update the user" do
       FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
-      post :update, {name: 'Johnny', status: 'away', status_text: 'be back soon', token: current_user.token}
+      post :update, {username: 'Johnny', status: 'away', status_text: 'be back soon', token: current_user.token}
 
       result.size.must_equal 1
       result_must_include 'user', current_user.id, {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny',
-        'username' => current_user.username, 'token' => current_user.token,
+        'username' => 'Johnny', 'token' => current_user.token,
         'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon', 'client_type' => 'web',
         'avatar_url' => nil}
     end

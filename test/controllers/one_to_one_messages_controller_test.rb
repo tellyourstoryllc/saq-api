@@ -16,12 +16,12 @@ describe OneToOneMessagesController do
         post :create, {one_to_one_id: one_to_one.id, text: text, token: current_user.token}
         message_id = one_to_one.message_ids.last
 
-        result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => nil, 'one_to_one_id' => one_to_one.id,
-                          'user_id' => current_user.id, 'rank' => 0, 'text' => text,
-                          'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
-                          'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-                          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
+        result_must_include 'message', message_id, {'object_type' => 'message', 'id' => message_id,
+          'group_id' => nil, 'one_to_one_id' => one_to_one.id,
+          'user_id' => current_user.id, 'rank' => 1, 'text' => text,
+          'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
+          'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
+          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}
 
         current_user.one_to_one_ids.members.must_include one_to_one.id
         current_user.one_to_one_user_ids.members.must_include member.id
@@ -45,12 +45,12 @@ describe OneToOneMessagesController do
         one_to_one = OneToOne.new(sender_id: current_user.id, recipient_id: member.id)
         message_id = one_to_one.message_ids.last
 
-        result.must_equal([{'object_type' => 'message', 'id' => message_id,
-                          'group_id' => nil, 'one_to_one_id' => one_to_one_id,
-                          'user_id' => current_user.id, 'rank' => 0, 'text' => text,
-                          'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
-                          'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-                          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}])
+        result_must_include 'message', message_id, {'object_type' => 'message', 'id' => message_id,
+          'group_id' => nil, 'one_to_one_id' => one_to_one_id,
+          'user_id' => current_user.id, 'rank' => 1, 'text' => text,
+          'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
+          'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
+          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}
 
         one_to_one.attrs.wont_be_empty
 
