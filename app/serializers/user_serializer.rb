@@ -1,7 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :object_type, :id, :token, :name, :username, :status, :status_text,
-    :idle_duration, :client_type, :avatar_url, :avatar_video_url, :phone_verification_token,
-    :replaced_user_ids, :replaced_by_user_id, :deactivated
+    :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
+    :phone_verification_token, :replaced_user_ids, :replaced_by_user_id, :deactivated
 
   def status
     if contacts?
@@ -25,14 +25,6 @@ class UserSerializer < ActiveModel::Serializer
     else
       'web'
     end
-  end
-
-  def avatar_url
-    object.avatar_url
-  end
-
-  def avatar_video_url
-    object.avatar_video_url
   end
 
   def include_token?

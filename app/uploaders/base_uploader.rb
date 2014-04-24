@@ -27,4 +27,20 @@ class BaseUploader < CarrierWave::Uploader::Base
 
     dirs.join('/')
   end
+
+  def media_type(file)
+    type = file.content_type
+    MIME::Types[type].first.try(:media_type) || type.split('/').first
+  end
+
+
+  private
+
+  def image?(file)
+    media_type(file) == 'image'
+  end
+
+  def video?(file)
+    media_type(file) == 'video'
+  end
 end

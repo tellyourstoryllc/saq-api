@@ -87,6 +87,10 @@ class User < ActiveRecord::Base
     @avatar_video_url ||= avatar_video.video.url if avatar_video
   end
 
+  def avatar_video_preview_url
+    @avatar_video_preview_url ||= avatar_video.preview_url if avatar_video
+  end
+
   def groups
     Group.where(id: group_ids.members)
   end

@@ -93,6 +93,11 @@ CREATE TABLE `avatar_videos` (
   `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `media_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `content_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `file_size` int(11) NOT NULL,
+  `preview_width` int(11) DEFAULT NULL,
+  `preview_height` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_avatar_videos_on_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -480,7 +485,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-09  9:46:01
+-- Dump completed on 2014-04-24 12:35:51
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -622,3 +627,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140312155807');
 INSERT INTO schema_migrations (version) VALUES ('20140408204911');
 
 INSERT INTO schema_migrations (version) VALUES ('20140409134155');
+
+INSERT INTO schema_migrations (version) VALUES ('20140424163441');
