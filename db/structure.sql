@@ -684,6 +684,7 @@ CREATE TABLE `users` (
   `last_public_story_latitude` decimal(10,7) DEFAULT NULL,
   `last_public_story_longitude` decimal(10,7) DEFAULT NULL,
   `public_avatar_image` tinyint(1) NOT NULL DEFAULT '0',
+  `public_avatar_video` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_users_on_username` (`username`),
   UNIQUE KEY `index_users_on_friend_code` (`friend_code`),
@@ -703,7 +704,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-19 10:52:01
+-- Dump completed on 2014-12-19 10:58:35
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -931,3 +932,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141210212510');
 INSERT INTO schema_migrations (version) VALUES ('20141219000000');
 
 INSERT INTO schema_migrations (version) VALUES ('20141219000001');
+
+INSERT INTO schema_migrations (version) VALUES ('20141219000002');
