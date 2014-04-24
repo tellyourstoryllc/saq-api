@@ -559,6 +559,10 @@ class User < ActiveRecord::Base
     update!(deactivated: true)
   end
 
+  def update_avatar_status!
+    update!(public_avatar_image: !! (self.avatar_image.try(:approved?)))
+  end
+
   def snap_invite_ad(client)
     send("#{client}_snap_invite_ad") if client.present?
   end

@@ -80,6 +80,8 @@ KrazyChat::Application.routes.draw do
     match '/contacts/autoconnect', to: 'contacts#autoconnect', as: 'remove_autoconnect'
     match '/groups/:id/add_users', to: 'groups#add_users', as: 'groups_add_users'
 
+    match '/moderation/callback', to: 'moderation#callback', as: 'moderation_callback'
+
     match '/hook/callback', to: 'hook#callback', as: 'hook_callback'
 
     match '/admin', to: 'admin#app_reviews', as: 'admin'

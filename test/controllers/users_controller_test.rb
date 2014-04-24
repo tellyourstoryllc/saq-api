@@ -232,5 +232,45 @@ describe UsersController do
       post :update, {name: 'Johnny', status: 'idle', status_text: 'be back soon', token: current_user.token}
       result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Status is not included in the list."})
     end
+
+    describe "when adding avatar image" do
+      before do
+        Email.destroy_all
+        Account.destroy_all
+        User.destroy_all
+      end
+
+      after do
+        # Delete temp files for upload created by CarrierWave.
+        FileUtils.rm_rf(Dir["#{Rails.root}/public/uploads/tmp/[^.]*"])
+      end
+
+      let(:user) { FactoryGirl.create(:registered_user) }
+
+      before do
+        stub_request(:any, /#{Rails.configuration.app['aws']['bucket_name']}/).to_return(headers: { 'ETag' => 'abc' })
+        @moderator_post = stub_request(:post, "#{Moderator.url}/api/photo/submit").to_return(body: {})
+      end
+
+      let(:image_file) { File.open(File.expand_path('test/data/rubygem.png')) }
+      
+      def uploaded_file_object
+        filename = File.basename(image_file.path)
+
+        ActionDispatch::Http::UploadedFile.new(
+          tempfile: image_file,
+          filename: filename,
+          head: %Q{Content-Disposition: form-data; filename="#{filename}"},
+          type: 'image/png'
+        )
+      end
+
+      it "should submit to the moderator" do
+        post :update, {token: user.token, avatar_image_file: uploaded_file_object}
+        assert_requested @moderator_post
+        user.reload
+        user.avatar_image.must_be :in_review?
+      end
+    end
   end
 end
