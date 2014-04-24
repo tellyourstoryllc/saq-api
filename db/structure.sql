@@ -694,6 +694,26 @@ CREATE TABLE `users` (
   KEY `index_on_last_public_story_location` (`last_public_story_latitude`,`last_public_story_longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `video_thumbnails`
+--
+
+DROP TABLE IF EXISTS `video_thumbnails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `video_thumbnails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `video_id` int(11) NOT NULL,
+  `status` enum('pending','review','normal','censored') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `offset` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_video_thumbnails_on_video_id` (`video_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -704,7 +724,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-19 10:58:35
+-- Dump completed on 2014-12-19 10:59:47
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -934,3 +954,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141219000000');
 INSERT INTO schema_migrations (version) VALUES ('20141219000001');
 
 INSERT INTO schema_migrations (version) VALUES ('20141219000002');
+
+INSERT INTO schema_migrations (version) VALUES ('20141219000003');
