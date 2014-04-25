@@ -563,6 +563,12 @@ class User < ActiveRecord::Base
     update!(public_avatar_image: !! (self.avatar_image.try(:approved?)))
   end
 
+  def update_avatar_video_status!
+    thumbnails = self.avatar_video.try(:thumbnails)
+    approved = thumbnails.present? && thumbnails.all? {|t| t.approved? }
+    update!(public_avatar_video: !! approved)
+  end
+
   def snap_invite_ad(client)
     send("#{client}_snap_invite_ad") if client.present?
   end
