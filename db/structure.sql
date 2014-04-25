@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.5.29, for osx10.8 (i386)
 --
--- Host: localhost    Database: krazychat_dev
+-- Host: localhost    Database: snap_dev
 -- ------------------------------------------------------
 -- Server version	5.5.29
 
@@ -485,7 +485,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-04-24 12:35:51
+-- Dump completed on 2014-04-25 16:55:40
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');

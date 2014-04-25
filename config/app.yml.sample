@@ -4,8 +4,8 @@ development:
     password: PASSWORD
   api:
     request_secret: SECRET
-  app_name: krazychat
-  app_name_short: krazykam
+  app_name: Snap Crackle Pop
+  app_name_short: Snap
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -16,11 +16,11 @@ development:
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
-    config_prefix: kk
+    config_prefix: snap
   facebook:
     app_access_token: TOKEN
   faye:
-    url: https://local.krazychat.com:8080/faye
+    url: https://local.snap.io:8080/faye
     server_secret: SECRET
   hook:
     passcode: PASSCODE
@@ -29,20 +29,20 @@ development:
     token: TOKEN
     group_token: GROUP_TOKEN
   rpush:
-    db_ios_app_name: krazychat_ios
-    db_android_app_name: krazychat_android
+    db_ios_app_name: snap_ios
+    db_android_app_name: snap_android
   redis:
     persisted:
       host: 127.0.0.1
-      port: 6381
+      port: 6384
       db: 0
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: krazychat.com
+    domain: snap.io
   statsd:
     server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
-    prefix: krazykam
+    prefix: snap
   web:
     domain: localhost:3001
     url: http://localhost:3001
@@ -53,8 +53,8 @@ test:
     password: PASSWORD
   api:
     request_secret: SECRET
-  app_name: krazychat
-  app_name_short: krazykam
+  app_name: Snap Crackle Pop
+  app_name_short: Snap
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -65,11 +65,11 @@ test:
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
-    config_prefix: kk
+    config_prefix: snap
   facebook:
     app_access_token: TOKEN
   faye:
-    url: https://local.krazychat.com:8080/faye_TEST
+    url: https://local.snap.io:8080/faye_TEST
     server_secret: SECRET
   hook:
     passcode: 'invalid'
@@ -88,10 +88,10 @@ test:
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: krazychat.com
+    domain: snap.io
   statsd:
     server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
-    prefix: krazykam
+    prefix: snap
   web:
     domain: test.host
     url: http://test.host
