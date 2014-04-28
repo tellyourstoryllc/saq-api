@@ -32,8 +32,8 @@ describe UsersController do
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil}
-        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-          'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
+          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
       end
 
       it "must create a user and account without a password" do
@@ -46,8 +46,8 @@ describe UsersController do
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil}
-        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-          'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
+          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
       end
 
       it "must create a user and a group" do
@@ -88,8 +88,8 @@ describe UsersController do
           result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
             'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
             'client_type' => nil, 'avatar_url' => nil}
-          result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-            'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
+          result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
+            'one_to_one_wallpaper_url' => nil, 'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
         end
       end
 
@@ -107,8 +107,8 @@ describe UsersController do
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'BruceLee', 'username' => 'BruceLee',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil}
-        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-          'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
+          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
 
         User.count.must_equal user_count
 
@@ -136,8 +136,8 @@ describe UsersController do
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'BruceLee', 'username' => 'BruceLee',
           'token' => user.token, 'status' => 'unavailable', 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil}
-        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id, 'one_to_one_wallpaper_url' => nil,
-          'facebook_id' => nil, 'time_zone' => 'America/New_York'}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
+          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
 
         User.count.must_equal user_count + 1
       end
