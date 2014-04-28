@@ -5,8 +5,7 @@ class Message
   attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
-    :attachment_metadata, :client_metadata, 
-    :created_at, :expires_in, :expires_at
+    :attachment_metadata, :client_metadata, :received, :created_at, :expires_in, :expires_at
   hash_key :attrs
   sorted_set :likes
 
@@ -18,7 +17,11 @@ class Message
 
   def initialize(attributes = {})
     super
-    to_int(:rank, :attachment_preview_width, :attachment_preview_height, :created_at, :expires_in, :expires_at) if id.present?
+
+    if id.present?
+      to_int(:rank, :attachment_preview_width, :attachment_preview_height, :created_at, :expires_in, :expires_at)
+      to_bool(:received)
+    end
   end
 
   def save
@@ -191,13 +194,16 @@ class Message
       self.message_attachment_id = @message_attachment.id
     end
 
+    # If this message was received, change the sender
+    self.user_id = one_to_one.other_user_id(user) if received
+
     redis.multi do
       self.attrs.bulk_set(id: id, group_id: group_id, one_to_one_id: one_to_one_id, user_id: user_id,
                           text: text, mentioned_user_ids: @mentioned_user_ids, message_attachment_id: message_attachment_id,
                           attachment_url: attachment_url, attachment_content_type: attachment_content_type,
                           attachment_preview_url: attachment_preview_url, attachment_preview_width: attachment_preview_width,
                           attachment_preview_height: attachment_preview_height, attachment_metadata: attachment_metadata,
-                          client_metadata: client_metadata,
+                          client_metadata: client_metadata, received: received,
                           created_at: created_at, expires_in: expires_in, expires_at: expires_at)
 
       if expires_in.present?
