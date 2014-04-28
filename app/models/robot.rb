@@ -33,8 +33,7 @@ class Robot
   end
 
   def self.send_initial_messages(current_user)
-    one_to_one_id = OneToOne.id_for_user_ids(current_user.id, user.id)
-    one_to_one = OneToOne.new(id: one_to_one_id)
+    one_to_one = OneToOne.new(sender_id: user.id, recipient_id: current_user.id)
     one_to_one.save if one_to_one.attrs.blank?
 
     send_messages_by_trigger(current_user, 'intro')
