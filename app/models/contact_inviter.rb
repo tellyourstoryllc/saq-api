@@ -150,7 +150,8 @@ class ContactInviter
       user = account.user
       phone = user.phones.find_by(number: number)
     else
-      phone = Phone.create!(number: number, user: user)
+      # Let this silently fail if the phone record already exists
+      phone = Phone.create(number: number, user: user)
     end
 
     Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number, new_user: new_user,
