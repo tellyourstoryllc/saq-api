@@ -92,6 +92,7 @@ class HookClient
   # Replace placeholder variables and if needed,
   # truncate sender name to ensure our copy fits
   def self.render_from_template(text, replacements = {})
+    replacements.reverse_merge!(app_name: Rails.configuration.app['app_name'])
     replacements.each do |placeholder, value|
       text.gsub!("%#{placeholder}%", value.to_s) unless placeholder == :sender_name
     end
