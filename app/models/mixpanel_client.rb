@@ -23,7 +23,8 @@ class MixpanelClient
         'Sent Messages' => user.metrics[:sent_messages_count].to_i,
         'Received Messages' => user.metrics[:received_messages_count].to_i,
         'Snap Invite Ad' => user.snap_invite_ad.try(:name), 'Snapchat Friends' => user.snapchat_friend_ids.size,
-        'Phone Contacts' => user.phone_contacts.size
+        'Phone Contacts' => user.phone_contacts.size,
+        'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size
       )
     end
 
