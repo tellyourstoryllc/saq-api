@@ -179,6 +179,7 @@ class Message
 
   def write_attrs
     self.created_at = Time.current.to_i
+    to_bool(:received)
 
     if expires_in.present?
       self.expires_in = expires_in.to_i
