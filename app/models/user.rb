@@ -61,6 +61,8 @@ class User < ActiveRecord::Base
   set :unread_convo_ids
   set :phone_contacts
 
+  value :assigned_snap_invite_ad_id
+
 
   def first_name
     name.present? ? name.split(' ').first : username
@@ -348,6 +350,20 @@ class User < ActiveRecord::Base
 
   def deactivate!
     update!(deactivated: true)
+  end
+
+  def snap_invite_ad
+    return @snap_invite_ad if defined?(@snap_invite_ad)
+
+    snap_invite_ad_id = assigned_snap_invite_ad_id.value
+    if snap_invite_ad_id
+      @snap_invite_ad = SnapInviteAd.find(snap_invite_ad_id)
+    else
+      @snap_invite_ad = SnapInviteAd.order('RAND()').first
+      self.assigned_snap_invite_ad_id = snap_invite_ad.id
+    end
+
+    @snap_invite_ad
   end
 
 

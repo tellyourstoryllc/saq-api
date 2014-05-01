@@ -21,7 +21,8 @@ class MixpanelClient
         'Time Zone' => user.account.time_zone, 'Status' => user.computed_status, 'Invited' => user.invited?,
         'Groups' => user.group_ids.size, 'Created Groups' => user.live_created_groups_count,
         'Sent Messages' => user.metrics[:sent_messages_count].to_i,
-        'Received Messages' => user.metrics[:received_messages_count].to_i
+        'Received Messages' => user.metrics[:received_messages_count].to_i,
+        'Snap Invite Ad' => user.snap_invite_ad.try(:name)
       )
     end
 
