@@ -22,7 +22,7 @@ class MixpanelClient
         'Groups' => user.group_ids.size, 'Created Groups' => user.live_created_groups_count,
         'Sent Messages' => user.metrics[:sent_messages_count].to_i,
         'Received Messages' => user.metrics[:received_messages_count].to_i,
-        'Snap Invite Ad' => user.snap_invite_ad.try(:name)
+        'Snap Invite Ad' => user.snap_invite_ad.try(:name), 'Snapchat Friends' => user.snapchat_friend_ids.size
       )
     end
 
@@ -120,6 +120,10 @@ class MixpanelClient
       user.last_mixpanel_message_at = Time.current.to_i
       track('Sent Daily Message')
     end
+  end
+
+  def invited_snapchat_friends
+    track('Invited Snapchat Friends')
   end
 
 

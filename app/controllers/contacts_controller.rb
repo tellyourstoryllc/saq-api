@@ -15,6 +15,14 @@ class ContactsController < ApplicationController
     invited_phone_users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite], source: params[:source]})
 
     users = invited_users | invited_phone_users | invited_emails.map(&:user)
+
+    mixpanel.invited_snapchat_friends if params[:initial_sc_import] == 'true'
+
+    if params[:sc_users] == 'true'
+      user_ids = users.map(&:id)
+      current_user.snapchat_friend_ids << user_ids if user_ids.present?
+    end
+
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
 

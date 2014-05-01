@@ -60,6 +60,7 @@ class User < ActiveRecord::Base
 
   set :unread_convo_ids
   set :phone_contacts
+  set :snapchat_friend_ids
 
   value :assigned_snap_invite_ad_id
 
