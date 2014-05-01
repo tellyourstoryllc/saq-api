@@ -196,7 +196,10 @@ class Message
     end
 
     # If this message was received, change the sender
-    self.user_id = one_to_one.other_user_id(user) if received
+    if received
+      self.user_id = one_to_one.other_user_id(user)
+      @user = nil # Clear memoizer
+    end
 
     redis.multi do
       self.attrs.bulk_set(id: id, group_id: group_id, one_to_one_id: one_to_one_id, user_id: user_id,
@@ -262,6 +265,11 @@ class Message
       registered_qualifier = recipient.account.registered? ? 'registered' : 'nonregistered'
       StatsD.increment("messages.one_to_one.#{registered_qualifier}.sent")
       StatsD.increment("messages.one_to_one.#{registered_qualifier}.received")
+
+      # Was this a message that was fetched/imported from another service?
+      sender_qualifier = (received && !user.account.registered?) ? 'external' : 'internal'
+      StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.sent")
+      StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.received")
     end
   end
 end
