@@ -38,6 +38,8 @@ class ContactsController < ApplicationController
     hashed_phone_numbers = split_param(:hashed_phone_numbers)
 
     added_users = ContactInviter.new(current_user).autoconnect(hashed_emails, hashed_phone_numbers)
+    mixpanel.shared_contacts
+
     render_json added_users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
 

@@ -22,7 +22,8 @@ class MixpanelClient
         'Groups' => user.group_ids.size, 'Created Groups' => user.live_created_groups_count,
         'Sent Messages' => user.metrics[:sent_messages_count].to_i,
         'Received Messages' => user.metrics[:received_messages_count].to_i,
-        'Snap Invite Ad' => user.snap_invite_ad.try(:name), 'Snapchat Friends' => user.snapchat_friend_ids.size
+        'Snap Invite Ad' => user.snap_invite_ad.try(:name), 'Snapchat Friends' => user.snapchat_friend_ids.size,
+        'Phone Contacts' => user.phone_contacts.size
       )
     end
 
@@ -124,6 +125,10 @@ class MixpanelClient
 
   def invited_snapchat_friends
     track('Invited Snapchat Friends')
+  end
+
+  def shared_contacts
+    track('Shared Contacts')
   end
 
 
