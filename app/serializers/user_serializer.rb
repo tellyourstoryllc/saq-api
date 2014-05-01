@@ -1,7 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :object_type, :id, :token, :name, :username, :status, :status_text,
     :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
-    :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered
+    :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered, :latitude, :longitude
 
 
   def name
@@ -60,6 +60,22 @@ class UserSerializer < ActiveModel::Serializer
       false
     else
       object.registered
+    end
+  end
+
+  def latitude
+    if owner?
+      object.latitude
+    else
+      object.latitude.try(:round, 2)
+    end
+  end
+
+  def longitude
+    if owner?
+      object.longitude
+    else
+      object.longitude.try(:round, 2)
     end
   end
 
