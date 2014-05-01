@@ -41,7 +41,7 @@ development:
     password: PASSWORD
     domain: krazychat.com
   statsd:
-    server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
+    server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
     prefix: krazykam
   web:
     domain: localhost:3001
@@ -90,7 +90,7 @@ test:
     password: PASSWORD
     domain: krazychat.com
   statsd:
-    server: 'ec2-54-203-184-36.us-west-2.compute.amazonaws.com:8125'
+    server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
     prefix: krazykam
   web:
     domain: test.host
