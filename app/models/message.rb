@@ -121,6 +121,10 @@ class Message
     group || one_to_one
   end
 
+  def has_attachment?
+    attachment_preview_url.present?
+  end
+
 
   private
 
