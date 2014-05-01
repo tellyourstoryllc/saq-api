@@ -6,7 +6,7 @@ class ContactsController < ApplicationController
   def add
     user_ids = split_param(:user_ids)
     emails = split_param(:emails)
-    phone_numbers = split_param(:phone_numbers)
+    phone_numbers = split_param(:phone_numbers).map{ |n| Phone.normalize(n) }
     phone_usernames = split_param(:phone_usernames)
 
     contact_inviter = ContactInviter.new(current_user)
@@ -21,6 +21,7 @@ class ContactsController < ApplicationController
     if params[:sc_users] == 'true'
       user_ids = users.map(&:id)
       current_user.snapchat_friend_ids << user_ids if user_ids.present?
+      current_user.snapchat_friend_phone_numbers << phone_numbers if phone_numbers.present?
     end
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer

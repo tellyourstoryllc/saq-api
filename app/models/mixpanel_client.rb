@@ -26,6 +26,8 @@ class MixpanelClient
         'Phone Contacts' => user.phone_contacts.size,
         'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size
       )
+
+      properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?
     end
 
     properties
