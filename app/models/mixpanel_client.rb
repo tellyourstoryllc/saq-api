@@ -35,8 +35,13 @@ class MixpanelClient
 
   def track_without_defaults(event_name, properties = {}, options = {})
     if Settings.enabled?(:queue)
-      properties['time'] ||= Time.current.to_i
-      MixpanelWorker.perform_async(event_name, properties, options)
+      delay = options.delete(:delay)
+      if delay.present?
+        MixpanelWorker.perform_in(delay.to_i, event_name, properties, options)
+      else
+        properties['time'] ||= Time.current.to_i
+        MixpanelWorker.perform_async(event_name, properties, options)
+      end
     else
       track!(event_name, properties, options)
     end
@@ -53,6 +58,7 @@ class MixpanelClient
   end
 
   def track!(event_name, properties = {}, options = {})
+    properties['time'] ||= Time.current.to_i
     mixpanel.track(event_name, properties, options)
   end
 
