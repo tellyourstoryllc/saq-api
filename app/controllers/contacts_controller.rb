@@ -20,6 +20,21 @@ class ContactsController < ApplicationController
       user_ids = users.map(&:id)
       current_user.snapchat_friend_ids << user_ids if user_ids.present?
       current_user.snapchat_friend_phone_numbers << phone_numbers if phone_numbers.present?
+
+      snap_invite = params[:sent_snap_invites] == 'true'
+      users.each do |recipient|
+        mp = MixpanelClient.new(recipient)
+
+        sms_invite = params[:omit_sms_invite] != 'true' && recipient.phones.where(number: phone_numbers).exists?
+        invite_channel = if snap_invite && sms_invite
+                           'snap_and_sms'
+                         elsif snap_invite
+                           'snap'
+                         elsif sms_invite
+                           'sms'
+                         end
+        mp.received_snap_invite(invite_channel: invite_channel)
+      end
     end
 
     if params[:initial_sc_import] == 'true'

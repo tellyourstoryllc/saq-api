@@ -145,6 +145,10 @@ class MixpanelClient
     track('Shared Contacts')
   end
 
+  def received_snap_invite(properties)
+    track('Received Snap Invite', received_snap_invite_properties(properties))
+  end
+
 
   private
 
@@ -184,5 +188,10 @@ class MixpanelClient
     {
       'distinct_id' => distinct_id, '$created' => Time.zone.now, 'Client' => client, 'OS' => Thread.current[:os]
     }
+  end
+
+  def received_snap_invite_properties(properties)
+    invite_channel = properties[:invite_channel] if %w(snap sms snap_and_sms email).include?(properties[:invite_channel])
+    {'Invite Channel' => invite_channel}
   end
 end
