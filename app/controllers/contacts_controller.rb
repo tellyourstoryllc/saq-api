@@ -32,7 +32,7 @@ class ContactsController < ApplicationController
       end
 
       mixpanel.imported_snapchat_friends
-      mixpanel.invited_snapchat_friends(delay: 5.seconds) unless params[:omit_sms_invite] == 'true'
+      mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if params[:sent_snap_invites] == 'true' || params[:omit_sms_invite] != 'true'
     end
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
