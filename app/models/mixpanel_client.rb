@@ -157,7 +157,7 @@ class MixpanelClient
     last_invite = Time.zone.at(last_invite.to_i) if last_invite
     within_24h = last_invite && last_invite >= 24.hours.ago
 
-    {'Within 24h of Invite' => within_24h}
+    {'Within 24h of Invite' => within_24h, 'Clicked Invite Link' => user.clicked_invite_link.exists?}
   end
 
   def invite_properties(invite)

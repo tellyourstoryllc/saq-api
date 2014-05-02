@@ -68,6 +68,7 @@ class User < ActiveRecord::Base
 
   value :assigned_snap_invite_ad_id
   value :last_invite_at
+  value :clicked_invite_link
 
 
   def first_name
