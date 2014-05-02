@@ -132,8 +132,12 @@ class MixpanelClient
     end
   end
 
-  def invited_snapchat_friends
-    track('Invited Snapchat Friends')
+  def imported_snapchat_friends
+    track('Imported Snapchat Friends')
+  end
+
+  def invited_snapchat_friends(options = {})
+    track('Invited Snapchat Friends', {}, options)
   end
 
   def shared_contacts
