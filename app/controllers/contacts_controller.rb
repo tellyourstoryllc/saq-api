@@ -23,6 +23,14 @@ class ContactsController < ApplicationController
     end
 
     if params[:initial_sc_import] == 'true'
+      unless current_user.set_initial_snapchat_friend_ids_in_app.exists?
+        user_ids_in_app = Account.where(user_id: invited_phone_users.map(&:id)).registered.pluck(:user_id)
+        current_user.redis.multi do
+          current_user.initial_snapchat_friend_ids_in_app << user_ids_in_app if user_ids_in_app.present?
+          current_user.set_initial_snapchat_friend_ids_in_app = 1
+        end
+      end
+
       mixpanel.imported_snapchat_friends
       mixpanel.invited_snapchat_friends(delay: 5.seconds) unless params[:omit_sms_invite] == 'true'
     end

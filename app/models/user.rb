@@ -63,6 +63,8 @@ class User < ActiveRecord::Base
   set :matching_phone_contact_user_ids
   set :snapchat_friend_ids
   set :snapchat_friend_phone_numbers
+  value :set_initial_snapchat_friend_ids_in_app
+  set :initial_snapchat_friend_ids_in_app
 
   value :assigned_snap_invite_ad_id
 

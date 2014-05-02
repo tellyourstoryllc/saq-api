@@ -18,6 +18,8 @@ class Account < ActiveRecord::Base
 
   accepts_nested_attributes_for :user, :emails, :phones
 
+  scope :registered, -> { where(registered: true) }
+
 
   def time_zone=(tz_name)
     self[:time_zone_offset] = ActiveSupport::TimeZone.new(tz_name).try(:utc_offset)
