@@ -69,7 +69,7 @@ class ContactsController < ApplicationController
                        elsif sms_invite
                          'sms'
                        end
-      mp.received_snap_invite(invite_channel: invite_channel)
+      mp.received_snap_invite(invite_channel: invite_channel) unless invite_channel.nil?
     end
   end
 
