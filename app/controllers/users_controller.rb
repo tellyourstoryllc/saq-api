@@ -23,10 +23,12 @@ class UsersController < ApplicationController
   def create
     @invite = Invite.find_by(invite_token: params[:invite_token]) if params[:invite_token].present?
     @current_user = @invite.try(:recipient)
+    @current_user ||= User.find_by(username: user_params[:username])
     @account = @current_user.try(:account)
 
-    # If an invite_token is included, just update that user
-    if @current_user && @account && @account.no_login_credentials?
+    # If an invite_token is included, OR if the given username already exists but that account hasn't
+    # yet been 'claimed' by registering, just update that user
+    if @current_user && @account && !@account.registered?
       @current_user.update!(user_params)
       @account.update!(account_params.merge(emails_attributes: [{email: params[:email]}]))
 
