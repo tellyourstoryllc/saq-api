@@ -67,6 +67,7 @@ class User < ActiveRecord::Base
   set :initial_snapchat_friend_ids_in_app
 
   value :assigned_snap_invite_ad_id
+  value :last_invite_at
 
 
   def first_name

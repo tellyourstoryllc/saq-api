@@ -63,9 +63,9 @@ class MixpanelClient
     mixpanel.track(event_name, properties, options)
   end
 
-  def user_registered(user)
+  def user_registered(user, properties = {})
     self.user = user
-    track('User Registered')
+    track('User Registered', registered_properties(properties))
   end
 
   def checked_in
@@ -151,6 +151,14 @@ class MixpanelClient
 
 
   private
+
+  def registered_properties(properties)
+    last_invite = user.last_invite_at.get
+    last_invite = Time.zone.at(last_invite.to_i) if last_invite
+    within_24h = last_invite && last_invite >= 24.hours.ago
+
+    {'Within 24h of Invite' => within_24h}
+  end
 
   def invite_properties(invite)
     channel = 'email' if invite.invited_email.present?

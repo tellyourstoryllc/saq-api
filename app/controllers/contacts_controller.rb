@@ -69,7 +69,11 @@ class ContactsController < ApplicationController
                        elsif sms_invite
                          'sms'
                        end
-      mp.received_snap_invite(invite_channel: invite_channel) unless invite_channel.nil?
+
+      unless invite_channel.nil?
+        recipient.last_invite_at = Time.current.to_i
+        mp.received_snap_invite(invite_channel: invite_channel)
+      end
     end
   end
 
