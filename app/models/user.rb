@@ -70,6 +70,8 @@ class User < ActiveRecord::Base
   value :last_invite_at
   value :clicked_invite_link
 
+  delegate :registered, :registered?, to: :account
+
 
   def first_name
     name.present? ? name.split(' ').first : username
