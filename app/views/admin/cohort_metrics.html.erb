@@ -9,6 +9,48 @@
 <h1>Cohort Metrics</h1>
 
 
+<h2>Avg. Percentage of a User's Snapchat Friends Who are Registered</h2>
+
+<table class="retention table table-striped table-bordered">
+  <tr>
+    <th class="registered">Registered (UTC)</th>
+    <th colspan="<%= @days %>">Days Later</th>
+  </tr>
+
+  <tr>
+    <th />
+
+    <% @days.times do |days_later| %>
+      <th class="day"><%= days_later %></th>
+    <% end -%>
+  </tr>
+
+  <% (@days - 1).downto(0) do |i| %>
+    <% registered_date = @today - i %>
+    <tr>
+      <th><%= registered_date %></th>
+
+      <% @days.times do |j| %>
+        <% action_date = registered_date + j %>
+
+        <td class="percentage">
+          <% if action_date <= @today -%>
+            <% percentages = [] %>
+            <% (@friend_counts[registered_date.to_s][action_date.to_s] || []).each do |user_id, hsh| -%>
+              <% percentages << hsh['percent_registered'] %>
+            <% end -%>
+            <% percentages.compact! %>
+            <% avg = percentages.sum / percentages.size if percentages.present? %>
+            <%= avg.nil? ? '-' : avg.round.to_s + '%' -%>
+          <% end -%>
+        </td>
+      <% end -%>
+    </tr>
+    <% end -%>
+</table>
+
+
+<br /><br />
 <h2>Percentage of Sent Messages to SCP Recipients</h2>
 
 <table class="retention table table-striped table-bordered">

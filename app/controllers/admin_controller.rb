@@ -21,6 +21,40 @@ class AdminController < ActionController::Base
     @today = Time.zone.today
     @days = 14
 
+    fetch_friend_metrics
+    fetch_message_metrics
+  end
+
+
+  private
+
+  def fetch_friend_metrics
+    @friend_counts = {}
+
+    @days.times do |i|
+      registered_date = (@today - i).to_s
+      @friend_counts[registered_date] = {}
+
+      User.joins(:account).where('DATE(accounts.registered_at) = ?', registered_date).find_each do |u|
+        contact_ids = u.contact_ids.members
+        contacts = User.includes(:account).where(id: contact_ids).to_a
+        contacts_count = contacts.size
+
+        @days.times do |j|
+          action_date = (@today - j)
+          @friend_counts[registered_date][action_date.to_s] ||= {}
+          @friend_counts[registered_date][action_date.to_s][u.id] ||= {}
+
+          registered_count = contacts.count{ |c| c.account.registered_at.present? && c.account.registered_at.to_date <= action_date }
+          @friend_counts[registered_date][action_date.to_s][u.id]['contacts_counts'] = contacts_count
+          @friend_counts[registered_date][action_date.to_s][u.id]['registered_counts'] = registered_count
+          @friend_counts[registered_date][action_date.to_s][u.id]['percent_registered'] = (registered_count.to_f / contacts_count) * 100 if contacts_count > 0
+        end
+      end
+    end
+  end
+
+  def fetch_message_metrics
     @sent_raw = {}
     @received_raw = {}
     @sent = {}
