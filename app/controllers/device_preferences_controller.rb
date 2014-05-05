@@ -20,6 +20,6 @@ class DevicePreferencesController < ApplicationController
   private
 
   def update_params
-    params.permit(:client, :server_mention, :server_one_to_one)
+    params.permit(:client, :server_mention, :server_one_to_one, :server_pushes_enabled)
   end
 end
