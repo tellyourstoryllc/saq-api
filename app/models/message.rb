@@ -37,6 +37,7 @@ class Message
     end
 
     increment_user_stats
+    increment_cohort_stats
     increment_stats
 
     true
@@ -252,6 +253,27 @@ class Message
       end
 
       user.redis.hincrby(key, :sent_messages_count, 1)
+    end
+  end
+
+  def increment_cohort_stats
+    return unless one_to_one
+
+    recipient = one_to_one.other_user(user)
+    today = Time.zone.today.to_s
+
+    user.redis.pipelined do
+      sender_key = user.cohort_metrics_key
+      if sender_key
+        field = ('sent_to_' + (recipient.account.registered? ? 'registered' : 'unregistered') + "_#{today}").to_sym
+        user.redis.hincrby(sender_key, field, 1)
+      end
+
+      recipient_key = recipient.cohort_metrics_key
+      if recipient_key
+        field = ('received_from_' + (user.account.registered? ? 'registered' : 'unregistered') + "_#{today}").to_sym
+        user.redis.hincrby(recipient_key, field, 1)
+      end
     end
   end
 

@@ -9,6 +9,7 @@ class Account < ActiveRecord::Base
   before_validation :set_time_zone, on: :create
   validate :valid_facebook_credentials?, on: :create
   validate :time_zone_set?
+  before_save :set_registered_at
   after_save :update_one_to_one_wallpaper_image, on: :update
 
   belongs_to :user
@@ -127,6 +128,10 @@ class Account < ActiveRecord::Base
 
   rescue Koala::Facebook::APIError
     false
+  end
+
+  def set_registered_at
+    self.registered_at = Time.current if registered_at.blank? && !registered_was && registered?
   end
 
   def update_one_to_one_wallpaper_image
