@@ -1,0 +1,82 @@
+<style>
+  table.retention { width: 850px; }
+  th, td { text-align: center; }
+  th.day, td.percentage { width: 50px; }
+  th.registered { width: 132px; }
+</style>
+
+
+<h1>Cohort Metrics</h1>
+
+
+<h2>Percentage Sent to Registered Recipients</h2>
+
+<table class="retention table table-striped table-bordered">
+  <tr>
+    <th class="registered">Registered (UTC)</th>
+    <th colspan="<%= @days %>">Days Later</th>
+  </tr>
+
+  <tr>
+    <th />
+
+    <% @days.times do |days_later| %>
+      <th class="day"><%= days_later %></th>
+    <% end -%>
+  </tr>
+
+  <% (@days - 1).downto(0) do |i| %>
+    <% registered_date = @today - i %>
+    <tr>
+      <th><%= registered_date %></th>
+
+      <% @days.times do |j| %>
+        <% action_date = registered_date + j %>
+
+        <td class="percentage">
+          <% if action_date <= @today -%>
+            <% percentage = (@sent["registered_on_#{registered_date}"] || {})["action_on_#{action_date}"].to_f -%>
+            <%= percentage == 0 ? '-' : percentage.round.to_s + '%' -%>
+          <% end -%>
+        </td>
+      <% end -%>
+    </tr>
+    <% end -%>
+</table>
+
+
+<br /><br />
+<h2>Percentage Received from Registered Senders</h2>
+
+<table class="retention table table-striped table-bordered">
+  <tr>
+    <th class="registered">Registered (UTC)</th>
+    <th colspan="<%= @days %>">Days Later</th>
+  </tr>
+
+  <tr>
+    <th />
+
+    <% @days.times do |days_later| %>
+      <th><%= days_later %></th>
+    <% end -%>
+  </tr>
+
+  <% (@days - 1).downto(0) do |i| %>
+    <% registered_date = @today - i %>
+    <tr>
+      <th><%= registered_date %></th>
+
+      <% @days.times do |j| %>
+        <% action_date = registered_date + j %>
+
+        <% if action_date > @today %>
+          <td />
+        <% else -%>
+          <% percentage = (@received["registered_on_#{registered_date}"] || {})["action_on_#{action_date}"].to_f %>
+          <td><%= percentage == 0 ? '-' : percentage.round.to_s + '%' %></td>
+        <% end -%>
+      <% end -%>
+    </tr>
+    <% end -%>
+</table>

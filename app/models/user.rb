@@ -373,6 +373,14 @@ class User < ActiveRecord::Base
     @snap_invite_ad
   end
 
+  def self.cohort_metrics_key(date)
+    "user::metrics:registered_on:#{date}" if date.present?
+  end
+
+  def cohort_metrics_key
+    self.class.cohort_metrics_key(account.registered_at.to_date) if account.registered_at.present?
+  end
+
 
   private
 
