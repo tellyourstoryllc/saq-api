@@ -58,6 +58,7 @@ class SessionsController < ApplicationController
           @group = invite.group
 
           unless invite.clicked?
+            recipient.clicked_invite_link = 1
             invite.update!(clicked: true)
             mixpanel = MixpanelClient.new(account.user)
             mixpanel.clicked_invite_link(invite)

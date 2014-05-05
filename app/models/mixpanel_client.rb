@@ -22,8 +22,13 @@ class MixpanelClient
         'Groups' => user.group_ids.size, 'Created Groups' => user.live_created_groups_count,
         'Sent Messages' => user.metrics[:sent_messages_count].to_i,
         'Received Messages' => user.metrics[:received_messages_count].to_i,
-        'Snap Invite Ad' => user.snap_invite_ad.try(:name)
+        'Phone Contacts' => user.phone_contacts.size,
+        'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
+        'Snap Invite Ad' => user.snap_invite_ad.try(:name), 'Snapchat Friends' => user.snapchat_friend_ids.size,
+        'Initial Snapchat Friends in App' => user.initial_snapchat_friend_ids_in_app.size
       )
+
+      properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?
     end
 
     properties
@@ -31,8 +36,13 @@ class MixpanelClient
 
   def track_without_defaults(event_name, properties = {}, options = {})
     if Settings.enabled?(:queue)
-      properties['time'] ||= Time.current.to_i
-      MixpanelWorker.perform_async(event_name, properties, options)
+      delay = options.delete(:delay)
+      if delay.present?
+        MixpanelWorker.perform_in(delay.to_i, event_name, properties, options)
+      else
+        properties['time'] ||= Time.current.to_i
+        MixpanelWorker.perform_async(event_name, properties, options)
+      end
     else
       track!(event_name, properties, options)
     end
@@ -49,12 +59,13 @@ class MixpanelClient
   end
 
   def track!(event_name, properties = {}, options = {})
+    properties['time'] ||= Time.current.to_i
     mixpanel.track(event_name, properties, options)
   end
 
-  def user_registered(user)
+  def user_registered(user, properties = {})
     self.user = user
-    track('User Registered')
+    track('User Registered', registered_properties(properties))
   end
 
   def checked_in
@@ -122,8 +133,32 @@ class MixpanelClient
     end
   end
 
+  def imported_snapchat_friends
+    track('Imported Snapchat Friends')
+  end
+
+  def invited_snapchat_friends(properties = {}, options = {})
+    track('Invited Snapchat Friends', properties, options)
+  end
+
+  def shared_contacts
+    track('Shared Contacts')
+  end
+
+  def received_snap_invite(properties)
+    track('Received Snap Invite', received_snap_invite_properties(properties))
+  end
+
 
   private
+
+  def registered_properties(properties)
+    last_invite = user.last_invite_at.get
+    last_invite = Time.zone.at(last_invite.to_i) if last_invite
+    within_24h = last_invite && last_invite >= 24.hours.ago
+
+    {'Within 24h of Invite' => within_24h, 'Clicked Invite Link' => user.clicked_invite_link.exists?}
+  end
 
   def invite_properties(invite)
     channel = 'email' if invite.invited_email.present?
@@ -161,5 +196,10 @@ class MixpanelClient
     {
       'distinct_id' => distinct_id, '$created' => Time.zone.now, 'Client' => client, 'OS' => Thread.current[:os]
     }
+  end
+
+  def received_snap_invite_properties(properties)
+    invite_channel = properties[:invite_channel] if %w(snap sms snap_and_sms email).include?(properties[:invite_channel])
+    {'Invite Channel' => invite_channel}
   end
 end

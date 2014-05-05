@@ -60,8 +60,15 @@ class User < ActiveRecord::Base
 
   set :unread_convo_ids
   set :phone_contacts
+  set :matching_phone_contact_user_ids
+  set :snapchat_friend_ids
+  set :snapchat_friend_phone_numbers
+  value :set_initial_snapchat_friend_ids_in_app
+  set :initial_snapchat_friend_ids_in_app
 
   value :assigned_snap_invite_ad_id
+  value :last_invite_at
+  value :clicked_invite_link
 
 
   def first_name
