@@ -413,7 +413,7 @@ class User < ActiveRecord::Base
 
   def username_format?
     return if username.blank?
-    valid = username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9_.]{2,16}\Z/
+    valid = username =~ /[a-zA-Z]/ && username =~ /\A[a-zA-Z0-9_\-.]{2,16}\Z/
     errors.add(:username, "must be 2-16 characters, include at least one letter, and contain only letters, numbers, _, -, and .") unless valid
   end
 
