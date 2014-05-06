@@ -24,7 +24,7 @@ class MixpanelClient
         'Received Messages' => user.metrics[:received_messages_count].to_i,
         'Phone Contacts' => user.phone_contacts.size,
         'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
-        'Snap Invite Ad' => user.snap_invite_ad.try(:name), 'Snapchat Friends' => user.snapchat_friend_ids.size,
+        'Snapchat Friends' => user.snapchat_friend_ids.size,
         'Initial Snapchat Friends in App' => user.initial_snapchat_friend_ids_in_app.size
       )
 
@@ -200,6 +200,10 @@ class MixpanelClient
 
   def received_snap_invite_properties(properties)
     invite_channel = properties[:invite_channel] if %w(snap sms snap_and_sms email).include?(properties[:invite_channel])
-    {'Invite Channel' => invite_channel}
+    ad_name = properties[:snap_invite_ad].try(:name)
+
+    props = {'Invite Channel' => invite_channel}
+    props['Snap Invite Ad'] = ad_name if %w(snap snap_and_sms).include?(invite_channel)
+    props
   end
 end

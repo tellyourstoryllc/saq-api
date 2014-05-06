@@ -61,8 +61,6 @@ class ContactsController < ApplicationController
 
     snap_invite = params[:sent_snap_invites] == 'true'
     users.each do |recipient|
-      mp = MixpanelClient.new(recipient)
-
       sms_invite = params[:omit_sms_invite] != 'true' && recipient.phones.where(number: phone_numbers).exists? && !recipient.account.registered?
       invite_channel = if snap_invite && sms_invite
                          'snap_and_sms'
@@ -74,7 +72,9 @@ class ContactsController < ApplicationController
 
       unless invite_channel.nil?
         recipient.last_invite_at = Time.current.to_i
-        mp.received_snap_invite(invite_channel: invite_channel)
+
+        mp = MixpanelClient.new(recipient)
+        mp.received_snap_invite(invite_channel: invite_channel, snap_invite_ad: current_user.snap_invite_ad)
       end
     end
   end
