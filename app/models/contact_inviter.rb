@@ -18,7 +18,7 @@ class ContactInviter
     emails_addresses.each do |email_address|
       emails << add_by_email(email_address, options)
     end
-    emails
+    emails.compact
   end
 
   def add_by_email(email_address, options = {})
@@ -41,7 +41,9 @@ class ContactInviter
 
     # If the user doesn't exist, create one
     unless account
-      account = Account.create!(user_attributes: {invite_type: :email}, emails_attributes: [{email: address}])
+      account = Account.create(user_attributes: {invite_type: :email}, emails_attributes: [{email: address}])
+      return unless account.persisted?
+
       user = account.user
       email = user.emails.find_by(email: address)
     end
@@ -61,7 +63,7 @@ class ContactInviter
     usernames.each_with_index do |username, i|
       users << add_by_phone_number(numbers[i], username, options)
     end
-    users
+    users.compact
   end
 
   def add_by_phone_number(number, username, options = {})
@@ -96,7 +98,9 @@ class ContactInviter
 
     # If the user doesn't exist, create one
     unless account
-      account = Account.create!(user_attributes: {invite_type: :sms}, phones_attributes: [{number: number}])
+      account = Account.create(user_attributes: {invite_type: :sms}, phones_attributes: [{number: number}])
+      return unless account.persisted?
+
       user = account.user
       phone = user.phones.find_by(number: number)
     end
@@ -119,7 +123,9 @@ class ContactInviter
 
     # If the user doesn't exist, create one
     unless account
-      account = Account.create!(user_attributes: {username: username, invite_type: :sms})
+      account = Account.create(user_attributes: {username: username, invite_type: :sms})
+      return unless account.persisted?
+
       user = account.user
     end
 
@@ -146,7 +152,9 @@ class ContactInviter
       attrs = {user_attributes: {username: username, invite_type: :sms}}
       attrs[:phones_attributes] = [{number: number}] unless Phone.where(number: number).exists?
 
-      account = Account.create!(attrs)
+      account = Account.create(attrs)
+      return unless account.persisted?
+
       user = account.user
       phone = user.phones.find_by(number: number)
     else
