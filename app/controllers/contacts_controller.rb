@@ -61,7 +61,7 @@ class ContactsController < ApplicationController
     users.each do |recipient|
       mp = MixpanelClient.new(recipient)
 
-      sms_invite = params[:omit_sms_invite] != 'true' && recipient.phones.where(number: phone_numbers).exists?
+      sms_invite = params[:omit_sms_invite] != 'true' && recipient.phones.where(number: phone_numbers).exists? && !recipient.account.registered?
       invite_channel = if snap_invite && sms_invite
                          'snap_and_sms'
                        elsif snap_invite
