@@ -138,7 +138,7 @@ class MobileNotifier
   def notify_friend_joined(friend)
     return if friend.id == user.id
 
-    alert = "Your friend just joined #{Rails.configuration.app['app_name_short']} as #{friend.username}."
+    alert = "Your friend #{friend.username} just joined!"
     custom_data = {}
 
     create_ios_notifications(alert, custom_data)

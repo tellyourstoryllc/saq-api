@@ -48,6 +48,8 @@ class UsersController < ApplicationController
     @account.facebook_user.try(:fetch_friends)
     ContactInviter.new(@current_user).facebook_autoconnect
 
+    @current_user.notify_friends
+
     render_json [@current_user, @account, @group].compact
   end
 

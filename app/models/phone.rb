@@ -81,6 +81,9 @@ class Phone < ActiveRecord::Base
   end
 
   def notify_friends
+    # Disabled for now
+    return
+
     return if notified_friends.get
     self.notified_friends = '1'
 

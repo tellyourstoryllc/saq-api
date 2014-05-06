@@ -57,6 +57,8 @@ class ContactsController < ApplicationController
     current_user.snapchat_friend_ids << user_ids if user_ids.present?
     current_user.snapchat_friend_phone_numbers << phone_numbers if phone_numbers.present?
 
+    current_user.add_to_user_ids_who_friended_me(user_ids)
+
     snap_invite = params[:sent_snap_invites] == 'true'
     users.each do |recipient|
       mp = MixpanelClient.new(recipient)

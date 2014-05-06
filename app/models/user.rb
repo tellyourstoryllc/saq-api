@@ -69,6 +69,7 @@ class User < ActiveRecord::Base
   value :assigned_snap_invite_ad_id
   value :last_invite_at
   value :clicked_invite_link
+  value :notified_friends
 
   delegate :registered, :registered?, to: :account
 
@@ -381,6 +382,36 @@ class User < ActiveRecord::Base
 
   def cohort_metrics_key
     self.class.cohort_metrics_key(account.registered_at.to_date) if account.registered_at.present?
+  end
+
+  def self.user_ids_who_friended_me_key(user_id)
+    "user:#{user_id}:user_ids_who_friended_me"
+  end
+
+  def user_ids_who_friended_me_key
+    self.class.user_ids_who_friended_me_key(id)
+  end
+
+  def user_ids_who_friended_me
+    redis.smembers(user_ids_who_friended_me_key)
+  end
+
+  def add_to_user_ids_who_friended_me(friend_ids)
+    redis.pipelined do
+      friend_ids.each do |friend_id|
+        redis.sadd(self.class.user_ids_who_friended_me_key(friend_id), id)
+      end
+    end
+  end
+
+  def notify_friends
+    return if notified_friends.get
+    self.notified_friends = '1'
+
+    # TODO: maybe move to Sidekiq
+    User.where(id: user_ids_who_friended_me).find_each do |friend|
+      friend.mobile_notifier.notify_friend_joined(self)
+    end
   end
 
 
