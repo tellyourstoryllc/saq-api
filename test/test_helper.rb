@@ -37,7 +37,7 @@ Spork.prefork do
     end
 
     def current_user
-      @current_user ||= FactoryGirl.create(:user)
+      @current_user ||= FactoryGirl.create(:registered_user)
     end
 
     def hash_must_include(actual, expected)
