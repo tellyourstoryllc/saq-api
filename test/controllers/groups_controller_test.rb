@@ -12,8 +12,6 @@ describe GroupsController do
 
     describe "valid" do
       it "must create a group" do
-        FactoryGirl.create(:account, user_id: current_user.id)
-
         Time.stub :now, now = Time.parse('2013-12-26 15:08') do
           post :create, {name: 'Cool Dudes', token: current_user.token}
 
@@ -104,7 +102,6 @@ describe GroupsController do
 
     it "must join the group and return the group, its users, and its most recent page of messages" do
       now = Time.parse('2013-12-26 15:08')
-      FactoryGirl.create(:account, user_id: current_user.id)
       group = FactoryGirl.create(:group, created_at: now)
       member = FactoryGirl.create(:user, username: 'JaneDoe', status: 'available', status_text: 'around')
       account = FactoryGirl.create(:account, user_id: member.id)
@@ -177,7 +174,7 @@ describe GroupsController do
       Group.stub :page_size, 2 do
         now = Time.parse('2013-12-26 15:08')
         group = FactoryGirl.create(:group, created_at: now)
-        member = FactoryGirl.create(:user, username: 'JaneDoe', status: 'available', status_text: 'around')
+        member = FactoryGirl.create(:registered_user, username: 'JaneDoe', status: 'available', status_text: 'around')
 
         group.add_admin(current_user)
         group.add_member(current_user)
@@ -244,7 +241,7 @@ describe GroupsController do
       Group.stub :page_size, 2 do
         now = Time.parse('2013-12-26 15:08')
         group = FactoryGirl.create(:group, created_at: now)
-        member = FactoryGirl.create(:user, username: 'JaneDoe', status: 'available', status_text: 'around')
+        member = FactoryGirl.create(:registered_user, username: 'JaneDoe', status: 'available', status_text: 'around')
 
         group.add_admin(current_user)
         group.add_member(current_user)

@@ -5,7 +5,6 @@ describe OneToOneMessagesController do
     it "must create a message for an existing one-to-one" do
       member = FactoryGirl.create(:user)
       FactoryGirl.create(:account, user_id: member.id)
-      FactoryGirl.create(:account, user_id: current_user.id)
 
       one_to_one = OneToOne.new(sender_id: current_user.id, recipient_id: member.id)
       one_to_one.save
@@ -34,7 +33,6 @@ describe OneToOneMessagesController do
     it "must create a message for an non-existant one-to-one" do
       member = FactoryGirl.create(:user)
       FactoryGirl.create(:account, user_id: member.id)
-      FactoryGirl.create(:account, user_id: current_user.id)
 
       text = 'hey'
       one_to_one_id = [current_user.id, member.id].sort.join('-')

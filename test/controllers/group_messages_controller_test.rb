@@ -3,8 +3,6 @@ require "test_helper"
 describe GroupMessagesController do
   describe "POST /messages/create" do
     it "must create a message" do
-      FactoryGirl.create(:account, user_id: current_user.id)
-
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
       text = 'hey everyone'
@@ -21,7 +19,6 @@ describe GroupMessagesController do
     end
 
     it "must create a message as long as the group ID is known (even if the user is not a member of the group)" do
-      FactoryGirl.create(:account, user_id: current_user.id)
       group = FactoryGirl.create(:group)
       text = 'hey everyone'
 
@@ -37,8 +34,6 @@ describe GroupMessagesController do
     end
 
     it "must create a message with one mention" do
-      FactoryGirl.create(:account, user_id: current_user.id)
-
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
 
@@ -61,8 +56,6 @@ describe GroupMessagesController do
     end
 
     it "must create a message with multiple mentions" do
-      FactoryGirl.create(:account, user_id: current_user.id)
-
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
 
@@ -88,8 +81,6 @@ describe GroupMessagesController do
     end
 
     it "must create a message and sanitize mentions" do
-      FactoryGirl.create(:account, user_id: current_user.id)
-
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
 
@@ -111,7 +102,6 @@ describe GroupMessagesController do
     end
 
     it "must create a message and allow an @all mention" do
-      account = FactoryGirl.create(:account, user_id: current_user.id)
       group = FactoryGirl.create(:group)
       group.add_member(current_user)
 

@@ -30,6 +30,8 @@ Spork.prefork do
       stub_request(:any, Rails.configuration.app['faye']['url'])
       stub_request(:any, /.*mixpanel.com/)
       stub_request(:any, /.*facebook.com/)
+
+      FactoryGirl.create(:snap_invite_ad)
     end
 
     def result
