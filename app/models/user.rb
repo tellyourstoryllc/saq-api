@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
   validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
-  validate :username_format?
+  validate :valid_username?, :username_format?
 
   after_save :update_sorting_name
   after_save :create_new_avatar_image, :create_new_avatar_video, on: :update
@@ -419,6 +419,10 @@ class User < ActiveRecord::Base
         self.username = "#{base_username}_#{i}"
       end
     end
+  end
+
+  def valid_username?
+    errors.add(:username, "must be valid.") if username == 'teamsnapchat'
   end
 
   def username_format?
