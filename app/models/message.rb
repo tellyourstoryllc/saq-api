@@ -5,10 +5,15 @@ class Message
   attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
-    :attachment_metadata, :client_metadata, 
-    :created_at, :expires_in, :expires_at
+    :attachment_metadata, :client_metadata, :original_message_id, :forward_message_id, :actor_id,
+    :attachment_message_id, :created_at, :expires_in, :expires_at
+
   hash_key :attrs
-  sorted_set :likes
+  list :ancestor_message_ids
+  list :forwards # JSON strings for each forward on this or any forwarded/decendant messages (all levels deep)
+  sorted_set :liker_ids # User IDs who have liked this specific message
+  list :likes # JSON strings for each like on this or any forwarded/decendant messages (all levels deep)
+  list :exports # JSON strings for each export on this or any forwarded/decendant messages (all levels deep)
 
   validates :user_id, presence: true
   validate :group_id_or_one_to_one_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
@@ -33,6 +38,8 @@ class Message
       add_to_conversation
     end
 
+    set_ancestor_list
+    increment_forward_stats
     increment_user_stats
     increment_stats
 
@@ -82,11 +89,30 @@ class Message
   end
 
   def like(user)
-    likes[user.id] = Time.current.to_f unless likes.member?(user.id)
+    return false if meta_message? || liker_ids.member?(user.id)
+
+    now = Time.current.to_f
+    liker_ids[user.id] = now
+    like_json = {message_id: id, user_id: user.id, timestamp: now}.to_json
+
+    if forward_message
+      ancestor_ids = ancestor_message_ids.values
+
+      redis.pipelined do
+        [*ancestor_ids, id].each do |message_id|
+          redis.rpush("message:#{message_id}:likes", like_json)
+        end
+      end
+    else
+      likes << like_json
+    end
+
+    true
   end
 
+  # Obsolete?
   def unlike(user)
-    likes.delete(user.id)
+    # likes.delete(user.id)
   end
 
   def paginated_liked_user_ids(options = {})
@@ -100,7 +126,7 @@ class Message
     start = options[:offset]
     stop = options[:offset] + options[:limit] - 1
 
-    likes.revrange(start, stop)
+    liker_ids.revrange(start, stop)
   end
 
   def paginated_liked_users(options = {})
@@ -120,6 +146,96 @@ class Message
 
   def has_attachment?
     attachment_preview_url.present?
+  end
+
+  def original_message
+    @original_message ||= Message.new(id: original_message_id) if original_message_id
+  end
+
+  def forward_message
+    @forward_message ||= Message.new(id: forward_message_id) if forward_message_id
+  end
+
+  def record_export(user, method)
+    raise_if_invalid_method(method)
+
+    now = Time.current.to_f
+    export_json = {message_id: id, user_id: user.id, method: method, timestamp: now}.to_json
+
+    if forward_message
+      ancestor_ids = ancestor_message_ids.values
+
+      redis.pipelined do
+        [*ancestor_ids, id].each do |message_id|
+          redis.rpush("message:#{message_id}:exports", export_json)
+        end
+      end
+    else
+      exports << export_json
+    end
+  end
+
+  def raise_if_invalid_method(method)
+    raise ArgumentError.new('Export method must be one of screenshot, library, or other.') unless %w(screenshot library other).include?(method)
+  end
+
+  def meta_message?
+    attachment_content_type.present? && attachment_content_type.starts_with?('meta/')
+  end
+
+  def send_forward_meta_messages
+    return if forward_message.nil?
+
+    attrs = {attachment_content_type: 'meta/forward', actor_id: user.id}
+    alert = "#{user.username} forwarded your #{message_attachment.media_type_name}"
+    custom_data = {}
+
+    [original_message, forward_message].uniq(&:id).each do |message|
+      m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
+                                  attachment_message_id: message.id))
+      m.save
+
+      message.conversation.publish_one_to_one_message(m)
+      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+    end
+  end
+
+  def send_like_meta_messages(current_user)
+    attrs = {attachment_content_type: 'meta/like', actor_id: current_user.id}
+    alert = "#{current_user.username} liked your #{message_attachment.try(:media_type_name) || 'message'}"
+    custom_data = {}
+
+    [original_message, self].compact.uniq(&:id).each do |message|
+      m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
+                                  attachment_message_id: message.id))
+      m.save
+
+      message.conversation.publish_one_to_one_message(m)
+      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+    end
+  end
+
+  def send_export_meta_messages(current_user, method)
+    raise_if_invalid_method(method)
+
+    attrs = {attachment_content_type: 'meta/export', actor_id: current_user.id}
+    msg_desc = message_attachment.try(:media_type_name) || 'message'
+    alert = case method
+            when 'screenshot' then "#{current_user.username} took a screenshot of your #{msg_desc}"
+            when 'library' then "#{current_user.username} saved your #{msg_desc} to their camera roll"
+            else "#{current_user.username} shared your #{msg_desc}"
+            end
+
+    custom_data = {}
+
+    [original_message, self].compact.uniq(&:id).each do |message|
+      m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
+                                  attachment_message_id: message.id))
+      m.save
+
+      message.conversation.publish_one_to_one_message(m)
+      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+    end
   end
 
 
@@ -165,7 +281,8 @@ class Message
   end
 
   def text_or_attachment_set?
-    errors.add(:base, "Either text or an attachment is required.") unless text.present? || attachment_file.present? || attachment_url.present?
+    errors.add(:base, "Either text or an attachment is required.") unless text.present? || attachment_file.present? ||
+      attachment_url.present? || (forward_message && forward_message.attachment_url.present?) || meta_message?
   end
 
   def save_message_attachment
@@ -174,6 +291,9 @@ class Message
       @message_attachment.save!
     elsif attachment_url.present?
       @message_attachment = MessageAttachment.new(message_id: id, message: self, remote_attachment_url: attachment_url)
+      @message_attachment.save!
+    elsif forward_message_id.present? && !forward_message.meta_message?
+      @message_attachment = MessageAttachment.new(message_id: id, message: self, remote_attachment_url: forward_message.attachment_url)
       @message_attachment.save!
     end
   end
@@ -201,8 +321,9 @@ class Message
                           attachment_url: attachment_url, attachment_content_type: attachment_content_type,
                           attachment_preview_url: attachment_preview_url, attachment_preview_width: attachment_preview_width,
                           attachment_preview_height: attachment_preview_height, attachment_metadata: attachment_metadata,
-                          client_metadata: client_metadata,
-                          created_at: created_at, expires_in: expires_in, expires_at: expires_at)
+                          client_metadata: client_metadata, original_message_id: original_message_id, forward_message_id: forward_message_id,
+                          actor_id: actor_id, attachment_message_id: attachment_message_id, created_at: created_at, expires_in: expires_in,
+                          expires_at: expires_at)
 
       if expires_in.present?
         redis.expire(attrs.key, expires_in)
@@ -218,6 +339,29 @@ class Message
     if convo
       lua_script = %{local rank = redis.call('INCR', KEYS[1]); redis.call('HSET', KEYS[2], 'rank', rank); redis.call('ZADD', KEYS[3], rank, ARGV[1])}
       redis.eval lua_script, {keys: [convo.rank.key, attrs.key, convo.message_ids.key], argv: [id]}
+    end
+  end
+
+  # Copy the parent's ancestor list and append the parent
+  def set_ancestor_list
+    return if forward_message.nil?
+
+    redis.multi do
+      redis.sort(forward_message.ancestor_message_ids.key, {by: 'nosort', store: ancestor_message_ids.key})
+      ancestor_message_ids << forward_message.id
+    end
+  end
+
+  def increment_forward_stats
+    return if forward_message.nil?
+
+    forward_json = {message_id: id, user_id: user.id, timestamp: Time.current.to_f}.to_json
+    ancestor_ids = ancestor_message_ids.values
+
+    redis.pipelined do
+      ancestor_ids.each do |message_id|
+        redis.rpush("message:#{message_id}:forwards", forward_json)
+      end
     end
   end
 
