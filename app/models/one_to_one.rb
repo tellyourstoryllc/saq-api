@@ -103,6 +103,17 @@ class OneToOne
     end
   end
 
+  def publish_one_to_one_message(message, current_user = nil)
+    u = current_user || message.user
+    faye_publisher = FayePublisher.new(u.token)
+
+    data = MessageSerializer.new(message).as_json
+
+    [sender, recipient].each do |user|
+      faye_publisher.publish_one_to_one_message(user, data)
+    end
+  end
+
 
   private
 

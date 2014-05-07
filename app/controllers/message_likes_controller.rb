@@ -7,8 +7,15 @@ class MessageLikesController < ApplicationController
   end
 
   def create
-    @message.like(current_user)
-    publish_updated_message
+    liked = @message.like(current_user)
+
+    if liked
+      publish_updated_message
+
+      # Send like meta messages to the most recent and original users
+      @message.send_like_meta_messages(current_user)
+    end
+
     render_json @message
   end
 
