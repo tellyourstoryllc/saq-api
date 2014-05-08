@@ -45,6 +45,7 @@ class UsersController < ApplicationController
     mixpanel.user_registered(@current_user)
     group_mixpanel.group_created(@group) if @group
 
+    @account.send_welcome_email
     @account.facebook_user.try(:fetch_friends)
     ContactInviter.new(@current_user).facebook_autoconnect
 
