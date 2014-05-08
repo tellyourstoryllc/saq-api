@@ -4,8 +4,8 @@ development:
     password: PASSWORD
   api:
     request_secret: SECRET
-  app_name: Snap Crackle Pop
-  app_name_short: Snap Crackle Pop
+  app_name: SnapCracklePop
+  app_name_short: SnapCracklePop
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -53,8 +53,8 @@ test:
     password: PASSWORD
   api:
     request_secret: SECRET
-  app_name: Snap Crackle Pop
-  app_name_short: Snap Crackle Pop
+  app_name: SnapCracklePop
+  app_name_short: SnapCracklePop
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
