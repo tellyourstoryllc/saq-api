@@ -220,12 +220,15 @@ class ContactInviter
     if hashed_phone_numbers.present?
       current_user.phone_contacts << hashed_phone_numbers
       Phone.add_user_to_phone_contacts(current_user, hashed_phone_numbers)
-      phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers).verified
 
-      phones.each do |phone|
-        added_users << phone.user
-        add_with_reciprocal(phone.user)
-      end
+      # Don't actually add contacts in SCP
+      # Just use this for funnels & metrics
+      #phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers).verified
+
+      #phones.each do |phone|
+      #  added_users << phone.user
+      #  add_with_reciprocal(phone.user)
+      #end
     end
 
     added_users
