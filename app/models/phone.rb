@@ -17,6 +17,8 @@ class Phone < ActiveRecord::Base
   value :notified_friends
   scope :verified, -> { where(verified: true) }
 
+  CANADIAN_AREA_CODES = %w(204 236 249 250 289 306 343 365 387 403 416 418 431 437 438 450 506 514 519 548 579 581 587 604 613 639 647 672 705 709 742 778 780 782 782 807 819 825 867 873 902 902 905)
+
 
   def self.normalize(number)
     # Remove any non-digit chars and the optional +1 country code for US
@@ -91,6 +93,20 @@ class Phone < ActiveRecord::Base
     User.where(id: phone_contact_of_user_ids).find_each do |friend|
       friend.mobile_notifier.notify_friend_joined(user)
     end
+  end
+
+  def self.country_code(number)
+    if number.size == 10
+      if CANADIAN_AREA_CODES.include?(number.first(3))
+        'CA'
+      else
+        'US'
+      end
+    end
+  end
+
+  def country_code
+    self.class.country_code(number)
   end
 
 

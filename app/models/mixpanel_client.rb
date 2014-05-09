@@ -162,13 +162,20 @@ class MixpanelClient
 
   def invite_properties(invite)
     channel = 'email' if invite.invited_email.present?
-    channel = 'sms' if invite.invited_phone.present?
 
-    {
+    if invite.invited_phone.present?
+      channel = 'sms'
+      phone_country_code = Phone.country_code(invite.invited_phone)
+    end
+
+    props = {
       'Invite ID' => invite.id, 'Invite Method' => 'api', 'Invite Channel' => channel,
       'Recipient ID' => invite.recipient_id, 'Recipient New User' => invite.new_user?,
       'Recipient Can Log In' => invite.can_log_in?, 'Group ID' => invite.group_id, 'Source' => invite.source
     }
+
+    props['Phone Country'] = phone_country_code if phone_country_code
+    props
   end
 
   def native_invite_properties(properties)
@@ -201,9 +208,11 @@ class MixpanelClient
   def received_snap_invite_properties(properties)
     invite_channel = properties[:invite_channel] if %w(snap sms snap_and_sms email).include?(properties[:invite_channel])
     ad_name = properties[:snap_invite_ad].try(:name)
+    phone_country_code = properties[:recipient_phone].try(:country_code)
 
     props = {'Invite Channel' => invite_channel}
     props['Snap Invite Ad'] = ad_name if %w(snap snap_and_sms).include?(invite_channel)
+    props['Phone Country'] = phone_country_code if phone_country_code
     props
   end
 end
