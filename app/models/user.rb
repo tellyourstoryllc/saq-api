@@ -366,10 +366,8 @@ class User < ActiveRecord::Base
     return @snap_invite_ad if defined?(@snap_invite_ad)
 
     snap_invite_ad_id = assigned_snap_invite_ad_id.value
-    if snap_invite_ad_id
-      @snap_invite_ad = SnapInviteAd.find(snap_invite_ad_id)
-    else
-      @snap_invite_ad = SnapInviteAd.order('RAND()').first
+    unless snap_invite_ad_id && (@snap_invite_ad = SnapInviteAd.active.find_by(id: snap_invite_ad_id))
+      @snap_invite_ad = SnapInviteAd.active.order('RAND()').first
       self.assigned_snap_invite_ad_id = snap_invite_ad.id
     end
 
