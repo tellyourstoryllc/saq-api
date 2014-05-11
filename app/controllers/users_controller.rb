@@ -30,11 +30,15 @@ class UsersController < ApplicationController
     # yet been 'claimed' by registering, just update that user
     if @current_user && @account && !@account.registered?
       @current_user.update!(user_params)
-      @account.update!(account_params.merge(emails_attributes: [{email: params[:email]}], phones_attributes: [{number: params[:phone_number]}]))
+      attrs = account_params.merge(emails_attributes: [{email: params[:email]}])
+      attrs[:phones_attributes] = [{number: params[:phone_number]}] if params[:phone_number].present?
+      @account.update!(attrs)
 
     # Otherwise, create a new user, account, etc.
     else
-      @account = Account.create!(account_params.merge(user_attributes: user_params, emails_attributes: [{email: params[:email]}], phones_attributes: [{number: params[:phone_number]}]))
+      attrs = account_params.merge(user_attributes: user_params, emails_attributes: [{email: params[:email]}])
+      attrs[:phones_attributes] = [{number: params[:phone_number]}] if params[:phone_number].present?
+      @account = Account.create!(attrs)
       @current_user = @account.user
     end
 
