@@ -73,6 +73,8 @@ class User < ActiveRecord::Base
 
   delegate :registered, :registered?, to: :account
 
+  COHORT_METRICS_TIME_ZONE = 'America/New_York'
+
 
   def first_name
     name.present? ? name.split(' ').first : username
@@ -379,7 +381,7 @@ class User < ActiveRecord::Base
   end
 
   def cohort_metrics_key
-    self.class.cohort_metrics_key(account.registered_at.to_date) if account.registered_at.present?
+    self.class.cohort_metrics_key(account.registered_at.in_time_zone(COHORT_METRICS_TIME_ZONE).to_date) if account.registered_at.present?
   end
 
   def self.user_ids_who_friended_me_key(user_id)

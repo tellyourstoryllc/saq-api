@@ -1,5 +1,7 @@
 class AdminController < ActionController::Base
   http_basic_authenticate_with name: Rails.configuration.app['admin']['username'], password: Rails.configuration.app['admin']['password']
+  around_filter :set_time_zone
+
 
   def sms_stats
     @today = Time.zone.today
@@ -28,27 +30,39 @@ class AdminController < ActionController::Base
 
   private
 
+  def set_time_zone
+    old_time_zone = Time.zone
+    Time.zone = 'Eastern Time (US & Canada)'
+    yield
+  ensure
+    Time.zone = old_time_zone
+  end
+
   def fetch_friend_metrics
     @friend_counts = {}
 
     @days.times do |i|
-      registered_date = (@today - i).to_s
-      @friend_counts[registered_date] = {}
+      registered_date = @today - i
+      registered_from = Time.zone.local_to_utc(registered_date.to_datetime).to_s(:db)
+      registered_to = Time.zone.local_to_utc((registered_date + 1).to_datetime - 1.second).to_s(:db)
+      @friend_counts[registered_date.to_s] = {}
 
-      User.joins(:account).where('DATE(accounts.registered_at) = ?', registered_date).find_each do |u|
+      User.joins(:account).where('accounts.registered_at BETWEEN ? AND ?', registered_from, registered_to).find_each do |u|
         contact_ids = u.contact_ids.members
         contacts = User.includes(:account).where(id: contact_ids).to_a
         contacts_count = contacts.size
 
         @days.times do |j|
           action_date = (@today - j)
-          @friend_counts[registered_date][action_date.to_s] ||= {}
-          @friend_counts[registered_date][action_date.to_s][u.id] ||= {}
+          next if action_date < registered_date
+
+          @friend_counts[registered_date.to_s][action_date.to_s] ||= {}
+          @friend_counts[registered_date.to_s][action_date.to_s][u.id] ||= {}
 
           registered_count = contacts.count{ |c| c.account.registered_at.present? && c.account.registered_at.to_date <= action_date }
-          @friend_counts[registered_date][action_date.to_s][u.id]['contacts_counts'] = contacts_count
-          @friend_counts[registered_date][action_date.to_s][u.id]['registered_counts'] = registered_count
-          @friend_counts[registered_date][action_date.to_s][u.id]['percent_registered'] = (registered_count.to_f / contacts_count) * 100 if contacts_count > 0
+          @friend_counts[registered_date.to_s][action_date.to_s][u.id]['contacts_counts'] = contacts_count
+          @friend_counts[registered_date.to_s][action_date.to_s][u.id]['registered_counts'] = registered_count
+          @friend_counts[registered_date.to_s][action_date.to_s][u.id]['percent_registered'] = (registered_count.to_f / contacts_count) * 100 if contacts_count > 0
         end
       end
     end

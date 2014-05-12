@@ -405,7 +405,7 @@ class Message
     return unless one_to_one
 
     recipient = one_to_one.other_user(user)
-    today = Time.zone.today.to_s
+    today = Time.find_zone(COHORT_METRICS_TIME_ZONE).today.to_s
 
     user.redis.pipelined do
       sender_key = user.cohort_metrics_key
