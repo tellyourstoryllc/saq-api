@@ -55,6 +55,8 @@ class ContactsController < ApplicationController
 
     user_ids = users.map(&:id)
     current_user.snapchat_friend_ids << user_ids if user_ids.present?
+
+    phone_numbers = phone_numbers.delete_if(&:blank?)
     current_user.snapchat_friend_phone_numbers << phone_numbers if phone_numbers.present?
 
     current_user.add_to_user_ids_who_friended_me(user_ids)
