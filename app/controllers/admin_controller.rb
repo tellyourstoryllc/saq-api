@@ -54,7 +54,7 @@ class AdminController < ActionController::Base
 
         @days.times do |j|
           action_date = (@today - j)
-          next if action_date < registered_date
+          next if action_date < registered_date || !u.active_on?(action_date)
 
           @friend_counts[registered_date.to_s][action_date.to_s] ||= {}
           @friend_counts[registered_date.to_s][action_date.to_s][u.id] ||= {}

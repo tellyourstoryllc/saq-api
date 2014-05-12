@@ -3,6 +3,7 @@ class CheckinController < ApplicationController
 
   def index
     send_mixpanel_events
+    add_to_daily_users
 
     objects = []
     config_class = case params[:client]
@@ -33,6 +34,9 @@ class CheckinController < ApplicationController
     render_json objects
   end
 
+
+  private
+
   def send_mixpanel_events
     if Thread.current[:client] == 'ios' && params[:device_id].present?
       device_id = params[:device_id]
@@ -43,5 +47,12 @@ class CheckinController < ApplicationController
     end
 
     mixpanel.checked_in if current_user
+  end
+
+  def add_to_daily_users
+    return unless current_user
+
+    key = User.daily_user_ids_in_eastern_key
+    User.redis.sadd(key, current_user.id)
   end
 end

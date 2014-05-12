@@ -414,6 +414,18 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.daily_user_ids_in_eastern_key(date = Time.find_zone('America/New_York').today)
+    "user::metrics:daily_user_ids_in_eastern:#{date}"
+  end
+
+  def active_on?(date)
+    return @active_on[date] if @active_on && !@active_on[date].nil?
+
+    @active_on ||= {}
+    key = self.class.daily_user_ids_in_eastern_key(date)
+    @active_on[date] = redis.sismember(key, id)
+  end
+
 
   private
 
