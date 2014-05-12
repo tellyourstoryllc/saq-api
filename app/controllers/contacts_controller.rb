@@ -61,7 +61,9 @@ class ContactsController < ApplicationController
 
     snap_invite = Bool.parse(params[:sent_snap_invites])
     users.each do |recipient|
-      sms_invite = params[:omit_sms_invite] != 'true' && (phone = recipient.phones.find_by(number: phone_numbers)) && !recipient.account.registered?
+      next if recipient.account.registered?
+
+      sms_invite = params[:omit_sms_invite] != 'true' && (phone = recipient.phones.find_by(number: phone_numbers))
       invite_channel = if snap_invite && sms_invite
                          'snap_and_sms'
                        elsif snap_invite
