@@ -77,8 +77,8 @@
 
         <td class="percentage">
           <% if action_date <= @today -%>
-            <% percentage = (@sent["registered_on_#{registered_date}"] || {})["action_on_#{action_date}"].to_f -%>
-            <%= percentage == 0 ? '-' : percentage.round.to_s + '%' -%>
+            <% percentage = (@sent["registered_on_#{registered_date}"] || {})["action_on_#{action_date}"] -%>
+            <%= percentage.nil? ? '-' : percentage.round.to_s + '%' -%>
           <% end -%>
         </td>
       <% end -%>
@@ -115,8 +115,8 @@
         <% if action_date > @today %>
           <td />
         <% else -%>
-          <% percentage = (@received["registered_on_#{registered_date}"] || {})["action_on_#{action_date}"].to_f %>
-          <td><%= percentage == 0 ? '-' : percentage.round.to_s + '%' %></td>
+          <% percentage = (@received["registered_on_#{registered_date}"] || {})["action_on_#{action_date}"] %>
+          <td><%= percentage.nil? ? '-' : percentage.round.to_s + '%' %></td>
         <% end -%>
       <% end -%>
     </tr>
