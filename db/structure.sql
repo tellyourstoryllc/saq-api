@@ -466,7 +466,7 @@ DROP TABLE IF EXISTS `snap_invite_ads`;
 CREATE TABLE `snap_invite_ads` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `image_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `media_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `text_overlay` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -505,7 +505,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-05-09 12:11:36
+-- Dump completed on 2014-05-13 17:45:29
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -655,3 +655,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140501212759');
 INSERT INTO schema_migrations (version) VALUES ('20140505144600');
 
 INSERT INTO schema_migrations (version) VALUES ('20140509161115');
+
+INSERT INTO schema_migrations (version) VALUES ('20140513214441');
