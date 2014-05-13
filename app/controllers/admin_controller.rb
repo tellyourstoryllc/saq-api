@@ -94,11 +94,11 @@ class AdminController < ActionController::Base
 
         reg = metrics["sent_to_registered_#{action_date}"].to_f
         unreg = metrics["sent_to_unregistered_#{action_date}"].to_f
-        @sent[registered_key]["action_on_#{action_date}"] = (reg / (reg + unreg)) * 100 if reg > 0
+        @sent[registered_key]["action_on_#{action_date}"] = (reg / (reg + unreg)) * 100 if reg > 0 || unreg > 0
 
         reg = metrics["received_from_registered_#{action_date}"].to_f
         unreg = metrics["received_from_unregistered_#{action_date}"].to_f
-        @received[registered_key]["action_on_#{action_date}"] = (reg / (reg + unreg)) * 100 if reg > 0
+        @received[registered_key]["action_on_#{action_date}"] = (reg / (reg + unreg)) * 100 if reg > 0 || unreg > 0
       end
     end
   end
