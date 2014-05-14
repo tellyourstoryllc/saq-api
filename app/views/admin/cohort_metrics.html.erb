@@ -1,15 +1,22 @@
 <style>
-  table.retention { width: 850px; }
+  table.retention, p.explanation { width: 850px; }
   th, td { text-align: center; }
   th.day, td.percentage { width: 50px; }
   th.registered { width: 132px; }
 </style>
 
 
+<div class="container">
 <h1>Cohort Metrics (Eastern Time)</h1>
 
 
 <h2>Avg. Percentage of a User's Snapchat Friends Who are Registered</h2>
+
+<p class="explanation text-muted">
+  For each user who registered on a given date Y (first column) *and* came to the app on a given date X (first row), what percentage of his Snapchat friends are registered in SCP?
+  Each user's percentage for a given registration and action date is calculated, and then those percentages are averaged.
+</p>
+
 
 <table class="retention table table-striped table-bordered">
   <tr>
@@ -53,6 +60,11 @@
 <br /><br />
 <h2>Percentage of Sent Messages to SCP Recipients</h2>
 
+<p class="explanation text-muted">
+  Of all the messages sent on a given date X (first row) by users who registered on a given date Y (first column), what percentage of the recipients are registered in SCP (as opposed to Snapchat-only recipients)?
+</p>
+
+
 <table class="retention table table-striped table-bordered">
   <tr>
     <th class="registered">Registered</th>
@@ -90,6 +102,11 @@
 <br /><br />
 <h2>Percentage of Received Messages from SCP Senders</h2>
 
+<p class="explanation text-muted">
+  Of all the messages received on a given date X (first row) by users who registered on a given date Y (first column), what percentage of the senders are registered in SCP (as opposed to a Snapchat-only senders who sent from Snapchat)?
+</p>
+
+
 <table class="retention table table-striped table-bordered">
   <tr>
     <th class="registered">Registered</th>
@@ -122,3 +139,5 @@
     </tr>
     <% end -%>
 </table>
+
+</div>
