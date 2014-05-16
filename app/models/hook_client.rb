@@ -36,6 +36,9 @@ class HookClient
   end
 
   def self.invite_to_group(sender, recipient, group, recipient_number, invite_token)
+    # Disabled for now
+    return
+
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
     sender_phone = sender_phone_text(sender)
@@ -45,6 +48,9 @@ class HookClient
   end
 
   def self.invite_via_message(sender, recipient, message, recipient_number, invite_token)
+    # Disabled for now
+    return
+
     from = Rails.configuration.app['hook']['invite_from']
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
     media_type = message.message_attachment.try(:friendly_media_type) || 'a message'
