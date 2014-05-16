@@ -24,7 +24,9 @@ class CheckinController < ApplicationController
       objects << current_user.preferences
 
       snap_invite_ad = current_user.snap_invite_ad
-      client_config.merge!(snap_invite_url: snap_invite_ad.media_url,
+      client_config.merge!(snap_invite_image_url: snap_invite_ad.media_url,
+                           snap_invite_image_text: snap_invite_ad.text_overlay,
+                           snap_invite_url: snap_invite_ad.media_url,
                            snap_invite_text: snap_invite_ad.text_overlay)
     end
 
