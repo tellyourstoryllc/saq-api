@@ -17,7 +17,7 @@ class ContactsController < ApplicationController
     users = invited_users | invited_phone_users | invited_emails.map(&:user)
 
     track_sc_users(users, phone_numbers)
-    track_initial_sc_import(invited_phone_users)
+    track_initial_sc_import
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
@@ -78,16 +78,17 @@ class ContactsController < ApplicationController
         recipient.last_invite_at = Time.current.to_i
 
         mp = MixpanelClient.new(recipient)
-        mp.received_snap_invite(invite_channel: invite_channel, snap_invite_ad: current_user.snap_invite_ad, recipient_phone: phone)
+        mp.received_snap_invite(sender: current_user, invite_channel: invite_channel,
+                                snap_invite_ad: current_user.snap_invite_ad, recipient_phone: phone)
       end
     end
   end
 
-  def track_initial_sc_import(invited_phone_users)
+  def track_initial_sc_import
     return unless params[:initial_sc_import] == 'true'
 
     unless current_user.set_initial_snapchat_friend_ids_in_app.exists?
-      user_ids_in_app = Account.where(user_id: invited_phone_users.map(&:id)).registered.pluck(:user_id)
+      user_ids_in_app = current_user.snapchat_friends_in_app
       current_user.redis.multi do
         current_user.initial_snapchat_friend_ids_in_app << user_ids_in_app if user_ids_in_app.present?
         current_user.set_initial_snapchat_friend_ids_in_app = 1

@@ -426,6 +426,10 @@ class User < ActiveRecord::Base
     @active_on[date] = redis.sismember(key, id)
   end
 
+  def snapchat_friend_ids_in_app
+    Account.where(user_id: snapchat_friend_ids.members).registered.pluck(:user_id)
+  end
+
 
   private
 
