@@ -88,7 +88,7 @@ class ContactsController < ApplicationController
     return unless params[:initial_sc_import] == 'true'
 
     unless current_user.set_initial_snapchat_friend_ids_in_app.exists?
-      user_ids_in_app = current_user.snapchat_friends_in_app
+      user_ids_in_app = current_user.snapchat_friend_ids_in_app
       current_user.redis.multi do
         current_user.initial_snapchat_friend_ids_in_app << user_ids_in_app if user_ids_in_app.present?
         current_user.set_initial_snapchat_friend_ids_in_app = 1
