@@ -30,7 +30,7 @@ describe OneToOneMessagesController do
       end
     end
 
-    it "must create a message for an non-existant one-to-one" do
+    it "must create a message for a non-existant one-to-one" do
       member = FactoryGirl.create(:user)
       FactoryGirl.create(:account, user_id: member.id)
 

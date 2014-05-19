@@ -461,7 +461,7 @@ class User < ActiveRecord::Base
       i = 0
 
       loop do
-        break unless User.where(username: username).where('id != ?', id).exists?
+        break unless User.where(username: username).where('id != ?', id).exists? || username == Robot.username
         i += 1
         self.username = "#{base_username}_#{i}"
       end

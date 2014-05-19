@@ -58,6 +58,8 @@ class MessagesController < ApplicationController
         # Track activity in Mixpanel
         mixpanel.sent_daily_message
 
+        Robot.reply_to(current_user, message)
+
         messages << message
       end
     end

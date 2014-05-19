@@ -361,6 +361,27 @@ CREATE TABLE `phones` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `robot_items`
+--
+
+DROP TABLE IF EXISTS `robot_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `robot_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `trigger` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `rank` int(11) DEFAULT NULL,
+  `parent_id` int(11) DEFAULT NULL,
+  `text` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `attachment_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `rpush_apps`
 --
 
@@ -505,7 +526,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-05-13 17:45:29
+-- Dump completed on 2014-05-19 15:30:23
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -647,6 +668,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140312155807');
 INSERT INTO schema_migrations (version) VALUES ('20140408204911');
 
 INSERT INTO schema_migrations (version) VALUES ('20140409134155');
+
+INSERT INTO schema_migrations (version) VALUES ('20140423155654');
 
 INSERT INTO schema_migrations (version) VALUES ('20140424163441');
 

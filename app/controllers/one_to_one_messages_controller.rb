@@ -29,6 +29,8 @@ class OneToOneMessagesController < ApplicationController
       # Track activity in Mixpanel
       mixpanel.sent_daily_message
 
+      Robot.reply_to(current_user, @message)
+
       render_json @message
     else
       render_error @message.errors.full_messages

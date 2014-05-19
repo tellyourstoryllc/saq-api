@@ -27,11 +27,21 @@ Spork.prefork do
       keys = Redis.current.keys
       Redis.current.del(keys) if keys.present?
 
+      set_up_robot
+
       stub_request(:any, Rails.configuration.app['faye']['url'])
       stub_request(:any, /.*mixpanel.com/)
       stub_request(:any, /.*facebook.com/)
 
       FactoryGirl.create(:snap_invite_ad)
+    end
+
+    def set_up_robot
+      Robot.instance_variable_set(:@user, nil)
+      robot = User.create!(username: Robot.username, created_at: 10.years.ago)
+      robot.save!
+      FactoryGirl.create(:account, registered: true, user_id: robot.id, created_at: 10.years.ago)
+      User.where(id: robot.id).update_all(username: Robot.username)
     end
 
     def result
