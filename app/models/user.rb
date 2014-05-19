@@ -254,6 +254,8 @@ class User < ActiveRecord::Base
   end
 
   def self.blocked?(user, other_user)
+    return if user.nil? || other_user.nil?
+
     replies = redis.pipelined do
       redis.zscore(user.blocked_user_ids.key, other_user.id)
       redis.zscore(other_user.blocked_user_ids.key, user.id)
