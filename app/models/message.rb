@@ -243,6 +243,10 @@ class Message
     end
   end
 
+  def sent_externally?
+    !received.nil?
+  end
+
 
   private
 
@@ -433,14 +437,18 @@ class Message
     elsif one_to_one
       recipient = one_to_one.other_user(user)
 
-      registered_qualifier = recipient.account.registered? ? 'registered' : 'nonregistered'
-      StatsD.increment("messages.one_to_one.#{registered_qualifier}.sent")
-      StatsD.increment("messages.one_to_one.#{registered_qualifier}.received")
+      unless sent_externally?
+        registered_qualifier = recipient.account.registered? ? 'registered' : 'nonregistered'
+        StatsD.increment("messages.one_to_one.#{registered_qualifier}.sent")
+        StatsD.increment("messages.one_to_one.#{registered_qualifier}.received")
+      end
 
-      # Was this a message that was fetched/imported from another service?
-      sender_qualifier = (received && !user.account.registered?) ? 'external' : 'internal'
-      StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.sent")
-      StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.received")
+      if recipient.account.registered?
+        # Was this a message that was fetched/imported from another service?
+        sender_qualifier = sent_externally? ? 'external' : 'internal'
+        StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.sent")
+        StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.received")
+      end
     end
   end
 end
