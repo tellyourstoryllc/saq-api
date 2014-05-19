@@ -36,15 +36,20 @@ class UsersController < ApplicationController
       @current_user = @account.user
     end
 
+    # Create or update device and group
     create_or_update_device
-
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
+    # Send events to Mixpanel
     mixpanel.user_registered(@current_user)
     group_mixpanel.group_created(@group) if @group
 
+    # Fetch friends and autoconnect Facebook if needed
     @account.facebook_user.try(:fetch_friends)
-    ContactInviter.new(@current_user).facebook_autoconnect
+    contact_inviter.facebook_autoconnect
+
+    # Add robot as a contact and send initial messages
+    Robot.set_up_new_user(@current_user)
 
     render_json [@current_user, @account, @group].compact
   end
@@ -81,5 +86,9 @@ class UsersController < ApplicationController
       group_name = attrs.delete(:group_name)
       attrs[:name] = group_name if group_name
     end
+  end
+
+  def contact_inviter
+    @contact_inviter ||= ContactInviter.new(@current_user)
   end
 end

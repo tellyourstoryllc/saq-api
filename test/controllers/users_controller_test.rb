@@ -25,8 +25,8 @@ describe UsersController do
       it "must create a user and account" do
         post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf'}
 
-        user = User.last
-        account = Account.last
+        user = User.order('created_at DESC').first
+        account = Account.order('created_at DESC').first
 
         result.size.must_equal 2
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
@@ -39,8 +39,8 @@ describe UsersController do
       it "must create a user and account without a password" do
         post :create, {username: 'JohnDoe', email: 'joe@example.com'}
 
-        user = User.last
-        account = Account.last
+        user = User.order('created_at DESC').first
+        account = Account.order('created_at DESC').first
 
         result.size.must_equal 2
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
@@ -54,12 +54,12 @@ describe UsersController do
         Time.stub :now, now = Time.parse('2013-12-26 15:08') do
           post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf', group_name: 'Cool Dudes'}
 
-          user = User.order('created_at DESC').last
-          account = Account.last
-          group = Group.order('created_at DESC').last
+          user = User.order('created_at DESC').first
+          account = Account.order('created_at DESC').first
+          group = Group.order('created_at DESC').first
 
           result.size.must_equal 3
-          result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe',
+          result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => user.name,
             'username' => 'JohnDoe', 'token' => user.token, 'status' => 'unavailable',
             'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil, 'avatar_url' => nil}
 
@@ -81,8 +81,8 @@ describe UsersController do
         Koala::Facebook::API.stub :new, api do
           post :create, {username: 'JohnDoe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
 
-          user = User.last
-          account = Account.last
+          user = User.order('created_at DESC').first
+          account = Account.order('created_at DESC').first
 
           result.size.must_equal 2
           result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
