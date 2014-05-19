@@ -373,7 +373,7 @@ CREATE TABLE `robot_items` (
   `trigger` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `rank` int(11) DEFAULT NULL,
   `parent_id` int(11) DEFAULT NULL,
-  `text` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `text` text COLLATE utf8_unicode_ci NOT NULL,
   `attachment_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -526,7 +526,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-05-19 15:30:23
+-- Dump completed on 2014-05-19 18:30:28
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -680,3 +680,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140505144600');
 INSERT INTO schema_migrations (version) VALUES ('20140509161115');
 
 INSERT INTO schema_migrations (version) VALUES ('20140513214441');
+
+INSERT INTO schema_migrations (version) VALUES ('20140519222919');
