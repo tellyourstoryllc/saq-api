@@ -68,6 +68,8 @@ class OneToOne
   end
 
   def other_user_id(user)
+    return if user.nil?
+
     if user.id == sender_id
       recipient_id
     elsif user.id == recipient_id
@@ -76,6 +78,8 @@ class OneToOne
   end
 
   def other_user(user)
+    return if user.nil?
+
     if user.id == sender.id
       recipient
     elsif user.id == recipient.id
