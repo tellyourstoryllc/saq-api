@@ -1,9 +1,13 @@
 class RobotItem < ActiveRecord::Base
+  def triggers
+    trigger.split(',')
+  end
+
   def self.by_trigger(trigger)
-    where(trigger: trigger).order(:rank)
+    where("FIND_IN_SET(?, `trigger`)", trigger).order(:rank)
   end
 
   def self.valid_triggers
-    @valid_triggers ||= pluck('DISTINCT(`trigger`)')
+    @valid_triggers ||= all.map(&:triggers).flatten.uniq
   end
 end
