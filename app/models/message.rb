@@ -447,20 +447,25 @@ class Message
     elsif one_to_one
       recipient = one_to_one.other_user(user)
 
-      # Skip metrics if either user is our bot
-      return if [user.id, recipient.id].include?(Robot.user.try(:id))
+      # Separate metrics if either user is our bot
+      sender_bot = user.id == Robot.user.try(:id)
+      recipient_bot = recipient.id == Robot.user.try(:id)
 
-      unless sent_externally?
-        registered_qualifier = recipient.account.registered? ? 'registered' : 'nonregistered'
-        StatsD.increment("messages.one_to_one.#{registered_qualifier}.sent")
-        StatsD.increment("messages.one_to_one.#{registered_qualifier}.received")
-      end
+      if recipient_bot
+        StatsD.increment("messages.one_to_one.by_user_type.bot.received")
+      elsif !sender_bot
+        unless sent_externally?
+          registered_qualifier = recipient.account.registered? ? 'registered' : 'nonregistered'
+          StatsD.increment("messages.one_to_one.#{registered_qualifier}.sent")
+          StatsD.increment("messages.one_to_one.#{registered_qualifier}.received")
+        end
 
-      if recipient.account.registered?
-        # Was this a message that was fetched/imported from another service?
-        sender_qualifier = sent_externally? ? 'external' : 'internal'
-        StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.sent")
-        StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.received")
+        if recipient.account.registered?
+          # Was this a message that was fetched/imported from another service?
+          sender_qualifier = sent_externally? ? 'external' : 'internal'
+          StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.sent")
+          StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.received")
+        end
       end
     end
   end
