@@ -49,9 +49,14 @@ class Robot
     return unless convo.is_a?(OneToOne) && message.user_id == current_user.id &&
       convo.other_user_id(current_user) == user.id
 
+    trigger = parse_trigger(message)
+    send_messages_by_trigger(current_user, trigger)
+  end
+
+  def self.parse_trigger(message)
     msg_text = message.text.to_s.strip.downcase
 
-    trigger = if RobotItem.valid_triggers.include?(msg_text)
+    if RobotItem.valid_triggers.include?(msg_text)
       msg_text
     elsif msg_text.blank? && message.attachment_url.present?
       'attachment error'
@@ -60,7 +65,5 @@ class Robot
     else
       'general error'
     end
-
-    send_messages_by_trigger(current_user, trigger)
   end
 end

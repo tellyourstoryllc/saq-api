@@ -24,7 +24,7 @@ class MessagesController < ApplicationController
 
         # Track activity in Mixpanel
         group_mixpanel.sent_daily_message(group)
-        mixpanel.sent_daily_message
+        mixpanel.daily_message_events(message)
 
         messages << message
       end
@@ -56,7 +56,7 @@ class MessagesController < ApplicationController
         end
 
         # Track activity in Mixpanel
-        mixpanel.sent_daily_message
+        mixpanel.daily_message_events(message)
 
         Robot.reply_to(current_user, message)
 

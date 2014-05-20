@@ -123,6 +123,20 @@ class MixpanelClient
     track_without_defaults('Mobile Install', mobile_install_properties(device_id))
   end
 
+  def daily_message_events(message)
+    if message.one_to_one
+      recipient = message.one_to_one.other_user(message.user)
+
+      if recipient.bot?
+        sent_daily_message_to_bot(message)
+      else
+        sent_daily_message
+      end
+    else
+      sent_daily_message
+    end
+  end
+
   def sent_daily_message
     last_message = user.last_mixpanel_message_at.get
     last_message = Time.zone.at(last_message.to_i) if last_message
@@ -130,6 +144,16 @@ class MixpanelClient
     if last_message.nil? || last_message < 24.hours.ago
       user.last_mixpanel_message_at = Time.current.to_i
       track('Sent Daily Message')
+    end
+  end
+
+  def sent_daily_message_to_bot(message)
+    last_message = user.last_mixpanel_message_to_bot_at.get
+    last_message = Time.zone.at(last_message.to_i) if last_message
+
+    if last_message.nil? || last_message < 24.hours.ago
+      user.last_mixpanel_message_to_bot_at = Time.current.to_i
+      track('Sent Daily Message to Bot', sent_daily_message_to_bot_properties(message))
     end
   end
 
@@ -219,5 +243,11 @@ class MixpanelClient
                  'Sender Snapchat Friends in App' => sender.snapchat_friend_ids_in_app.size)
 
     props
+  end
+
+  def sent_daily_message_to_bot_properties(message)
+    trigger = Robot.parse_trigger(message)
+    robot_item = RobotItem.by_trigger(trigger).first
+    {'Trigger' => trigger, 'Bot Reply' => robot_item.try(:name)}
   end
 end

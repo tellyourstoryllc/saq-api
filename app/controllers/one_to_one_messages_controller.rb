@@ -27,7 +27,7 @@ class OneToOneMessagesController < ApplicationController
       recipient.send_notifications(@message)
 
       # Track activity in Mixpanel
-      mixpanel.sent_daily_message
+      mixpanel.daily_message_events(@message)
 
       Robot.reply_to(current_user, @message)
 
