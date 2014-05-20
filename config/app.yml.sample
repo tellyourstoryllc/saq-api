@@ -28,6 +28,7 @@ development:
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
+  robot_username: teamsnapcrackle
   rpush:
     db_ios_app_name: snap_ios
     db_android_app_name: snap_android
@@ -77,6 +78,7 @@ test:
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
+  robot_username: teamsnapcrackle
   rpush:
     db_ios_app_name: ~
     db_android_app_name: ~

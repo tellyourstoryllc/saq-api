@@ -1,6 +1,6 @@
 class Robot
   def self.username
-    Rails.configuration.app['app_name_short']
+    Rails.configuration.app['robot_username']
   end
 
   def self.user
