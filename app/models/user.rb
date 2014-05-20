@@ -230,7 +230,7 @@ class User < ActiveRecord::Base
 
   # Send notifications via all the user's channels, taking into account his preferences for each
   def send_notifications(message)
-    return unless away_idle_or_unavailable? && Robot.user.try(:id) != id
+    return unless away_idle_or_unavailable? && !bot?
 
     if !mobile_notifier.notify(message)
       email_notifier.notify(message)  # only send email notification if no mobile notification was sent.
@@ -430,6 +430,10 @@ class User < ActiveRecord::Base
 
   def snapchat_friend_ids_in_app
     Account.where(user_id: snapchat_friend_ids.members).registered.pluck(:user_id)
+  end
+
+  def bot?
+    Robot.bot?(self)
   end
 
 

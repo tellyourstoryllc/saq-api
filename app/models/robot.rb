@@ -7,6 +7,11 @@ class Robot
     @user ||= User.find_by(username: username)
   end
 
+  def self.bot?(u)
+    user_id = u.is_a?(User) ? u.id : u
+    user.try(:id) == user_id
+  end
+
   def self.set_up_new_user(current_user)
     return if user.nil?
 

@@ -396,12 +396,9 @@ class Message
       elsif one_to_one
         recipient = one_to_one.other_user(user)
 
-        sender_bot = user.id == Robot.user.try(:id)
-        recipient_bot = recipient.id == Robot.user.try(:id)
+        user.redis.hincrby(key, :sent_one_to_one_messages_count, 1) if user.bot? || !recipient.bot?
 
-        user.redis.hincrby(key, :sent_one_to_one_messages_count, 1) if sender_bot || !recipient_bot
-
-        if recipient_bot || !sender_bot
+        if recipient.bot? || !user.bot?
           recipient_key = recipient.metrics.key
           user.redis.hincrby(recipient_key, :received_one_to_one_messages_count, 1)
           user.redis.hincrby(recipient_key, :received_messages_count, 1)
@@ -419,7 +416,7 @@ class Message
     today = Time.find_zone(User::COHORT_METRICS_TIME_ZONE).today.to_s
 
     # Skip metrics if either user is our bot
-    return if [user.id, recipient.id].include?(Robot.user.try(:id))
+    return if user.bot? || recipient.bot?
 
     user.redis.pipelined do
       sender_key = user.cohort_metrics_key
@@ -448,12 +445,9 @@ class Message
       recipient = one_to_one.other_user(user)
 
       # Separate metrics if either user is our bot
-      sender_bot = user.id == Robot.user.try(:id)
-      recipient_bot = recipient.id == Robot.user.try(:id)
-
-      if recipient_bot
+      if recipient.bot?
         StatsD.increment("messages.one_to_one.by_user_type.bot.received")
-      elsif !sender_bot
+      elsif !user.bot?
         unless sent_externally?
           registered_qualifier = recipient.account.registered? ? 'registered' : 'nonregistered'
           StatsD.increment("messages.one_to_one.#{registered_qualifier}.sent")
