@@ -396,14 +396,16 @@ class Message
       elsif one_to_one
         recipient = one_to_one.other_user(user)
 
-        # Skip metrics if either user is our bot
-        return if [user.id, recipient.id].include?(Robot.user.try(:id))
+        sender_bot = user.id == Robot.user.try(:id)
+        recipient_bot = recipient.id == Robot.user.try(:id)
 
-        user.redis.hincrby(key, :sent_one_to_one_messages_count, 1)
+        user.redis.hincrby(key, :sent_one_to_one_messages_count, 1) if sender_bot || !recipient_bot
 
-        recipient_key = recipient.metrics.key
-        user.redis.hincrby(recipient_key, :received_one_to_one_messages_count, 1)
-        user.redis.hincrby(recipient_key, :received_messages_count, 1)
+        if recipient_bot || !sender_bot
+          recipient_key = recipient.metrics.key
+          user.redis.hincrby(recipient_key, :received_one_to_one_messages_count, 1)
+          user.redis.hincrby(recipient_key, :received_messages_count, 1)
+        end
       end
 
       user.redis.hincrby(key, :sent_messages_count, 1)
