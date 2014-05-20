@@ -5,6 +5,14 @@ class BaseMailer < ActionMailer::Base
   BLACKLISTED_DOMAINS = /snap.io|ffm.fm|krazychat.com|krazykam.com/
 
   def mail(options)
-    super unless options[:to].blank? || options[:to] =~ BLACKLISTED_DOMAINS
+    super unless invalid_to?(options[:to])
+  end
+
+  def invalid_to?(to)
+    return false if to.blank?
+
+    to = Array(to) if to.is_a?(String)
+    to.reject!{ |e| e =~ BLACKLISTED_DOMAINS }
+    to.blank?
   end
 end
