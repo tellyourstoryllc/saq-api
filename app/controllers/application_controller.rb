@@ -113,4 +113,12 @@ class ApplicationController < ActionController::Base
     values = values.split(',', -1) unless values.is_a?(Array)
     values.map(&:strip)
   end
+
+  def sent_snap_invites?
+    Bool.parse(params[:sent_snap_invites]) && !Settings.enabled?(:disable_snap_invites)
+  end
+
+  def send_sms_invites?
+    params[:omit_sms_invite] != 'true' && !Settings.enabled?(:disable_sms_invites)
+  end
 end

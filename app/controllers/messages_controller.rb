@@ -109,7 +109,7 @@ class MessagesController < ApplicationController
     other_user.phones.each do |phone|
       Invite.create!(sender_id: current_user.id, recipient_id: other_user.id, invited_phone: phone.number,
                      new_user: false, can_log_in: other_user.account.can_log_in?, message: message,
-                     skip_sending: params[:omit_sms_invite])
+                     skip_sending: !send_sms_invites?)
     end
   end
 

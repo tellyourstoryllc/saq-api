@@ -12,7 +12,7 @@ class ContactsController < ApplicationController
     contact_inviter = ContactInviter.new(current_user)
     invited_users = contact_inviter.add_users(user_ids)
     invited_emails = contact_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite], source: params[:source]})
-    invited_phone_users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: params[:omit_sms_invite], source: params[:source]})
+    invited_phone_users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: !send_sms_invites?, source: params[:source]})
 
     users = invited_users | invited_phone_users | invited_emails.map(&:user)
 
@@ -65,7 +65,7 @@ class ContactsController < ApplicationController
     users.each do |recipient|
       next if recipient.account.registered?
 
-      sms_invite = params[:omit_sms_invite] != 'true' && (phone = recipient.phones.find_by(number: phone_numbers))
+      sms_invite = send_sms_invites? && (phone = recipient.phones.find_by(number: phone_numbers))
       invite_channel = if snap_invite && sms_invite
                          'snap_and_sms'
                        elsif snap_invite
@@ -96,10 +96,6 @@ class ContactsController < ApplicationController
     end
 
     mixpanel.imported_snapchat_friends
-    mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if sent_snap_invites? || params[:omit_sms_invite] != 'true'
-  end
-
-  def sent_snap_invites?
-    Bool.parse(params[:sent_snap_invites]) && !Settings.enabled?(:disable_snap_invites)
+    mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if sent_snap_invites? || send_sms_invites?
   end
 end
