@@ -231,7 +231,7 @@ class User < ActiveRecord::Base
 
   # Send notifications via all the user's channels, taking into account his preferences for each
   def send_notifications(message)
-    return unless away_idle_or_unavailable? && !bot?
+    return unless away_idle_or_unavailable? && !bot? && !message.received
 
     if !mobile_notifier.notify(message)
       email_notifier.notify(message)  # only send email notification if no mobile notification was sent.
