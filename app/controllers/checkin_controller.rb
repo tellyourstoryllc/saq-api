@@ -23,11 +23,14 @@ class CheckinController < ApplicationController
       objects << current_user.account
       objects << current_user.preferences
 
-      snap_invite_ad = current_user.snap_invite_ad
-      client_config.merge!(snap_invite_image_url: snap_invite_ad.media_url,
-                           snap_invite_image_text: snap_invite_ad.text_overlay,
-                           snap_invite_url: snap_invite_ad.media_url,
-                           snap_invite_text: snap_invite_ad.text_overlay)
+      unless Settings.enabled?(:disable_snap_invites)
+        snap_invite_ad = current_user.snap_invite_ad
+
+        client_config.merge!(snap_invite_image_url: snap_invite_ad.media_url,
+                             snap_invite_image_text: snap_invite_ad.text_overlay,
+                             snap_invite_url: snap_invite_ad.media_url,
+                             snap_invite_text: snap_invite_ad.text_overlay)
+      end
     end
 
     objects << current_device.preferences if current_device

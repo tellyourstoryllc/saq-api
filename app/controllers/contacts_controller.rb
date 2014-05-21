@@ -61,7 +61,7 @@ class ContactsController < ApplicationController
 
     current_user.add_to_user_ids_who_friended_me(user_ids)
 
-    snap_invite = Bool.parse(params[:sent_snap_invites])
+    snap_invite = sent_snap_invites?
     users.each do |recipient|
       next if recipient.account.registered?
 
@@ -96,6 +96,10 @@ class ContactsController < ApplicationController
     end
 
     mixpanel.imported_snapchat_friends
-    mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if Bool.parse(params[:sent_snap_invites]) || params[:omit_sms_invite] != 'true'
+    mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if sent_snap_invites? || params[:omit_sms_invite] != 'true'
+  end
+
+  def sent_snap_invites?
+    Bool.parse(params[:sent_snap_invites]) && !Settings.enabled?(:disable_snap_invites)
   end
 end
