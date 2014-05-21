@@ -87,10 +87,16 @@ class MixpanelClient
   end
 
   def sent_photo_invite(invite)
+    # Disabled for now
+    return
+
     track('Sent Photo Invite', invite_properties(invite))
   end
 
   def sent_native_photo_invite(properties)
+    # Disabled for now
+    return
+
     track('Sent Photo Invite', native_invite_properties(properties))
   end
 
