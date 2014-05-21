@@ -234,12 +234,6 @@ describe UsersController do
     end
 
     describe "when adding avatar image" do
-      before do
-        Email.destroy_all
-        Account.destroy_all
-        User.destroy_all
-      end
-
       after do
         # Delete temp files for upload created by CarrierWave.
         FileUtils.rm_rf(Dir["#{Rails.root}/public/uploads/tmp/[^.]*"])
