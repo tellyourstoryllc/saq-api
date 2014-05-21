@@ -38,7 +38,7 @@ class MessagesController < ApplicationController
       message = Message.new(message_params.merge(one_to_one_id: one_to_one.id))
 
       if message.save
-        other_user = one_to_one.other_user(current_user)
+        other_user = one_to_one.other_user(message.user)
 
         unless params[:skip_publish]
           data = MessageSerializer.new(message).as_json
