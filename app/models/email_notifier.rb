@@ -68,4 +68,19 @@ class EmailNotifier
   def notify_new_member!(new_member, group)
     # Don't do anything
   end
+
+  def notify_new_snap(sender_username)
+    sender = User.find_by(username: sender_username) if sender_username.present?
+    return if sender.blank?
+
+    if Settings.enabled?(:queue)
+      SnapMailerNewSnapWorker.perform_async(user.id, sender.id)
+    else
+      notify_new_snap!(sender)
+    end
+  end
+
+  def notify_new_snap!(sender)
+    SnapMailer.new_snap(user, sender).deliver!
+  end
 end

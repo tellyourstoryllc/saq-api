@@ -1,5 +1,4 @@
 class MessageMailer < BaseMailer
-
   def all(message, recipient, data)
     data = data.with_indifferent_access
 
@@ -26,5 +25,4 @@ class MessageMailer < BaseMailer
 
     mail(to: @recipient.emails.map(&:email), subject: subject)
   end
-
 end

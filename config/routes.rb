@@ -80,6 +80,8 @@ KrazyChat::Application.routes.draw do
     match '/admin/sms_stats', to: 'admin#sms_stats', as: 'admin_sms_stats'
     match '/admin/cohort_metrics', to: 'admin#cohort_metrics', as: 'admin_cohort_metrics'
     match '/logs/event', to: 'logs#event', as: 'logs_event'
+
+    match '/snaps/fetched', to: 'snaps#fetched', as: 'fetched_snaps'
   end
 
   require 'sidekiq/web'

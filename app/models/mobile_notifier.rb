@@ -51,6 +51,10 @@ class MobileNotifier
     send_notification(message, notification_type)
   end
 
+  def pushes_enabled?
+    (user.ios_devices + user.android_devices).flatten.any?{ |d| d.preferences.server_pushes_enabled }
+  end
+
   def create_ios_notification(ios_device, alert, custom_data)
     return if ios_device.push_token.blank? || !ios_device.preferences.server_pushes_enabled
 
