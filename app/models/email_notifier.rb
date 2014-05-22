@@ -83,4 +83,34 @@ class EmailNotifier
   def notify_new_snap!(sender)
     SnapMailer.new_snap(user, sender).deliver!
   end
+
+  def notify_missed_sent_snaps
+    return if user.daily_missed_sent_snaps_email.exists?
+
+    if Settings.enabled?(:queue)
+      SnapMailerMissedSentSnapsWorker.perform_async(user.id)
+    else
+      notify_missed_sent_snaps!
+    end
+  end
+
+  def notify_missed_sent_snaps!
+    return unless user.redis.set(user.daily_missed_sent_snaps_email.key, '1', {ex: 24.hours, nx: true})
+    SnapMailer.missed_sent_snaps(user).deliver!
+  end
+
+  def notify_missed_received_snaps
+    return if user.daily_missed_received_snaps_email.exists?
+
+    if Settings.enabled?(:queue)
+      SnapMailerMissedReceivedSnapsWorker.perform_async(user.id)
+    else
+      notify_missed_received_snaps!
+    end
+  end
+
+  def notify_missed_received_snaps!
+    return unless user.redis.set(user.daily_missed_received_snaps_email.key, '1', {ex: 24.hours, nx: true})
+    SnapMailer.missed_received_snaps(user).deliver!
+  end
 end

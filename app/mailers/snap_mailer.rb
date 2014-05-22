@@ -9,4 +9,20 @@ class SnapMailer < BaseMailer
 
     mail(to: @recipient.emails.map(&:email), subject: subject)
   end
+
+  def missed_sent_snaps(user)
+    @user = user
+    @url = Rails.configuration.app['web']['url'] + "/missed_sent_snaps?invite_channel=email"
+    subject = "Reminder: Sending messages from the Snapchat app prevents them from being saved by #{Rails.configuration.app['app_name']}"
+
+    mail(to: @user.emails.map(&:email), subject: subject)
+  end
+
+  def missed_received_snaps(user)
+    @user = user
+    @url = Rails.configuration.app['web']['url'] + "/missed_received_snaps?invite_channel=email"
+    subject = "Reminder: Viewing messages in the Snapchat app prevents them from being saved by #{Rails.configuration.app['app_name']}"
+
+    mail(to: @user.emails.map(&:email), subject: subject)
+  end
 end

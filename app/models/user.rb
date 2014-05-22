@@ -71,6 +71,8 @@ class User < ActiveRecord::Base
   value :last_invite_at
   value :clicked_invite_link
   value :notified_friends
+  value :daily_missed_sent_snaps_email
+  value :daily_missed_received_snaps_email
 
   delegate :registered, :registered?, to: :account
 
