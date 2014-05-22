@@ -33,7 +33,7 @@ class Robot
                             text: item.text, attachment_url: item.attachment_url)
       message.save
 
-      one_to_one.publish_one_to_one_message(message)
+      one_to_one.publish_one_to_one_message(message, nil, skip_sender: trigger == 'intro')
     end
   end
 
