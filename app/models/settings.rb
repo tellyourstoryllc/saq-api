@@ -7,16 +7,16 @@ class Settings
 
 
   def self.get(key)
-    val = attrs[PREFIX + key]
+    val = attrs[PREFIX + key.to_s]
     val == '_nil' ? nil : val
   end
 
   def self.set(key, value)
-    attrs[PREFIX + key] = value.nil? ? '_nil' : value
+    attrs[PREFIX + key.to_s] = value.nil? ? '_nil' : value
   end
 
   def self.delete(key)
-    attrs.delete(PREFIX + key)
+    attrs.delete(PREFIX + key.to_s)
   end
 
   def self.feature_toggle_key(feature)

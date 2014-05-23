@@ -73,6 +73,10 @@ class User < ActiveRecord::Base
   value :notified_friends
   value :daily_missed_sent_snaps_email
   value :daily_missed_received_snaps_email
+  sorted_set :unviewed_message_ids
+  set :unviewed_message_user_ids, global: true
+  value :snap_invites_allowed
+  value :sms_invites_allowed
 
   delegate :registered, :registered?, to: :account
 

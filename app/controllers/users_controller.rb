@@ -52,6 +52,8 @@ class UsersController < ApplicationController
 
     @account.send_welcome_email
 
+    set_invite_flags
+
     # Fetch friends and autoconnect Facebook if needed
     @account.facebook_user.try(:fetch_friends)
     contact_inviter.facebook_autoconnect
@@ -100,5 +102,10 @@ class UsersController < ApplicationController
 
   def contact_inviter
     @contact_inviter ||= ContactInviter.new(@current_user)
+  end
+
+  def set_invite_flags
+    @current_user.snap_invites_allowed = (rand < Settings.get(:snap_invites_percentage).to_f) ? '1' : '0'
+    @current_user.sms_invites_allowed = (rand < Settings.get(:sms_invites_percentage).to_f) ? '1' : '0'
   end
 end

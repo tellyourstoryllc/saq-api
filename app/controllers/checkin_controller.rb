@@ -23,7 +23,7 @@ class CheckinController < ApplicationController
       objects << current_user.account
       objects << current_user.preferences
 
-      unless Settings.enabled?(:disable_snap_invites)
+      if !Settings.enabled?(:disable_snap_invites) && Bool.parse(current_user.snap_invites_allowed.value)
         snap_invite_ad = current_user.snap_invite_ad
 
         client_config.merge!(snap_invite_image_url: snap_invite_ad.media_url,

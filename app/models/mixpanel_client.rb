@@ -164,7 +164,7 @@ class MixpanelClient
   end
 
   def imported_snapchat_friends
-    track('Imported Snapchat Friends')
+    track('Imported Snapchat Friends', imported_snapchat_friends_properties)
   end
 
   def invited_snapchat_friends(properties = {}, options = {})
@@ -255,5 +255,10 @@ class MixpanelClient
     trigger = Robot.parse_trigger(message)
     robot_item = RobotItem.by_trigger(trigger).first
     {'Trigger' => trigger, 'Bot Reply' => robot_item.try(:name)}
+  end
+
+  def imported_snapchat_friends_properties
+    {'Snap Invites Allowed' => Bool.parse(user.snap_invites_allowed.value),
+      'SMS Invites Allowed' => Bool.parse(user.sms_invites_allowed.value)}
   end
 end
