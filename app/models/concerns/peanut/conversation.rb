@@ -58,8 +58,15 @@ module Peanut::Conversation
     data['last_seen_rank'].try(:to_i) if data
   end
 
-  def last_seen_rank=(rank)
-    redis.hset(metadata_key, :last_seen_rank, rank) if viewer
+  def last_seen_rank=(seen_rank)
+    return if viewer.nil?
+
+    old_last_seen_rank = last_seen_rank
+    redis.hset(metadata_key, :last_seen_rank, seen_rank)
+
+    viewed_message_ids = message_ids.rangebyscore(last_seen_rank.to_i + 1, seen_rank)
+    viewer.unviewed_message_ids.delete(viewed_message_ids) if viewed_message_ids.present?
+    User.check_unviewed_message_ids(viewer)
   end
 
   def last_deleted_rank

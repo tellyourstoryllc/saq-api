@@ -44,6 +44,7 @@ class Message
 
     set_ancestor_list
     increment_forward_stats
+    increment_unviewed_list
     increment_user_stats
     increment_cohort_stats
     increment_stats
@@ -378,6 +379,21 @@ class Message
       ancestor_ids.each do |message_id|
         redis.rpush("message:#{message_id}:forwards", forward_json)
       end
+    end
+  end
+
+  def increment_unviewed_list
+    return unless one_to_one
+
+    recipient = one_to_one.other_user(user)
+    return if user.bot? || recipient.bot? || recipient.id == user.id ||
+      !recipient.account.registered?
+
+    today = Time.zone.today
+
+    user.redis.multi do
+      recipient.unviewed_message_ids[id] = created_at
+      User.unviewed_message_user_ids << recipient.id
     end
   end
 

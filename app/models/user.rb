@@ -443,6 +443,12 @@ class User < ActiveRecord::Base
     Robot.bot?(self)
   end
 
+  # If the user no longer has any unviewed messages,
+  # remove him from the global list
+  def self.check_unviewed_message_ids(user)
+    unviewed_message_user_ids.delete(user.id) unless user.unviewed_message_ids.exists?
+  end
+
 
   private
 

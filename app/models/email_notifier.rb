@@ -113,4 +113,19 @@ class EmailNotifier
     return unless user.redis.set(user.daily_missed_received_snaps_email.key, '1', {ex: 24.hours, nx: true})
     SnapMailer.missed_received_snaps(user).deliver!
   end
+
+  def notify_unviewed_snaps(message_ids)
+    return if message_ids.blank?
+
+    if Settings.enabled?(:queue)
+      SnapMailerUnviewedSnapsWorker.perform_async(user.id, message_ids)
+    else
+      notify_unviewed_snaps!(message_ids)
+    end
+  end
+
+  def notify_unviewed_snaps!(message_ids)
+    messages = message_ids.map{ |id| Message.new(id: id) }
+    SnapMailer.unviewed_snaps(user, messages).deliver!
+  end
 end
