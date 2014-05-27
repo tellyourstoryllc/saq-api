@@ -14,6 +14,21 @@ class ConversationsController < ApplicationController
     end
 
     conversations = groups + one_to_ones
+
+    # To be backward compatible with old clients, return all conversations when
+    # no limit is specified.
+    if params[:limit].present?
+      limit = params[:limit].to_i
+      limit = 500 if limit > 500
+      limit = 0 if limit < 0
+      offset = params[:offset].to_i
+
+      # Sort in a way that's consistent between calls.
+      conversations.sort_by!{ |convo| [convo.created_at, convo.id] }
+
+      conversations = conversations[offset, limit]
+    end
+
     conversations.each{ |convo| convo.viewer = current_user }
     other_users = User.includes(:avatar_image, :avatar_video).where(id: one_to_ones.map{ |o| o.other_user_id(current_user) })
 
