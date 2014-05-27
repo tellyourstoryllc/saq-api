@@ -30,7 +30,8 @@ class ConversationsController < ApplicationController
     end
 
     conversations.each{ |convo| convo.viewer = current_user }
-    other_users = User.includes(:avatar_image, :avatar_video).where(id: one_to_ones.map{ |o| o.other_user_id(current_user) })
+    other_user_ids = conversations.map{ |c| c.other_user_id(current_user) if c.respond_to?(:other_user_id) }.compact
+    other_users = User.includes(:avatar_image, :avatar_video).where(id: other_user_ids)
 
     render_json conversations + other_users
   end
