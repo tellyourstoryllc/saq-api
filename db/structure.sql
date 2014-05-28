@@ -497,6 +497,26 @@ CREATE TABLE `snap_invite_ads` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `sysops`
+--
+
+DROP TABLE IF EXISTS `sysops`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sysops` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `password_digest` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `index_sysops_on_name` (`name`),
+  UNIQUE KEY `index_sysops_on_token` (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `users`
 --
 
@@ -682,3 +702,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140509161115');
 INSERT INTO schema_migrations (version) VALUES ('20140513214441');
 
 INSERT INTO schema_migrations (version) VALUES ('20140519222919');
+
+INSERT INTO schema_migrations (version) VALUES ('20140528212241');
