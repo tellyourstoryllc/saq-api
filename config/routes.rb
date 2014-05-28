@@ -77,6 +77,8 @@ KrazyChat::Application.routes.draw do
 
     match '/hook/callback', to: 'hook#callback', as: 'hook_callback'
 
+    match '/admin/login', to: 'admin_auth#login', as: 'admin_login'
+    match '/admin/logout', to: 'admin_auth#logout', as: 'admin_logout'
     match '/admin/sms_stats', to: 'admin#sms_stats', as: 'admin_sms_stats'
     match '/admin/cohort_metrics', to: 'admin#cohort_metrics', as: 'admin_cohort_metrics'
     match '/admin/users', to: 'admin#users', as: 'admin_users'

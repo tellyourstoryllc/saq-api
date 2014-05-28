@@ -45,3 +45,10 @@ Or for fast tests, run spork in one tab:
 And in another tab:
 
     testdrb test/**/*_test.rb
+
+## Admin
+
+To create an admin login, use the Sysop model and add permissions to it.
+
+    s = Sysop.create(name: 'username', password: 'secret', password_confirmation: 'secret')
+    s.permissions << 'superuser'

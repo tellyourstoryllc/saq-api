@@ -1,8 +1,9 @@
 class AdminController < ActionController::Base
-  http_basic_authenticate_with name: Rails.configuration.app['admin']['username'], password: Rails.configuration.app['admin']['password']
+  before_action :authenticate, :require_sysop
   around_filter :set_time_zone
   before_action :load_user, only: :show_user
   helper :admin
+  helper_method :logged_in?
 
 
   def sms_stats
@@ -42,8 +43,31 @@ class AdminController < ActionController::Base
   def show_user
   end
 
+  def logged_in?
+    !! @sysop
+  end
+
 
   private
+
+  def self.required_permissions
+    @@required_permissions ||= []
+  end
+
+  def self.require_permission(permission)
+    required_permissions << permission
+  end
+
+  # Superuser can access all admin tools.
+  require_permission :superuser
+
+  def authenticate
+    @sysop = Sysop.find_by_token(cookies[:admin_token]) if cookies[:admin_token]
+  end
+
+  def require_sysop
+    redirect_to admin_login_path unless @sysop && self.class.required_permissions.any? {|perm| @sysop.has_permission?(perm) }
+  end
 
   def load_user
     @user = User.find(params[:id])

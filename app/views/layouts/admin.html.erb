@@ -9,6 +9,25 @@
 </head>
 <body>
 
+  <div class='navbar navbar-default'>
+    <div class='container-fluid'>
+      <ul class='nav navbar-nav navbar-right'>
+        <% if logged_in? %>
+          <li><%= link_to 'Cohort Metrics', admin_cohort_metrics_path %></li>
+          <li><%= link_to 'SMS Stats', admin_sms_stats_path %></li>
+          <li><%= link_to 'Users', admin_users_path %></li>
+          <li><%= link_to 'Log Out', admin_logout_path %></li>
+        <% else %>
+          <li><%= link_to 'Log In', admin_login_path %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
+  <% flash.each do |type, msg| %>
+    <div class='alert <%= alert_class(type) %>'><%= msg %></div>
+  <% end %>
+
 <%= yield %>
 
 </body>
