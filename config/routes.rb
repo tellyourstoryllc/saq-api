@@ -79,6 +79,8 @@ KrazyChat::Application.routes.draw do
 
     match '/admin/sms_stats', to: 'admin#sms_stats', as: 'admin_sms_stats'
     match '/admin/cohort_metrics', to: 'admin#cohort_metrics', as: 'admin_cohort_metrics'
+    match '/admin/users', to: 'admin#users', as: 'admin_users'
+    match '/admin/users/:id', to: 'admin#show_user', as: 'admin_user'
     match '/logs/event', to: 'logs#event', as: 'logs_event'
 
     match '/snaps/fetched', to: 'snaps#fetched', as: 'fetched_snaps'

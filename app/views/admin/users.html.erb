@@ -1,0 +1,43 @@
+<div class='admin-content'>
+
+<form class='form-inline' style='margin: 20px 0'>
+  <input type='search' name='name' value='<%= params[:name] %>' placeholder='Username or Email'>
+  <button type='submit' class='btn'>Search</button>
+</form>
+
+<p>
+  <% if @user_search.show_all? %>
+    There are <%= pluralize(@users_count, 'user') %>.
+  <% else %>
+    Found <%= pluralize(@users_count, 'user') %>.
+  <% end %>
+  Showing <%= @offset + 1 %> to <%= @offset + @users.size %>.
+</p>
+
+<% if @users.present? %>
+  <div class='users'>
+    <% @users.each do |user| %>
+      <div class='user'>
+        <%= link_to user.username, admin_user_path(user) %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p>
+    Nothing found.
+  </p>
+<% end %>
+
+<ul class='pagination'>
+  <% if @offset > 0 %>
+    <li><%= link_to 'First', admin_users_path(@user_search.to_params) %></li>
+  <% end %>
+  <% if @offset - @users.size >= 0 %>
+    <li><%= link_to 'Previous', admin_users_path(@user_search.to_params.merge(offset: @offset - @users.size)) %></li>
+  <% end %>
+  <% if @offset + @users.size < @users_count %>
+    <li><%= link_to 'Next', admin_users_path(@user_search.to_params.merge(offset: @offset + @users.size)) %></li>
+  <% end %>
+</ul>
+
+</div>

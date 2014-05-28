@@ -1,6 +1,8 @@
 class AdminController < ActionController::Base
   http_basic_authenticate_with name: Rails.configuration.app['admin']['username'], password: Rails.configuration.app['admin']['password']
   around_filter :set_time_zone
+  before_action :load_user, only: :show_user
+  helper :admin
 
 
   def sms_stats
@@ -27,8 +29,25 @@ class AdminController < ActionController::Base
     fetch_message_metrics
   end
 
+  def users
+    @user_search = AdminUserSearch.new(params[:name])
+
+    @users = @user_search.to_scope
+    @users = @users.reorder(created_at: :desc)
+    @users_count = @users.count
+    @offset = params[:offset].to_i
+    @users = @users.limit((params[:limit].presence || 30).to_i).offset(@offset)
+  end
+
+  def show_user
+  end
+
 
   private
+
+  def load_user
+    @user = User.find(params[:id])
+  end
 
   def set_time_zone
     old_time_zone = Time.zone

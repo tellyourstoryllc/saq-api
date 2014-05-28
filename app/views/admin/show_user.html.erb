@@ -1,0 +1,50 @@
+<div class='admin-content'>
+
+<div class='nav'>
+  <%= link_to 'Back to Users', admin_users_path %>
+</div>
+
+<h3><%= @user.username %></h3>
+
+<div>created: <%= admin_timestamp @user.created_at, time_ago: true %></div>
+<div>
+  emails:
+  <%= @user.emails.pluck(:email).map {|e| mail_to(e, e) }.join(', ').html_safe %>
+</div>
+<% if @user.avatar_image %>
+  <div><%= image_tag @user.avatar_url %></div>
+<% end %>
+<% if @user.avatar_video %>
+  <div>
+    <video controls>
+      <source src='<%= @user.avatar_video_url %>'>
+    </video>
+  </div>
+<% end %>
+<% if @user.account.one_to_one_wallpaper_image %>
+  <div><%= link_to '1-1 wallpaper', @user.account.one_to_one_wallpaper_url, target: '_blank' %></div>
+<% end %>
+
+<table class='table table-striped'>
+  <tbody>
+    <tr>
+      <td>contacts</td><td><%= @user.contact_ids.size %></td>
+    </tr>
+  </tbody>
+</table>
+
+<div>
+  This user...
+  <table class='table table-striped'>
+    <tbody>
+      <tr>
+        <td>was invited by another user?</td><td><%= "#{@user.invited?}".titleize %></td>
+      </tr>
+      <tr>
+        <td>is deactivated?</td><td><%= "#{@user.deactivated}".titleize %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div>
