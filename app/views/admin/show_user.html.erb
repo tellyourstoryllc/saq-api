@@ -28,7 +28,11 @@
 <table class='table table-striped'>
   <tbody>
     <tr>
-      <td>contacts</td><td><%= @user.contact_ids.size %></td>
+      <td>contacts</td>
+      <td>
+        <%= @user.contact_ids.size %>
+        <%= link_to 'See All', admin_user_contacts_path(@user) %>
+      </td>
     </tr>
   </tbody>
 </table>

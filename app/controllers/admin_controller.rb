@@ -1,7 +1,7 @@
 class AdminController < ActionController::Base
   before_action :authenticate, :require_sysop
   around_filter :set_time_zone
-  before_action :load_user, only: :show_user
+  before_action :load_user, only: [:show_user, :show_user_contacts]
   helper :admin
   helper_method :logged_in?
 
@@ -42,6 +42,15 @@ class AdminController < ActionController::Base
 
   def show_user
   end
+
+  def show_user_contacts
+    @offset = params[:offset].to_i
+    @contacts = @user.paginated_contacts(limit: 50, offset: @offset)
+    @contacts_count = @user.contact_ids.size
+  end
+
+
+  protected
 
   def logged_in?
     !! @sysop

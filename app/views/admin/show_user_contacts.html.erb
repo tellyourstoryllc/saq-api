@@ -1,0 +1,41 @@
+<div class='admin-content'>
+
+<div class='nav'>
+  <%= link_to 'Users', admin_users_path %>
+  &gt;
+  <%= link_to @user.username, admin_user_path(@user) %>
+  &gt;
+  Contacts
+</div>
+
+<h3><%= @user.username %>'s Contacts</h3>
+
+<% if @contacts.size > 0 %>
+  <table class='table table-striped'>
+    <tbody>
+      <% @contacts.each do |user| %>
+        <tr>
+          <td><%= link_to user.username, admin_user_path(user) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>
+    None Found.
+  </p>
+<% end %>
+
+<ul class='pagination'>
+  <% if @offset > 0 %>
+    <li><%= link_to 'First', admin_user_contacts_path(@user) %></li>
+  <% end %>
+  <% if @offset > 0 %>
+    <li><%= link_to 'Previous', admin_user_contacts_path(@user, offset: @offset - @contacts.size) %></li>
+  <% end %>
+  <% if @offset + @contacts.size < @contacts_count %>
+    <li><%= link_to 'Next', admin_users_path(@user, offset: @offset + @contacts_size) %></li>
+  <% end %>
+</ul>
+
+</div>
