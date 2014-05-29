@@ -25,6 +25,7 @@ class AdminController < ActionController::Base
   def cohort_metrics
     @today = Time.zone.today
     @days = 14
+    @hours_cached = 1
 
     fetch_friend_metrics
     fetch_message_metrics
@@ -93,30 +94,39 @@ class AdminController < ActionController::Base
   def fetch_friend_metrics
     @friend_counts = {}
 
-    @days.times do |i|
-      registered_date = @today - i
-      registered_from = Time.zone.local_to_utc(registered_date.to_datetime).to_s(:db)
-      registered_to = Time.zone.local_to_utc((registered_date + 1).to_datetime - 1.second).to_s(:db)
-      @friend_counts[registered_date.to_s] = {}
+    cache_key = 'user::metrics:cohort:average_percentage_registered'
+    cached_results = User.redis.get(cache_key)
 
-      User.joins(:account).where('accounts.registered_at BETWEEN ? AND ?', registered_from, registered_to).find_each do |u|
-        contact_ids = u.contact_ids.members
-        contacts = User.includes(:account).where(id: contact_ids).to_a
-        contacts_count = contacts.size
+    if cached_results
+      @friend_counts = JSON.load(cached_results)
+    else
+      @days.times do |i|
+        registered_date = @today - i
+        registered_from = Time.zone.local_to_utc(registered_date.to_datetime).to_s(:db)
+        registered_to = Time.zone.local_to_utc((registered_date + 1).to_datetime - 1.second).to_s(:db)
+        @friend_counts[registered_date.to_s] = {}
 
-        @days.times do |j|
-          action_date = (@today - j)
-          next if action_date < registered_date || !u.active_on?(action_date)
+        User.joins(:account).where('accounts.registered_at BETWEEN ? AND ?', registered_from, registered_to).find_each do |u|
+          contact_ids = u.contact_ids.members
+          contacts = User.includes(:account).where(id: contact_ids).to_a
+          contacts_count = contacts.size
 
-          @friend_counts[registered_date.to_s][action_date.to_s] ||= {}
-          @friend_counts[registered_date.to_s][action_date.to_s][u.id] ||= {}
+          @days.times do |j|
+            action_date = (@today - j)
+            next if action_date < registered_date || !u.active_on?(action_date)
 
-          registered_count = contacts.count{ |c| c.account.registered_at.present? && c.account.registered_at.to_date <= action_date }
-          @friend_counts[registered_date.to_s][action_date.to_s][u.id]['contacts_counts'] = contacts_count
-          @friend_counts[registered_date.to_s][action_date.to_s][u.id]['registered_counts'] = registered_count
-          @friend_counts[registered_date.to_s][action_date.to_s][u.id]['percent_registered'] = (registered_count.to_f / contacts_count) * 100 if contacts_count > 0
+            @friend_counts[registered_date.to_s][action_date.to_s] ||= {}
+            @friend_counts[registered_date.to_s][action_date.to_s][u.id] ||= {}
+
+            registered_count = contacts.count{ |c| c.account.registered_at.present? && c.account.registered_at.to_date <= action_date }
+            @friend_counts[registered_date.to_s][action_date.to_s][u.id]['contacts_counts'] = contacts_count
+            @friend_counts[registered_date.to_s][action_date.to_s][u.id]['registered_counts'] = registered_count
+            @friend_counts[registered_date.to_s][action_date.to_s][u.id]['percent_registered'] = (registered_count.to_f / contacts_count) * 100 if contacts_count > 0
+          end
         end
       end
+
+      User.redis.set(cache_key, @friend_counts.to_json, {ex: @hours_cached.hours})
     end
   end
 
