@@ -10,8 +10,10 @@
     There are <%= pluralize(@users_count, 'user') %>.
   <% else %>
     Found <%= pluralize(@users_count, 'user') %>.
+    <% if @users.size > 0 %>
+      Showing <%= @offset + 1 %> to <%= @offset + @users.size %>.
+    <% end %>
   <% end %>
-  Showing <%= @offset + 1 %> to <%= @offset + @users.size %>.
 </p>
 
 <% if @users.present? %>
@@ -22,10 +24,6 @@
       </div>
     <% end %>
   </div>
-<% else %>
-  <p>
-    Nothing found.
-  </p>
 <% end %>
 
 <ul class='pagination'>
