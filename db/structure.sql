@@ -510,6 +510,7 @@ CREATE TABLE `sysops` (
   `token` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_sysops_on_name` (`name`),
   UNIQUE KEY `index_sysops_on_token` (`token`)
@@ -704,3 +705,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140513214441');
 INSERT INTO schema_migrations (version) VALUES ('20140519222919');
 
 INSERT INTO schema_migrations (version) VALUES ('20140528212241');
+
+INSERT INTO schema_migrations (version) VALUES ('20140529204103');
