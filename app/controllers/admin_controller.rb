@@ -71,7 +71,7 @@ class AdminController < ActionController::Base
   require_permission :superuser
 
   def authenticate
-    @sysop = Sysop.find_by_token(cookies[:admin_token]) if cookies[:admin_token]
+    @sysop = Sysop.find_by_token(cookies[:admin_token]) if cookies[:admin_token].present?
   end
 
   def require_sysop
