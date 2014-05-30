@@ -29,7 +29,7 @@ class SnapMailer < BaseMailer
   def unviewed_snaps(user, messages)
     @user = user
     @messages = messages
-    @senders = @messages.map(&:user).uniq
+    @senders = @messages.map(&:user).uniq(&:id)
     @url = Rails.configuration.app['web']['url'] + "/unviewed_snaps?invite_channel=email"
 
     friends_text = "s from #{@senders.size} of your friends" if @messages.size > 1
