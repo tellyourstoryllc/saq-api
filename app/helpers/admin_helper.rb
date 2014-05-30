@@ -1,6 +1,6 @@
 module AdminHelper
   def alert_class(type)
-    case type
+    case type.to_s
     when 'info'
       # Blue.
       'alert-info'
