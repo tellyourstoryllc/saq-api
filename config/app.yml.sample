@@ -3,6 +3,7 @@ development:
     username: USERNAME
     password: PASSWORD
   api:
+    url: http://localhost:3008
     request_secret: SECRET
   app_name: SnapCracklePop
   app_name_short: SnapCracklePop
@@ -53,6 +54,7 @@ test:
     username: USERNAME
     password: PASSWORD
   api:
+    url: http://localhost:3008
     request_secret: SECRET
   app_name: SnapCracklePop
   app_name_short: SnapCracklePop
