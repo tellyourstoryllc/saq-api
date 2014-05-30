@@ -89,7 +89,13 @@ class AdminController < ActionController::Base
   end
 
   def require_sysop
-    redirect_to admin_login_path unless @sysop && self.class.required_permissions.any? {|perm| @sysop.has_permission?(perm) }
+    unless @sysop
+      redirect_to admin_login_path; return
+    end
+    unless self.class.required_permissions.any? {|perm| @sysop.has_permission?(perm) }
+      flash.now[:alert] = "You don't have permission to view this page."
+      render 'error'
+    end
   end
 
   def load_user
