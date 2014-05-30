@@ -15,7 +15,12 @@
 <p class="explanation text-muted">
   For each user who registered on a given date Y (first column) *and* came to the app on a given date X (first row), what percentage of his Snapchat friends are registered in SCP?
   Each user's percentage for a given registration and action date is calculated, and then those percentages are averaged.<br /><br />
-  Note: This table is cached for <%= pluralize(@hours_cached, 'hour') %>.
+  Note:
+  <% if @friend_counts_in_progress -%>
+    This data is currently being re-calculated. Please refresh in a minute or so.
+  <% else -%>
+    This table will be re-calculated in <%= distance_of_time_in_words(@admin_metrics.next_recalculation_at - Time.current) %>.
+  <% end -%>
 </p>
 
 
@@ -44,7 +49,7 @@
         <td class="percentage">
           <% if action_date <= @today -%>
             <% percentages = [] %>
-            <% (@friend_counts[registered_date.to_s][action_date.to_s] || []).each do |user_id, hsh| -%>
+            <% ((@friend_counts[registered_date.to_s] || {})[action_date.to_s] || []).each do |user_id, hsh| -%>
               <% percentages << hsh['percent_registered'] %>
             <% end -%>
             <% percentages.compact! %>
