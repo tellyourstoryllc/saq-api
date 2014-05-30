@@ -513,7 +513,8 @@ CREATE TABLE `sysops` (
   `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_sysops_on_name` (`name`),
-  UNIQUE KEY `index_sysops_on_token` (`token`)
+  UNIQUE KEY `index_sysops_on_token` (`token`),
+  UNIQUE KEY `index_sysops_on_email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
