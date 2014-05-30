@@ -50,5 +50,5 @@ And in another tab:
 
 To create an admin login, use the Sysop model and add permissions to it.
 
-    s = Sysop.create(name: 'username', password: 'secret', password_confirmation: 'secret')
+    s = Sysop.create(name: 'username', password: 'secret', password_confirmation: 'secret', email: 'email@address')
     s.permissions << 'superuser'
