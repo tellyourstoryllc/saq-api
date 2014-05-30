@@ -4,6 +4,8 @@ class DailyUnviewedSnapNotifier
   # Send an email to each user who has at least 1 unviewed
   # snap that's at least X hours old
   def self.send_daily_emails
+    metrics_key = "user::sent_unviewed_message_email_metrics:#{Time.zone.today}"
+
     user_ids = User.unviewed_message_user_ids.members
     User.where(id: user_ids).find_each do |user|
       # Only send an email if the user has pushes enabled
@@ -25,6 +27,11 @@ class DailyUnviewedSnapNotifier
 
       # Email the user about his unviewed snaps
       user.email_notifier.notify_unviewed_snaps(message_ids)
+
+      messages = message_ids.map{ |id| Message.new(id: id) }
+      User.redis.hset(metrics_key, user.id, {messages_count: messages.size,
+                      uniq_friends_count: messages.uniq(&:user_id).size,
+                      message_ids: message_ids}.to_json)
     end
   end
 end
