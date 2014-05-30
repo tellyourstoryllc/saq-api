@@ -79,6 +79,10 @@ KrazyChat::Application.routes.draw do
 
     match '/admin/login', to: 'admin_auth#login', as: 'admin_login'
     match '/admin/logout', to: 'admin_auth#logout', as: 'admin_logout'
+    match '/admin/forgot_password', to: 'admin_auth#forgot_password', as: 'admin_forgot_password'
+    match '/admin/send_reset_password_email', to: 'admin_auth#send_reset_password_email', as: 'admin_send_reset_password_email'
+    match '/admin/reset_password', to: 'admin_auth#update_password', as: 'admin_update_password', via: [:post, :put]
+    match '/admin/reset_password', to: 'admin_auth#reset_password', as: 'admin_reset_password'
     match '/admin/sms_stats', to: 'admin#sms_stats', as: 'admin_sms_stats'
     match '/admin/cohort_metrics', to: 'admin#cohort_metrics', as: 'admin_cohort_metrics'
     match '/admin/users', to: 'admin#users', as: 'admin_users'

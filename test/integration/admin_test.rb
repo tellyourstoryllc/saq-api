@@ -8,17 +8,20 @@ describe "Admin Integration Test" do
   before do
     # Create a sysop with permission to everything.
     sysop.permissions << 'superuser'
-    # Create token.
-    sysop.set_token
-    sysop.save!
 
     # Force creation of the user.
     user
   end
 
+  def login!
+    # We could actually use the form, but I'm being lazy and just setting the
+    # cookie directly.
+    cookies[:admin_token] = sysop.token
+  end
+
   describe "GET /admin/users" do
     it "must list users" do
-      cookies[:admin_token] = sysop.token
+      login!
       get '/admin/users'
       assert_response :success
     end
@@ -34,7 +37,7 @@ describe "Admin Integration Test" do
 
   describe "GET /admin/users/:id" do
     it "must show user" do
-      cookies[:admin_token] = sysop.token
+      login!
       get "/admin/users/#{user.id}"
       assert_response :success
     end
@@ -48,7 +51,7 @@ describe "Admin Integration Test" do
       inviter.add_user(user, u2)
       inviter.add_user(u2, user)
 
-      cookies[:admin_token] = sysop.token
+      login!
       get "/admin/users/#{user.id}/contacts"
       assert_response :success
     end

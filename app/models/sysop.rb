@@ -3,7 +3,10 @@ class Sysop < ActiveRecord::Base
 
   has_secure_password
 
+  validates :name, presence: true
   validates :name, uniqueness: true
+
+  before_create :set_token
 
   # A set of strings to indicate the permissions this sysop has.
   # 'superuser' is a special case

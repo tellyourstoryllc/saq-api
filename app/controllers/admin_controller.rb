@@ -53,8 +53,12 @@ class AdminController < ActionController::Base
 
   protected
 
+  def current_sysop
+    @sysop
+  end
+
   def logged_in?
-    !! @sysop
+    !! current_sysop
   end
 
 
@@ -72,7 +76,16 @@ class AdminController < ActionController::Base
   require_permission :superuser
 
   def authenticate
-    @sysop = Sysop.find_by_token(cookies[:admin_token]) if cookies[:admin_token].present?
+    # Allow params to override cookies.
+    if params[:admin_token].present?
+      t = params[:admin_token]
+      @sysop = Sysop.find_by_token(t)
+      # Save token to cookies if it's valid.
+      cookies[:admin_token] = t if @sysop
+    end
+    if ! @sysop && cookies[:admin_token].present?
+      @sysop = Sysop.find_by_token(cookies[:admin_token])
+    end
   end
 
   def require_sysop
