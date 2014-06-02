@@ -128,4 +128,19 @@ class EmailNotifier
     messages = message_ids.map{ |id| Message.new(id: id) }
     SnapMailer.unviewed_snaps(user, messages).deliver!
   end
+
+  def notify_like(message, actor)
+    return if message.user_id == actor.id
+
+    if Settings.enabled?(:queue)
+      MessageMailerLikedMessageWorker.perform_async(message.id, actor.id)
+    else
+      notify_unviewed_snaps!(message, actor)
+    end
+  end
+
+  def notify_like!(message, actor)
+    return if message.user_id == actor.id
+    MessageMailer.liked_message(message, actor).deliver!
+  end
 end

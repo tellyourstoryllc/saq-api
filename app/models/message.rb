@@ -208,8 +208,6 @@ class Message
 
   def send_like_meta_messages(current_user)
     attrs = {attachment_content_type: 'meta/like', actor_id: current_user.id}
-    alert = "#{current_user.username} liked your #{message_attachment.try(:media_type_name) || 'message'}"
-    custom_data = {}
 
     [original_message, self].compact.uniq(&:id).each do |message|
       m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
@@ -217,7 +215,7 @@ class Message
       m.save
 
       message.conversation.publish_one_to_one_message(m)
-      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+      message.user.send_like_notifications(message, current_user)
     end
   end
 

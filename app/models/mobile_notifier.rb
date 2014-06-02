@@ -148,4 +148,14 @@ class MobileNotifier
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)
   end
+
+  def notify_like(message, actor)
+    return if message.user_id == actor.id
+
+    alert = "#{actor.username} liked your #{message.message_attachment.try(:media_type_name) || 'message'}"
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
 end

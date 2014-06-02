@@ -244,6 +244,14 @@ class User < ActiveRecord::Base
     end
   end
 
+  def send_like_notifications(message, actor)
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_like(message, actor)
+    else
+      email_notifier.notify_like(message, actor)
+    end
+  end
+
   def block(user)
     return if blocked_user_ids.member?(user.id)
 
