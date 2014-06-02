@@ -129,6 +129,21 @@ class EmailNotifier
     SnapMailer.unviewed_snaps(user, messages).deliver!
   end
 
+  def notify_forward(message, actor)
+    return if message.user_id == actor.id
+
+    if Settings.enabled?(:queue)
+      MessageMailerForwardedMessageWorker.perform_async(message.id, actor.id)
+    else
+      notify_unviewed_snaps!(message, actor)
+    end
+  end
+
+  def notify_forward!(message, actor)
+    return if message.user_id == actor.id
+    MessageMailer.forwarded_message(message, actor).deliver!
+  end
+
   def notify_like(message, actor)
     return if message.user_id == actor.id
 

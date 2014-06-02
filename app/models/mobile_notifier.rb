@@ -149,6 +149,16 @@ class MobileNotifier
     create_android_notifications(alert, custom_data)
   end
 
+  def notify_forward(message, actor)
+    return if message.user_id == actor.id
+
+    alert = "#{actor.username} forwarded your #{message.message_attachment.media_type_name}"
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
+
   def notify_like(message, actor)
     return if message.user_id == actor.id
 

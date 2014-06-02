@@ -193,8 +193,6 @@ class Message
     return if forward_message.nil?
 
     attrs = {attachment_content_type: 'meta/forward', actor_id: user.id}
-    alert = "#{user.username} forwarded your #{message_attachment.media_type_name}"
-    custom_data = {}
 
     [original_message, forward_message].uniq(&:id).each do |message|
       m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
@@ -202,7 +200,7 @@ class Message
       m.save
 
       message.conversation.publish_one_to_one_message(m)
-      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+      message.user.send_forward_notifications(message, user)
     end
   end
 

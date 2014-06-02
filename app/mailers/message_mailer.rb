@@ -26,6 +26,20 @@ class MessageMailer < BaseMailer
     mail(to: @recipient.emails.map(&:email), subject: subject)
   end
 
+  def forwarded_message(message, actor)
+    @message = message
+    @actor = actor
+    @user = @message.user
+    @message_description = @message.message_attachment.try(:media_type_name) || 'message'
+
+    id = @message.conversation.id
+    @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
+
+    subject = "#{@actor.username} forwarded your #{@message_description}"
+
+    mail(to: @user.emails.map(&:email), subject: subject)
+  end
+
   def liked_message(message, actor)
     @message = message
     @actor = actor
