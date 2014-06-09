@@ -3,11 +3,35 @@ class MessagesController < ApplicationController
 
 
   def create
-    group_ids = split_param(:group_ids)
-    one_to_one_ids = split_param(:one_to_one_ids)
-    messages = []
+    @messages = []
 
-    # Create a message for each group
+    create_group_messages
+    create_one_to_one_messages
+    send_forward_messages
+
+    render_json @messages
+  end
+
+  def export
+    @message.record_export(current_user, params[:method])
+
+    # Send export meta messages to the most recent and original users
+    @message.send_export_meta_messages(current_user, params[:method])
+
+    render_success
+  end
+
+
+  private
+
+  def message_params
+    params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata, :expires_in,
+                  :received, :original_message_id, :forward_message_id).merge(user_id: current_user.id)
+  end
+
+  # Create a message for each group
+  def create_group_messages
+    group_ids = split_param(:group_ids)
     valid_group_ids = group_ids & current_user.group_ids.members
     groups = valid_group_ids.present? ? Group.where(id: valid_group_ids) : []
 
@@ -26,11 +50,15 @@ class MessagesController < ApplicationController
         group_mixpanel.sent_daily_message(group)
         mixpanel.daily_message_events(message)
 
-        messages << message
+        @messages << message
       end
     end
+  end
 
-    # Create a message for each 1-1
+  # Create a message for each 1-1
+  def create_one_to_one_messages
+    one_to_one_ids = split_param(:one_to_one_ids)
+
     one_to_one_ids.each do |one_to_one_id|
       one_to_one = load_one_to_one(one_to_one_id)
       next if one_to_one.nil?
@@ -60,33 +88,16 @@ class MessagesController < ApplicationController
 
         Robot.reply_to(current_user, message)
 
-        messages << message
+        @messages << message
       end
     end
+  end
 
-    # Send forward meta messages to the most recent and original users
-    if messages.present? && messages.first.forward_message
-      messages.first.send_forward_meta_messages
+  # Send forward meta messages to the most recent and original users
+  def send_forward_messages
+    if @messages.present? && @messages.first.forward_message
+      @messages.first.send_forward_meta_messages
     end
-
-    render_json messages
-  end
-
-  def export
-    @message.record_export(current_user, params[:method])
-
-    # Send export meta messages to the most recent and original users
-    @message.send_export_meta_messages(current_user, params[:method])
-
-    render_success
-  end
-
-
-  private
-
-  def message_params
-    params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata, :expires_in,
-                  :received, :original_message_id, :forward_message_id).merge(user_id: current_user.id)
   end
 
   def load_one_to_one(one_to_one_id)
