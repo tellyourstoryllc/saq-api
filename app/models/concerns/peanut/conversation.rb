@@ -4,9 +4,10 @@ module Peanut::Conversation
 
 
   included do
+    hash_key :attrs
+    counter :rank
     sorted_set :message_ids
     sorted_set :message_id_expirations
-    counter :rank
 
     # These can be overridden
     def self.page_size; 20 end
