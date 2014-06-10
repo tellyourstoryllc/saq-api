@@ -20,6 +20,11 @@ module Peanut::Conversation
     alias_method_chain :message_ids, :expiration_gc
   end
 
+  def add_message(message)
+    lua_script = %{local rank = redis.call('INCR', KEYS[1]); redis.call('HSET', KEYS[2], 'rank', rank); redis.call('ZADD', KEYS[3], rank, ARGV[1])}
+    redis.eval lua_script, {keys: [rank.key, message.attrs.key, message_ids.key], argv: [message.id]}
+  end
+
   def paginate_messages(options = {})
     limit = [(options[:limit].presence || self.class.page_size).to_i, self.class.max_page_size].min
     return [] if limit == 0

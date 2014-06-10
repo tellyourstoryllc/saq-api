@@ -357,11 +357,7 @@ class Message
   # Atomically set the rank and add it to the conversation's message list
   def add_to_conversation
     convo = conversation
-
-    if convo
-      lua_script = %{local rank = redis.call('INCR', KEYS[1]); redis.call('HSET', KEYS[2], 'rank', rank); redis.call('ZADD', KEYS[3], rank, ARGV[1])}
-      redis.eval lua_script, {keys: [convo.rank.key, attrs.key, convo.message_ids.key], argv: [id]}
-    end
+    convo.add_message(self) if convo
   end
 
   # Copy the parent's ancestor list and append the parent

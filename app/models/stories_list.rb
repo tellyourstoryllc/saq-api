@@ -9,6 +9,13 @@ class StoriesList
     write_attrs
   end
 
+  # Add the story to the list, but don't set the rank on the story itself,
+  # since the rank can change depending on the list it's being viewed in
+  def add_message(story)
+    lua_script = %{local rank = redis.call('INCR', KEYS[1]); redis.call('ZADD', KEYS[2], rank, ARGV[1])}
+    redis.eval lua_script, {keys: [rank.key, message_ids.key], argv: [story.id]}
+  end
+
 
   private
 
