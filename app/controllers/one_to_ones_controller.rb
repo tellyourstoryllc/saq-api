@@ -30,7 +30,7 @@ class OneToOnesController < ApplicationController
   end
 
   def pagination_params
-    params.permit(:limit, :below_rank)
+    params.permit(:limit, :below_rank, :below_message_id)
   end
 
   def update_params

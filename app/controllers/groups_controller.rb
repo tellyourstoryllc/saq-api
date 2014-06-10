@@ -194,7 +194,7 @@ class GroupsController < ApplicationController
   end
 
   def pagination_params
-    params.permit(:limit, :below_rank)
+    params.permit(:limit, :below_rank, :below_message_id)
   end
 
   def publish_updated_group

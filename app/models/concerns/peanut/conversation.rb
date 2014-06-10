@@ -24,7 +24,14 @@ module Peanut::Conversation
     return [] if limit == 0
 
     below_rank = options[:below_rank]
-    below_rank = below_rank.to_i if below_rank.present?
+    below_message_id = options[:below_message_id]
+
+    below_rank = if below_rank.present?
+                   below_rank.to_i
+                 elsif below_message_id.present?
+                   message_ids[below_message_id]
+                 end
+
     return [] if below_rank && below_rank <= 0
 
     max = below_rank ? below_rank - 1 : 'inf'
