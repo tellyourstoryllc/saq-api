@@ -2,11 +2,11 @@ class Message
   include Peanut::RedisModel
   include Redis::Objects
 
-  attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
+  attr_accessor :id, :group_id, :one_to_one_id, :stories_list_id, :user_id, :rank, :text, :attachment_file,
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
     :attachment_metadata, :client_metadata, :received, :original_message_id, :forward_message_id,
-    :actor_id, :attachment_message_id, :created_at, :expires_in, :expires_at
+    :actor_id, :attachment_message_id, :type, :snapchat_media_id, :created_at, :expires_in, :expires_at
 
   hash_key :attrs
   list :ancestor_message_ids
@@ -16,7 +16,7 @@ class Message
   list :exports # JSON strings for each export on this or any forwarded/decendant messages (all levels deep)
 
   validates :user_id, presence: true
-  validate :group_id_or_one_to_one_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
+  validate :conversation_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
 
   TEXT_LIMIT = 1_000
 
@@ -28,6 +28,10 @@ class Message
       to_int(:rank, :attachment_preview_width, :attachment_preview_height, :created_at, :expires_in, :expires_at)
       to_bool(:received)
     end
+  end
+
+  def story?
+    type == 'story'
   end
 
   def save
@@ -53,7 +57,7 @@ class Message
   end
 
   def rank
-   @rank ||= attrs[:rank].to_i
+    @rank ||= attrs[:rank].to_i
   end
 
   def user
@@ -66,6 +70,10 @@ class Message
 
   def one_to_one
     @one_to_one ||= OneToOne.new(id: one_to_one_id) if one_to_one_id
+  end
+
+  def stories_list
+    @stories_list ||= StoriesList.new(id: stories_list_id) if stories_list_id
   end
 
   def message_attachment
@@ -147,7 +155,7 @@ class Message
   end
 
   def conversation
-    group || one_to_one
+    one_to_one || stories_list || group
   end
 
   def has_attachment?
@@ -273,13 +281,13 @@ class Message
     end
   end
 
-  def group_id_or_one_to_one_id?
-    attrs = [group_id, one_to_one_id]
-    errors.add(:base, "Must specify exactly one of group_id or one_to_one_id.") if attrs.all?(&:blank?) || attrs.all?(&:present?)
+  def conversation_id?
+    convo_ids = [group_id, one_to_one_id, stories_list_id]
+    errors.add(:base, "Must specify exactly one of group_id, one_to_one_id, or stories_list_id.") unless convo_ids.count(&:present?) == 1
   end
 
   def not_blocked?
-    errors.add(:base, "Sorry, you can't send a 1-1 message to that user.") if one_to_one.try(:blocked?)
+    errors.add(:base, "Sorry, you can't message that user.") if conversation && conversation.respond_to?(:blocked?) && conversation.try(:blocked?)
   end
 
   def text_under_limit?
@@ -324,7 +332,7 @@ class Message
 
     # If this message was received, change the sender
     if received
-      self.user_id = one_to_one.other_user_id(user)
+      self.user_id = (one_to_one || stories_list).other_user_id(user)
       @user = nil # Clear memoizer
     end
 
@@ -334,8 +342,9 @@ class Message
                           attachment_url: attachment_url, attachment_content_type: attachment_content_type,
                           attachment_preview_url: attachment_preview_url, attachment_preview_width: attachment_preview_width,
                           attachment_preview_height: attachment_preview_height, attachment_metadata: attachment_metadata,
-                          client_metadata: client_metadata, received: received, original_message_id: original_message_id, forward_message_id: forward_message_id,
-                          actor_id: actor_id, attachment_message_id: attachment_message_id, created_at: created_at, expires_in: expires_in,
+                          client_metadata: client_metadata, received: received, original_message_id: original_message_id,
+                          forward_message_id: forward_message_id, actor_id: actor_id, attachment_message_id: attachment_message_id,
+                          type: type, snapchat_media_id: snapchat_media_id, created_at: created_at, expires_in: expires_in,
                           expires_at: expires_at)
 
       if expires_in.present?

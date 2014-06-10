@@ -3,13 +3,15 @@ class MessagesController < ApplicationController
 
 
   def create
+    @stories = []
     @messages = []
 
     create_group_messages
     create_one_to_one_messages
+    create_story
     send_forward_messages
 
-    render_json @messages
+    render_json @stories + @messages
   end
 
   def export
@@ -27,6 +29,10 @@ class MessagesController < ApplicationController
   def message_params
     params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata, :expires_in,
                   :received, :original_message_id, :forward_message_id).merge(user_id: current_user.id)
+  end
+
+  def story_params
+    message_params.merge(snapchat_media_id: params[:snapchat_media_id])
   end
 
   # Create a message for each group
@@ -93,6 +99,28 @@ class MessagesController < ApplicationController
     end
   end
 
+  # Create a story
+  def create_story
+    stories_list_ids = split_param(:stories_ids)
+
+    stories_list_ids.each do |stories_list_id|
+      stories_list = load_stories_list(stories_list_id)
+      next if stories_list.nil?
+
+      story = Story.new(story_params.merge(stories_list_id: stories_list.id))
+
+      if story.save
+        # TODO Notify all friends who can view the story
+
+        # Track activity in Mixpanel
+        # TODO Same metrics?
+        #mixpanel.daily_message_events(story)
+
+        @stories << story
+      end
+    end
+  end
+
   # Send forward meta messages to the most recent and original users
   def send_forward_messages
     if @messages.present? && @messages.first.forward_message
@@ -107,6 +135,16 @@ class MessagesController < ApplicationController
       one_to_one if one_to_one.save
     else
       one_to_one if one_to_one.authorized?(current_user)
+    end
+  end
+
+  def load_stories_list(stories_list_id)
+    stories_list = StoriesList.new(id: stories_list_id)
+
+    if stories_list.attrs.blank?
+      stories_list if stories_list.save
+    else
+      stories_list if stories_list.authorized?(current_user)
     end
   end
 
