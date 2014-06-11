@@ -101,23 +101,24 @@ class MessagesController < ApplicationController
 
   # Create a story
   def create_story
-    stories_list_ids = split_param(:stories_ids)
+    return unless Bool.parse(params[:create_story]) &&
+      params[:snapchat_media_id].present? && params[:story_creator_id].present?
 
-    stories_list_ids.each do |stories_list_id|
-      stories_list = load_stories_list(stories_list_id)
-      next if stories_list.nil?
+    stories_list = load_stories_list(params[:story_creator_id])
+    return if stories_list.nil?
 
-      story = Story.new(story_params.merge(stories_list_id: stories_list.id))
+    story = Story.new(story_params.merge(stories_list_id: stories_list.id))
 
-      if story.save
-        # TODO Notify all friends who can view the story
+    if story.save
+      story.push_to_feeds(current_user)
 
-        # Track activity in Mixpanel
-        # TODO Same metrics?
-        #mixpanel.daily_message_events(story)
+      # TODO Notify all friends who can view the story
 
-        @stories << story
-      end
+      # Track activity in Mixpanel
+      # TODO Same metrics?
+      #mixpanel.daily_message_events(story)
+
+      @stories << story
     end
   end
 
@@ -138,8 +139,8 @@ class MessagesController < ApplicationController
     end
   end
 
-  def load_stories_list(stories_list_id)
-    stories_list = StoriesList.new(id: stories_list_id)
+  def load_stories_list(story_creator_id)
+    stories_list = StoriesList.new(creator_id: story_creator_id, viewer_id: current_user.id)
 
     if stories_list.attrs.blank?
       stories_list if stories_list.save

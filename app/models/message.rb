@@ -57,7 +57,7 @@ class Message
   end
 
   def rank
-    @rank ||= attrs[:rank].to_i
+    @rank ||= attrs[:rank].to_i unless story?
   end
 
   def user
