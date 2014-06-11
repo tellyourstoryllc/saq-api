@@ -127,6 +127,6 @@ class ApplicationController < ActionController::Base
   end
 
   def message_pagination_params
-    params.permit(:limit, :below_rank, :below_message_id)
+    params.permit(:limit, :below_rank, :below_message_id, :below_story_id)
   end
 end

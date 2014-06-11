@@ -30,7 +30,7 @@ module Peanut::Conversation
     return [] if limit == 0
 
     below_rank = options[:below_rank]
-    below_message_id = options[:below_message_id]
+    below_message_id = options[:below_story_id] || options[:below_message_id]
 
     below_rank = if below_rank.present?
                    below_rank.to_i
@@ -45,7 +45,8 @@ module Peanut::Conversation
     min = deleted_rank ? deleted_rank + 1 : '-inf'
 
     ids = message_ids.revrangebyscore(max, min, {limit: limit}).reverse
-    Message.pipelined_find(ids)
+    klass = [StoriesList, StoriesFeed, Peanut::StoriesCollection].any?{ |c| is_a?(c) } ? Story : Message
+    klass.pipelined_find(ids)
   end
 
   # Find all expired message ids and remove them from the sorted set

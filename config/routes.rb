@@ -91,6 +91,8 @@ KrazyChat::Application.routes.draw do
     match '/logs/event', to: 'logs#event', as: 'logs_event'
 
     match '/snaps/fetched', to: 'snaps#fetched', as: 'fetched_snaps'
+
+    match '/stories/:user_id', to: 'stories_lists#show', as: 'stories_list'
   end
 
   require 'sidekiq/web'

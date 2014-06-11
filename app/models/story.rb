@@ -5,6 +5,7 @@ class Story < Message
   end
 
   def rank; end
+  def self.redis_prefix; 'message' end
 
   def add_to_stories_list_and_feed(other_user_id)
     stories_list = StoriesList.new(creator_id: user.id, viewer_id: other_user_id, fetched: true)
