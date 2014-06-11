@@ -4,7 +4,7 @@ class GroupMessagesController < ApplicationController
 
 
   def index
-    render_json @group.paginate_messages(pagination_params)
+    render_json @group.paginate_messages(message_pagination_params)
   end
 
   def create
@@ -39,9 +39,5 @@ class GroupMessagesController < ApplicationController
 
   def message_params
     params.permit(:text, :mentioned_user_ids, {:mentioned_user_ids => []}, :attachment_file, :attachment_metadata, :client_metadata).merge(group_id: @group.id, user_id: current_user.id)
-  end
-
-  def pagination_params
-    params.permit(:limit, :below_rank, :below_message_id)
   end
 end

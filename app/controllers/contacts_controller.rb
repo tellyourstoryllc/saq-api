@@ -46,10 +46,6 @@ class ContactsController < ApplicationController
 
   private
 
-  def pagination_params
-    params.permit(:limit, :offset)
-  end
-
   def track_sc_users(users, phone_numbers)
     return unless params[:sc_users] == 'true'
 
