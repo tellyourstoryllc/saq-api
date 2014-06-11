@@ -57,6 +57,25 @@ class Story < Message
     end
   end
 
+  def self.existing_snapchat_media_ids(story_usernames, snapchat_media_ids)
+    raise ArgumentError.new('story_usernames and snapchat_media_ids must be the same size.') if story_usernames.size != snapchat_media_ids.size
+
+    users = User.select(:id, :username).where(username: story_usernames).to_a
+
+    results = redis.pipelined do
+      story_usernames.each_with_index do |username, i|
+        user = users.detect{ |u| u.username == username }
+        next if user.nil?
+
+        user.story_snapchat_media_ids.include?(snapchat_media_ids[i])
+      end
+    end
+
+    results.map.with_index do |exists, i|
+      snapchat_media_ids[i] if exists
+    end.compact
+  end
+
 
   private
 
