@@ -7,11 +7,30 @@ class Story < Message
   def rank; end
   def self.redis_prefix; 'message' end
 
+  def self.media_id_exists?(user, snapchat_media_id)
+    user.story_snapchat_media_ids.include?(snapchat_media_id)
+  end
+
+  def media_id_exists?
+    self.class.media_id_exists?(user, snapchat_media_id)
+  end
+
+  def self.find_or_create(attrs)
+    story = new(attrs)
+    existing_story_id = story.user.story_snapchat_media_ids[story.snapchat_media_id]
+
+    if existing_story_id
+      new(id: existing_story_id)
+    else
+      story if story.save
+    end
+  end
+
   def add_to_stories_list_and_feed(other_user_id)
-    stories_list = StoriesList.new(creator_id: user.id, viewer_id: other_user_id, fetched: true)
+    stories_list = StoriesList.new(creator_id: user.id, viewer_id: other_user_id)
     return unless stories_list.save
 
-    stories_feed = StoriesFeed.new(user_id: other_user_id, fetched: true)
+    stories_feed = StoriesFeed.new(user_id: other_user_id)
     return unless stories_feed.save
 
     redis.pipelined do
@@ -36,5 +55,17 @@ class Story < Message
     user_ids.uniq.each do |friend_id|
       add_to_stories_list_and_feed(friend_id)
     end
+  end
+
+
+  private
+
+  def text_or_attachment_set?
+    errors.add(:base, "Either text or an attachment is required.") unless media_id_exists? || text.present? || attachment_file.present? ||
+      attachment_url.present? || (forward_message && forward_message.attachment_url.present?) || meta_message?
+  end
+
+  def add_snapchat_media_id
+    user.redis.hsetnx(user.story_snapchat_media_ids.key, snapchat_media_id, id) if snapchat_media_id.present?
   end
 end

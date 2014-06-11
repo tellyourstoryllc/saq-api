@@ -77,6 +77,7 @@ class User < ActiveRecord::Base
   set :unviewed_message_user_ids, global: true
   value :snap_invites_allowed
   value :sms_invites_allowed
+  hash_key :story_snapchat_media_ids
 
   delegate :registered, :registered?, to: :account
 

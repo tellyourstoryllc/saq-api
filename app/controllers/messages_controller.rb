@@ -32,7 +32,7 @@ class MessagesController < ApplicationController
   end
 
   def story_params
-    message_params.merge(snapchat_media_id: params[:snapchat_media_id])
+    message_params.merge(user_id: params[:story_creator_id], snapchat_media_id: params[:snapchat_media_id])
   end
 
   # Create a message for each group
@@ -107,9 +107,9 @@ class MessagesController < ApplicationController
     stories_list = load_stories_list(params[:story_creator_id])
     return if stories_list.nil?
 
-    story = Story.new(story_params.merge(stories_list_id: stories_list.id))
+    story = Story.find_or_create(story_params.merge(stories_list_id: stories_list.id))
 
-    if story.save
+    if story
       story.push_to_feeds(current_user)
 
       # TODO Notify all friends who can view the story

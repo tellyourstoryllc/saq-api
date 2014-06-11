@@ -43,6 +43,7 @@ class Message
 
     redis.multi do
       write_attrs
+      add_snapchat_media_id if story?
       add_to_conversation
     end
 
@@ -331,8 +332,8 @@ class Message
     end
 
     # If this message was received, change the sender
-    if received
-      self.user_id = (one_to_one || stories_list).other_user_id(user)
+    if received && !story?
+      self.user_id = one_to_one.other_user_id(user)
       @user = nil # Clear memoizer
     end
 
