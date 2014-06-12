@@ -110,9 +110,13 @@ class MessagesController < ApplicationController
     story = Story.find_or_create(story_params.merge(stories_list_id: stories_list.id))
 
     if story
-      story.push_to_feeds(current_user)
+      # Push the story to the relevant users' stories lists and feeds
+      pushed_user_ids = story.push_to_feeds(current_user)
 
-      # TODO Notify all friends who can view the story
+      # Notify the users to whose feed this story was just added
+      User.where(id: pushed_user_ids).find_each do |user|
+        user.mobile_notifier.notify_story(story)
+      end
 
       # Track activity in Mixpanel
       # TODO Same metrics?

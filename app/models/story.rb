@@ -33,13 +33,16 @@ class Story < Message
     stories_feed = StoriesFeed.new(user_id: other_user_id)
     return unless stories_feed.save
 
+    added_to_feed = false
     redis.pipelined do
       # Add to the friend's view of the creator's stories
       stories_list.add_message(self)
 
       # Add to the friend's feed
-      stories_feed.add_message(self)
+      added_to_feed = stories_feed.add_message(self)
     end
+
+    !!added_to_feed.value
   end
 
   # For each user who should be able to view this story,
@@ -52,9 +55,14 @@ class Story < Message
     # TODO contact_ids or snapchat_friend_ids
     user_ids += current_user.contact_ids.members if current_user.id == user_id
 
+    pushed_user_ids = []
+
     user_ids.uniq.each do |friend_id|
-      add_to_stories_list_and_feed(friend_id)
+      added = add_to_stories_list_and_feed(friend_id)
+      pushed_user_ids << friend_id if added
     end
+
+    pushed_user_ids
   end
 
   def self.existing_snapchat_media_ids(story_usernames, snapchat_media_ids)
