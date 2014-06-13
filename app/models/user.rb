@@ -62,7 +62,8 @@ class User < ActiveRecord::Base
   set :unread_convo_ids
   set :phone_contacts
   set :matching_phone_contact_user_ids
-  set :snapchat_friend_ids
+  set :snapchat_friend_ids   # Users I added in Snapchat
+  set :snapchat_follower_ids # Users who added me in Snapchat
   set :snapchat_friend_phone_numbers
   value :set_initial_snapchat_friend_ids_in_app
   set :initial_snapchat_friend_ids_in_app
@@ -268,6 +269,8 @@ class User < ActiveRecord::Base
 
     one_to_one = OneToOne.new(sender_id: id, recipient_id: user.id)
     one_to_one.remove_from_lists if one_to_one.attrs.exists?
+
+    SnapchatFriendsImporter.new(self).defriend(user)
   end
 
   def unblock(user)
@@ -464,6 +467,10 @@ class User < ActiveRecord::Base
   # remove him from the global list
   def self.check_unviewed_message_ids(user)
     unviewed_message_user_ids.delete(user.id) unless user.unviewed_message_ids.exists?
+  end
+
+  def snapchat_mutual_friend_ids
+    snapchat_friend_ids & snapchat_follower_ids
   end
 
 
