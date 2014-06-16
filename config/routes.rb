@@ -88,7 +88,7 @@ KrazyChat::Application.routes.draw do
     match '/admin/cohort_metrics', to: 'admin#cohort_metrics', as: 'admin_cohort_metrics'
     match '/admin/users', to: 'admin#users', as: 'admin_users'
     match '/admin/users/:id', to: 'admin#show_user', as: 'admin_user'
-    match '/admin/users/:id/contacts', to: 'admin#show_user_contacts', as: 'admin_user_contacts'
+    match '/admin/users/:id/friends', to: 'admin#show_user_friends', as: 'admin_user_friends'
     match '/logs/event', to: 'logs#event', as: 'logs_event'
 
     match '/snaps/fetched', to: 'snaps#fetched', as: 'fetched_snaps'

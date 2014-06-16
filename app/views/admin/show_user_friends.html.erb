@@ -5,15 +5,15 @@
   &gt;
   <%= link_to @user.username, admin_user_path(@user) %>
   &gt;
-  Contacts
+  friends
 </div>
 
-<h3><%= @user.username %>'s Contacts</h3>
+<h3><%= @user.username %>'s friends</h3>
 
-<% if @contacts.size > 0 %>
+<% if @friends.size > 0 %>
   <table class='table table-striped'>
     <tbody>
-      <% @contacts.each do |user| %>
+      <% @friends.each do |user| %>
         <tr>
           <td><%= link_to user.username, admin_user_path(user) %></td>
         </tr>
@@ -28,13 +28,13 @@
 
 <ul class='pagination'>
   <% if @offset > 0 %>
-    <li><%= link_to 'First', admin_user_contacts_path(@user) %></li>
+    <li><%= link_to 'First', admin_user_friends_path(@user) %></li>
   <% end %>
   <% if @offset > 0 %>
-    <li><%= link_to 'Previous', admin_user_contacts_path(@user, offset: @offset - @contacts.size) %></li>
+    <li><%= link_to 'Previous', admin_user_friends_path(@user, offset: @offset - @friends.size) %></li>
   <% end %>
-  <% if @offset + @contacts.size < @contacts_count %>
-    <li><%= link_to 'Next', admin_users_path(@user, offset: @offset + @contacts_size) %></li>
+  <% if @offset + @friends.size < @friends_count %>
+    <li><%= link_to 'Next', admin_users_path(@user, offset: @offset + @friends_size) %></li>
   <% end %>
 </ul>
 
