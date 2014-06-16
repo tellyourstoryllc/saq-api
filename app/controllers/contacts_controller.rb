@@ -3,7 +3,12 @@ class ContactsController < ApplicationController
     render_json current_user.paginated_snapchat_friends(pagination_params), each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
+  # OBSOLETE
   def add
+    render_json []
+    return
+
+
     user_ids = split_param(:user_ids)
     emails = split_param(:emails)
     phone_numbers = split_param(:phone_numbers).map{ |n| Phone.normalize(n) }
