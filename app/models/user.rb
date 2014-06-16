@@ -369,6 +369,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  # DEPRECATED?
   def paginated_contact_ids(options = {})
     max = 50
     options[:limit] ||= 10
@@ -378,8 +379,29 @@ class User < ActiveRecord::Base
     contact_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
+  # DEPRECATED?
   def paginated_contacts(options = {})
     user_ids = paginated_contact_ids(options)
+
+    if user_ids.present?
+      field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
+      User.includes(:avatar_image, :avatar_video, :emails, :phones).where(id: user_ids).order("FIELD(id, #{field_order})")
+    else
+      []
+    end
+  end
+
+  def paginated_snapchat_friend_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+
+    snapchat_friend_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+  end
+
+  def paginated_snapchat_friends(options = {})
+    user_ids = paginated_snapchat_friend_ids(options)
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
