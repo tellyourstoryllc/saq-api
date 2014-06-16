@@ -74,7 +74,7 @@ class UsersController < ApplicationController
     current_user.reset_digests_if_needed(old_status, new_status)
     current_user.reset_badge_count_if_needed(old_status, new_status)
 
-    faye_publisher.broadcast_to_contacts
+    faye_publisher.broadcast_to_followers
     render_json current_user
   end
 

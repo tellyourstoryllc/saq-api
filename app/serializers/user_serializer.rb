@@ -4,7 +4,7 @@ class UserSerializer < ActiveModel::Serializer
     :phone_verification_token, :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered
 
   def status
-    if contacts?
+    if friends?
       object.computed_status
     else
       'unavailable'
@@ -12,15 +12,15 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def status_text
-    object.status_text if contacts?
+    object.status_text if friends?
   end
 
   def idle_duration
-    object.idle_duration if contacts?
+    object.idle_duration if friends?
   end
 
   def client_type
-    if contacts?
+    if friends?
       object.computed_client_type
     else
       'web'
@@ -50,7 +50,7 @@ class UserSerializer < ActiveModel::Serializer
     respond_to?(:current_user) && current_user.try(:id) == id
   end
 
-  def contacts?
-    scope && (scope.id == object.id || object.dynamic_contact?(scope))
+  def friends?
+    scope && (scope.id == object.id || object.dynamic_friend?(scope))
   end
 end

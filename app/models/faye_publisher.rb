@@ -22,6 +22,10 @@ class FayePublisher
     publish '/internal/broadcast_to_contacts'
   end
 
+  def broadcast_to_followers
+    publish '/internal/broadcast_to_followers'
+  end
+
   def publish_to_group(group, data)
     publish "/groups/#{group.id}/messages", data, {persisted: true}
   end

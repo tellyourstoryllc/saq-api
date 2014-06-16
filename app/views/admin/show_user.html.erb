@@ -28,10 +28,10 @@
 <table class='table table-striped'>
   <tbody>
     <tr>
-      <td>contacts</td>
+      <td>friends</td>
       <td>
-        <%= @user.contact_ids.size %>
-        <%= link_to 'See All', admin_user_contacts_path(@user) %>
+        <%= @user.snapchat_friend_ids.size %>
+        <%= link_to 'See All', admin_user_friends_path(@user) %>
       </td>
     </tr>
   </tbody>
