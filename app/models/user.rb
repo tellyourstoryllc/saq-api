@@ -195,6 +195,24 @@ class User < ActiveRecord::Base
     @dynamic_contacts_memoizer[user.id] = dynamic_contact_ids.include?(user.id)
   end
 
+  def dynamic_friend_ids
+    gids = group_ids.members
+    group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
+    one_to_one_user_keys = [one_to_one_user_ids.key]
+
+    redis.sunion([snapchat_friend_ids.key] + group_member_keys + one_to_one_user_keys)
+  end
+
+  def dynamic_friend?(user)
+    return unless user && user.is_a?(User)
+
+    @dynamic_friends_memoizer ||= {}
+    is_friend = @dynamic_friends_memoizer[user.id]
+    return is_friend unless is_friend.nil?
+
+    @dynamic_friends_memoizer[user.id] = dynamic_friend_ids.include?(user.id)
+  end
+
   # Did another user send an email or SMS invite to this person before he registered?
   # Or did the user join his first group (not including creating a group)
   # within 5 minutes of registering?
