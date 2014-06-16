@@ -139,9 +139,6 @@ class ApplicationController < ActionController::Base
     phone_numbers = phone_numbers.delete_if(&:blank?)
     current_user.snapchat_friend_phone_numbers << phone_numbers if phone_numbers.present?
 
-    # TODO need to decide who to notify
-    # current_user.add_to_user_ids_who_friended_me(user_ids)
-
     snap_invite = sent_snap_invites?
     users.each do |recipient|
       next if recipient.account.registered?
