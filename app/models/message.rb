@@ -188,6 +188,8 @@ class Message
     else
       exports << export_json
     end
+
+    true
   end
 
   def self.raise_if_invalid_method(method)

@@ -10,7 +10,8 @@ class StoriesController < ApplicationController
   end
 
   def export
-    @story.record_export(current_user, params[:method])
+    exported = @story.record_export(current_user, params[:method])
+    @story.user.send_export_notifications(@story, current_user, params[:method]) if exported
     render_success
   end
 
