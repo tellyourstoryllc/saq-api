@@ -7,6 +7,12 @@ class Story < Message
   def rank; end
   def self.redis_prefix; 'message' end
 
+  # Disable some message functionality
+  def forward_message_id=(*args); end
+  def send_forward_meta_messages(*args); end
+  def send_like_meta_messages(*args); end
+  def send_export_meta_messages(*args); end
+
   def self.media_id_exists?(user, snapchat_media_id)
     user.story_snapchat_media_ids.include?(snapchat_media_id)
   end
