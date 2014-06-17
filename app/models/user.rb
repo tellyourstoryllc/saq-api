@@ -493,6 +493,12 @@ class User < ActiveRecord::Base
     snapchat_friend_ids & snapchat_follower_ids
   end
 
+  def custom_story_friend_ids
+    blocked_usernames = preferences.server_story_friends_to_block.members
+    blocked_friend_ids = blocked_usernames.present? ? User.where(username: blocked_usernames).pluck(:id) : []
+    snapchat_mutual_friend_ids - blocked_friend_ids
+  end
+
 
   private
 

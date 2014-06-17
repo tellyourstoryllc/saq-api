@@ -50,9 +50,22 @@ class Story < Message
   # push the story's ID to his feed and his view of the
   # creator's stories
   def push_to_feeds(current_user)
-
     user_ids = [user_id, current_user.id]
-    user_ids += current_user.snapchat_mutual_friend_ids if current_user.id == user_id
+
+    if current_user.id == user_id
+      story_privacy = current_user.preferences.server_story_privacy
+
+      friend_ids = case story_privacy
+                   when 'everyone'
+                     current_user.snapchat_follower_ids.members
+                   when 'custom'
+                     current_user.custom_story_friend_ids
+                   else
+                     current_user.snapchat_mutual_friend_ids
+                   end
+
+      user_ids += friend_ids
+    end
 
     pushed_user_ids = []
 
