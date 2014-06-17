@@ -280,6 +280,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def send_export_notifications(message, actor, method)
+    mobile_notifier.notify_export(message, actor, method)
+  end
+
   def block(user)
     return if blocked_user_ids.member?(user.id)
 

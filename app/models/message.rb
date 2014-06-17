@@ -172,7 +172,7 @@ class Message
   end
 
   def record_export(user, method)
-    raise_if_invalid_method(method)
+    self.class.raise_if_invalid_method(method)
 
     now = Time.current.to_f
     export_json = {message_id: id, user_id: user.id, method: method, timestamp: now}.to_json
@@ -190,7 +190,7 @@ class Message
     end
   end
 
-  def raise_if_invalid_method(method)
+  def self.raise_if_invalid_method(method)
     raise ArgumentError.new('Export method must be one of screenshot, library, or other.') unless %w(screenshot library other).include?(method)
   end
 
@@ -227,17 +227,9 @@ class Message
   end
 
   def send_export_meta_messages(current_user, method)
-    raise_if_invalid_method(method)
+    self.class.raise_if_invalid_method(method)
 
     attrs = {attachment_content_type: 'meta/export', actor_id: current_user.id}
-    msg_desc = message_attachment.try(:media_type_name) || 'message'
-    alert = case method
-            when 'screenshot' then "#{current_user.username} took a screenshot of your #{msg_desc}"
-            when 'library' then "#{current_user.username} saved your #{msg_desc} to their camera roll"
-            else "#{current_user.username} shared your #{msg_desc}"
-            end
-
-    custom_data = {}
 
     [original_message, self].compact.uniq(&:id).each do |message|
       m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
@@ -245,7 +237,7 @@ class Message
       m.save
 
       message.conversation.publish_one_to_one_message(m)
-      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+      message.user.send_export_notifications(message, current_user, method)
     end
   end
 
