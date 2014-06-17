@@ -135,7 +135,7 @@ class EmailNotifier
     if Settings.enabled?(:queue)
       MessageMailerForwardedMessageWorker.perform_async(message.id, actor.id)
     else
-      notify_unviewed_snaps!(message, actor)
+      notify_forward!(message, actor)
     end
   end
 
@@ -150,7 +150,7 @@ class EmailNotifier
     if Settings.enabled?(:queue)
       MessageMailerLikedMessageWorker.perform_async(message.id, actor.id)
     else
-      notify_unviewed_snaps!(message, actor)
+      notify_like!(message, actor)
     end
   end
 
