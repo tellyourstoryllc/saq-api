@@ -3,15 +3,19 @@ class UserPreferences
   include Redis::Objects
 
   attr_accessor :id, :user_id, :client_web, :server_mention_email,
-    :server_one_to_one_email, :created_at
+    :server_one_to_one_email, :server_story_privacy, :created_at
   hash_key :attrs
+  set :server_story_friends_to_block
 
   validates :id, :user_id, presence: true
 
   DEFAULTS = {
     server_one_to_one_email: true,
-    server_mention_email: true
+    server_mention_email: true,
+    server_story_privacy: 'friends'
   }
+
+  STORY_PRIVACIES = %w(everyone friends custom)
 
 
   def initialize(attributes = {})
@@ -38,6 +42,21 @@ class UserPreferences
     !@server_one_to_one_email.nil? ? @server_one_to_one_email : DEFAULTS[:server_one_to_one_email]
   end
 
+  def server_story_privacy
+    !@server_story_privacy.nil? ? @server_story_privacy : DEFAULTS[:server_story_privacy]
+  end
+
+  def server_story_privacy=(privacy)
+    @server_story_privacy = privacy if STORY_PRIVACIES.include?(privacy)
+  end
+
+  def update_blocks(usernames)
+    redis.multi do
+      server_story_friends_to_block.del
+      server_story_friends_to_block << usernames unless usernames.blank?
+    end
+  end
+
 
   private
 
@@ -46,6 +65,7 @@ class UserPreferences
     self.created_at ||= Time.current.to_i
 
     self.attrs.bulk_set(user_id: user_id, client_web: client_web, server_mention_email: server_mention_email,
-                        server_one_to_one_email: server_one_to_one_email, created_at: created_at)
+                        server_one_to_one_email: server_one_to_one_email,
+                        server_story_privacy: server_story_privacy, created_at: created_at)
   end
 end
