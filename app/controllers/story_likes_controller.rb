@@ -7,7 +7,8 @@ class StoryLikesController < ApplicationController
   end
 
   def create
-    @story.like(current_user)
+    liked = @story.like(current_user)
+    @story.user.send_like_notifications(@story, current_user) if liked
     render_json @story
   end
 

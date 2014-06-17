@@ -44,10 +44,15 @@ class MessageMailer < BaseMailer
     @message = message
     @actor = actor
     @user = @message.user
-    @message_description = @message.message_attachment.try(:media_type_name) || 'message'
 
-    id = @message.conversation.id
-    @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
+    if @message.story?
+      @message_description = 'story'
+      @url = Rails.configuration.app['web']['url'] + "?invite_channel=email"
+    else
+      @message_description = @message.message_attachment.try(:media_type_name) || 'message'
+      id = @message.conversation.id
+      @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
+    end
 
     subject = "#{@actor.username} liked your #{@message_description}"
 
