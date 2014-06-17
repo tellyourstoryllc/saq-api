@@ -115,7 +115,7 @@ class MessagesController < ApplicationController
 
       # Notify the users to whose feed this story was just added
       User.where(id: pushed_user_ids).find_each do |user|
-        user.mobile_notifier.notify_story(story)
+        user.send_story_notifications(story)
       end
 
       # Track activity in Mixpanel

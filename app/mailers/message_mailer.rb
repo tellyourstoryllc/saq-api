@@ -58,4 +58,15 @@ class MessageMailer < BaseMailer
 
     mail(to: @user.emails.map(&:email), subject: subject)
   end
+
+  def new_story(story, recipient)
+    @story = story
+    @user = @story.user
+    @recipient = recipient
+
+    @url = Rails.configuration.app['web']['url'] + "?invite_channel=email"
+    subject = "Your friend has posted a story"
+
+    mail(to: @recipient.emails.map(&:email), subject: subject)
+  end
 end

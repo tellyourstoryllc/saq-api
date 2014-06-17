@@ -158,4 +158,19 @@ class EmailNotifier
     return if message.user_id == actor.id
     MessageMailer.liked_message(message, actor).deliver!
   end
+
+  def notify_story(story)
+    return if story.user_id == user.id
+
+    if Settings.enabled?(:queue)
+      MessageMailerNewStoryWorker.perform_async(story.id, user.id)
+    else
+      notify_story!(story)
+    end
+  end
+
+  def notify_story!(story)
+    return if story.user_id == user.id
+    MessageMailer.new_story(story, user).deliver!
+  end
 end
