@@ -191,7 +191,7 @@ class MobileNotifier
     return if story.user_id == user.id
 
     alert = "Your friend has posted a story"
-    custom_data = {}
+    custom_data = {stories: story.id}
 
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)
