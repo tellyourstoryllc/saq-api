@@ -47,7 +47,7 @@ class MessageMailer < BaseMailer
 
     if @message.story?
       @message_description = 'story'
-      @url = Rails.configuration.app['web']['url'] + "?invite_channel=email"
+      @url = Rails.configuration.app['web']['url'] + "/stories/#{message.id}/liked?invite_channel=email"
     else
       @message_description = @message.message_attachment.try(:media_type_name) || 'message'
       id = @message.conversation.id
@@ -64,7 +64,7 @@ class MessageMailer < BaseMailer
     @user = @story.user
     @recipient = recipient
 
-    @url = Rails.configuration.app['web']['url'] + "?invite_channel=email"
+    @url = Rails.configuration.app['web']['url'] + "/stories/#{story.id}?invite_channel=email"
     subject = "Your friend has posted a story"
 
     mail(to: @recipient.emails.map(&:email), subject: subject)
