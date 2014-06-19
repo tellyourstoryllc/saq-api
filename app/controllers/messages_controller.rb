@@ -119,8 +119,7 @@ class MessagesController < ApplicationController
       end
 
       # Track activity in Mixpanel
-      # TODO Same metrics?
-      #mixpanel.daily_message_events(story)
+      mixpanel.daily_message_events(story)
 
       @stories << story
     end
