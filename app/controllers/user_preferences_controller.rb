@@ -8,6 +8,7 @@ class UserPreferencesController < ApplicationController
     end
 
     if @preferences.save
+      @preferences.update_blocks(params[:server_story_friends_to_block]) if params.has_key?(:server_story_friends_to_block)
       faye_publisher.publish_preferences(current_user, UserPreferencesSerializer.new(@preferences).as_json)
       render_json @preferences
     else
@@ -19,6 +20,6 @@ class UserPreferencesController < ApplicationController
   private
 
   def update_params
-    params.permit(:client_web, :server_mention_email, :server_one_to_one_email)
+    params.permit(:client_web, :server_mention_email, :server_one_to_one_email, :server_story_privacy)
   end
 end

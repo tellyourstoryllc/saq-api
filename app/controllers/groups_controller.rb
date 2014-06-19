@@ -19,7 +19,7 @@ class GroupsController < ApplicationController
 
     @group.viewer = current_user
     objects = [@group, @group.members]
-    objects += @group.paginate_messages(pagination_params)
+    objects += @group.paginate_messages(message_pagination_params)
     render_json objects
   end
 
@@ -29,7 +29,7 @@ class GroupsController < ApplicationController
     end
 
     objects = [@group, @group.members]
-    objects += @group.paginate_messages(pagination_params) if current_user && @group.member?(current_user)
+    objects += @group.paginate_messages(message_pagination_params) if current_user && @group.member?(current_user)
     render_json objects
   end
 
@@ -58,7 +58,7 @@ class GroupsController < ApplicationController
         mixpanel.joined_group(@group)
       end
 
-      render_json [@group, @group.members, @group.paginate_messages(pagination_params)]
+      render_json [@group, @group.members, @group.paginate_messages(message_pagination_params)]
     else
       render_error "Sorry, you cannot join that group at this time."
     end
@@ -191,10 +191,6 @@ class GroupsController < ApplicationController
         attrs_to_delete.each{ |attr| attrs.delete(attr) }
       end
     end
-  end
-
-  def pagination_params
-    params.permit(:limit, :below_rank)
   end
 
   def publish_updated_group

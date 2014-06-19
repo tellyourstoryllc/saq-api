@@ -162,8 +162,36 @@ class MobileNotifier
   def notify_like(message, actor)
     return if message.user_id == actor.id
 
-    alert = "#{actor.username} liked your #{message.message_attachment.try(:media_type_name) || 'message'}"
+    description = message.story? ? 'story' : (message.message_attachment.try(:media_type_name) || 'message')
+    alert = "#{actor.username} liked your #{description}"
     custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
+
+  def notify_export(message, actor, method)
+    return if message.user_id == actor.id
+    Message.raise_if_invalid_method(method)
+
+    msg_desc = message.story? ? 'story' : (message.message_attachment.try(:media_type_name) || 'message')
+    alert = case method
+            when 'screenshot' then "#{actor.username} took a screenshot of your #{msg_desc}"
+            when 'library' then "#{actor.username} saved your #{msg_desc} to their camera roll"
+            else "#{actor.username} shared your #{msg_desc}"
+            end
+
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
+
+  def notify_story(story)
+    return if story.user_id == user.id
+
+    alert = "Your friend has posted a story"
+    custom_data = {stories: story.id}
 
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)

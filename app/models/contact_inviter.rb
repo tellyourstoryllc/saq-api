@@ -76,97 +76,19 @@ class ContactInviter
 
   def add_by_phone_number!(number, username, options = {})
     options = options.with_indifferent_access
-
-    if number.present? && username.blank?
-      add_by_phone_number_only!(number, options)
-    elsif number.blank? && username.present?
-      add_by_username_only!(username, options)
-    else
-      add_by_phone_number_and_username!(number, username, options)
-    end
-  end
-
-  def add_by_phone_number_only!(number, options)
     number = Phone.normalize(number)
-    return if number.blank?
+    return if number.blank? || username.blank?
 
-    # Look for existing user/account
-    phone = Phone.find_by(number: number)
-    account = phone.try(:account)
-    user = phone.try(:user)
-    new_user = user.nil?
-
-    # If the user doesn't exist, create one
-    unless account
-      account = Account.create(user_attributes: {invite_type: :sms}, phones_attributes: [{number: number}])
-      return unless account.persisted?
-
-      user = account.user
-      phone = user.phones.find_by(number: number)
-    end
-
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number,
-                   new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
-                   source: options[:source])
-
-    # Add the new or existing user to my contacts and vice versa
-    add_with_reciprocal(user)
-
-    user
-  end
-
-  def add_by_username_only!(username, options)
-    # Look for existing user/account
+    # Find existing user/account
     user = User.find_by(username: username)
     account = user.try(:account)
-    new_user = user.nil?
+    return if user.nil? || account.nil?
 
-    # If the user doesn't exist, create one
-    unless account
-      account = Account.create(user_attributes: {username: username, invite_type: :sms})
-      return unless account.persisted?
+    # Let this silently fail if the phone record already exists
+    phone = Phone.create(number: number, user: user)
 
-      user = account.user
-    end
-
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, new_user: new_user, can_log_in: account.can_log_in?,
-                   skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
-
-    # Add the new or existing user to my contacts and vice versa
-    add_with_reciprocal(user)
-
-    user
-  end
-
-  def add_by_phone_number_and_username!(number, username, options)
-    number = Phone.normalize(number)
-    return if number.blank?
-
-    # Look for existing user/account
-    user = User.find_by(username: username)
-    account = user.try(:account)
-    new_user = user.nil?
-
-    # If the user doesn't exist, create one
-    if account.nil?
-      attrs = {user_attributes: {username: username, invite_type: :sms}}
-      attrs[:phones_attributes] = [{number: number}] unless Phone.where(number: number).exists?
-
-      account = Account.create(attrs)
-      return unless account.persisted?
-
-      user = account.user
-      phone = user.phones.find_by(number: number)
-    else
-      # Let this silently fail if the phone record already exists
-      phone = Phone.create(number: number, user: user)
-    end
-
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number, new_user: new_user,
+    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number, new_user: false,
                    can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
-
-    # Add the new or existing user to my contacts and vice versa
-    add_with_reciprocal(user)
 
     user
   end

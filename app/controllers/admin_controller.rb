@@ -1,7 +1,7 @@
 class AdminController < ActionController::Base
   before_action :authenticate, :require_sysop
   around_filter :set_time_zone
-  before_action :load_user, only: [:show_user, :show_user_contacts]
+  before_action :load_user, only: [:show_user, :show_user_friends]
   helper :admin
   helper_method :logged_in?
 
@@ -46,10 +46,10 @@ class AdminController < ActionController::Base
   def show_user
   end
 
-  def show_user_contacts
+  def show_user_friends
     @offset = params[:offset].to_i
-    @contacts = @user.paginated_contacts(limit: 50, offset: @offset)
-    @contacts_count = @user.contact_ids.size
+    @friends = @user.paginated_snapchat_friends(limit: 50, offset: @offset)
+    @friends_count = @user.snapchat_friend_ids.size
   end
 
 

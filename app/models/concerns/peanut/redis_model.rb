@@ -9,6 +9,8 @@ module Peanut::RedisModel
 
   included do
     def self.pipelined_find(ids)
+      return [] if ids.blank?
+
       attrs = redis.pipelined do
         ids.map{ |id| redis.hgetall("#{redis_prefix}:#{id}:attrs") }
       end

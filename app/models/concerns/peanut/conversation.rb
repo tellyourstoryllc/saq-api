@@ -4,9 +4,10 @@ module Peanut::Conversation
 
 
   included do
+    hash_key :attrs
+    counter :rank
     sorted_set :message_ids
     sorted_set :message_id_expirations
-    counter :rank
 
     # These can be overridden
     def self.page_size; 20 end
@@ -19,12 +20,24 @@ module Peanut::Conversation
     alias_method_chain :message_ids, :expiration_gc
   end
 
+  def add_message(message)
+    lua_script = %{local rank = redis.call('INCR', KEYS[1]); redis.call('HSET', KEYS[2], 'rank', rank); redis.call('ZADD', KEYS[3], rank, ARGV[1])}
+    redis.eval lua_script, {keys: [rank.key, message.attrs.key, message_ids.key], argv: [message.id]}
+  end
+
   def paginate_messages(options = {})
     limit = [(options[:limit].presence || self.class.page_size).to_i, self.class.max_page_size].min
     return [] if limit == 0
 
     below_rank = options[:below_rank]
-    below_rank = below_rank.to_i if below_rank.present?
+    below_message_id = options[:below_story_id] || options[:below_message_id]
+
+    below_rank = if below_rank.present?
+                   below_rank.to_i
+                 elsif below_message_id.present?
+                   message_ids[below_message_id]
+                 end
+
     return [] if below_rank && below_rank <= 0
 
     max = below_rank ? below_rank - 1 : 'inf'
@@ -32,7 +45,19 @@ module Peanut::Conversation
     min = deleted_rank ? deleted_rank + 1 : '-inf'
 
     ids = message_ids.revrangebyscore(max, min, {limit: limit}).reverse
-    Message.pipelined_find(ids)
+    klass = [StoriesList, StoriesFeed, Peanut::StoriesCollection].any?{ |c| is_a?(c) } ? Story : Message
+
+    messages = klass.pipelined_find(ids)
+
+    # Delete any deleted messages/stories from the list
+    missing_message_ids = ids - messages.map(&:id)
+
+    if missing_message_ids.present?
+      message_ids.delete(missing_message_ids)
+      paginate_messages(options)
+    else
+      messages
+    end
   end
 
   # Find all expired message ids and remove them from the sorted set

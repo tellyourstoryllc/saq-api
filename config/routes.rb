@@ -68,6 +68,7 @@ KrazyChat::Application.routes.draw do
 
     match '/phones/create', to: 'phones#create', as: 'create_phone'
     match '/phones/verify', to: 'phones#verify', as: 'verify_phone'
+    match '/phones/add', to: 'phones#add', as: 'add_phones'
 
     match '/contacts', to: 'contacts#index', as: 'contacts'
     match '/contacts/add', to: 'contacts#add', as: 'add_contacts'
@@ -87,10 +88,20 @@ KrazyChat::Application.routes.draw do
     match '/admin/cohort_metrics', to: 'admin#cohort_metrics', as: 'admin_cohort_metrics'
     match '/admin/users', to: 'admin#users', as: 'admin_users'
     match '/admin/users/:id', to: 'admin#show_user', as: 'admin_user'
-    match '/admin/users/:id/contacts', to: 'admin#show_user_contacts', as: 'admin_user_contacts'
+    match '/admin/users/:id/friends', to: 'admin#show_user_friends', as: 'admin_user_friends'
     match '/logs/event', to: 'logs#event', as: 'logs_event'
 
     match '/snaps/fetched', to: 'snaps#fetched', as: 'fetched_snaps'
+
+    match '/stories/search', to: 'stories#search', as: 'search_stories'
+    match '/stories_feed', to: 'stories_feeds#show', as: 'stories_feed'
+    match '/stories/:user_id', to: 'stories_lists#show', as: 'stories_list'
+    match '/stories/:id/likes', to: 'story_likes#index', as: 'story_likes'
+    match '/stories/:id/like', to: 'story_likes#create', as: 'like_story'
+    match '/stories/:id/export', to: 'stories#export', as: 'export_story'
+    match '/stories/:id/delete', to: 'stories#delete', as: 'delete_story'
+
+    match '/snapchat_friends/import', to: 'snapchat_friends#import', as: 'import_snapchat_friends'
   end
 
   require 'sidekiq/web'
