@@ -1,5 +1,6 @@
 class StoriesController < ApplicationController
   before_action :load_story, only: :export
+  before_action :load_my_story, only: :delete
 
 
   def search
@@ -15,10 +16,21 @@ class StoriesController < ApplicationController
     render_success
   end
 
+  def delete
+    @story.delete
+    render_success
+  end
+
 
   private
 
   def load_story
     @story = Story.new(id: params[:id])
+  end
+
+  def load_my_story
+    @story = Story.new(id: params[:id])
+    raise Peanut::Redis::RecordNotFound unless @story.attrs.exists? &&
+      @story.user_id == current_user.id
   end
 end

@@ -99,6 +99,7 @@ KrazyChat::Application.routes.draw do
     match '/stories/:id/likes', to: 'story_likes#index', as: 'story_likes'
     match '/stories/:id/like', to: 'story_likes#create', as: 'like_story'
     match '/stories/:id/export', to: 'stories#export', as: 'export_story'
+    match '/stories/:id/delete', to: 'stories#delete', as: 'delete_story'
 
     match '/snapchat_friends/import', to: 'snapchat_friends#import', as: 'import_snapchat_friends'
   end

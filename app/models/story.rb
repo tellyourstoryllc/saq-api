@@ -102,6 +102,11 @@ class Story < Message
     end.compact
   end
 
+  def delete
+    # TODO delete all its likes, exports, etc. to clean up and delete unused memory?
+    attrs.del
+  end
+
 
   private
 

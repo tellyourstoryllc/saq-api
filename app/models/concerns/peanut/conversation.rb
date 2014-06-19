@@ -46,7 +46,18 @@ module Peanut::Conversation
 
     ids = message_ids.revrangebyscore(max, min, {limit: limit}).reverse
     klass = [StoriesList, StoriesFeed, Peanut::StoriesCollection].any?{ |c| is_a?(c) } ? Story : Message
-    klass.pipelined_find(ids)
+
+    messages = klass.pipelined_find(ids)
+
+    # Delete any deleted messages/stories from the list
+    missing_message_ids = ids - messages.map(&:id)
+
+    if missing_message_ids.present?
+      message_ids.delete(missing_message_ids)
+      paginate_messages(options)
+    else
+      messages
+    end
   end
 
   # Find all expired message ids and remove them from the sorted set
