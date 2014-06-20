@@ -9,7 +9,7 @@ class BaseMailer < ActionMailer::Base
   end
 
   def invalid_to?(to)
-    return false if to.blank?
+    return true if to.blank?
 
     to = Array(to) if to.is_a?(String)
     to.reject!{ |e| e =~ BLACKLISTED_DOMAINS }
