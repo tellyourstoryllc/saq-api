@@ -298,8 +298,7 @@ class User < ActiveRecord::Base
     if mobile_notifier.pushes_enabled?
       mobile_notifier.notify_story_comment(comment)
     else
-      # TODO
-      #email_notifier.notify_story_comment(comment)
+      email_notifier.notify_story_comment(comment)
     end
   end
 

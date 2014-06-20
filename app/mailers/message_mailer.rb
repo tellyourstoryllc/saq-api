@@ -69,4 +69,16 @@ class MessageMailer < BaseMailer
 
     mail(to: @recipient.emails.map(&:email), subject: subject)
   end
+
+  def story_comment(comment, recipient)
+    @comment = comment
+    @story = @comment.conversation
+    @user = @story.user
+    @recipient = recipient
+
+    @url = Rails.configuration.app['web']['url'] + "/stories/#{@story.id}/comments?invite_channel=email"
+    subject = "Somebody commented on #{@user.username}'s story"
+
+    mail(to: @recipient.emails.map(&:email), subject: subject)
+  end
 end
