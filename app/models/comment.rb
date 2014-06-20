@@ -25,6 +25,14 @@ class Comment < Message
                       end
   end
 
+  def can_delete?(user)
+    user_id == user.id || conversation.try(:user_id) == user.id
+  end
+
+  def delete
+    attrs.del
+  end
+
 
   private
 

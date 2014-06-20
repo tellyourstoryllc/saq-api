@@ -19,6 +19,17 @@ class StoryCommentsController < ApplicationController
     end
   end
 
+  def delete
+    @story = Story.new(id: params[:story_id])
+    raise Peanut::Redis::RecordNotFound and return unless @story.attrs.exists?
+
+    @comment = Comment.new(id: params[:id])
+    raise Peanut::Redis::RecordNotFound and return unless @comment.attrs.exists? && @comment.can_delete?(current_user)
+
+    @comment.delete
+    render_json []
+  end
+
 
   private
 
