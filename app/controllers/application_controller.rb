@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   before_action :require_token, :create_or_update_device
   around_action :set_client
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
+  rescue_from Peanut::UnauthorizedError, with: :render_401
   rescue_from ActiveRecord::RecordInvalid, with: :render_422
 
 
@@ -94,6 +95,12 @@ class ApplicationController < ActionController::Base
 
   def render_404(exception)
     render_error 'Sorry, that could not be found.', nil, status: :not_found
+  end
+
+  def render_401(exception)
+    msg = "Sorry, you are not authorized to do that"
+    msg << (exception.to_s != 'Peanut::UnauthorizedError' ? ": #{exception}." : '.')
+    render_error msg, nil, status: :unauthorized
   end
 
   def render_422(exception)
