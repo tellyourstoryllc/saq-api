@@ -267,8 +267,10 @@ class User < ActiveRecord::Base
   def send_story_notifications(story)
     return unless away_idle_or_unavailable? && !bot? && !story.received
 
-    if !mobile_notifier.notify_story(story)
-      email_notifier.notify_story(story)  # only send email notification if no mobile notification was sent.
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_story(story)
+    else
+      email_notifier.notify_story(story)
     end
   end
 
