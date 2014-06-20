@@ -8,7 +8,9 @@ class StoryCommentsController < ApplicationController
 
   def create
     @story = Story.new(id: params[:id])
-    raise Peanut::Redis::RecordNotFound and return unless @story.attrs.exists? && @story.can_create_comment?(current_user)
+
+    raise Peanut::Redis::RecordNotFound and return unless @story.attrs.exists?
+    raise Peanut::UnauthorizedError and return unless @story.can_create_comment?(current_user)
 
     @comment = Comment.new(comment_params.merge(collection_id: @story.id, collection_type: 'story'))
 
