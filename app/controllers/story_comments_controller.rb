@@ -1,8 +1,15 @@
 class StoryCommentsController < ApplicationController
-  before_action :load_story, only: :create
+  def index
+    @story = Story.new(id: params[:id])
+    raise Peanut::Redis::RecordNotFound and return unless @story.attrs.exists? && @story.can_view_comments?(current_user)
 
+    render_json @story.paginate_comments(message_pagination_params)
+  end
 
   def create
+    @story = Story.new(id: params[:id])
+    raise Peanut::Redis::RecordNotFound and return unless @story.attrs.exists? && @story.can_create_comment?(current_user)
+
     @comment = Comment.new(comment_params.merge(collection_id: @story.id, collection_type: 'story'))
 
     if @comment.save
@@ -17,10 +24,5 @@ class StoryCommentsController < ApplicationController
 
   def comment_params
     params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata).merge(user_id: current_user.id)
-  end
-
-  def load_story
-    @story = Story.new(id: params[:id])
-    raise Peanut::Redis::RecordNotFound unless @story.attrs.exists? && @story.can_create_comment?(current_user)
   end
 end

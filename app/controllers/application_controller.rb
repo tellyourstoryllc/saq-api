@@ -127,7 +127,7 @@ class ApplicationController < ActionController::Base
   end
 
   def message_pagination_params
-    params.permit(:limit, :below_rank, :below_message_id, :below_story_id)
+    params.permit(:limit, :below_rank, :below_message_id, :below_story_id, :above_comment_id)
   end
 
   def track_sc_users(users, phone_numbers = [])

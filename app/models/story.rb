@@ -105,8 +105,16 @@ class Story < Message
     end.compact
   end
 
-  def can_create_comment?(user)
+  def in_users_feed?(user)
     StoriesFeed.new(user_id: user.id).message_ids.member?(id)
+  end
+
+  def can_create_comment?(user)
+    in_users_feed?(user)
+  end
+
+  def can_view_comments?(user)
+    in_users_feed?(user)
   end
 
   def delete
