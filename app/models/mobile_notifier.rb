@@ -200,7 +200,13 @@ class MobileNotifier
   def notify_story_comment(comment)
     return if comment.user_id == user.id
 
-    alert = "Somebody commented on #{comment.conversation.user.username}'s story"
+    friendly_media_type = comment.message_attachment.try(:comment_friendly_media_type)
+    alert = if friendly_media_type.present?
+              "Somebody posted #{friendly_media_type} comment on #{comment.conversation.user.username}'s story"
+            else
+              "Somebody commented on #{comment.conversation.user.username}'s story"
+            end
+
     custom_data = {stories: comment.conversation.id}
 
     create_ios_notifications(alert, custom_data)

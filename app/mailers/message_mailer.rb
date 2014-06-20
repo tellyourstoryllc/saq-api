@@ -77,8 +77,14 @@ class MessageMailer < BaseMailer
     @recipient = recipient
 
     @url = Rails.configuration.app['web']['url'] + "/stories/#{@story.id}/comments?invite_channel=email"
-    subject = "Somebody commented on #{@user.username}'s story"
 
-    mail(to: @recipient.emails.map(&:email), subject: subject)
+    friendly_media_type = @comment.message_attachment.try(:comment_friendly_media_type)
+    @subject = if friendly_media_type.present?
+              "Somebody posted #{friendly_media_type} comment on #{@user.username}'s story"
+            else
+              "Somebody commented on #{@user.username}'s story"
+            end
+
+    mail(to: @recipient.emails.map(&:email), subject: @subject)
   end
 end
