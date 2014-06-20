@@ -196,4 +196,14 @@ class MobileNotifier
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)
   end
+
+  def notify_story_comment(comment)
+    return if comment.user_id == user.id
+
+    alert = "Somebody commented on #{comment.conversation.user.username}'s story"
+    custom_data = {stories: comment.conversation.id}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
 end

@@ -15,6 +15,15 @@ class StoryCommentsController < ApplicationController
     @comment = Comment.new(comment_params.merge(collection_id: @story.id, collection_type: 'story'))
 
     if @comment.save
+      # Notify the story's creator and all other users
+      # who have commented on this story
+      user_ids = [@story.user_id, *@story.commenter_ids].uniq
+      user_ids.delete_if{ |id| id == current_user.id }
+
+      User.where(id: user_ids).find_each do |user|
+        user.send_story_comment_notifications(@comment)
+      end
+
       render_json @comment
     else
       render_error

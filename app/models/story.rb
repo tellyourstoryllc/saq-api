@@ -126,6 +126,15 @@ class Story < Message
     attrs.del
   end
 
+  def commenter_ids
+    comment_prefix = Comment.redis_prefix
+    ids = comment_ids.members
+
+    redis.pipelined do
+      ids.map{ |id| redis.hget("#{comment_prefix}:#{id}:attrs", :user_id) }
+    end.uniq
+  end
+
 
   private
 

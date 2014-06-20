@@ -294,6 +294,15 @@ class User < ActiveRecord::Base
     mobile_notifier.notify_export(message, actor, method)
   end
 
+  def send_story_comment_notifications(comment)
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_story_comment(comment)
+    else
+      # TODO
+      #email_notifier.notify_story_comment(comment)
+    end
+  end
+
   def block(user)
     return if blocked_user_ids.member?(user.id)
 
