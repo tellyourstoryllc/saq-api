@@ -173,4 +173,19 @@ class EmailNotifier
     return if story.user_id == user.id
     MessageMailer.new_story(story, user).deliver!
   end
+
+  def notify_story_comment(comment)
+    return if comment.user_id == user.id
+
+    if Settings.enabled?(:queue)
+      MessageMailerStoryCommentWorker.perform_async(comment.id, user.id)
+    else
+      notify_story_comment!(comment)
+    end
+  end
+
+  def notify_story_comment!(comment)
+    return if comment.user_id == user.id
+    MessageMailer.story_comment(comment, user).deliver!
+  end
 end

@@ -20,6 +20,7 @@ class UserPreferencesController < ApplicationController
   private
 
   def update_params
-    params.permit(:client_web, :server_mention_email, :server_one_to_one_email, :server_story_privacy)
+    params.permit(:client_web, :server_mention_email, :server_one_to_one_email,
+                  :server_story_privacy, :server_disable_story_comments)
   end
 end

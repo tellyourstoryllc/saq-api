@@ -394,6 +394,8 @@ class Message
   end
 
   def increment_user_stats
+    return unless group || one_to_one
+
     key = user.metrics.key
     recipients = conversation.members(includes: nil).reject{ |m| m.id == user.id }
 

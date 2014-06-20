@@ -101,6 +101,10 @@ KrazyChat::Application.routes.draw do
     match '/stories/:id/export', to: 'stories#export', as: 'export_story'
     match '/stories/:id/delete', to: 'stories#delete', as: 'delete_story'
 
+    match '/stories/:id/comments/create', to: 'story_comments#create', as: 'create_story_comment'
+    match '/stories/:id/comments', to: 'story_comments#index', as: 'story_comments'
+    match '/stories/:story_id/comments/:id/delete', to: 'story_comments#delete', as: 'delete_story_comment'
+
     match '/snapchat_friends/import', to: 'snapchat_friends#import', as: 'import_snapchat_friends'
   end
 

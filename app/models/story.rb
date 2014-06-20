@@ -1,4 +1,7 @@
 class Story < Message
+  include Peanut::CommentsCollection
+
+
   def initialize(attributes = {})
     super
     self.type = 'story'
@@ -102,9 +105,34 @@ class Story < Message
     end.compact
   end
 
+  def in_users_feed?(current_user)
+    StoriesFeed.new(user_id: current_user.id).message_ids.member?(id)
+  end
+
+  def comments_disabled?
+    user.preferences.server_disable_story_comments
+  end
+
+  def can_create_comment?(current_user)
+    in_users_feed?(current_user) && !comments_disabled?
+  end
+
+  def can_view_comments?(current_user)
+    in_users_feed?(current_user)
+  end
+
   def delete
     # TODO delete all its likes, exports, etc. to clean up and delete unused memory?
     attrs.del
+  end
+
+  def commenter_ids
+    comment_prefix = Comment.redis_prefix
+    ids = comment_ids.members
+
+    redis.pipelined do
+      ids.map{ |id| redis.hget("#{comment_prefix}:#{id}:attrs", :user_id) }
+    end.uniq
   end
 
 
