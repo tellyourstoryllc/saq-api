@@ -1,4 +1,7 @@
 class Story < Message
+  include Peanut::CommentsCollection
+
+
   def initialize(attributes = {})
     super
     self.type = 'story'
@@ -100,6 +103,10 @@ class Story < Message
     results.map.with_index do |exists, i|
       snapchat_media_ids[i] if exists
     end.compact
+  end
+
+  def can_create_comment?(user)
+    StoriesFeed.new(user_id: user.id).message_ids.member?(id)
   end
 
   def delete
