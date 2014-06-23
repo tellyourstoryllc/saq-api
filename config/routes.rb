@@ -105,7 +105,7 @@ KrazyChat::Application.routes.draw do
     match '/stories/:id/comments', to: 'story_comments#index', as: 'story_comments'
     match '/stories/:story_id/comments/:id/delete', to: 'story_comments#delete', as: 'delete_story_comment'
 
-    match '/snapchat_friends/import', to: 'snapchat_friends#import', as: 'import_snapchat_friends'
+    match '/friends/import', to: 'friends#import', as: 'import_friends'
   end
 
   require 'sidekiq/web'

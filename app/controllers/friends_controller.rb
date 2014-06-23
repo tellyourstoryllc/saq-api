@@ -1,4 +1,4 @@
-class SnapchatFriendsController < ApplicationController
+class FriendsController < ApplicationController
   def import
     outgoing_usernames = split_param(:outgoing_usernames)
     outgoing_types = split_param(:outgoing_types)
