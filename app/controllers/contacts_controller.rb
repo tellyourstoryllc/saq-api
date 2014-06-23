@@ -3,23 +3,13 @@ class ContactsController < ApplicationController
     render_json current_user.paginated_snapchat_friends(pagination_params), each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
-  # OBSOLETE
+  # DEPRECATED
   def add
-    render_json []
-    return
-
-
-    user_ids = split_param(:user_ids)
-    emails = split_param(:emails)
     phone_numbers = split_param(:phone_numbers).map{ |n| Phone.normalize(n) }
     phone_usernames = split_param(:phone_usernames)
 
     contact_inviter = ContactInviter.new(current_user)
-    invited_users = contact_inviter.add_users(user_ids)
-    invited_emails = contact_inviter.add_by_emails(emails, {skip_sending: params[:omit_email_invite], source: params[:source]})
-    invited_phone_users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: !send_sms_invites?, source: params[:source]})
-
-    users = invited_users | invited_phone_users | invited_emails.map(&:user)
+    users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: !send_sms_invites?, source: params[:source]})
 
     track_sc_users(users, phone_numbers)
     track_initial_sc_import
