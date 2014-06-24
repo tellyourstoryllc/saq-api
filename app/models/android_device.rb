@@ -4,6 +4,8 @@ class AndroidDevice < BaseDevice
 
   belongs_to :user
 
+  after_save :remove_old_registration_ids
+
   set :mixpanel_installed_device_ids, global: true
 
 
@@ -17,5 +19,12 @@ class AndroidDevice < BaseDevice
 
   def has_auth?
     registration_id.present?
+  end
+
+
+  private
+
+  def remove_old_registration_ids
+    AndroidDevice.where('id != ?', id).where(registration_id: registration_id).update_all(registration_id: nil) if registration_id.present?
   end
 end
