@@ -81,7 +81,7 @@ class MobileNotifier
   # Send to all Android devices for which the given block is true
   def create_android_notifications(alert, custom_data, &block)
     user.android_devices.each do |android_device|
-      create_android_notification(android_device, alert, custom_data) if block.call(android_device)
+      create_android_notification(android_device, alert, custom_data) if !block_given? || block.call(android_device)
     end
   end
 
