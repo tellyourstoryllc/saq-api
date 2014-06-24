@@ -12,7 +12,7 @@ class MixpanelClient
   end
 
   def default_properties
-    properties = {'Client' => Thread.current[:client], 'OS' => Thread.current[:os]}
+    properties = {'Client' => Thread.current[:client], 'Client Version' => Thread.current[:client_version], 'OS' => Thread.current[:os]}
 
     if user
       properties.merge!(
