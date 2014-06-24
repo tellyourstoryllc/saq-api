@@ -57,12 +57,14 @@ class ApplicationController < ActionController::Base
 
   def set_client
     Thread.current[:client] = params[:client]
+    Thread.current[:client_version] = params[:client_version].to_i if params[:client_version].present?
     Thread.current[:os] = params[:os]
 
     begin
       yield
     ensure
       Thread.current[:client] = nil
+      Thread.current[:client_version] = nil
       Thread.current[:os] = nil
     end
   end
