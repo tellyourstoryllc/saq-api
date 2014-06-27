@@ -521,6 +521,13 @@ class User < ActiveRecord::Base
     snapchat_mutual_friend_ids - blocked_friend_ids
   end
 
+  def age
+    return if birthday.nil?
+
+    today = Time.current.to_date
+    today.year - birthday.year - ((today.month > birthday.month || (today.month == birthday.month && today.day >= birthday.day)) ? 0 : 1)
+  end
+
 
   private
 
