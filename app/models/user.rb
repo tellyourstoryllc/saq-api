@@ -465,6 +465,13 @@ class User < ActiveRecord::Base
     unviewed_message_user_ids.delete(user.id) unless user.unviewed_message_ids.exists?
   end
 
+  def age
+    return if birthday.nil?
+
+    today = Time.current.to_date
+    today.year - birthday.year - ((today.month > birthday.month || (today.month == birthday.month && today.day >= birthday.day)) ? 0 : 1)
+  end
+
 
   private
 
