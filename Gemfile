@@ -57,3 +57,4 @@ gem 'mixpanel', '4.1.1'
 
 gem 'phony'
 gem 'daemons', '1.1.9'
+gem 'globalize', '~> 4.0.1'
