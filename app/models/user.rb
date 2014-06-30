@@ -264,6 +264,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def send_mobile_only_notifications(message)
+    return unless away_idle_or_unavailable? && !bot? && !message.received
+
+    mobile_notifier.notify(message)
+  end
+
   def send_story_notifications(story)
     return unless away_idle_or_unavailable? && !bot? && !story.received
 

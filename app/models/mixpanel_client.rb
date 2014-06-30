@@ -11,8 +11,13 @@ class MixpanelClient
     @token ||= Rails.configuration.app['mixpanel']['token']
   end
 
+  def common_properties
+    {'$created' => Time.current, 'Client' => Thread.current[:client], 'Client Version' => Thread.current[:client_version],
+      'OS' => Thread.current[:os]}
+  end
+
   def default_properties
-    properties = {'Client' => Thread.current[:client], 'Client Version' => Thread.current[:client_version], 'OS' => Thread.current[:os]}
+    properties = common_properties
 
     if user
       properties.merge!(
@@ -230,9 +235,7 @@ class MixpanelClient
     client = Thread.current[:client]
     distinct_id = "#{client}-#{device_id}"
 
-    {
-      'distinct_id' => distinct_id, '$created' => Time.zone.now, 'Client' => client, 'OS' => Thread.current[:os]
-    }
+    common_properties.merge!('distinct_id' => distinct_id, 'Client' => client)
   end
 
   def received_snap_invite_properties(properties)
