@@ -40,6 +40,7 @@ class PhonesController < ApplicationController
     users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: !send_sms_invites?, source: params[:source]})
 
     track_sc_users(users, phone_numbers)
+    track_initial_sc_import
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
@@ -84,5 +85,20 @@ class PhonesController < ApplicationController
                                 snap_invite_ad: current_user.snap_invite_ad, recipient_phone: phone)
       end
     end
+  end
+
+  def track_initial_sc_import
+    return unless params[:initial_sc_import] == 'true'
+
+    unless current_user.set_initial_snapchat_friend_ids_in_app.exists?
+      user_ids_in_app = current_user.snapchat_friend_ids_in_app
+      current_user.redis.multi do
+        current_user.initial_snapchat_friend_ids_in_app << user_ids_in_app if user_ids_in_app.present?
+        current_user.set_initial_snapchat_friend_ids_in_app = 1
+      end
+    end
+
+    mixpanel.imported_snapchat_friends
+    mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if sent_snap_invites? || send_sms_invites?
   end
 end
