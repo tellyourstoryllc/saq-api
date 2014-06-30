@@ -37,13 +37,18 @@ class Robot
     end
   end
 
-  def self.send_arbitrary_message(recipient, msg_text)
+  def self.send_arbitrary_message(recipient, msg_text, options = {})
     one_to_one = OneToOne.new(sender_id: user.id, recipient_id: recipient.id)
     message = Message.new(one_to_one_id: one_to_one.id, user_id: user.id, text: msg_text)
 
     if message.save
       one_to_one.publish_one_to_one_message(message)
-      recipient.send_notifications(message)
+
+      if options[:mobile_only]
+        recipient.send_mobile_only_notifications(message)
+      else
+        recipient.send_notifications(message)
+      end
     end
   end
 

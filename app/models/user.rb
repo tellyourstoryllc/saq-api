@@ -244,6 +244,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def send_mobile_only_notifications(message)
+    return unless away_idle_or_unavailable? && !bot? && !message.received
+
+    mobile_notifier.notify(message)
+  end
+
   def send_forward_notifications(message, actor)
     if mobile_notifier.pushes_enabled?
       mobile_notifier.notify_forward(message, actor)
