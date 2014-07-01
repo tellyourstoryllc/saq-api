@@ -14,7 +14,9 @@ class CheckinController < ApplicationController
                    end
 
     client_config = {object_type: 'configuration'}.merge(config_class.config)
-    client_config.merge!(phone_verification_destination: Rails.configuration.app['hook']['invite_from']) if params[:client] == 'ios'
+    client_config[:phone_verification_destination] = Rails.configuration.app['hook']['invite_from'] if params[:client] == 'ios'
+    client_config[:client_version] = current_device.try(:client_version)
+    client_config[:has_push_token] = current_device.try(:has_auth?)
 
     objects << client_config
 
