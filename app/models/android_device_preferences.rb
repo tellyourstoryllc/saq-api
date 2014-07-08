@@ -10,6 +10,12 @@ class AndroidDevicePreferences < BaseDevicePreferences
     self.android_device_id = id if id.present?
   end
 
+  # On Android, the client can't determine if the user
+  # has disabled push notifications
+  def server_pushes_enabled
+    true
+  end
+
   def attrs_to_write
     super.merge(android_device_id: android_device_id)
   end
