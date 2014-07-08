@@ -7,7 +7,13 @@ class BaseDevice < ActiveRecord::Base
     return if device_id.blank?
 
     device = where(device_id: device_id).first_or_initialize
-    device.update!(attrs.merge(user_id: user.id))
+    attrs[:user_id] = user.id
+
+    # If we get a request for a device that was previously
+    # uninstalled, it must have since been reinstalled
+    attrs[:uninstalled] = false
+
+    device.update!(attrs)
   end
 
   def unassign!
