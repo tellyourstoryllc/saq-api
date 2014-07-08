@@ -56,7 +56,7 @@ class MobileNotifier
   end
 
   def create_ios_notification(ios_device, alert, custom_data)
-    return if ios_device.push_token.blank? || !ios_device.preferences.server_pushes_enabled
+    return unless ios_device.can_send?
 
     options = {device_token: ios_device.push_token, badge: user.unread_convo_ids.size}
     n = ios_notifier.build_notification(alert, options, custom_data)
@@ -64,7 +64,7 @@ class MobileNotifier
   end
 
   def create_android_notification(android_device, alert, custom_data)
-    return if android_device.registration_id.blank? || !android_device.preferences.server_pushes_enabled
+    return unless android_device.can_send?
 
     options = {registration_ids: android_device.registration_id, badge: user.unread_convo_ids.size}
     n = android_notifier.build_notification(alert, options, custom_data)

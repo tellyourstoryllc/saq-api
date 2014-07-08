@@ -15,11 +15,15 @@ class BaseDevice < ActiveRecord::Base
   end
 
   def notify?(user, conversation, message, notification_type)
-    return false unless has_auth?
+    return false unless can_send?
     preferences.server_one_to_one
   end
 
+  def can_send?
+    !uninstalled? && has_auth? && preferences.server_pushes_enabled
+  end
+
   def notify_new_member?(user)
-    has_auth?
+    can_send?
   end
 end
