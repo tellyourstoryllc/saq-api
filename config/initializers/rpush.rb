@@ -54,6 +54,12 @@ Rpush.reflect do |on|
   # Further notifications should not be sent to the device.
   on.apns_feedback do |feedback|
     Rpush.logger.info "(Rpush) Received feedback: #{feedback.inspect}"
+
+    # Set the device(s) to uninstalled so we don't try to send
+    # notifications to it any more
+    IosDevice.where(push_token: feedback.device_token).each do |device|
+      device.update!(uninstalled: true)
+    end
   end
 
   # Called when a notification is queued internally for delivery.
