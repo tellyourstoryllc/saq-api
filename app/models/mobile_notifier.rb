@@ -172,4 +172,11 @@ class MobileNotifier
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)
   end
+
+  def notify_content_available(options = {})
+    options.reverse_merge!(sound: nil)
+    options[:content_available] = true
+
+    create_ios_notifications(nil, {}, options)
+  end
 end
