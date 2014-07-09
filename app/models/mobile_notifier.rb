@@ -55,33 +55,37 @@ class MobileNotifier
     (user.ios_devices + user.android_devices).flatten.any?{ |d| d.preferences.server_pushes_enabled }
   end
 
-  def create_ios_notification(ios_device, alert, custom_data)
+  def create_ios_notification(ios_device, alert, custom_data = {}, options = {})
     return unless ios_device.can_send?
 
-    options = {device_token: ios_device.push_token, badge: user.unread_convo_ids.size}
-    n = ios_notifier.build_notification(alert, options, custom_data)
+    options.reverse_merge!(badge: user.unread_convo_ids.size)
+    options[:device_token] = ios_device.push_token
+
+    n = ios_notifier.build_notification(alert, custom_data, options)
     n.save!
   end
 
-  def create_android_notification(android_device, alert, custom_data)
+  def create_android_notification(android_device, alert, custom_data = {}, options = {})
     return unless android_device.can_send?
 
-    options = {registration_ids: android_device.registration_id, badge: user.unread_convo_ids.size}
-    n = android_notifier.build_notification(alert, options, custom_data)
+    options.reverse_merge!(badge: user.unread_convo_ids.size)
+    options[:registration_ids] = android_device.registration_id
+
+    n = android_notifier.build_notification(alert, custom_data, options)
     n.save!
   end
 
   # Send to all iOS devices for which the given block is true
-  def create_ios_notifications(alert, custom_data, &block)
+  def create_ios_notifications(alert, custom_data = {}, options = {}, &block)
     user.ios_devices.each do |ios_device|
-      create_ios_notification(ios_device, alert, custom_data) if !block_given? || block.call(ios_device)
+      create_ios_notification(ios_device, alert, custom_data, options) if !block_given? || block.call(ios_device)
     end
   end
 
   # Send to all Android devices for which the given block is true
-  def create_android_notifications(alert, custom_data, &block)
+  def create_android_notifications(alert, custom_data = {}, options = {}, &block)
     user.android_devices.each do |android_device|
-      create_android_notification(android_device, alert, custom_data) if !block_given? || block.call(android_device)
+      create_android_notification(android_device, alert, custom_data, options) if !block_given? || block.call(android_device)
     end
   end
 
