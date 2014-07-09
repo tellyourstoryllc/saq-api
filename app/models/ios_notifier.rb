@@ -12,6 +12,7 @@ class IosNotifier < MobileNotifier
       Rails.logger.debug "Truncated payload_size: #{notification.payload_size}"
     end
 
+    Rails.logger.debug "Notification payload: #{notification.payload}"
     notification
   end
 end
