@@ -1,5 +1,5 @@
 class AndroidNotifier < MobileNotifier
-  def build_notification(alert, options = {}, custom_data = {})
+  def build_notification(alert, custom_data = {}, options = {})
     app = Rails.configuration.app['rpush']['android_app']
     attrs = options.merge(app: app, data: custom_data.merge(message: alert))
     notification = Rpush::Gcm::Notification.new(attrs)

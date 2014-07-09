@@ -1,5 +1,5 @@
 class IosNotifier < MobileNotifier
-  def build_notification(alert, options = {}, custom_data = {})
+  def build_notification(alert, custom_data = {}, options = {})
     attrs = options.merge(app: Rails.configuration.app['rpush']['ios_app'], alert: alert, data: custom_data)
     notification = Rpush::Apns::Notification.new(attrs)
     Rails.logger.debug "Notification: #{notification.inspect}; payload_size: #{notification.payload_size}"
@@ -12,6 +12,7 @@ class IosNotifier < MobileNotifier
       Rails.logger.debug "Truncated payload_size: #{notification.payload_size}"
     end
 
+    Rails.logger.debug "Notification payload: #{notification.payload}"
     notification
   end
 end
