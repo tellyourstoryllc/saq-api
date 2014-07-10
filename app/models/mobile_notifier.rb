@@ -61,10 +61,12 @@ class MobileNotifier
     options.reverse_merge!(badge: user.unread_convo_ids.size)
     options[:device_token] = ios_device.push_token
 
-    StatsD.increment('content_available_pushes.server_sent') if options[:content_available]
-
     n = ios_notifier.build_notification(alert, custom_data, options)
-    n.save!
+    saved = n.save!
+
+    StatsD.increment('content_available_pushes.server_sent') if saved && options[:content_available]
+
+    saved
   end
 
   def create_android_notification(android_device, alert, custom_data = {}, options = {})
