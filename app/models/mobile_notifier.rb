@@ -64,7 +64,10 @@ class MobileNotifier
     n = ios_notifier.build_notification(alert, custom_data, options)
     saved = n.save!
 
-    StatsD.increment('content_available_pushes.server_sent') if saved && options[:content_available]
+    if saved && options[:content_available]
+      User.redis.incr("user::content_pushes_count:#{Time.zone.today}")
+      StatsD.increment('content_available_pushes.server_sent')
+    end
 
     saved
   end
