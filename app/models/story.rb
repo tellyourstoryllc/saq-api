@@ -151,4 +151,12 @@ class Story < Message
     key = user.metrics.key
     user.redis.hincrby(key, :created_stories_count, 1)
   end
+
+  def increment_stats
+    StatsD.increment("stories.by_source.internal.sent") unless sent_externally?
+
+    # Was this a message that was fetched/imported from another service?
+    sender_qualifier = sent_externally? ? 'external' : 'internal'
+    StatsD.increment("stories.by_source.#{sender_qualifier}.received")
+  end
 end
