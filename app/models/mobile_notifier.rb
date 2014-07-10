@@ -179,6 +179,8 @@ class MobileNotifier
     options.reverse_merge!(sound: nil)
     options[:content_available] = true
 
-    create_ios_notifications(nil, {}, options)
+    create_ios_notifications(nil, {}, options) do |ios_device|
+      ios_device.client_version.to_i >= 206
+    end
   end
 end
