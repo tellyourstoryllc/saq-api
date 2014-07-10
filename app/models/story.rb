@@ -146,4 +146,9 @@ class Story < Message
   def add_snapchat_media_id
     user.redis.hsetnx(user.story_snapchat_media_ids.key, snapchat_media_id, id) if snapchat_media_id.present?
   end
+
+  def increment_user_stats
+    key = user.metrics.key
+    user.redis.hincrby(key, :created_stories_count, 1)
+  end
 end
