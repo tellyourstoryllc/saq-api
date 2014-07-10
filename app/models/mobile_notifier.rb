@@ -61,6 +61,8 @@ class MobileNotifier
     options.reverse_merge!(badge: user.unread_convo_ids.size)
     options[:device_token] = ios_device.push_token
 
+    StatsD.increment('content_available_pushes.server_sent') if options[:content_available]
+
     n = ios_notifier.build_notification(alert, custom_data, options)
     n.save!
   end
@@ -178,6 +180,5 @@ class MobileNotifier
     options[:content_available] = true
 
     create_ios_notifications(nil, {}, options)
-    StatsD.increment('content_available_pushes.server_sent')
   end
 end
