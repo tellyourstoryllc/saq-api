@@ -15,6 +15,7 @@ class SnapsController < ApplicationController
     end
 
     increment_stories_metrics
+    increment_content_push_metrics
 
     render_success
   end
@@ -27,5 +28,10 @@ class SnapsController < ApplicationController
     trigger = params[:trigger]
 
     StatsD.increment("stories.fetched.by_trigger.#{trigger}", count) if count > 0 && %w(periodic_check content_push).include?(trigger)
+  end
+
+  def increment_content_push_metrics
+    return unless params[:trigger] == 'content_push'
+    StatsD.increment('content_available_pushes.client_received')
   end
 end

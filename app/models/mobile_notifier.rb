@@ -178,5 +178,6 @@ class MobileNotifier
     options[:content_available] = true
 
     create_ios_notifications(nil, {}, options)
+    StatsD.increment('content_available_pushes.server_sent')
   end
 end
