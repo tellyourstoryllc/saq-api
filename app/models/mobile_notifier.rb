@@ -64,7 +64,9 @@ class MobileNotifier
     n = ios_notifier.build_notification(alert, custom_data, options)
     saved = n.save!
 
+    # Updates for content-available pushes
     if saved && options[:content_available]
+      user.content_push_info['last_content_push_at'] = Time.current.to_i
       User.redis.incr("user::content_pushes_count:#{Time.zone.today}")
       StatsD.increment('content_available_pushes.server_sent')
     end
