@@ -4,14 +4,16 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'envi
 #sleep_time = 10
 sleep_time = 120
 
-started_template = "\n[%s] Started content-available enqueuing."
-ended_template = "[%s] (%s sec) Ended content-available enqueuing."
+started_template = "[%s] Started content-available enqueuing."
+ended_template = "[%s] Ended content-available enqueuing (%s sec)."
 
 
 loop do
   start_time = Time.current
   started_text = started_template % start_time.to_s(:db)
+  puts
   puts started_text
+  Rails.logger.info
   Rails.logger.info started_text
 
   ContentNotifier.new.send_notifications
