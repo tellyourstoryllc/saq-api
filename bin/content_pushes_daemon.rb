@@ -2,7 +2,7 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
 
 #sleep_time = 10
-sleep_time = 300
+sleep_time = 120
 
 started_template = "\n[%s] Started content-available enqueuing."
 ended_template = "[%s] (%s sec) Ended content-available enqueuing."
