@@ -24,6 +24,7 @@ class DailyUnviewedSnapNotifier
 
       # Remove the user from the global list if needed
       User.check_unviewed_message_ids(user)
+      next if message_ids.blank?
 
       # Email the user about his unviewed snaps
       user.email_notifier.notify_unviewed_snaps(message_ids)
