@@ -146,7 +146,7 @@ class MobileNotifier
   def notify_friend_joined(friend)
     return if friend.id == user.id
 
-    alert = "Your friend #{friend.username} just joined!"
+    alert = "Your friend #{friend.username} just joined! Send a snap to say hi!"
     custom_data = {}
 
     create_ios_notifications(alert, custom_data)
