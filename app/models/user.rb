@@ -77,6 +77,7 @@ class User < ActiveRecord::Base
   set :unviewed_message_user_ids, global: true
   value :snap_invites_allowed
   value :sms_invites_allowed
+  hash_key :content_push_info
 
   delegate :registered, :registered?, to: :account
 
@@ -476,6 +477,28 @@ class User < ActiveRecord::Base
 
     today = Time.current.to_date
     today.year - birthday.year - ((today.month > birthday.month || (today.month == birthday.month && today.day >= birthday.day)) ? 0 : 1)
+  end
+
+  # To be safe, make sure not to overwrite an existing frequency
+  # and get the existing one if it already exists
+  def set_content_frequency
+    frequency = ContentNotifier::CONTENT_FREQUENCIES.sample
+    newly_set = redis.hsetnx(content_push_info.key, 'frequency', frequency)
+    newly_set ? frequency : get_content_frequency
+  end
+
+  def get_content_frequency
+    frequency = content_push_info['frequency']
+    frequency.blank? ? nil : frequency.to_i
+  end
+
+  def content_frequency
+    @content_frequency ||= get_content_frequency || set_content_frequency
+  end
+
+  def last_content_push_at
+    timestamp = content_push_info['last_content_push_at']
+    timestamp.blank? ? nil : Time.zone.at(timestamp)
   end
 
 
