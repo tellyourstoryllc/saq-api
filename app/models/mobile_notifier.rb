@@ -62,7 +62,16 @@ class MobileNotifier
     options[:device_token] = ios_device.push_token
 
     n = ios_notifier.build_notification(alert, custom_data, options)
-    n.save!
+    saved = n.save!
+
+    # Updates for content-available pushes
+    if saved && options[:content_available]
+      user.content_push_info['last_content_push_at'] = Time.current.to_i
+      User.redis.incr("user::content_pushes_count:#{Time.zone.today}")
+      StatsD.increment('content_available_pushes.server_sent')
+    end
+
+    saved
   end
 
   def create_android_notification(android_device, alert, custom_data = {}, options = {})
@@ -146,7 +155,7 @@ class MobileNotifier
   def notify_friend_joined(friend)
     return if friend.id == user.id
 
-    alert = "Your friend #{friend.username} just joined!"
+    alert = "Your friend #{friend.username} just joined! Send a snap to say hi!"
     custom_data = {}
 
     create_ios_notifications(alert, custom_data)
@@ -221,6 +230,8 @@ class MobileNotifier
     options.reverse_merge!(sound: nil)
     options[:content_available] = true
 
-    create_ios_notifications(nil, {}, options)
+    create_ios_notifications(nil, {}, options) do |ios_device|
+      ios_device.client_version.to_i >= 206
+    end
   end
 end

@@ -67,6 +67,7 @@ GEM
     cookiejar (0.3.0)
     crack (0.4.1)
       safe_yaml (~> 0.9.0)
+    daemons (1.1.9)
     em-http-request (1.1.1)
       addressable (>= 2.3.4)
       cookiejar
@@ -264,6 +265,7 @@ DEPENDENCIES
   bcrypt-ruby (~> 3.0.0)
   carrierwave (= 0.9.0)
   coffee-rails (~> 4.0.0)
+  daemons (= 1.1.9)
   factory_girl_rails
   faraday (= 0.8.8)
   faye (= 1.0.0)
