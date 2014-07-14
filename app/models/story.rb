@@ -54,8 +54,8 @@ class Story < Message
     !!added_to_feed.value
   end
 
-  # For each user who should be able to view this story,
-  # according the the creator's current story preference,
+  # For each user who should be able to view this story
+  # according to the creator's current story preference,
   # push the story's ID to his feed and his view of the
   # creator's stories
   def push_to_feeds(current_user)
@@ -153,7 +153,7 @@ class Story < Message
   end
 
   def increment_stats
-    StatsD.increment("stories.by_source.internal.sent") unless sent_externally?
+    StatsD.increment('stories.by_source.internal.sent') unless sent_externally?
 
     # Was this a message that was fetched/imported from another service?
     sender_qualifier = sent_externally? ? 'external' : 'internal'
