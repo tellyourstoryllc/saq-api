@@ -1,4 +1,5 @@
 class ContentNotifier
+  MIN_CLIENT_VERSION = 206
   # Frequency of 0 means never send content pushes
   CONTENT_FREQUENCIES = [0, 5, 60]
 

@@ -538,6 +538,8 @@ class User < ActiveRecord::Base
   # To be safe, make sure not to overwrite an existing frequency
   # and get the existing one if it already exists
   def set_content_frequency
+    return unless ios_devices.any?{ |d| d.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION }
+
     frequency = ContentNotifier::CONTENT_FREQUENCIES.sample
     newly_set = redis.hsetnx(content_push_info.key, 'frequency', frequency)
     newly_set ? frequency : get_content_frequency

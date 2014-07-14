@@ -231,7 +231,7 @@ class MobileNotifier
     options[:content_available] = true
 
     create_ios_notifications(nil, {}, options) do |ios_device|
-      ios_device.client_version.to_i >= 206
+      ios_device.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION
     end
   end
 end
