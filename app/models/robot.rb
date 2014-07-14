@@ -15,13 +15,13 @@ class Robot
   def self.set_up_new_user(current_user)
     return if user.nil?
 
-    add_contact(current_user)
+    add_friend(current_user)
     send_initial_messages(current_user)
   end
     
-  def self.add_contact(current_user)
-    contact_inviter = ContactInviter.new(current_user)
-    contact_inviter.add_with_reciprocal(user)
+  def self.add_friend(current_user)
+    SnapchatFriendsImporter.new(current_user).add_friend(user, :outgoing)
+    SnapchatFriendsImporter.new(user).add_friend(current_user, :outgoing)
   end
 
   def self.send_messages_by_trigger(current_user, trigger)

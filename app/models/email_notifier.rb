@@ -135,7 +135,7 @@ class EmailNotifier
     if Settings.enabled?(:queue)
       MessageMailerForwardedMessageWorker.perform_async(message.id, actor.id)
     else
-      notify_unviewed_snaps!(message, actor)
+      notify_forward!(message, actor)
     end
   end
 
@@ -150,12 +150,42 @@ class EmailNotifier
     if Settings.enabled?(:queue)
       MessageMailerLikedMessageWorker.perform_async(message.id, actor.id)
     else
-      notify_unviewed_snaps!(message, actor)
+      notify_like!(message, actor)
     end
   end
 
   def notify_like!(message, actor)
     return if message.user_id == actor.id
     MessageMailer.liked_message(message, actor).deliver!
+  end
+
+  def notify_story(story)
+    return if story.user_id == user.id
+
+    if Settings.enabled?(:queue)
+      MessageMailerNewStoryWorker.perform_async(story.id, user.id)
+    else
+      notify_story!(story)
+    end
+  end
+
+  def notify_story!(story)
+    return if story.user_id == user.id
+    MessageMailer.new_story(story, user).deliver!
+  end
+
+  def notify_story_comment(comment)
+    return if comment.user_id == user.id
+
+    if Settings.enabled?(:queue)
+      MessageMailerStoryCommentWorker.perform_async(comment.id, user.id)
+    else
+      notify_story_comment!(comment)
+    end
+  end
+
+  def notify_story_comment!(comment)
+    return if comment.user_id == user.id
+    MessageMailer.story_comment(comment, user).deliver!
   end
 end

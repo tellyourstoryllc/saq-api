@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   before_action :require_token, :create_or_update_device
   around_action :set_client
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
+  rescue_from Peanut::UnauthorizedError, with: :render_401
   rescue_from ActiveRecord::RecordInvalid, with: :render_422
 
 
@@ -98,6 +99,12 @@ class ApplicationController < ActionController::Base
     render_error 'Sorry, that could not be found.', nil, status: :not_found
   end
 
+  def render_401(exception)
+    msg = "Sorry, you are not authorized to do that"
+    msg << (exception.to_s != 'Peanut::UnauthorizedError' ? ": #{exception}." : '.')
+    render_error msg, nil, status: :unauthorized
+  end
+
   def render_422(exception)
     render_error "Sorry, that could not be saved: #{exception}.", nil, status: :unprocessable_entity
   end
@@ -122,5 +129,60 @@ class ApplicationController < ActionController::Base
 
   def send_sms_invites?
     params[:omit_sms_invite] != 'true' && !Settings.enabled?(:disable_sms_invites) && Bool.parse(current_user.sms_invites_allowed.value)
+  end
+
+  def pagination_params
+    params.permit(:limit, :offset)
+  end
+
+  def message_pagination_params
+    params.permit(:limit, :below_rank, :below_message_id, :below_story_id, :above_comment_id)
+  end
+
+  def track_sc_users(users, phone_numbers = [])
+    user_ids = users.map(&:id)
+    return if user_ids.blank?
+
+    current_user.snapchat_friend_ids << user_ids
+
+    phone_numbers = phone_numbers.delete_if(&:blank?)
+    current_user.snapchat_friend_phone_numbers << phone_numbers if phone_numbers.present?
+
+    snap_invite = sent_snap_invites?
+    users.each do |recipient|
+      next if recipient.account.registered?
+
+      sms_invite = send_sms_invites? && (phone = recipient.phones.find_by(number: phone_numbers))
+      invite_channel = if snap_invite && sms_invite
+                         'snap_and_sms'
+                       elsif snap_invite
+                         'snap'
+                       elsif sms_invite
+                         'sms'
+                       end
+
+      unless invite_channel.nil?
+        recipient.last_invite_at = Time.current.to_i
+
+        mp = MixpanelClient.new(recipient)
+        mp.received_snap_invite(sender: current_user, invite_channel: invite_channel,
+                                snap_invite_ad: current_user.snap_invite_ad, recipient_phone: phone)
+      end
+    end
+  end
+
+  def track_initial_sc_import
+    return unless params[:initial_sc_import] == 'true'
+
+    unless current_user.set_initial_snapchat_friend_ids_in_app.exists?
+      user_ids_in_app = current_user.snapchat_friend_ids_in_app
+      current_user.redis.multi do
+        current_user.initial_snapchat_friend_ids_in_app << user_ids_in_app if user_ids_in_app.present?
+        current_user.set_initial_snapchat_friend_ids_in_app = 1
+      end
+    end
+
+    mixpanel.imported_snapchat_friends
+    mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if sent_snap_invites? || send_sms_invites?
   end
 end

@@ -2,11 +2,11 @@ class Message
   include Peanut::RedisModel
   include Redis::Objects
 
-  attr_accessor :id, :group_id, :one_to_one_id, :user_id, :rank, :text, :attachment_file,
+  attr_accessor :id, :group_id, :one_to_one_id, :stories_list_id, :user_id, :rank, :text, :attachment_file,
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
     :attachment_metadata, :client_metadata, :received, :original_message_id, :forward_message_id,
-    :actor_id, :attachment_message_id, :created_at, :expires_in, :expires_at
+    :actor_id, :attachment_message_id, :type, :snapchat_media_id, :created_at, :expires_in, :expires_at
 
   hash_key :attrs
   list :ancestor_message_ids
@@ -16,7 +16,7 @@ class Message
   list :exports # JSON strings for each export on this or any forwarded/decendant messages (all levels deep)
 
   validates :user_id, presence: true
-  validate :group_id_or_one_to_one_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
+  validate :conversation_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
 
   TEXT_LIMIT = 1_000
 
@@ -30,6 +30,10 @@ class Message
     end
   end
 
+  def story?
+    type == 'story'
+  end
+
   def save
     return unless valid?
 
@@ -39,6 +43,7 @@ class Message
 
     redis.multi do
       write_attrs
+      add_snapchat_media_id if story?
       add_to_conversation
     end
 
@@ -53,7 +58,7 @@ class Message
   end
 
   def rank
-   @rank ||= attrs[:rank].to_i
+    @rank ||= attrs[:rank].to_i unless story?
   end
 
   def user
@@ -66,6 +71,10 @@ class Message
 
   def one_to_one
     @one_to_one ||= OneToOne.new(id: one_to_one_id) if one_to_one_id
+  end
+
+  def stories_list
+    @stories_list ||= StoriesList.new(id: stories_list_id) if stories_list_id
   end
 
   def message_attachment
@@ -147,7 +156,7 @@ class Message
   end
 
   def conversation
-    group || one_to_one
+    one_to_one || stories_list || group
   end
 
   def has_attachment?
@@ -163,7 +172,7 @@ class Message
   end
 
   def record_export(user, method)
-    raise_if_invalid_method(method)
+    self.class.raise_if_invalid_method(method)
 
     now = Time.current.to_f
     export_json = {message_id: id, user_id: user.id, method: method, timestamp: now}.to_json
@@ -179,9 +188,11 @@ class Message
     else
       exports << export_json
     end
+
+    true
   end
 
-  def raise_if_invalid_method(method)
+  def self.raise_if_invalid_method(method)
     raise ArgumentError.new('Export method must be one of screenshot, library, or other.') unless %w(screenshot library other).include?(method)
   end
 
@@ -218,17 +229,9 @@ class Message
   end
 
   def send_export_meta_messages(current_user, method)
-    raise_if_invalid_method(method)
+    self.class.raise_if_invalid_method(method)
 
     attrs = {attachment_content_type: 'meta/export', actor_id: current_user.id}
-    msg_desc = message_attachment.try(:media_type_name) || 'message'
-    alert = case method
-            when 'screenshot' then "#{current_user.username} took a screenshot of your #{msg_desc}"
-            when 'library' then "#{current_user.username} saved your #{msg_desc} to their camera roll"
-            else "#{current_user.username} shared your #{msg_desc}"
-            end
-
-    custom_data = {}
 
     [original_message, self].compact.uniq(&:id).each do |message|
       m = Message.new(attrs.merge(one_to_one_id: message.conversation.id, user_id: message.conversation.other_user_id(message.user),
@@ -236,7 +239,7 @@ class Message
       m.save
 
       message.conversation.publish_one_to_one_message(m)
-      message.user.mobile_notifier.create_ios_notifications(alert, custom_data)
+      message.user.send_export_notifications(message, current_user, method)
     end
   end
 
@@ -273,13 +276,13 @@ class Message
     end
   end
 
-  def group_id_or_one_to_one_id?
-    attrs = [group_id, one_to_one_id]
-    errors.add(:base, "Must specify exactly one of group_id or one_to_one_id.") if attrs.all?(&:blank?) || attrs.all?(&:present?)
+  def conversation_id?
+    convo_ids = [group_id, one_to_one_id, stories_list_id]
+    errors.add(:base, "Must specify exactly one of group_id, one_to_one_id, or stories_list_id.") unless convo_ids.count(&:present?) == 1
   end
 
   def not_blocked?
-    errors.add(:base, "Sorry, you can't send a 1-1 message to that user.") if one_to_one.try(:blocked?)
+    errors.add(:base, "Sorry, you can't message that user.") if conversation && conversation.respond_to?(:blocked?) && conversation.try(:blocked?)
   end
 
   def text_under_limit?
@@ -324,7 +327,7 @@ class Message
     end
 
     # If this message was received, change the sender
-    if received
+    if received && !story?
       self.user_id = one_to_one.other_user_id(user)
       @user = nil # Clear memoizer
     end
@@ -335,8 +338,9 @@ class Message
                           attachment_url: attachment_url, attachment_content_type: attachment_content_type,
                           attachment_preview_url: attachment_preview_url, attachment_preview_width: attachment_preview_width,
                           attachment_preview_height: attachment_preview_height, attachment_metadata: attachment_metadata,
-                          client_metadata: client_metadata, received: received, original_message_id: original_message_id, forward_message_id: forward_message_id,
-                          actor_id: actor_id, attachment_message_id: attachment_message_id, created_at: created_at, expires_in: expires_in,
+                          client_metadata: client_metadata, received: received, original_message_id: original_message_id,
+                          forward_message_id: forward_message_id, actor_id: actor_id, attachment_message_id: attachment_message_id,
+                          type: type, snapchat_media_id: snapchat_media_id, created_at: created_at, expires_in: expires_in,
                           expires_at: expires_at)
 
       if expires_in.present?
@@ -349,11 +353,7 @@ class Message
   # Atomically set the rank and add it to the conversation's message list
   def add_to_conversation
     convo = conversation
-
-    if convo
-      lua_script = %{local rank = redis.call('INCR', KEYS[1]); redis.call('HSET', KEYS[2], 'rank', rank); redis.call('ZADD', KEYS[3], rank, ARGV[1])}
-      redis.eval lua_script, {keys: [convo.rank.key, attrs.key, convo.message_ids.key], argv: [id]}
-    end
+    convo.add_message(self) if convo
   end
 
   # Copy the parent's ancestor list and append the parent
@@ -395,6 +395,8 @@ class Message
   end
 
   def increment_user_stats
+    return unless group || one_to_one
+
     key = user.metrics.key
     recipients = conversation.members(includes: nil).reject{ |m| m.id == user.id }
 

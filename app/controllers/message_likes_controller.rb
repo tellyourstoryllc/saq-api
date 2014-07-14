@@ -34,10 +34,6 @@ class MessageLikesController < ApplicationController
       @message.conversation && @message.conversation.fetched_member_ids.include?(current_user.id)
   end
 
-  def pagination_params
-    params.permit(:limit, :offset)
-  end
-
   def publish_updated_message
     convo = @message.conversation
 

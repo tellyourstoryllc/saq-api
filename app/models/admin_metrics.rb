@@ -54,9 +54,9 @@ class AdminMetrics
       metrics[registered_date.to_s] = {}
 
       User.joins(:account).where('accounts.registered_at BETWEEN ? AND ?', registered_from, registered_to).find_each do |u|
-        contact_ids = u.contact_ids.members
-        contacts = User.includes(:account).where(id: contact_ids).to_a
-        contacts_count = contacts.size
+        friend_ids = u.snapchat_friend_ids.members
+        friends = User.includes(:account).where(id: friend_ids).to_a
+        friends_count = friends.size
 
         DAYS.times do |j|
           action_date = (today - j)
@@ -65,10 +65,10 @@ class AdminMetrics
           metrics[registered_date.to_s][action_date.to_s] ||= {}
           metrics[registered_date.to_s][action_date.to_s][u.id] ||= {}
 
-          registered_count = contacts.count{ |c| c.account.registered_at.present? && c.account.registered_at.to_date <= action_date }
-          metrics[registered_date.to_s][action_date.to_s][u.id]['contacts_counts'] = contacts_count
+          registered_count = friends.count{ |c| c.account.registered_at.present? && c.account.registered_at.to_date <= action_date }
+          metrics[registered_date.to_s][action_date.to_s][u.id]['friends_counts'] = friends_count
           metrics[registered_date.to_s][action_date.to_s][u.id]['registered_counts'] = registered_count
-          metrics[registered_date.to_s][action_date.to_s][u.id]['percent_registered'] = (registered_count.to_f / contacts_count) * 100 if contacts_count > 0
+          metrics[registered_date.to_s][action_date.to_s][u.id]['percent_registered'] = (registered_count.to_f / friends_count) * 100 if friends_count > 0
         end
       end
     end

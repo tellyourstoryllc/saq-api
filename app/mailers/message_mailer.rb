@@ -44,13 +44,47 @@ class MessageMailer < BaseMailer
     @message = message
     @actor = actor
     @user = @message.user
-    @message_description = @message.message_attachment.try(:media_type_name) || 'message'
 
-    id = @message.conversation.id
-    @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
+    if @message.story?
+      @message_description = 'story'
+      @url = Rails.configuration.app['web']['url'] + "/stories/#{message.id}/liked?invite_channel=email"
+    else
+      @message_description = @message.message_attachment.try(:media_type_name) || 'message'
+      id = @message.conversation.id
+      @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
+    end
 
     subject = "#{@actor.username} liked your #{@message_description}"
 
     mail(to: @user.emails.map(&:email), subject: subject)
+  end
+
+  def new_story(story, recipient)
+    @story = story
+    @user = @story.user
+    @recipient = recipient
+
+    @url = Rails.configuration.app['web']['url'] + "/stories/#{story.id}?invite_channel=email"
+    subject = "Your friend has posted a story"
+
+    mail(to: @recipient.emails.map(&:email), subject: subject)
+  end
+
+  def story_comment(comment, recipient)
+    @comment = comment
+    @story = @comment.conversation
+    @user = @story.user
+    @recipient = recipient
+
+    @url = Rails.configuration.app['web']['url'] + "/stories/#{@story.id}/comments?invite_channel=email"
+
+    friendly_media_type = @comment.message_attachment.try(:comment_friendly_media_type)
+    @subject = if friendly_media_type.present?
+              "Somebody posted #{friendly_media_type} comment on #{@user.username}'s story"
+            else
+              "Somebody commented on #{@user.username}'s story"
+            end
+
+    mail(to: @recipient.emails.map(&:email), subject: @subject)
   end
 end

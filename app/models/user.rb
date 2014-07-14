@@ -62,7 +62,8 @@ class User < ActiveRecord::Base
   set :unread_convo_ids
   set :phone_contacts
   set :matching_phone_contact_user_ids
-  set :snapchat_friend_ids
+  set :snapchat_friend_ids   # Users I added in Snapchat
+  set :snapchat_follower_ids # Users who added me in Snapchat
   set :snapchat_friend_phone_numbers
   value :set_initial_snapchat_friend_ids_in_app
   set :initial_snapchat_friend_ids_in_app
@@ -78,6 +79,7 @@ class User < ActiveRecord::Base
   value :snap_invites_allowed
   value :sms_invites_allowed
   hash_key :content_push_info
+  hash_key :story_snapchat_media_ids
 
   delegate :registered, :registered?, to: :account
 
@@ -194,6 +196,24 @@ class User < ActiveRecord::Base
     @dynamic_contacts_memoizer[user.id] = dynamic_contact_ids.include?(user.id)
   end
 
+  def dynamic_friend_ids
+    gids = group_ids.members
+    group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
+    one_to_one_user_keys = [one_to_one_user_ids.key]
+
+    redis.sunion([snapchat_friend_ids.key] + group_member_keys + one_to_one_user_keys)
+  end
+
+  def dynamic_friend?(user)
+    return unless user && user.is_a?(User)
+
+    @dynamic_friends_memoizer ||= {}
+    is_friend = @dynamic_friends_memoizer[user.id]
+    return is_friend unless is_friend.nil?
+
+    @dynamic_friends_memoizer[user.id] = dynamic_friend_ids.include?(user.id)
+  end
+
   # Did another user send an email or SMS invite to this person before he registered?
   # Or did the user join his first group (not including creating a group)
   # within 5 minutes of registering?
@@ -251,6 +271,16 @@ class User < ActiveRecord::Base
     mobile_notifier.notify(message)
   end
 
+  def send_story_notifications(story)
+    return unless away_idle_or_unavailable? && !bot? && !story.received
+
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_story(story)
+    else
+      email_notifier.notify_story(story)
+    end
+  end
+
   def send_forward_notifications(message, actor)
     if mobile_notifier.pushes_enabled?
       mobile_notifier.notify_forward(message, actor)
@@ -267,6 +297,18 @@ class User < ActiveRecord::Base
     end
   end
 
+  def send_export_notifications(message, actor, method)
+    mobile_notifier.notify_export(message, actor, method)
+  end
+
+  def send_story_comment_notifications(comment)
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_story_comment(comment)
+    else
+      email_notifier.notify_story_comment(comment)
+    end
+  end
+
   def block(user)
     return if blocked_user_ids.member?(user.id)
 
@@ -274,6 +316,8 @@ class User < ActiveRecord::Base
 
     one_to_one = OneToOne.new(sender_id: id, recipient_id: user.id)
     one_to_one.remove_from_lists if one_to_one.attrs.exists?
+
+    SnapchatFriendsImporter.new(self).defriend(user)
   end
 
   def unblock(user)
@@ -372,6 +416,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  # DEPRECATED?
   def paginated_contact_ids(options = {})
     max = 50
     options[:limit] ||= 10
@@ -381,8 +426,29 @@ class User < ActiveRecord::Base
     contact_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
+  # DEPRECATED?
   def paginated_contacts(options = {})
     user_ids = paginated_contact_ids(options)
+
+    if user_ids.present?
+      field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
+      User.includes(:avatar_image, :avatar_video, :emails, :phones).where(id: user_ids).order("FIELD(id, #{field_order})")
+    else
+      []
+    end
+  end
+
+  def paginated_snapchat_friend_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+
+    snapchat_friend_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+  end
+
+  def paginated_snapchat_friends(options = {})
+    user_ids = paginated_snapchat_friend_ids(options)
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
@@ -416,32 +482,12 @@ class User < ActiveRecord::Base
     self.class.cohort_metrics_key(account.registered_at.in_time_zone(COHORT_METRICS_TIME_ZONE).to_date) if account.registered_at.present?
   end
 
-  def self.user_ids_who_friended_me_key(user_id)
-    "user:#{user_id}:user_ids_who_friended_me"
-  end
-
-  def user_ids_who_friended_me_key
-    self.class.user_ids_who_friended_me_key(id)
-  end
-
-  def user_ids_who_friended_me
-    redis.smembers(user_ids_who_friended_me_key)
-  end
-
-  def add_to_user_ids_who_friended_me(friend_ids)
-    redis.pipelined do
-      friend_ids.each do |friend_id|
-        redis.sadd(self.class.user_ids_who_friended_me_key(friend_id), id)
-      end
-    end
-  end
-
   def notify_friends
     return if notified_friends.get
     self.notified_friends = '1'
 
     # TODO: maybe move to Sidekiq
-    User.where(id: user_ids_who_friended_me).find_each do |friend|
+    User.where(id: snapchat_follower_ids.members).find_each do |friend|
       friend.mobile_notifier.notify_friend_joined(self)
     end
   end
@@ -470,6 +516,16 @@ class User < ActiveRecord::Base
   # remove him from the global list
   def self.check_unviewed_message_ids(user)
     unviewed_message_user_ids.delete(user.id) unless user.unviewed_message_ids.exists?
+  end
+
+  def snapchat_mutual_friend_ids
+    snapchat_friend_ids & snapchat_follower_ids
+  end
+
+  def custom_story_friend_ids
+    blocked_usernames = preferences.server_story_friends_to_block.members
+    blocked_friend_ids = blocked_usernames.present? ? User.where(username: blocked_usernames).pluck(:id) : []
+    snapchat_mutual_friend_ids - blocked_friend_ids
   end
 
   def age

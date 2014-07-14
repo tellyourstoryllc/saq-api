@@ -39,8 +39,4 @@ class BannedGroupUsersController < ApplicationController
   def load_user
     @user = User.find(params[:user_id])
   end
-
-  def pagination_params
-    params.permit(:limit, :offset)
-  end
 end

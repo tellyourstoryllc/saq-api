@@ -47,12 +47,12 @@ describe "Admin Integration Test" do
     it "must show user contacts" do
       # Create a contact.
       u2 = FactoryGirl.create(:registered_user)
-      inviter = ContactInviter.new(user)
-      inviter.add_user(user, u2)
-      inviter.add_user(u2, user)
+
+      importer = SnapchatFriendsImporter.new(user)
+      importer.add_friend(u2, :outgoing)
 
       login!
-      get "/admin/users/#{user.id}/contacts"
+      get "/admin/users/#{user.id}/friends"
       assert_response :success
     end
   end

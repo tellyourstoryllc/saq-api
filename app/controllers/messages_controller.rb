@@ -3,11 +3,41 @@ class MessagesController < ApplicationController
 
 
   def create
-    group_ids = split_param(:group_ids)
-    one_to_one_ids = split_param(:one_to_one_ids)
-    messages = []
+    @stories = []
+    @messages = []
 
-    # Create a message for each group
+    create_group_messages
+    create_one_to_one_messages
+    create_story
+    send_forward_messages
+
+    render_json @stories + @messages
+  end
+
+  def export
+    @message.record_export(current_user, params[:method])
+
+    # Send export meta messages to the most recent and original users
+    @message.send_export_meta_messages(current_user, params[:method])
+
+    render_success
+  end
+
+
+  private
+
+  def message_params
+    params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata, :expires_in,
+                  :received, :original_message_id, :forward_message_id).merge(user_id: current_user.id)
+  end
+
+  def story_params
+    message_params.merge(user_id: params[:story_creator_id], snapchat_media_id: params[:snapchat_media_id])
+  end
+
+  # Create a message for each group
+  def create_group_messages
+    group_ids = split_param(:group_ids)
     valid_group_ids = group_ids & current_user.group_ids.members
     groups = valid_group_ids.present? ? Group.where(id: valid_group_ids) : []
 
@@ -26,11 +56,15 @@ class MessagesController < ApplicationController
         group_mixpanel.sent_daily_message(group)
         mixpanel.daily_message_events(message)
 
-        messages << message
+        @messages << message
       end
     end
+  end
 
-    # Create a message for each 1-1
+  # Create a message for each 1-1
+  def create_one_to_one_messages
+    one_to_one_ids = split_param(:one_to_one_ids)
+
     one_to_one_ids.each do |one_to_one_id|
       one_to_one = load_one_to_one(one_to_one_id)
       next if one_to_one.nil?
@@ -60,29 +94,43 @@ class MessagesController < ApplicationController
 
         Robot.reply_to(current_user, message)
 
-        messages << message
+        @messages << message
       end
     end
+  end
 
-    # Send forward meta messages to the most recent and original users
-    if messages.present? && messages.first.forward_message
-      messages.first.send_forward_meta_messages
+  # Create a story
+  def create_story
+    return unless Bool.parse(params[:create_story]) &&
+      params[:snapchat_media_id].present? && params[:story_creator_id].present?
+
+    stories_list = load_stories_list(params[:story_creator_id])
+    return if stories_list.nil?
+
+    story = Story.find_or_create(story_params.merge(stories_list_id: stories_list.id))
+
+    if story
+      # Push the story to the relevant users' stories lists and feeds
+      pushed_user_ids = story.push_to_feeds(current_user)
+
+      # Notify the users to whose feed this story was just added
+      User.where(id: pushed_user_ids).find_each do |user|
+        user.send_story_notifications(story)
+      end
+
+      # Track activity in Mixpanel
+      mixpanel.daily_message_events(story)
+
+      @stories << story
     end
-
-    render_json messages
   end
 
-  def export
-    @message.record_export(current_user, params[:method])
-
-    # Send export meta messages to the most recent and original users
-    @message.send_export_meta_messages(current_user, params[:method])
-
-    render_success
+  # Send forward meta messages to the most recent and original users
+  def send_forward_messages
+    if @messages.present? && @messages.first.forward_message
+      @messages.first.send_forward_meta_messages
+    end
   end
-
-
-  private
 
   def message_params
     params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata, :expires_in,
@@ -96,6 +144,16 @@ class MessagesController < ApplicationController
       one_to_one if one_to_one.save
     else
       one_to_one if one_to_one.authorized?(current_user)
+    end
+  end
+
+  def load_stories_list(story_creator_id)
+    stories_list = StoriesList.new(creator_id: story_creator_id, viewer_id: current_user.id)
+
+    if stories_list.attrs.blank?
+      stories_list if stories_list.save
+    else
+      stories_list if stories_list.authorized?(current_user)
     end
   end
 
