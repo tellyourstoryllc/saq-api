@@ -470,7 +470,12 @@ class User < ActiveRecord::Base
     snap_invite_ad_id = assigned_snap_invite_ad_id.value
     unless snap_invite_ad_id && (@snap_invite_ad = SnapInviteAd.active.find_by(id: snap_invite_ad_id))
       @snap_invite_ad = SnapInviteAd.active.order('RAND()').first
-      self.assigned_snap_invite_ad_id = snap_invite_ad.id
+
+      if @snap_invite_ad
+        self.assigned_snap_invite_ad_id = @snap_invite_ad.id
+      else
+        assigned_snap_invite_ad_id.del
+      end
     end
 
     @snap_invite_ad
@@ -482,7 +487,12 @@ class User < ActiveRecord::Base
     like_snap_template_id = assigned_like_snap_template_id.value
     unless like_snap_template_id && (@like_snap_template = LikeSnapTemplate.active.find_by(id: like_snap_template_id))
       @like_snap_template = LikeSnapTemplate.active.order('RAND()').first
-      self.assigned_like_snap_template_id = like_snap_template.id
+
+      if @like_snap_template
+        self.assigned_like_snap_template_id = @like_snap_template.id
+      else
+        assigned_like_snap_template_id.del
+      end
     end
 
     @like_snap_template
@@ -494,7 +504,12 @@ class User < ActiveRecord::Base
     comment_snap_template_id = assigned_comment_snap_template_id.value
     unless comment_snap_template_id && (@comment_snap_template = CommentSnapTemplate.active.find_by(id: comment_snap_template_id))
       @comment_snap_template = CommentSnapTemplate.active.order('RAND()').first
-      self.assigned_comment_snap_template_id = comment_snap_template.id
+
+      if @comment_snap_template
+        self.assigned_comment_snap_template_id = @comment_snap_template.id
+      else
+        assigned_comment_snap_template_id.del
+      end
     end
 
     @comment_snap_template

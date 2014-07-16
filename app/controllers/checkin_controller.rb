@@ -28,18 +28,23 @@ class CheckinController < ApplicationController
       if !Settings.enabled?(:disable_snap_invites) && Bool.parse(current_user.snap_invites_allowed.value)
         snap_invite_ad = current_user.snap_invite_ad
 
-        client_config.merge!(snap_invite_image_url: snap_invite_ad.media_url,
-                             snap_invite_image_text: snap_invite_ad.text_overlay,
-                             snap_invite_url: snap_invite_ad.media_url,
-                             snap_invite_text: snap_invite_ad.text_overlay)
+        if snap_invite_ad
+          client_config.merge!(snap_invite_image_url: snap_invite_ad.media_url,
+                               snap_invite_image_text: snap_invite_ad.text_overlay,
+                               snap_invite_url: snap_invite_ad.media_url,
+                               snap_invite_text: snap_invite_ad.text_overlay)
+        end
       end
 
       like_snap_template = current_user.like_snap_template
-      client_config[:like_template] = like_snap_template.text_overlay
+      client_config[:like_template] = like_snap_template.text_overlay if like_snap_template
 
       comment_snap_template = current_user.comment_snap_template
-      client_config[:comment_title_template] = comment_snap_template.title_overlay
-      client_config[:comment_body_template] = comment_snap_template.body_overlay
+
+      if comment_snap_template
+        client_config[:comment_title_template] = comment_snap_template.title_overlay
+        client_config[:comment_body_template] = comment_snap_template.body_overlay
+      end
     end
 
     objects << current_device.preferences if current_device
