@@ -135,6 +135,10 @@ class MixpanelClient
     track_without_defaults('Mobile Install', mobile_install_properties(device_id))
   end
 
+  def existing_user_install
+    track('Existing User Install')
+  end
+
   def daily_message_events(message)
     if message.one_to_one
       recipient = message.one_to_one.other_user(message.user)

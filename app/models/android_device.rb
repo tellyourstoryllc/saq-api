@@ -7,6 +7,7 @@ class AndroidDevice < BaseDevice
   after_save :remove_old_registration_ids
 
   set :mixpanel_installed_device_ids, global: true
+  value :sent_existing_user_install_event_at
 
 
   def v=(version)

@@ -7,7 +7,9 @@ class SessionsController < ApplicationController
 
     if @account
       @current_user = @account.user
+
       create_or_update_device
+      check_existing_user_install
 
       render_json [current_user, @account, @group].compact
     else
@@ -66,6 +68,15 @@ class SessionsController < ApplicationController
           account
         end
       end
+    end
+  end
+
+  def check_existing_user_install
+    existing_user_install = current_device && @current_user.ios_devices.size + @current_user.android_devices.size > 1
+
+    if existing_user_install && !current_device.sent_existing_user_install_event_at.exists?
+      mixpanel.existing_user_install
+      current_device.sent_existing_user_install_event_at = Time.current.to_i
     end
   end
 end
