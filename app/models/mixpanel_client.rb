@@ -185,6 +185,10 @@ class MixpanelClient
     track('Received Snap Invite', received_snap_invite_properties(properties))
   end
 
+  def received_like_snap(properties)
+    track('Received Like Snap', received_like_snap_properties(properties))
+  end
+
 
   private
 
@@ -239,19 +243,31 @@ class MixpanelClient
     common_properties.merge!('distinct_id' => distinct_id, 'Client' => client)
   end
 
-  def received_snap_invite_properties(properties)
+  def received_snap_properties(properties)
     sender = properties[:sender]
+    return {} if sender.blank?
+
+    {'Sender ID' => sender.id, 'Sender Username' => sender.username,
+      'Sender Snapchat Friends in App' => sender.snapchat_friend_ids_in_app.size}
+  end
+
+  def received_snap_invite_properties(properties)
+    props = received_snap_properties(properties)
+
     invite_channel = properties[:invite_channel] if %w(snap sms snap_and_sms email).include?(properties[:invite_channel])
     ad_name = properties[:snap_invite_ad].try(:name)
     phone_country_code = properties[:recipient_phone].try(:country_code)
 
-    props = {'Invite Channel' => invite_channel}
+    props['Invite Channel'] = invite_channel
     props['Snap Invite Ad'] = ad_name if %w(snap snap_and_sms).include?(invite_channel)
     props['Phone Country'] = phone_country_code if phone_country_code
 
-    props.merge!('Sender ID' => sender.id, 'Sender Username' => sender.username,
-                 'Sender Snapchat Friends in App' => sender.snapchat_friend_ids_in_app.size)
+    props
+  end
 
+  def received_like_snap_properties(properties)
+    props = received_snap_properties(properties)
+    props['Like Snap Template'] = properties[:like_snap_template].try(:name)
     props
   end
 

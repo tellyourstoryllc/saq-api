@@ -9,6 +9,12 @@ class StoryLikesController < ApplicationController
   def create
     liked = @story.like(current_user)
     @story.user.send_like_notifications(@story, current_user) if liked
+
+    if Bool.parse(params[:sent_snap])
+      mp = MixpanelClient.new(@story.user)
+      mp.received_like_snap(sender: current_user, like_snap_template: current_user.like_snap_template)
+    end
+
     render_json @story
   end
 

@@ -33,6 +33,9 @@ class CheckinController < ApplicationController
                              snap_invite_url: snap_invite_ad.media_url,
                              snap_invite_text: snap_invite_ad.text_overlay)
       end
+
+      like_snap_template = current_user.like_snap_template
+      client_config[:like_template] = like_snap_template.text_overlay
     end
 
     objects << current_device.preferences if current_device

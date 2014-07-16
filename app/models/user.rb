@@ -80,6 +80,7 @@ class User < ActiveRecord::Base
   value :sms_invites_allowed
   hash_key :content_push_info
   hash_key :story_snapchat_media_ids
+  value :assigned_like_snap_template_id
 
   delegate :registered, :registered?, to: :account
 
@@ -472,6 +473,18 @@ class User < ActiveRecord::Base
     end
 
     @snap_invite_ad
+  end
+
+  def like_snap_template
+    return @like_snap_template if defined?(@like_snap_template)
+
+    like_snap_template_id = assigned_like_snap_template_id.value
+    unless like_snap_template_id && (@like_snap_template = LikeSnapTemplate.active.find_by(id: like_snap_template_id))
+      @like_snap_template = LikeSnapTemplate.active.order('RAND()').first
+      self.assigned_like_snap_template_id = like_snap_template.id
+    end
+
+    @like_snap_template
   end
 
   def self.cohort_metrics_key(date)
