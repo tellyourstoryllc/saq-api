@@ -72,7 +72,10 @@ class SessionsController < ApplicationController
   end
 
   def check_existing_user_install
-    existing_user_install = current_device && !current_device.existing_user_status.exists?
+    # Hack: only count devices created after deploy
+    return if current_device.nil? || current_device.created_at < Time.zone.parse('2014-07-16 23:25')
+
+    existing_user_install = !current_device.existing_user_status.exists?
 
     if existing_user_install
       mixpanel.existing_user_install
