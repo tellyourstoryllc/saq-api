@@ -223,7 +223,7 @@ class User < ActiveRecord::Base
     was_invited = invited.get
 
     if was_invited.nil?
-      if received_invites.exists?
+      if last_invite_at.exists?
         self.invited = 1
         true
       else
