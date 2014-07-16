@@ -106,6 +106,25 @@ CREATE TABLE `avatar_videos` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `comment_snap_templates`
+--
+
+DROP TABLE IF EXISTS `comment_snap_templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `comment_snap_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `title_overlay` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `body_overlay` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `emails`
 --
 
@@ -569,7 +588,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-07-15 11:26:01
+-- Dump completed on 2014-07-16 12:44:42
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -737,3 +756,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140708150642');
 INSERT INTO schema_migrations (version) VALUES ('20140708150727');
 
 INSERT INTO schema_migrations (version) VALUES ('20140714200420');
+
+INSERT INTO schema_migrations (version) VALUES ('20140716163233');
