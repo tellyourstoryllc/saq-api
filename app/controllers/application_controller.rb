@@ -124,7 +124,7 @@ class ApplicationController < ActionController::Base
   end
 
   def sent_snap_invites?
-    Bool.parse(params[:sent_snap_invites]) && !Settings.enabled?(:disable_snap_invites) && Bool.parse(current_user.snap_invites_allowed.value)
+    Bool.parse(params[:sent_snap_invites]) && Bool.parse(current_user.snap_invites_allowed.value)
   end
 
   def send_sms_invites?
