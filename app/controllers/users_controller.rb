@@ -61,6 +61,7 @@ class UsersController < ApplicationController
     # Add robot as a contact and send initial messages
     Robot.set_up_new_user(@current_user)
 
+    current_device.existing_user_status = 'r'
     @current_user.notify_friends
 
     render_json [@current_user, @account, @group].compact

@@ -72,11 +72,11 @@ class SessionsController < ApplicationController
   end
 
   def check_existing_user_install
-    existing_user_install = current_device && @current_user.ios_devices.size + @current_user.android_devices.size > 1
+    existing_user_install = current_device && !current_device.existing_user_status.exists?
 
-    if existing_user_install && !current_device.sent_existing_user_install_event_at.exists?
+    if existing_user_install
       mixpanel.existing_user_install
-      current_device.sent_existing_user_install_event_at = Time.current.to_i
+      current_device.existing_user_status = 's'
     end
   end
 end
