@@ -47,6 +47,7 @@ class UsersController < ApplicationController
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
     # Send events to Mixpanel
+    @current_user.set_content_frequency
     mixpanel.user_registered(@current_user)
     group_mixpanel.group_created(@group) if @group
 
