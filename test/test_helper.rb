@@ -10,6 +10,7 @@ Spork.prefork do
 
   $LOAD_PATH << "test"
   ENV["RAILS_ENV"] = "test"
+  Rails.env = 'test'
   require File.expand_path("../../config/environment", __FILE__)
   require "rails/test_help"
   require "minitest/rails"
