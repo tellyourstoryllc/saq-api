@@ -32,6 +32,8 @@ class SnapsController < ApplicationController
 
   def increment_content_push_metrics
     return unless params[:trigger] == 'content_push'
+
     StatsD.increment('content_available_pushes.client_received')
+    mixpanel.received_daily_content_push
   end
 end

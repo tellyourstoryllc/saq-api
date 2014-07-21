@@ -197,6 +197,16 @@ class MixpanelClient
     track('Received Comment Snap', received_comment_snap_properties(properties))
   end
 
+  def received_daily_content_push
+    last_push = user.last_mixpanel_received_content_push_at.get
+    last_push = Time.zone.at(last_push.to_i) if last_push
+
+    if last_push.nil? || last_push < 24.hours.ago
+      user.last_mixpanel_received_content_push_at = Time.current.to_i
+      track('Received Daily Content Push')
+    end
+  end
+
 
   private
 
