@@ -40,7 +40,7 @@ Run the tests (Warning: make sure your `test` Redis config in `config/app.yml` i
 
 Or for fast tests, run spork in one tab:
 
-    spork
+    RAILS_ENV=test spork
 
 And in another tab:
 
