@@ -56,7 +56,7 @@ class MobileNotifier
   end
 
   def create_ios_notification(ios_device, alert, custom_data = {}, options = {})
-    return unless ios_device.can_send?
+    return unless (options[:content_available] && ios_device.can_send_content_push?) || ios_device.can_send?
 
     options.reverse_merge!(badge: user.unread_convo_ids.size)
     options[:device_token] = ios_device.push_token

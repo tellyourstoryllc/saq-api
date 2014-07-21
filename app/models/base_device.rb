@@ -29,6 +29,10 @@ class BaseDevice < ActiveRecord::Base
     !uninstalled? && has_auth? && preferences.server_pushes_enabled
   end
 
+  def can_send_content_push?
+    !uninstalled? && has_auth?
+  end
+
   def notify_new_member?(user)
     can_send?
   end
