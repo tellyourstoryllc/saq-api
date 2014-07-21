@@ -23,8 +23,10 @@ Spork.prefork do
   class ActiveSupport::TestCase
     # Add more helper methods to be used by all tests here...
 
-    # Delete all test Redis keys before each test
     def setup
+      raise("Rails.env == #{Rails.env}, i.e. Spork is a piece of shit") unless Rails.env == 'test'
+
+      # Delete all test Redis keys before each test
       keys = Redis.current.keys
       Redis.current.del(keys) if keys.present?
 
