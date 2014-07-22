@@ -47,7 +47,7 @@ class IosDevice < BaseDevice
   end
 
   def reset_content_push_info
-    content_push_info.bulk_set(current_frequency: user.content_frequency, unanswered_count: 0)
+    content_push_info.bulk_set(current_frequency: user.try(:content_frequency), unanswered_count: 0)
   end
 
 
