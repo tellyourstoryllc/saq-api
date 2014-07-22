@@ -61,6 +61,7 @@ class ApplicationController < ActionController::Base
     Thread.current[:client_version] = params[:client_version].to_i if params[:client_version].present?
     Thread.current[:os] = params[:os]
     Thread.current[:lang] = params[:lang] || current_device.try(:lang)
+    Thread.current[:conn] = params[:conn]
 
     begin
       yield
@@ -69,6 +70,7 @@ class ApplicationController < ActionController::Base
       Thread.current[:client_version] = nil
       Thread.current[:os] = nil
       Thread.current[:lang] = nil
+      Thread.current[:conn] = nil
     end
   end
 

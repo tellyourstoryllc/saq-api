@@ -12,8 +12,13 @@ class MixpanelClient
   end
 
   def common_properties
+    connection = Thread.current[:conn]
+    connection = case connection.to_s.downcase
+                 when 'wifi' then 'Wifi'
+                 end
+
     {'$created' => Time.current, 'Client' => Thread.current[:client], 'Client Version' => Thread.current[:client_version],
-      'OS' => Thread.current[:os], 'Preferred Language' => Thread.current[:lang]}
+      'OS' => Thread.current[:os], 'Preferred Language' => Thread.current[:lang], 'Connection' => connection}
   end
 
   def default_properties
