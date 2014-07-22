@@ -16,7 +16,7 @@ class Message
   list :exports # JSON strings for each export on this or any forwarded/decendant messages (all levels deep)
 
   validates :user_id, presence: true
-  validate :conversation_id?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
+  validate :conversation_id?, :blacklisted_recipient?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?
 
   TEXT_LIMIT = 1_000
 
@@ -279,6 +279,13 @@ class Message
   def conversation_id?
     convo_ids = [group_id, one_to_one_id, stories_list_id]
     errors.add(:base, "Must specify exactly one of group_id, one_to_one_id, or stories_list_id.") unless convo_ids.count(&:present?) == 1
+  end
+
+  def blacklisted_recipient?
+    recipient = conversation.other_user(user) if conversation && conversation.respond_to?(:other_user)
+    return if recipient.nil?
+
+    errors.add(:base, "Sorry, that user is not available.") if User::BLACKLISTED_USERNAMES.include?(recipient.username)
   end
 
   def not_blocked?

@@ -43,6 +43,10 @@ class UserSerializer < ActiveModel::Serializer
     object.replaced_user_ids.members
   end
 
+  def registered
+    User::BLACKLISTED_USERNAMES.include?(object.username) ? true : object.registered
+  end
+
 
   private
 
