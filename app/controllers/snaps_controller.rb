@@ -1,4 +1,7 @@
 class SnapsController < ApplicationController
+  before_action :reset_unanswered_content_pushes, only: :fetched
+
+
   def fetched
     unviewed_usernames = split_param(:unviewed_usernames)
     viewed_sent_usernames = split_param(:viewed_sent_usernames)

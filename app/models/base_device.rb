@@ -7,13 +7,23 @@ class BaseDevice < ActiveRecord::Base
     return if device_id.blank?
 
     device = where(device_id: device_id).first_or_initialize
+    old_user_id = device.user_id
     attrs[:user_id] = user.id
 
     # If we get a request for a device that was previously
     # uninstalled, it must have since been reinstalled
     attrs[:uninstalled] = false
 
-    device.update!(attrs)
+    result = device.update!(attrs)
+
+    # If the device changes ownership to a different user,
+    # delete the existing content push info
+    new_user_id = device.user_id
+    if new_user_id != old_user_id && device.respond_to?(:content_push_info)
+      device.content_push_info.del
+    end
+
+    result
   end
 
   def unassign!

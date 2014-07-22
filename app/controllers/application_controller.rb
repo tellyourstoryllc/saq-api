@@ -185,4 +185,8 @@ class ApplicationController < ActionController::Base
     mixpanel.imported_snapchat_friends
     mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if sent_snap_invites? || send_sms_invites?
   end
+
+  def reset_unanswered_content_pushes
+    current_device.reset_content_push_info if current_device && current_device.respond_to?(:reset_content_push_info)
+  end
 end

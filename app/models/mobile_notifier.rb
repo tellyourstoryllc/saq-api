@@ -66,7 +66,8 @@ class MobileNotifier
 
     # Updates for content-available pushes
     if saved && options[:content_available]
-      user.content_push_info['last_content_push_at'] = Time.current.to_i
+      ios_device.content_push_info['last_content_push_at'] = Time.current.to_i
+      ios_device.content_push_info.incr('unanswered_count')
       User.redis.incr("user::content_pushes_count:#{Time.zone.today}")
       StatsD.increment('content_available_pushes.server_sent')
     end
@@ -233,5 +234,14 @@ class MobileNotifier
     create_ios_notifications(nil, {}, options) do |ios_device|
       ios_device.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION
     end
+  end
+
+  def notify_content_available(ios_device, options = {})
+    return unless ios_device.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION
+
+    options.reverse_merge!(sound: nil)
+    options[:content_available] = true
+
+    create_ios_notification(ios_device, nil, {}, options)
   end
 end
