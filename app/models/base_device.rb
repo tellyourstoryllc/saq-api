@@ -46,4 +46,8 @@ class BaseDevice < ActiveRecord::Base
   def notify_new_member?(user)
     can_send?
   end
+
+  def lang=(new_lang)
+    self[:lang] = new_lang.gsub('_', '-')
+  end
 end

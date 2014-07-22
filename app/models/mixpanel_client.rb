@@ -13,7 +13,7 @@ class MixpanelClient
 
   def common_properties
     {'$created' => Time.current, 'Client' => Thread.current[:client], 'Client Version' => Thread.current[:client_version],
-      'OS' => Thread.current[:os]}
+      'OS' => Thread.current[:os], 'Preferred Language' => Thread.current[:lang]}
   end
 
   def default_properties

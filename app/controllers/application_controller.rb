@@ -60,6 +60,7 @@ class ApplicationController < ActionController::Base
     Thread.current[:client] = params[:client]
     Thread.current[:client_version] = params[:client_version].to_i if params[:client_version].present?
     Thread.current[:os] = params[:os]
+    Thread.current[:lang] = params[:lang] || current_device.try(:lang)
 
     begin
       yield
@@ -67,15 +68,16 @@ class ApplicationController < ActionController::Base
       Thread.current[:client] = nil
       Thread.current[:client_version] = nil
       Thread.current[:os] = nil
+      Thread.current[:lang] = nil
     end
   end
 
   def ios_device_params
-    params.permit(:device_id, :client_version, :os_version)
+    params.permit(:device_id, :client_version, :os_version, :lang)
   end
 
   def android_device_params
-    params.permit(:android_id, :v, :os_version)
+    params.permit(:android_id, :v, :os_version, :lang)
   end
 
   def render_json(objects, options = {})

@@ -56,6 +56,7 @@ CREATE TABLE `android_devices` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `uninstalled` tinyint(1) DEFAULT '0',
+  `lang` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_android_devices_on_device_id` (`device_id`),
   KEY `index_android_devices_on_user_id` (`user_id`)
@@ -300,6 +301,7 @@ CREATE TABLE `ios_devices` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `uninstalled` tinyint(1) DEFAULT '0',
+  `lang` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_ios_devices_on_device_id` (`device_id`),
   KEY `index_ios_devices_on_user_id` (`user_id`)
@@ -588,7 +590,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-07-16 12:44:42
+-- Dump completed on 2014-07-22 16:56:41
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -758,3 +760,7 @@ INSERT INTO schema_migrations (version) VALUES ('20140708150727');
 INSERT INTO schema_migrations (version) VALUES ('20140714200420');
 
 INSERT INTO schema_migrations (version) VALUES ('20140716163233');
+
+INSERT INTO schema_migrations (version) VALUES ('20140722205601');
+
+INSERT INTO schema_migrations (version) VALUES ('20140722205626');
