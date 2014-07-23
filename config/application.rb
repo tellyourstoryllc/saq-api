@@ -21,6 +21,7 @@ module KrazyChat
     # config.i18n.default_locale = :de
     config.i18n.enforce_available_locales = true
     I18n.config.enforce_available_locales = true
+    I18n.available_locales = [:en, :fr]
 
     config.active_record.schema_format = :sql
 
