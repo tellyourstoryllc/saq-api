@@ -4,7 +4,7 @@ class IosDevice < BaseDevice
 
   belongs_to :user
 
-  after_save :remove_old_push_tokens
+  after_save :remove_old_push_tokens, :check_uninstalls
 
   set :mixpanel_installed_device_ids, global: true
   value :existing_user_status # r = registered, s = sent event
@@ -55,5 +55,13 @@ class IosDevice < BaseDevice
 
   def remove_old_push_tokens
     IosDevice.where('id != ?', id).where(push_token: push_token).update_all(push_token: nil) if push_token.present?
+  end
+
+  def check_uninstalls
+    if !uninstalled_was && uninstalled && !user.ios_devices.where(uninstalled: false).exists? && user.android_devices.empty?
+      user.update!(uninstalled: true)
+    elsif uninstalled_was && !uninstalled
+      user.update!(uninstalled: false)
+    end
   end
 end

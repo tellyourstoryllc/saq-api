@@ -576,6 +576,7 @@ CREATE TABLE `users` (
   `updated_at` datetime DEFAULT NULL,
   `deactivated` tinyint(1) NOT NULL DEFAULT '0',
   `birthday` date DEFAULT NULL,
+  `uninstalled` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_users_on_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -590,7 +591,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-07-22 16:56:41
+-- Dump completed on 2014-07-23 14:59:14
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -764,3 +765,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140716163233');
 INSERT INTO schema_migrations (version) VALUES ('20140722205601');
 
 INSERT INTO schema_migrations (version) VALUES ('20140722205626');
+
+INSERT INTO schema_migrations (version) VALUES ('20140723185858');
