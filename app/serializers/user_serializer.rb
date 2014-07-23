@@ -44,7 +44,13 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def registered
-    User::BLACKLISTED_USERNAMES.include?(object.username) ? true : object.registered
+    if User::BLACKLISTED_USERNAMES.include?(object.username)
+      true
+    elsif object.uninstalled
+      false
+    else
+      object.registered
+    end
   end
 
 
