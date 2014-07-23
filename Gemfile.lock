@@ -110,6 +110,9 @@ GEM
       nokogiri (~> 1.5)
       ruby-hmac
     formatador (0.2.4)
+    globalize (4.0.1)
+      activemodel (>= 4.0.0, < 5)
+      activerecord (>= 4.0.0, < 5)
     hike (1.2.3)
     hiredis (0.4.5)
     http_parser.rb (0.6.0.beta.2)
@@ -270,6 +273,7 @@ DEPENDENCIES
   faraday (= 0.8.8)
   faye (= 1.0.0)
   fog (= 1.19.0)
+  globalize (~> 4.0.1)
   hiredis
   httparty
   jbuilder (~> 1.2)

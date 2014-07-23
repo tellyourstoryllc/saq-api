@@ -1,7 +1,7 @@
 require 'active_record/validations'
 
 class ApplicationController < ActionController::Base
-  before_action :require_token, :create_or_update_device
+  before_action :require_token, :set_locale, :create_or_update_device
   around_action :set_client
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
   rescue_from Peanut::UnauthorizedError, with: :render_401
@@ -44,6 +44,19 @@ class ApplicationController < ActionController::Base
   def require_token
     # Note: Android depends on this error message, so don't change it
     render_error('Invalid token.', nil, status: :unauthorized) if current_user.nil?
+  end
+
+  def requested_locale
+    @requested_locale ||= (params[:lang].to_s.gsub('_', '-').presence || current_device.try(:lang).presence).try(:to_sym)
+  end
+
+  def requested_language
+    @requested_language ||= requested_locale.to_s.split(/[-_]/).first.try(:to_sym)
+  end
+
+  def set_locale
+    locale = [requested_locale, requested_language].detect{ |l| I18n.available_locales.include?(l) }
+    I18n.locale = locale || I18n.default_locale
   end
 
   def create_or_update_device
