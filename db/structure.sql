@@ -519,6 +519,28 @@ CREATE TABLE `schema_migrations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `snap_invite_ad_translations`
+--
+
+DROP TABLE IF EXISTS `snap_invite_ad_translations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `snap_invite_ad_translations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `snap_invite_ad_id` int(11) NOT NULL,
+  `locale` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `media_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `text_overlay` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_snap_invite_ad_translations_on_snap_invite_ad_id` (`snap_invite_ad_id`),
+  KEY `index_snap_invite_ad_translations_on_locale` (`locale`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `snap_invite_ads`
 --
 
@@ -765,5 +787,7 @@ INSERT INTO schema_migrations (version) VALUES ('20140716163233');
 INSERT INTO schema_migrations (version) VALUES ('20140722205601');
 
 INSERT INTO schema_migrations (version) VALUES ('20140722205626');
+
+INSERT INTO schema_migrations (version) VALUES ('20140723161424');
 
 INSERT INTO schema_migrations (version) VALUES ('20140723185858');
