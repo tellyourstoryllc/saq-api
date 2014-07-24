@@ -49,6 +49,7 @@ class ContactInviter
       return unless account.persisted?
 
       user = account.user
+      user.account = account
       email = user.emails.find_by(email: address)
     end
 
@@ -106,6 +107,7 @@ class ContactInviter
       return unless account.persisted?
 
       user = account.user
+      user.account = account
       phone = user.phones.find_by(number: number)
     end
 
@@ -131,6 +133,7 @@ class ContactInviter
       return unless account.persisted?
 
       user = account.user
+      user.account = account
     end
 
     Invite.create!(sender_id: current_user.id, recipient: user, new_user: new_user, can_log_in: account.can_log_in?,
@@ -160,6 +163,7 @@ class ContactInviter
       return unless account.persisted?
 
       user = account.user
+      user.account = account
       phone = user.phones.find_by(number: number)
     else
       # Let this silently fail if the phone record already exists
