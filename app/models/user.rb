@@ -547,7 +547,7 @@ class User < ActiveRecord::Base
   end
 
   def snapchat_friend_ids_in_app
-    Account.where(user_id: snapchat_friend_ids.members).registered.pluck(:user_id)
+    @snapchat_friend_ids_in_app ||= Account.where(user_id: snapchat_friend_ids.members).registered.pluck(:user_id)
   end
 
   def bot?
