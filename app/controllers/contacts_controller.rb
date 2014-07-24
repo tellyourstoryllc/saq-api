@@ -11,6 +11,8 @@ class ContactsController < ApplicationController
     contact_inviter = ContactInviter.new(current_user)
     users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: !send_sms_invites?, source: params[:source]})
 
+    users = User.includes(:account, :avatar_image, :avatar_video, :phones, :emails).where(id: users.map(&:id))
+
     track_sc_users(users, phone_numbers)
     track_initial_sc_import
 
