@@ -200,7 +200,7 @@ class User < ActiveRecord::Base
   end
 
   def dynamic_friend_ids
-    redis.sunion(snapchat_friend_ids.key, one_to_one_user_ids.key)
+    @dynamic_friend_ids ||= redis.sunion(snapchat_friend_ids.key, one_to_one_user_ids.key)
   end
 
   def dynamic_friend?(user)
