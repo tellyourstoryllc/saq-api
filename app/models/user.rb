@@ -7,7 +7,6 @@ class User < ActiveRecord::Base
   before_validation :fix_username
 
   validates :username, presence: true
-  validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
   validate :valid_username?, :username_format?
