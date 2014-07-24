@@ -159,13 +159,13 @@ class MessagesController < ApplicationController
 
   def send_invites(message, other_user)
     other_user.emails.each do |email|
-      Invite.create!(sender_id: current_user.id, recipient_id: other_user.id, invited_email: email.email,
+      Invite.create!(sender_id: current_user.id, recipient: other_user, invited_email: email.email,
                      new_user: false, can_log_in: other_user.account.can_log_in?, message: message,
                      skip_sending: params[:omit_email_invite])
     end
 
     other_user.phones.each do |phone|
-      Invite.create!(sender_id: current_user.id, recipient_id: other_user.id, invited_phone: phone.number,
+      Invite.create!(sender_id: current_user.id, recipient: other_user, invited_phone: phone.number,
                      new_user: false, can_log_in: other_user.account.can_log_in?, message: message,
                      skip_sending: !send_sms_invites?)
     end

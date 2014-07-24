@@ -52,7 +52,7 @@ class ContactInviter
       email = user.emails.find_by(email: address)
     end
 
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address,
+    Invite.create!(sender_id: current_user.id, recipient: user, invited_email: address,
                    new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
                    source: options[:source])
 
@@ -109,7 +109,7 @@ class ContactInviter
       phone = user.phones.find_by(number: number)
     end
 
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number,
+    Invite.create!(sender_id: current_user.id, recipient: user, invited_phone: number,
                    new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
                    source: options[:source])
 
@@ -133,7 +133,7 @@ class ContactInviter
       user = account.user
     end
 
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, new_user: new_user, can_log_in: account.can_log_in?,
+    Invite.create!(sender_id: current_user.id, recipient: user, new_user: new_user, can_log_in: account.can_log_in?,
                    skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
 
     # Add the new or existing user to my friends list
@@ -166,7 +166,7 @@ class ContactInviter
       phone = Phone.create(number: number, user: user)
     end
 
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number, new_user: new_user,
+    Invite.create!(sender_id: current_user.id, recipient: user, invited_phone: number, new_user: new_user,
                    can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
 
     # Add the new or existing user to my friends list
