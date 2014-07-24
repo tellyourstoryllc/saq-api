@@ -200,11 +200,7 @@ class User < ActiveRecord::Base
   end
 
   def dynamic_friend_ids
-    gids = group_ids.members
-    group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
-    one_to_one_user_keys = [one_to_one_user_ids.key]
-
-    redis.sunion([snapchat_friend_ids.key] + group_member_keys + one_to_one_user_keys)
+    redis.sunion(snapchat_friend_ids.key, one_to_one_user_ids.key)
   end
 
   def dynamic_friend?(user)
@@ -242,6 +238,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  # DEPRECATED
   def live_created_groups_count
     member_counts = redis.pipelined{ created_groups.map{ |g| g.member_ids.size } }
     member_counts.count{ |size| size > 1 }
