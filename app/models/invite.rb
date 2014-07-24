@@ -16,7 +16,7 @@ class Invite < ActiveRecord::Base
   # Send an invite if the recipient isn't yet registered
   # This way the person can get invites from multiple friends
   def send_invite?
-    !recipient.account.registered? && (invited_email.present? || invited_phone.present?) && !skip_sending?
+    (recipient.uninstalled? || !recipient.account.registered?) && (invited_email.present? || invited_phone.present?) && !skip_sending?
   end
 
   def phone
