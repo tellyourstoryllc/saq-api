@@ -7,7 +7,6 @@ class User < ActiveRecord::Base
   before_validation :fix_username
 
   validates :username, presence: true
-  validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
   validate :valid_username?, :username_format?
@@ -201,11 +200,7 @@ class User < ActiveRecord::Base
   end
 
   def dynamic_friend_ids
-    gids = group_ids.members
-    group_member_keys = gids.map{ |group_id| "group:#{group_id}:member_ids" }
-    one_to_one_user_keys = [one_to_one_user_ids.key]
-
-    redis.sunion([snapchat_friend_ids.key] + group_member_keys + one_to_one_user_keys)
+    @dynamic_friend_ids ||= redis.sunion(snapchat_friend_ids.key, one_to_one_user_ids.key)
   end
 
   def dynamic_friend?(user)
@@ -243,6 +238,7 @@ class User < ActiveRecord::Base
     end
   end
 
+  # DEPRECATED
   def live_created_groups_count
     member_counts = redis.pipelined{ created_groups.map{ |g| g.member_ids.size } }
     member_counts.count{ |size| size > 1 }
@@ -456,7 +452,7 @@ class User < ActiveRecord::Base
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
-      User.includes(:avatar_image, :avatar_video, :emails, :phones).where(id: user_ids).order("FIELD(id, #{field_order})")
+      User.includes(:account, :avatar_image, :avatar_video, :emails, :phones).where(id: user_ids).order("FIELD(id, #{field_order})")
     else
       []
     end
@@ -548,7 +544,7 @@ class User < ActiveRecord::Base
   end
 
   def snapchat_friend_ids_in_app
-    Account.where(user_id: snapchat_friend_ids.members).registered.pluck(:user_id)
+    @snapchat_friend_ids_in_app ||= Account.where(user_id: snapchat_friend_ids.members).registered.pluck(:user_id)
   end
 
   def bot?

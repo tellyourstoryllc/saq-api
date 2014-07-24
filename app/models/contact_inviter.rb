@@ -49,10 +49,11 @@ class ContactInviter
       return unless account.persisted?
 
       user = account.user
+      user.account = account
       email = user.emails.find_by(email: address)
     end
 
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_email: address,
+    Invite.create!(sender_id: current_user.id, recipient: user, invited_email: address,
                    new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
                    source: options[:source])
 
@@ -106,10 +107,11 @@ class ContactInviter
       return unless account.persisted?
 
       user = account.user
+      user.account = account
       phone = user.phones.find_by(number: number)
     end
 
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number,
+    Invite.create!(sender_id: current_user.id, recipient: user, invited_phone: number,
                    new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
                    source: options[:source])
 
@@ -131,9 +133,10 @@ class ContactInviter
       return unless account.persisted?
 
       user = account.user
+      user.account = account
     end
 
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, new_user: new_user, can_log_in: account.can_log_in?,
+    Invite.create!(sender_id: current_user.id, recipient: user, new_user: new_user, can_log_in: account.can_log_in?,
                    skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
 
     # Add the new or existing user to my friends list
@@ -160,13 +163,14 @@ class ContactInviter
       return unless account.persisted?
 
       user = account.user
+      user.account = account
       phone = user.phones.find_by(number: number)
     else
       # Let this silently fail if the phone record already exists
       phone = Phone.create(number: number, user: user)
     end
 
-    Invite.create!(sender_id: current_user.id, recipient_id: user.id, invited_phone: number, new_user: new_user,
+    Invite.create!(sender_id: current_user.id, recipient: user, invited_phone: number, new_user: new_user,
                    can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
 
     # Add the new or existing user to my friends list
