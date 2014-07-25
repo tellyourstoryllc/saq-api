@@ -18,7 +18,6 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    current_device.try(:unassign!)
     render_json current_user
   end
 
