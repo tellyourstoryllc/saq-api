@@ -227,15 +227,6 @@ class MobileNotifier
     create_android_notifications(alert, custom_data)
   end
 
-  def notify_content_available(options = {})
-    options.reverse_merge!(sound: nil)
-    options[:content_available] = true
-
-    create_ios_notifications(nil, {}, options) do |ios_device|
-      ios_device.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION
-    end
-  end
-
   def notify_content_available(ios_device, options = {})
     return unless ios_device.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION
 
