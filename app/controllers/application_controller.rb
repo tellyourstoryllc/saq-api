@@ -145,7 +145,7 @@ class ApplicationController < ActionController::Base
   end
 
   def send_sms_invites?
-    params[:omit_sms_invite] != 'true' && !Settings.enabled?(:disable_sms_invites) && Bool.parse(current_user.sms_invites_allowed.value)
+    !Bool.parse(params[:omit_sms_invite]) && !Settings.enabled?(:disable_sms_invites) && Bool.parse(current_user.sms_invites_allowed.value)
   end
 
   def pagination_params
