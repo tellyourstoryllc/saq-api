@@ -183,7 +183,7 @@ class ApplicationController < ActionController::Base
 
         mp = MixpanelClient.new(recipient)
         mp.received_snap_invite(sender: current_user, invite_channel: invite_channel,
-                                snap_invite_ad: current_user.snap_invite_ad, recipient_phone: phone)
+                                snap_invite_ad: current_user.snap_invite_ad(params[:client]), recipient_phone: phone)
       end
     end
   end

@@ -68,7 +68,8 @@ class User < ActiveRecord::Base
   value :set_initial_snapchat_friend_ids_in_app
   set :initial_snapchat_friend_ids_in_app
 
-  value :assigned_snap_invite_ad_id
+  value :assigned_ios_snap_invite_ad_id
+  value :assigned_android_snap_invite_ad_id
   value :last_invite_at
   value :clicked_invite_link
   value :notified_friends
@@ -462,21 +463,42 @@ class User < ActiveRecord::Base
     update!(deactivated: true)
   end
 
-  def snap_invite_ad
-    return @snap_invite_ad if defined?(@snap_invite_ad)
+  def snap_invite_ad(client)
+    send("#{client}_snap_invite_ad") if client.present?
+  end
 
-    snap_invite_ad_id = assigned_snap_invite_ad_id.value
-    unless snap_invite_ad_id && (@snap_invite_ad = SnapInviteAd.active.find_by(id: snap_invite_ad_id))
-      @snap_invite_ad = SnapInviteAd.active.order('RAND()').first
+  def ios_snap_invite_ad
+    return @ios_snap_invite_ad if defined?(@ios_snap_invite_ad)
 
-      if @snap_invite_ad
-        self.assigned_snap_invite_ad_id = @snap_invite_ad.id
+    ios_snap_invite_ad_id = assigned_ios_snap_invite_ad_id.value
+    unless ios_snap_invite_ad_id && (@ios_snap_invite_ad = SnapInviteAd.active.ios.find_by(id: ios_snap_invite_ad_id))
+      @ios_snap_invite_ad = SnapInviteAd.active.ios.order('RAND()').first
+
+      if @ios_snap_invite_ad
+        self.assigned_ios_snap_invite_ad_id = @ios_snap_invite_ad.id
       else
-        assigned_snap_invite_ad_id.del
+        assigned_ios_snap_invite_ad_id.del
       end
     end
 
-    @snap_invite_ad
+    @ios_snap_invite_ad
+  end
+
+  def android_snap_invite_ad
+    return @android_snap_invite_ad if defined?(@android_snap_invite_ad)
+
+    android_snap_invite_ad_id = assigned_android_snap_invite_ad_id.value
+    unless android_snap_invite_ad_id && (@android_snap_invite_ad = SnapInviteAd.active.android.find_by(id: android_snap_invite_ad_id))
+      @android_snap_invite_ad = SnapInviteAd.active.android.order('RAND()').first
+
+      if @android_snap_invite_ad
+        self.assigned_android_snap_invite_ad_id = @android_snap_invite_ad.id
+      else
+        assigned_android_snap_invite_ad_id.del
+      end
+    end
+
+    @android_snap_invite_ad
   end
 
   def like_snap_template

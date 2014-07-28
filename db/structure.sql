@@ -555,6 +555,8 @@ CREATE TABLE `snap_invite_ads` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `active` tinyint(1) NOT NULL DEFAULT '1',
+  `ios` tinyint(1) NOT NULL DEFAULT '0',
+  `android` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -613,7 +615,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-07-23 14:59:14
+-- Dump completed on 2014-07-28 10:12:44
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -791,3 +793,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140722205626');
 INSERT INTO schema_migrations (version) VALUES ('20140723161424');
 
 INSERT INTO schema_migrations (version) VALUES ('20140723185858');
+
+INSERT INTO schema_migrations (version) VALUES ('20140728141113');
