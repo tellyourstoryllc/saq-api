@@ -42,6 +42,12 @@ class UsersController < ApplicationController
       @current_user = @account.user
     end
 
+    # Ensure you are your own friend
+    User.redis.pipelined do
+      @current_user.snapchat_friend_ids << @current_user.id
+      @current_user.initial_snapchat_friend_ids_in_app << @current_user.id
+    end
+
     # Create or update device and group
     create_or_update_device
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
