@@ -23,6 +23,28 @@ class MixpanelClient
 
   def default_properties
     properties = common_properties
+
+    snapchat_friends_count, friends_bot_included, set_initial_exists, initial_friends_in_app_count, initial_bot_included = User.redis.pipelined do
+      user.snapchat_friend_ids.size
+      user.snapchat_friend_ids.include?(Robot.user.id)
+
+      user.set_initial_snapchat_friend_ids_in_app.exists?
+      user.initial_snapchat_friend_ids_in_app.size
+      user.initial_snapchat_friend_ids_in_app.include?(Robot.user.id)
+    end
+
+    if snapchat_friends_count > 0
+      snapchat_friends_count -= 1 if friends_bot_included
+    else
+      snapchat_friends_count = nil
+    end
+
+    if set_initial_exists
+      initial_friends_in_app_count -= 1 if initial_bot_included
+    else
+      initial_friends_in_app_count = nil
+    end
+
     drip_enabled = user.drip_notifications_enabled.value
 
     if user
@@ -34,8 +56,8 @@ class MixpanelClient
         'Received Messages' => user.metrics[:received_messages_count].to_i,
         'Phone Contacts' => user.phone_contacts.size,
         'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
-        'Snapchat Friends' => (user.snapchat_friend_ids.exists? ? user.snapchat_friend_ids.size : nil),
-        'Initial Snapchat Friends in App' => (user.set_initial_snapchat_friend_ids_in_app.exists? ? user.initial_snapchat_friend_ids_in_app.size : nil),
+        'Snapchat Friends' => snapchat_friends_count,
+        'Initial Snapchat Friends in App' => initial_friends_in_app_count,
         'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency,
         'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil)
       )
@@ -271,8 +293,11 @@ class MixpanelClient
     sender = properties[:sender]
     return {} if sender.blank?
 
+    friend_ids = sender.snapchat_friend_ids_in_app
+    friend_ids.delete(Robot.user.id)
+
     {'Sender ID' => sender.id, 'Sender Username' => sender.username,
-      'Sender Snapchat Friends in App' => sender.snapchat_friend_ids_in_app.size}
+      'Sender Snapchat Friends in App' => friend_ids.size}
   end
 
   def received_snap_invite_properties(properties)
