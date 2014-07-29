@@ -23,6 +23,7 @@ class MixpanelClient
 
   def default_properties
     properties = common_properties
+    drip_enabled = user.drip_notifications_enabled.value
 
     if user
       properties.merge!(
@@ -35,7 +36,8 @@ class MixpanelClient
         'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
         'Snapchat Friends' => (user.snapchat_friend_ids.exists? ? user.snapchat_friend_ids.size : nil),
         'Initial Snapchat Friends in App' => (user.set_initial_snapchat_friend_ids_in_app.exists? ? user.initial_snapchat_friend_ids_in_app.size : nil),
-        'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency
+        'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency,
+        'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil)
       )
 
       properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?
