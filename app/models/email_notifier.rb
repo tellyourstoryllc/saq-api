@@ -188,4 +188,16 @@ class EmailNotifier
     return if comment.user_id == user.id
     MessageMailer.story_comment(comment, user).deliver!
   end
+
+  def notify_drip(drip_notification)
+    if Settings.enabled?(:queue)
+      MessageMailerDripNotificationWorker.perform_async(drip_notification.id, user.id)
+    else
+      notify_drip!(drip_notification)
+    end
+  end
+
+  def notify_drip!(drip_notification)
+    MessageMailer.drip_notification(drip_notification, user).deliver!
+  end
 end

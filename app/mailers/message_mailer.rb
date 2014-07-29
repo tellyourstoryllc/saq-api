@@ -87,4 +87,13 @@ class MessageMailer < BaseMailer
 
     mail(to: @recipient.emails.map(&:email), subject: @subject)
   end
+
+  def drip_notification(drip_notification, user)
+    @drip_notification = drip_notification
+    @user = user
+    @url = Rails.configuration.app['web']['url'] + "/app_tips/#{drip_notification.id}?invite_channel=email"
+    subject = @drip_notification.email_subject
+
+    mail(to: @user.emails.map(&:email), subject: subject)
+  end
 end

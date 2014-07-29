@@ -315,8 +315,7 @@ class User < ActiveRecord::Base
     if mobile_notifier.pushes_enabled?
       mobile_notifier.notify_drip(drip_notification)
     else
-      # TODO
-      #email_notifier.notify_drip(drip_notification)
+      email_notifier.notify_drip(drip_notification)
     end
   end
 

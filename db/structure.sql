@@ -141,6 +141,8 @@ CREATE TABLE `drip_notifications` (
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `email_subject` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `email_body` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -635,7 +637,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-07-29 10:37:47
+-- Dump completed on 2014-07-29 11:36:12
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -817,3 +819,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140723185858');
 INSERT INTO schema_migrations (version) VALUES ('20140728141113');
 
 INSERT INTO schema_migrations (version) VALUES ('20140729105854');
+
+INSERT INTO schema_migrations (version) VALUES ('20140729153438');
