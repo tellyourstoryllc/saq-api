@@ -22,6 +22,10 @@ class AndroidDevice < BaseDevice
     registration_id.present?
   end
 
+  def client
+    'android'
+  end
+
 
   private
 

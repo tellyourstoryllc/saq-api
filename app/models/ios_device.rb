@@ -50,6 +50,10 @@ class IosDevice < BaseDevice
     content_push_info.bulk_set(current_frequency: user.try(:content_frequency), unanswered_count: 0)
   end
 
+  def client
+    'ios'
+  end
+
 
   private
 

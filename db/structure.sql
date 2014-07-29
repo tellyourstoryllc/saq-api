@@ -126,6 +126,26 @@ CREATE TABLE `comment_snap_templates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `drip_notifications`
+--
+
+DROP TABLE IF EXISTS `drip_notifications`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `drip_notifications` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `push_text` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `rank` int(11) NOT NULL,
+  `client` enum('ios','android') COLLATE utf8_unicode_ci NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `emails`
 --
 
@@ -615,7 +635,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-07-28 10:12:44
+-- Dump completed on 2014-07-29 10:37:47
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -795,3 +815,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140723161424');
 INSERT INTO schema_migrations (version) VALUES ('20140723185858');
 
 INSERT INTO schema_migrations (version) VALUES ('20140728141113');
+
+INSERT INTO schema_migrations (version) VALUES ('20140729105854');

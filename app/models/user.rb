@@ -83,6 +83,7 @@ class User < ActiveRecord::Base
   hash_key :story_snapchat_media_ids
   value :assigned_like_snap_template_id
   value :assigned_comment_snap_template_id
+  value :drip_notifications_enabled
 
   delegate :registered, :registered?, to: :account
 
@@ -307,6 +308,15 @@ class User < ActiveRecord::Base
       mobile_notifier.notify_story_comment(comment)
     else
       email_notifier.notify_story_comment(comment)
+    end
+  end
+
+  def send_drip_notifications(drip_notification)
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_drip(drip_notification)
+    else
+      # TODO
+      #email_notifier.notify_drip(drip_notification)
     end
   end
 
