@@ -62,6 +62,10 @@ class UsersController < ApplicationController
     # Add robot as a contact and send initial messages
     Robot.set_up_new_user(@current_user)
 
+    # Assign whether or not the user should get new user drip notifications
+    # and if so, schedule them all
+    DripNotification.set_up_new_user(@current_user, current_device)
+
     current_device.existing_user_status = 'r' if current_device
     @current_user.notify_friends
 

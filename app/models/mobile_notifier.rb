@@ -235,4 +235,14 @@ class MobileNotifier
 
     create_ios_notification(ios_device, nil, {}, options)
   end
+
+  def notify_drip(drip_notification)
+    return if drip_notification.blank?
+
+    alert = drip_notification.push_text
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
 end
