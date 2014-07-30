@@ -23,6 +23,7 @@ class MixpanelClient
 
   def default_properties
     properties = common_properties
+    return properties if user.nil?
 
     snapchat_friends_count, friends_bot_included, set_initial_exists, initial_friends_in_app_count, initial_bot_included = User.redis.pipelined do
       user.snapchat_friend_ids.size
@@ -47,23 +48,21 @@ class MixpanelClient
 
     drip_enabled = user.drip_notifications_enabled.value
 
-    if user
-      properties.merge!(
-        'distinct_id' => user.id, '$created' => user.created_at, 'Name' => user.name,
-        '$username' => user.username, 'Birthday' => user.birthday, 'Age' => user.age, 'Can Log In' => user.account.can_log_in?,
-        'Time Zone' => user.account.time_zone, 'Status' => user.computed_status, 'Invited' => user.invited?,
-        'Sent Messages' => user.metrics[:sent_messages_count].to_i,
-        'Received Messages' => user.metrics[:received_messages_count].to_i,
-        'Phone Contacts' => user.phone_contacts.size,
-        'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
-        'Snapchat Friends' => snapchat_friends_count,
-        'Initial Snapchat Friends in App' => initial_friends_in_app_count,
-        'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency,
-        'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil)
-      )
+    properties.merge!(
+      'distinct_id' => user.id, '$created' => user.created_at, 'Name' => user.name,
+      '$username' => user.username, 'Birthday' => user.birthday, 'Age' => user.age, 'Can Log In' => user.account.can_log_in?,
+      'Time Zone' => user.account.time_zone, 'Status' => user.computed_status, 'Invited' => user.invited?,
+      'Sent Messages' => user.metrics[:sent_messages_count].to_i,
+      'Received Messages' => user.metrics[:received_messages_count].to_i,
+      'Phone Contacts' => user.phone_contacts.size,
+      'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
+      'Snapchat Friends' => snapchat_friends_count,
+      'Initial Snapchat Friends in App' => initial_friends_in_app_count,
+      'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency,
+      'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil)
+    )
 
-      properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?
-    end
+    properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?
 
     properties
   end
@@ -283,10 +282,8 @@ class MixpanelClient
   end
 
   def mobile_install_properties(device_id)
-    client = Thread.current[:client]
     distinct_id = "#{client}-#{device_id}"
-
-    common_properties.merge!('distinct_id' => distinct_id, 'Client' => client)
+    common_properties.merge!('distinct_id' => distinct_id)
   end
 
   def received_snap_properties(properties)
