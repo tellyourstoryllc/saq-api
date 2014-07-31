@@ -27,7 +27,7 @@ class MessagesController < ApplicationController
   private
 
   def message_params
-    params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata, :expires_in,
+    params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata,
                   :received, :original_message_id, :forward_message_id, :created_at).merge(user_id: current_user.id)
   end
 
