@@ -13,11 +13,13 @@ module Peanut::Conversation
     def self.page_size; 20 end
     def self.max_page_size; 200 end
 
-    def message_ids_with_expiration_gc
-      remove_expired_message_ids
-      message_ids_without_expiration_gc
-    end
-    alias_method_chain :message_ids, :expiration_gc
+    # Disabling message expiration checking for now since
+    # we made all messages never expire
+    #def message_ids_with_expiration_gc
+    #  remove_expired_message_ids
+    #  message_ids_without_expiration_gc
+    #end
+    #alias_method_chain :message_ids, :expiration_gc
   end
 
   def add_message(message)
