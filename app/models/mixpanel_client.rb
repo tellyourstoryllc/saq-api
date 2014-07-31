@@ -282,6 +282,7 @@ class MixpanelClient
   end
 
   def mobile_install_properties(device_id)
+    client = Thread.current[:client]
     distinct_id = "#{client}-#{device_id}"
     common_properties.merge!('distinct_id' => distinct_id)
   end
