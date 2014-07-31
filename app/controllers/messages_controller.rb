@@ -28,7 +28,7 @@ class MessagesController < ApplicationController
 
   def message_params
     params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata, :expires_in,
-                  :received, :original_message_id, :forward_message_id).merge(user_id: current_user.id)
+                  :received, :original_message_id, :forward_message_id, :created_at).merge(user_id: current_user.id)
   end
 
   def story_params
@@ -130,11 +130,6 @@ class MessagesController < ApplicationController
     if @messages.present? && @messages.first.forward_message
       @messages.first.send_forward_meta_messages
     end
-  end
-
-  def message_params
-    params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata, :expires_in,
-                  :received, :original_message_id, :forward_message_id, :created_at).merge(user_id: current_user.id)
   end
 
   def load_one_to_one(one_to_one_id)
