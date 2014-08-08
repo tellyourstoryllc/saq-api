@@ -3,5 +3,5 @@ class SnapInviteAd < ActiveRecord::Base
   scope :active, -> { where(active: true) }
   scope :ios, -> { where(ios: true) }
   scope :android, -> { where(android: true) }
-  scope :by_lang, -> (lang) { where(lang: lang) }
+  scope :by_lang, ->(lang) { where(lang: lang) }
 end
