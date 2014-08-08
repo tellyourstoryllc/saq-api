@@ -479,9 +479,11 @@ class User < ActiveRecord::Base
   def ios_snap_invite_ad
     return @ios_snap_invite_ad if defined?(@ios_snap_invite_ad)
 
+    scope = SnapInviteAd.by_lang(I18n.locale).ios.active
     ios_snap_invite_ad_id = assigned_ios_snap_invite_ad_id.value
-    unless ios_snap_invite_ad_id && (@ios_snap_invite_ad = SnapInviteAd.active.ios.find_by(id: ios_snap_invite_ad_id))
-      @ios_snap_invite_ad = SnapInviteAd.active.ios.order('RAND()').first
+
+    unless ios_snap_invite_ad_id && (@ios_snap_invite_ad = scope.find_by(id: ios_snap_invite_ad_id))
+      @ios_snap_invite_ad = scope.order('RAND()').first || SnapInviteAd.by_lang('en').ios.active.order('RAND()').first
 
       if @ios_snap_invite_ad
         self.assigned_ios_snap_invite_ad_id = @ios_snap_invite_ad.id
@@ -496,9 +498,11 @@ class User < ActiveRecord::Base
   def android_snap_invite_ad
     return @android_snap_invite_ad if defined?(@android_snap_invite_ad)
 
+    scope = SnapInviteAd.by_lang(I18n.locale).android.active
     android_snap_invite_ad_id = assigned_android_snap_invite_ad_id.value
-    unless android_snap_invite_ad_id && (@android_snap_invite_ad = SnapInviteAd.active.android.find_by(id: android_snap_invite_ad_id))
-      @android_snap_invite_ad = SnapInviteAd.active.android.order('RAND()').first
+
+    unless android_snap_invite_ad_id && (@android_snap_invite_ad = scope.find_by(id: android_snap_invite_ad_id))
+      @android_snap_invite_ad = scope.order('RAND()').first || SnapInviteAd.by_lang('en').android.active.order('RAND()').first
 
       if @android_snap_invite_ad
         self.assigned_android_snap_invite_ad_id = @android_snap_invite_ad.id

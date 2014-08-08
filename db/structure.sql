@@ -541,28 +541,6 @@ CREATE TABLE `schema_migrations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `snap_invite_ad_translations`
---
-
-DROP TABLE IF EXISTS `snap_invite_ad_translations`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `snap_invite_ad_translations` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `snap_invite_ad_id` int(11) NOT NULL,
-  `locale` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `media_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  `text_overlay` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `index_snap_invite_ad_translations_on_snap_invite_ad_id` (`snap_invite_ad_id`),
-  KEY `index_snap_invite_ad_translations_on_locale` (`locale`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `snap_invite_ads`
 --
 
@@ -579,6 +557,7 @@ CREATE TABLE `snap_invite_ads` (
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `ios` tinyint(1) NOT NULL DEFAULT '0',
   `android` tinyint(1) NOT NULL DEFAULT '0',
+  `lang` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'en',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -637,7 +616,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-07-29 11:36:12
+-- Dump completed on 2014-08-08 15:56:25
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -821,3 +800,7 @@ INSERT INTO schema_migrations (version) VALUES ('20140728141113');
 INSERT INTO schema_migrations (version) VALUES ('20140729105854');
 
 INSERT INTO schema_migrations (version) VALUES ('20140729153438');
+
+INSERT INTO schema_migrations (version) VALUES ('20140808194303');
+
+INSERT INTO schema_migrations (version) VALUES ('20140808195535');
