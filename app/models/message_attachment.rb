@@ -5,7 +5,30 @@ class MessageAttachment < ActiveRecord::Base
   validates :sha, presence: true, on: :create
 
   mount_uploader :attachment, MessageAttachmentUploader
+  skip_callback :save, :after, :store_attachment!, if: :skip_storage?
+  after_commit :delete_temp_files
 
+
+  def skip_storage?
+    @skip_storage ||= self.class.where(sha: sha).where('message_attachments.id != ?', id).exists?
+  end
+
+  def delete_temp_files
+    if attachment.delete_tmp_file_after_storage && !attachment.move_to_store
+      temp_files = [attachment.file.file] + attachment.versions.map{ |k,v| v.file.try(:file) }.compact
+      temp_files.each do |path|
+        File.delete(path) if File.exist?(path)
+      end
+    end
+  end
+
+  def sha
+    if self[:sha].present?
+      self[:sha]
+    else
+      self.sha = Digest::SHA1.file(attachment.file.path).hexdigest
+    end
+  end
 
   def message
     @message ||= Message.new(id: message_id)
@@ -73,7 +96,6 @@ class MessageAttachment < ActiveRecord::Base
       self.media_type = attachment.media_type(attachment.file)
       self.content_type = attachment.file.content_type
       self.file_size = attachment.file.size
-      self.sha = Digest::SHA1.file(attachment.file.path).hexdigest
 
       version = if attachment.version_exists?(:thumb)
                   attachment.thumb
