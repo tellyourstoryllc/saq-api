@@ -12,7 +12,7 @@ class BaseUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def store_dir
-    if model.sha.present?
+    if model.respond_to?(:sha) && model.sha.present?
       "uploads/#{model.class.to_s.underscore}/#{mounted_as}/sha/#{sha_hierarchy}"
     else
       "uploads/#{model.class.to_s.underscore}/#{mounted_as}/#{id_hierarchy}/#{model.id}/#{model.uuid}"
