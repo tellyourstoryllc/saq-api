@@ -2,9 +2,33 @@ class MessageAttachment < ActiveRecord::Base
   attr_writer :message
   before_validation :set_group_id, :set_one_to_one_id, :set_uuid, :update_attachment_attrs, on: :create
   validates :message_id, :attachment, :uuid, presence: true
+  validates :sha, presence: true, on: :create
 
   mount_uploader :attachment, MessageAttachmentUploader
+  skip_callback :save, :after, :store_attachment!, if: :skip_storage?
+  after_commit :delete_temp_files
 
+
+  def skip_storage?
+    @skip_storage ||= self.class.where(sha: sha).where('message_attachments.id != ?', id).exists?
+  end
+
+  def delete_temp_files
+    if attachment.delete_tmp_file_after_storage && !attachment.move_to_store
+      temp_files = [attachment.file.file] + attachment.versions.map{ |k,v| v.file.try(:file) }.compact
+      temp_files.each do |path|
+        File.delete(path) if File.exist?(path)
+      end
+    end
+  end
+
+  def sha
+    if self[:sha].present?
+      self[:sha]
+    else
+      self.sha = Digest::SHA1.file(attachment.file.path).hexdigest
+    end
+  end
 
   def message
     @message ||= Message.new(id: message_id)

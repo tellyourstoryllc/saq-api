@@ -325,6 +325,12 @@ class Message
     end
 
     if @message_attachment && @message_attachment.attachment.present?
+      # HACK: For duplicate attachments that weren't uploaded, the URL is still
+      # set to the tmp file path. So we need to reload the model to get the S3 URL.
+      if @message_attachment.attachment.url.include?('tmp')
+        @message_attachment = MessageAttachment.find_by(id: @message_attachment.id)
+      end
+
       self.attachment_url = @message_attachment.attachment.url
       self.attachment_content_type = @message_attachment.content_type
       self.attachment_preview_url = @message_attachment.preview_url
