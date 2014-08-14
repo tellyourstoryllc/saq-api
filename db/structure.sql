@@ -369,10 +369,12 @@ CREATE TABLE `message_attachments` (
   `file_size` int(11) NOT NULL,
   `preview_width` int(11) DEFAULT NULL,
   `preview_height` int(11) DEFAULT NULL,
+  `sha` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `index_message_attachments_on_group_id` (`group_id`),
   KEY `index_message_attachments_on_message_id` (`message_id`),
-  KEY `index_message_attachments_on_one_to_one_id` (`one_to_one_id`)
+  KEY `index_message_attachments_on_one_to_one_id` (`one_to_one_id`),
+  KEY `index_message_attachments_on_sha` (`sha`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -616,7 +618,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-08 15:56:25
+-- Dump completed on 2014-08-14 13:56:58
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -804,3 +806,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140729153438');
 INSERT INTO schema_migrations (version) VALUES ('20140808194303');
 
 INSERT INTO schema_migrations (version) VALUES ('20140808195535');
+
+INSERT INTO schema_migrations (version) VALUES ('20140814175449');

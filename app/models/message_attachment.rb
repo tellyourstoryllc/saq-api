@@ -2,6 +2,7 @@ class MessageAttachment < ActiveRecord::Base
   attr_writer :message
   before_validation :set_group_id, :set_one_to_one_id, :set_uuid, :update_attachment_attrs, on: :create
   validates :message_id, :attachment, :uuid, presence: true
+  validates :sha, presence: true, on: :create
 
   mount_uploader :attachment, MessageAttachmentUploader
 
@@ -72,6 +73,7 @@ class MessageAttachment < ActiveRecord::Base
       self.media_type = attachment.media_type(attachment.file)
       self.content_type = attachment.file.content_type
       self.file_size = attachment.file.size
+      self.sha = Digest::SHA1.file(attachment.file.path).hexdigest
 
       version = if attachment.version_exists?(:thumb)
                   attachment.thumb
