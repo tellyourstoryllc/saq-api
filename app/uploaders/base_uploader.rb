@@ -20,7 +20,7 @@ class BaseUploader < CarrierWave::Uploader::Base
   end
 
   def filename
-    "#{model.sha}.#{file.extension}"
+    model.respond_to?(:sha) ? "#{model.sha}.#{file.extension}" : super
   end
 
   # Limit the number of items in each subdirectory
