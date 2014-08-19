@@ -62,6 +62,27 @@ module Peanut::Conversation
     end
   end
 
+  def paginate_unseen_messages(options = {})
+    limit = [(options[:limit].presence || self.class.page_size).to_i, self.class.max_page_size].min
+    return [] if limit == 0
+
+    max = 'inf'
+    min = last_seen_rank.present? ? last_seen_rank + 1 : '-inf'
+
+    ids = message_ids.revrangebyscore(max, min, {limit: limit}).reverse
+    messages = Message.pipelined_find(ids)
+
+    # Delete any deleted messages from the list
+    missing_message_ids = ids - messages.map(&:id)
+
+    if missing_message_ids.present?
+      message_ids.delete(missing_message_ids)
+      paginate_unseen_messages(options)
+    else
+      messages
+    end
+  end
+
   # Find all expired message ids and remove them from the sorted set
   def remove_expired_message_ids
     lua_script = %{local message_ids = redis.call("ZRANGEBYSCORE", KEYS[1], '-inf', ARGV[1]); for k,v in pairs(message_ids) do redis.call("ZREM", KEYS[1], v); redis.call("ZREM", KEYS[2], v) end}
