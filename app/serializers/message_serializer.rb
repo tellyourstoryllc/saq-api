@@ -6,10 +6,10 @@ class MessageSerializer < ActiveModel::Serializer
     :actor_id, :created_at, :expires_at
 
   def likes_count
-    object.likes.size
+    object.cached_likes_count || object.likes.size
   end
 
   def forwards_count
-    object.forwards.size
+    object.cached_forwards_count || object.forwards.size
   end
 end

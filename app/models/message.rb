@@ -6,7 +6,8 @@ class Message
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
     :attachment_metadata, :client_metadata, :received, :original_message_id, :forward_message_id,
-    :actor_id, :attachment_message_id, :type, :snapchat_media_id, :created_at, :expires_in, :expires_at
+    :actor_id, :attachment_message_id, :type, :snapchat_media_id, :created_at, :expires_in, :expires_at,
+    :cached_likes_count, :cached_forwards_count
 
   hash_key :attrs
   list :ancestor_message_ids
@@ -27,6 +28,26 @@ class Message
     if id.present?
       to_int(:rank, :attachment_preview_width, :attachment_preview_height, :created_at, :expires_in, :expires_at)
       to_bool(:received)
+    end
+  end
+
+  def self.pipelined_find(ids)
+    return [] if ids.blank?
+
+    attrs = redis.pipelined do
+      ids.map{ |id| redis.hgetall("#{redis_prefix}:#{id}:attrs") }
+    end
+
+    likes_counts = redis.pipelined do
+      ids.map{ |id| redis.llen("#{redis_prefix}:#{id}:likes") }
+    end
+
+    forwards_counts = redis.pipelined do
+      ids.map{ |id| redis.llen("#{redis_prefix}:#{id}:forwards") }
+    end
+
+    messages = attrs.map.with_index do |attrs, i|
+      new(attrs.merge(fetched: true, cached_likes_count: likes_counts[i], cached_forwards_count: forwards_counts[i]))
     end
   end
 
