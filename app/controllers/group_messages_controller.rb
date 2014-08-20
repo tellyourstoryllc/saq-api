@@ -19,8 +19,10 @@ class GroupMessagesController < ApplicationController
       @group.members.each{ |user| user.send_notifications(@message) }
 
       # Track activity in Mixpanel
-      group_mixpanel.sent_daily_message(@group)
-      mixpanel.daily_message_events(@message)
+      unless importing_from_sc
+        group_mixpanel.sent_daily_message(@group)
+        mixpanel.daily_message_events(@message)
+      end
 
       Robot.reply_to(current_user, @message)
 

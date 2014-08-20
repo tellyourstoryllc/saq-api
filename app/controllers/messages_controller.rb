@@ -53,8 +53,10 @@ class MessagesController < ApplicationController
         group.members.each{ |user| user.send_notifications(message) }
 
         # Track activity in Mixpanel
-        group_mixpanel.sent_daily_message(group)
-        mixpanel.daily_message_events(message)
+        unless importing_from_sc
+          group_mixpanel.sent_daily_message(group)
+          mixpanel.daily_message_events(message)
+        end
 
         @messages << message
       end
@@ -90,7 +92,7 @@ class MessagesController < ApplicationController
         end
 
         # Track activity in Mixpanel
-        mixpanel.daily_message_events(message)
+        mixpanel.daily_message_events(message) unless importing_from_sc
 
         Robot.reply_to(current_user, message)
 
@@ -119,7 +121,7 @@ class MessagesController < ApplicationController
       end
 
       # Track activity in Mixpanel
-      mixpanel.daily_message_events(story)
+      mixpanel.daily_message_events(story) unless importing_from_sc
 
       @stories << story
     end

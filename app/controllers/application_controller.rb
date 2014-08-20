@@ -206,4 +206,8 @@ class ApplicationController < ActionController::Base
   def reset_unanswered_content_pushes
     current_device.reset_content_push_info if current_device && current_device.respond_to?(:reset_content_push_info)
   end
+
+  def importing_from_sc
+    params.has_key?(:received)
+  end
 end
