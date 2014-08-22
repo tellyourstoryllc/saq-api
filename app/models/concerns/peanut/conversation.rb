@@ -66,8 +66,10 @@ module Peanut::Conversation
     limit = [(options[:limit].presence || self.class.page_size).to_i, self.class.max_page_size].min
     return [] if limit == 0
 
+    last_rank = options[:last_seen_rank].presence || last_seen_rank
+
     max = 'inf'
-    min = last_seen_rank.present? ? last_seen_rank + 1 : '-inf'
+    min = last_rank.present? ? last_rank.to_i + 1 : '-inf'
 
     ids = message_ids.revrangebyscore(max, min, {limit: limit}).reverse
     messages = Message.pipelined_find(ids)

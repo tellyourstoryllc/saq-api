@@ -40,10 +40,12 @@ class ConversationsController < ApplicationController
 
   def fetch_unseen_messages
     limit = params[:limit]
+    last_seen_ranks = params[:last_seen_ranks].present? ? JSON.parse(params[:last_seen_ranks]) : {}
     messages = []
 
     @one_to_ones.each do |o|
-      messages += o.paginate_unseen_messages(limit: limit)
+      rank = last_seen_ranks[o.id]
+      messages += o.paginate_unseen_messages(last_seen_rank: rank, limit: limit)
     end
 
     messages
