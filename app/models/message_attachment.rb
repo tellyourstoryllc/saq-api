@@ -14,8 +14,8 @@ class MessageAttachment < ActiveRecord::Base
   end
 
   def delete_temp_files
-    if attachment.delete_tmp_file_after_storage && !attachment.move_to_store
-      temp_files = [attachment.file.file] + attachment.versions.map{ |k,v| v.file.try(:file) }.compact
+    if attachment.delete_tmp_file_after_storage && !attachment.move_to_store && attachment.file.path.include?('/tmp/')
+      temp_files = [attachment.file.path] + attachment.versions.map{ |k,v| v.file.try(:path) }.compact
       temp_files.each do |path|
         File.delete(path) if File.exist?(path)
       end
