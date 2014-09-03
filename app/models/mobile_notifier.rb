@@ -58,7 +58,6 @@ class MobileNotifier
   def create_ios_notification(ios_device, alert, custom_data = {}, options = {})
     return unless (options[:content_available] && ios_device.can_send_content_push?) || ios_device.can_send?
 
-    options.reverse_merge!(badge: user.unread_convo_ids.size)
     options[:device_token] = ios_device.push_token
 
     n = ios_notifier.build_notification(alert, custom_data, options)
@@ -78,7 +77,6 @@ class MobileNotifier
   def create_android_notification(android_device, alert, custom_data = {}, options = {})
     return unless android_device.can_send?
 
-    options.reverse_merge!(badge: user.unread_convo_ids.size)
     options[:registration_ids] = android_device.registration_id
 
     n = android_notifier.build_notification(alert, custom_data, options)
