@@ -1,5 +1,6 @@
 class MessagesController < ApplicationController
   before_action :load_message, only: :export
+  before_action :load_my_message, only: :delete
 
 
   def create
@@ -20,6 +21,11 @@ class MessagesController < ApplicationController
     # Send export meta messages to the most recent and original users
     @message.send_export_meta_messages(current_user, params[:method])
 
+    render_success
+  end
+
+  def delete
+    @message.delete
     render_success
   end
 
@@ -172,5 +178,11 @@ class MessagesController < ApplicationController
     @message = Message.new(id: params[:id])
     raise Peanut::Redis::RecordNotFound unless @message.attrs.exists? &&
       @message.conversation && @message.conversation.fetched_member_ids.include?(current_user.id)
+  end
+
+  def load_my_message
+    @message = Message.new(id: params[:id])
+    raise Peanut::Redis::RecordNotFound unless @message.attrs.exists? &&
+      @message.user_id == current_user.id
   end
 end

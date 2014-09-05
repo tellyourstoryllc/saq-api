@@ -43,6 +43,7 @@ KrazyChat::Application.routes.draw do
     match '/one_to_ones/:one_to_one_id/messages', to: 'one_to_one_messages#index', as: 'one_to_one_messages'
 
     match '/messages/create', to: 'messages#create', as: 'create_message'
+    match '/messages/:id/delete', to: 'messages#delete', as: 'delete_message'
     match '/messages/:id/export', to: 'messages#export', as: 'export_message'
 
     match '/messages/:id/likes', to: 'message_likes#index', as: 'message_likes'
