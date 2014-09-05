@@ -268,9 +268,22 @@ class Message
     !received.nil?
   end
 
-  def delete
+  def deleted?
+    attrs[:attachment_content_type] == 'meta/delete'
+  end
+
+  def delete(current_user)
+    return if deleted?
+
     # TODO delete all its likes, exports, etc. to clean up and delete unused memory?
-    attrs.del
+    media_type = message_attachment.try(:media_type_name) || 'message'
+
+    self.attrs.bulk_set(attachment_content_type: 'meta/delete',
+                        attachment_metadata: {deleted_at: Time.current.to_i}.to_json,
+                        actor_id: current_user.id, text: "[This #{media_type} has been deleted]",
+                        message_attachment_id: nil, attachment_url: nil,
+                        attachment_preview_url: nil, attachment_preview_width: nil,
+                        attachment_preview_height: nil, attachment_message_id: nil)
   end
 
 

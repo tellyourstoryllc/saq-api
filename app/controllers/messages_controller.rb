@@ -25,8 +25,9 @@ class MessagesController < ApplicationController
   end
 
   def delete
-    @message.delete
-    render_success
+    @message.delete(current_user)
+    load_my_message
+    render_json @message
   end
 
 
