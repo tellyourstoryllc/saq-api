@@ -88,7 +88,6 @@ class User < ActiveRecord::Base
   delegate :registered, :registered?, to: :account
 
   COHORT_METRICS_TIME_ZONE = 'America/New_York'
-  BLACKLISTED_USERNAMES = %w(riolive2014 electriczoolive collegefootball)
 
 
   def first_name

@@ -324,7 +324,7 @@ class Message
     recipient = conversation.other_user(user) if conversation && conversation.respond_to?(:other_user)
     return if recipient.nil?
 
-    errors.add(:base, "Sorry, that user is not available.") if User::BLACKLISTED_USERNAMES.include?(recipient.username)
+    errors.add(:base, "Sorry, that user is not available.") if Settings.get_list(:blacklisted_usernames).include?(recipient.username)
   end
 
   def not_blocked?

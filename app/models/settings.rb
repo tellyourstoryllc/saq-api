@@ -34,4 +34,10 @@ class Settings
   def self.disable!(feature)
     set(feature_toggle_key(feature), '0')
   end
+
+  def self.get_list(key)
+    val = get(key)
+    val = val.to_s.split(',')
+    val
+  end
 end
