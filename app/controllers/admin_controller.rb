@@ -52,6 +52,23 @@ class AdminController < ActionController::Base
     @friends_count = @user.snapchat_friend_ids.size
   end
 
+  def settings
+    @settings = {blacklisted_usernames: Settings.get(:blacklisted_usernames)}
+  end
+
+  def edit_setting
+    @key = params[:key]
+    @value = Settings.get(@key)
+  end
+
+  def update_setting
+    val = params[:value]
+    val = val.split(',').map(&:strip).reject(&:empty?).uniq.sort.join(',')
+    Settings.set(params[:key], val)
+
+    redirect_to admin_settings_path
+  end
+
 
   protected
 

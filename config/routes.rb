@@ -90,6 +90,10 @@ KrazyChat::Application.routes.draw do
     match '/admin/users', to: 'admin#users', as: 'admin_users'
     match '/admin/users/:id', to: 'admin#show_user', as: 'admin_user'
     match '/admin/users/:id/friends', to: 'admin#show_user_friends', as: 'admin_user_friends'
+    match '/admin/settings', to: 'admin#settings', as: 'admin_settings'
+    match '/admin/settings/:key/edit', to: 'admin#edit_setting', as: 'admin_edit_setting'
+    match '/admin/settings/:key/update', to: 'admin#update_setting', as: 'admin_update_setting'
+
     match '/logs/event', to: 'logs#event', as: 'logs_event'
 
     match '/snaps/fetched', to: 'snaps#fetched', as: 'fetched_snaps'

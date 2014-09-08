@@ -1,0 +1,18 @@
+<div class='admin-content'>
+<h1>Settings</h1>
+
+
+<table class="table table-striped table-bordered" style="width: 600px;">
+  <tr>
+    <th style="text-align: center;">Key</th>
+    <th style="text-align: center;">Value</th>
+  </tr>
+
+  <% @settings.each do |key, value| %>
+  <tr>
+    <td align="center"><%= key %></td>
+    <td align="center"><%= value.presence %></td>
+    <td align="center"><%= link_to('Edit', admin_edit_setting_url(key)) %></td>
+  </tr>
+  <% end %>
+</table>
