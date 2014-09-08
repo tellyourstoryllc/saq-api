@@ -15,7 +15,8 @@ class DripNotification < ActiveRecord::Base
   def self.assign(user, device)
     return false if user.nil? || device.nil? || !scope_for_client(device.client).exists?
 
-    val = rand >= 0.5 ? 1 : 0
+    #val = rand >= 0.5 ? 1 : 0
+    val = 1
     user.redis.set(user.drip_notifications_enabled.key, val, {nx: true})
     val == 1
   end
