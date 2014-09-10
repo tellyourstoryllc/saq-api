@@ -19,6 +19,7 @@ class CheckinController < ApplicationController
     client_config[:phone_verification_destination] = Rails.configuration.app['hook']['invite_from'] if params[:client] == 'ios'
     client_config[:client_version] = current_device.try(:client_version)
     client_config[:has_push_token] = current_device.try(:has_auth?)
+    client_config[:blacklisted_usernames] = Settings.get_list(:blacklisted_usernames)
 
     objects << client_config
 
