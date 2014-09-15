@@ -111,6 +111,8 @@ KrazyChat::Application.routes.draw do
     match '/stories/:story_id/comments/:id/delete', to: 'story_comments#delete', as: 'delete_story_comment'
 
     match '/friends/import', to: 'friends#import', as: 'import_friends'
+
+    match '/blacklisted_usernames/add', to: 'blacklisted_usernames#add', as: 'add_blacklisted_username'
   end
 
   require 'sidekiq/web'
