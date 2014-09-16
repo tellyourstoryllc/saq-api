@@ -105,7 +105,17 @@ class MixpanelClient
     last_checkin = user.last_mixpanel_checkin_at.get
     last_checkin = Time.zone.at(last_checkin.to_i) if last_checkin
 
-    if last_checkin.nil? || last_checkin < 24.hours.ago
+    send_event = if last_checkin.nil?
+                   true
+                 else
+                   registered_at = user.account.registered_at
+                   time_since_registration = Time.current - registered_at
+                   days_since_registration = (time_since_registration / 24.hours).floor
+                   bucket_start = registered_at + days_since_registration.days
+                   last_checkin < bucket_start
+                 end
+
+    if send_event
       user.last_mixpanel_checkin_at = Time.current.to_i
       track('Checked In')
     end
