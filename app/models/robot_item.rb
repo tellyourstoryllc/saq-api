@@ -12,7 +12,7 @@ class RobotItem < ActiveRecord::Base
   end
 
   def self.max_help_number
-    valid_triggers.select{ |t| t =~ /^\d+$/ }.max{ |t| t.to_i }
+    valid_triggers.select{ |t| t =~ /^\d+$/ }.max_by(&:to_i)
   end
 
   def self.by_trigger(trigger)
