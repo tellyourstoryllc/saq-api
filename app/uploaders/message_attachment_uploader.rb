@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 class MessageAttachmentUploader < BaseUploader
-  include Peanut::AnimatedGif
+  include Peanut::VideoThumbnail
   include CarrierWave::MimeTypes
 
   # Create a thumbnail with a max width of 300 and a max height of 300

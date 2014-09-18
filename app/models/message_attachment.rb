@@ -34,12 +34,18 @@ class MessageAttachment < ActiveRecord::Base
     @message ||= Message.new(id: message_id)
   end
 
-  def preview_url
+  def preview_version
     if attachment.version_exists?(:thumb)
-      attachment.thumb.url
+      attachment.thumb
     elsif attachment.version_exists?(:animated_gif)
-      attachment.animated_gif.url
+      attachment.animated_gif
+    elsif attachment.version_exists?(:screenshot)
+      attachment.screenshot
     end
+  end
+
+  def preview_url
+    preview_version.try(:url)
   end
 
   def media_type_name
@@ -97,11 +103,7 @@ class MessageAttachment < ActiveRecord::Base
       self.content_type = attachment.file.content_type
       self.file_size = attachment.file.size
 
-      version = if attachment.version_exists?(:thumb)
-                  attachment.thumb
-                elsif attachment.version_exists?(:animated_gif)
-                  attachment.animated_gif
-                end
+      version = preview_version
       if version
         img = MiniMagick::Image.open(version.file.file)
         if img
