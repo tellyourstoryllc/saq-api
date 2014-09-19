@@ -46,7 +46,7 @@ gem 'streamio-ffmpeg', '1.0.0'
 
 gem 'faye', '1.0.0'
 gem 'koala', '1.6.0'
-gem 'newrelic_rpm', '3.6.9.171'
+gem 'newrelic_rpm', '3.9.4.245'
 gem 'newrelic-redis'
 gem 'rpush', git: 'git://github.com/bray/rpush.git', branch: 'ar_logger_config'
 
