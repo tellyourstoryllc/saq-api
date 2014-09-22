@@ -54,9 +54,10 @@ class AdminMetrics
       metrics[registered_date.to_s] = {}
 
       User.joins(:account).where('accounts.registered_at BETWEEN ? AND ?', registered_from, registered_to).find_each do |u|
-        friend_ids = u.snapchat_friend_ids.members
+        # Exclude yourself and the bot
+        friend_ids = u.snapchat_friend_ids.members - [u.id, Robot.user.id]
+        friends_count = friend_ids.size
         friends = User.includes(:account).where(id: friend_ids).to_a
-        friends_count = friends.size
 
         DAYS.times do |j|
           action_date = (today - j)
