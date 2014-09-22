@@ -17,7 +17,7 @@
   Each user's percentage for a given registration and action date is calculated, and then those percentages are averaged.<br /><br />
   Note:
   <% if @friend_counts_in_progress -%>
-    This table is currently being re-calculated. Please refresh in a minute or so.
+    This table is currently being re-calculated. Please refresh in a few minutes.
   <% else -%>
     This table is cached and will be re-calculated in <%= distance_of_time_in_words(@admin_metrics.next_recalculation_at - Time.current) %>.
   <% end -%>
