@@ -1,6 +1,6 @@
 ## Development
 
-Install the Ruby version as specified in `.ruby-version` (same as in production).
+Install the Ruby version as specified in `.ruby-version` (to match production).
 
 Copy all `config/[name].yml.sample` files to `config/[name].yml` and configure accordingly.
 
