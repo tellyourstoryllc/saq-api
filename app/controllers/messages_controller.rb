@@ -81,6 +81,8 @@ class MessagesController < ApplicationController
       message = Message.new(message_params.merge(one_to_one_id: one_to_one.id))
 
       if message.save
+        mark_as_seen(one_to_one, message) if message.user_id == current_user.id
+
         other_user = one_to_one.other_user(message.user)
 
         unless params[:skip_publish]
@@ -185,5 +187,10 @@ class MessagesController < ApplicationController
     @message = Message.new(id: params[:id])
     raise Peanut::Redis::RecordNotFound unless @message.attrs.exists? &&
       @message.user_id == current_user.id
+  end
+
+  def mark_as_seen(one_to_one, message)
+    one_to_one.viewer = current_user
+    one_to_one.last_seen_rank = message.rank
   end
 end
