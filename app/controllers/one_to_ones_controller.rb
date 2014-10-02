@@ -15,6 +15,9 @@ class OneToOnesController < ApplicationController
       @one_to_one.send("#{k}=", v)
     end
 
+    # Reload the 1-1
+    load_one_to_one
+
     publish_updated_one_to_one
     render_json @one_to_one
   end
