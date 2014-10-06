@@ -5,6 +5,7 @@ development:
   api:
     url: http://localhost:3008
     request_secret: SECRET
+    signature_secret: SECRET
   app_name: SnapCracklePop
   app_name_short: SnapCracklePop
   aws:
@@ -56,6 +57,7 @@ test:
   api:
     url: http://localhost:3008
     request_secret: SECRET
+    signature_secret: SECRET
   app_name: SnapCracklePop
   app_name_short: SnapCracklePop
   aws:
