@@ -69,7 +69,9 @@ class ApplicationController < ActionController::Base
 
   def sorted_params_for_signature
     selected_params = params.reject do |k,v|
-      %w(controller action signature).include?(k) || v.is_a?(ActionDispatch::Http::UploadedFile)
+      # Remove controller, action, signature, params in the URL (e.g. :id), and uploaded files
+      keys_to_exclude = request.path_parameters.keys + [:signature]
+      keys_to_exclude.include?(k.to_sym) || v.is_a?(ActionDispatch::Http::UploadedFile)
     end
 
     selected_params.map{ |k,v| "#{k}=#{v}" }.sort!
