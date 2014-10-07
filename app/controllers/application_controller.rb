@@ -42,7 +42,7 @@ class ApplicationController < ActionController::Base
   private
 
   def require_signature
-    return if Settings.enabled?(:skip_request_signature)
+    return if secure_request? || Settings.enabled?(:skip_request_signature) || Rails.env.test?
 
     given_signature = params[:signature]
 
