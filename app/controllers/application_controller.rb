@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   around_action :set_client
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
   rescue_from Peanut::UnauthorizedError, with: :render_401
+  rescue_from Peanut::MissingTimestampError, Peanut::InvalidSignatureError, with: :notify_nr_and_render_401
   rescue_from ActiveRecord::RecordInvalid, with: :render_422
 
 
@@ -156,6 +157,11 @@ class ApplicationController < ActionController::Base
     msg = "Sorry, you are not authorized to do that"
     msg << (exception.to_s != 'Peanut::UnauthorizedError' ? ": #{exception}." : '.')
     render_error msg, nil, status: :unauthorized
+  end
+
+  def notify_nr_and_render_401(exception)
+    NewRelic::Agent.notice_error(exception, {})
+    render_error exception.to_s, nil, status: :unauthorized
   end
 
   def render_422(exception)
