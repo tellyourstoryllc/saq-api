@@ -45,7 +45,7 @@ class HookController < ApplicationController
   end
 
   def content
-    @content ||= parsed_body['text'].strip
+    @content ||= parsed_body['text'].to_s.strip
   end
 
   def from_phone
