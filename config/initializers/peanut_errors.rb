@@ -1,4 +1,10 @@
 module Peanut
+  class MissingTimestampError < StandardError
+  end
+
+  class InvalidSignatureError < StandardError
+  end
+
   class UnauthorizedError < StandardError
   end
 
