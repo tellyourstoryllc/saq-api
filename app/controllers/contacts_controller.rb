@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   def index
-    render_json current_user.paginated_snapchat_friends(pagination_params), each_serializer: UserWithEmailsAndPhonesSerializer
+    render_json current_user.paginated_contacts(pagination_params), each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
   # DEPRECATED

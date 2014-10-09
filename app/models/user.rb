@@ -445,8 +445,6 @@ class User < ActiveRecord::Base
     end
   end
 
-
-  # DEPRECATED?
   def paginated_contact_ids(options = {})
     max = 50
     options[:limit] ||= 10
@@ -456,7 +454,6 @@ class User < ActiveRecord::Base
     contact_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
-  # DEPRECATED?
   def paginated_contacts(options = {})
     user_ids = paginated_contact_ids(options)
 
