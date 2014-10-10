@@ -7,16 +7,6 @@ class ContactInviter
     self.current_user = current_user
   end
 
-  def snapchat_friends_importer
-    @snapchat_friends_importer ||= SnapchatFriendsImporter.new(current_user)
-  end
-
-  def add_users(user_ids)
-    User.where(id: user_ids.map(&:to_s)).each do |user|
-      add_with_reciprocal(user)
-    end
-  end
-
   def add_by_emails(emails_addresses, options = {})
     emails = []
     emails_addresses.each do |email_address|
@@ -71,6 +61,14 @@ class ContactInviter
     users.compact
   end
 
+  def add_by_phone_numbers_only(numbers, options = {})
+    users = []
+    numbers.each do |number|
+      users << add_by_phone_number(number, nil, options)
+    end
+    users.compact
+  end
+
   def add_by_phone_number(number, username, options = {})
     if Settings.enabled?(:queue) && Settings.enabled?(:background_invites)
       ContactInviterPhoneWorker.perform_async(current_user.id, number, username, options)
@@ -115,8 +113,8 @@ class ContactInviter
                    new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
                    source: options[:source])
 
-    # Add the new or existing user to my friends list
-    add_friend(user)
+    # Add the user to my contacts list only if he already existed
+    add_user(current_user, user) unless new_user
 
     user
   end
@@ -210,10 +208,6 @@ class ContactInviter
       user.contact_ids.delete(other_user.id)
       other_user.reciprocal_contact_ids.delete(user.id)
     end
-  end
-
-  def add_friend(user)
-    snapchat_friends_importer.add_friend(user, :outgoing)
   end
 
   def autoconnect(hashed_emails, hashed_phone_numbers)

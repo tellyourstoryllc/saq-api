@@ -3,18 +3,13 @@ class ContactsController < ApplicationController
     render_json current_user.paginated_contacts(pagination_params), each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
-  # DEPRECATED
   def add
+    # TODO emails?
     phone_numbers = split_param(:phone_numbers).map{ |n| Phone.normalize(n) }
-    phone_usernames = split_param(:phone_usernames)
 
     contact_inviter = ContactInviter.new(current_user)
-    users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: !send_sms_invites?, source: params[:source]})
-
+    users = contact_inviter.add_by_phone_numbers_only(phone_numbers, {skip_sending: !send_sms_invites?, source: params[:source]})
     users = User.includes(:account, :avatar_image, :avatar_video, :phones, :emails).where(id: users.map(&:id))
-
-    track_sc_users(users, phone_numbers)
-    track_initial_sc_import
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
