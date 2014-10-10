@@ -18,6 +18,18 @@ class FriendsController < ApplicationController
     render_json added_users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
+  def remove
+    usernames = split_param(:usernames)
+    users = User.where(username: usernames)
+
+    User.redis.multi do
+      current_user.snapchat_friend_ids.delete(users.map(&:id))
+      current_user.snapchat_follower_ids.delete(users.map(&:id))
+    end
+
+    render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
+  end
+
   def import
     outgoing_usernames = split_param(:outgoing_usernames)
     outgoing_types = split_param(:outgoing_types)

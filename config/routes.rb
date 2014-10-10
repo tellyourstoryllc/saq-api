@@ -112,6 +112,7 @@ KrazyChat::Application.routes.draw do
 
     match '/friends/import', to: 'friends#import', as: 'import_friends'
     match '/friends/add', to: 'friends#add', as: 'add_friends'
+    match '/friends/remove', to: 'friends#remove', as: 'remove_friends'
 
     match '/blacklisted_usernames/add', to: 'blacklisted_usernames#add', as: 'add_blacklisted_username'
     match '/app_reviews/create', to: 'app_reviews#create', as: 'create_app_review'
