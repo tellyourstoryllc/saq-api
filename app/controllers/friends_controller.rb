@@ -1,4 +1,23 @@
 class FriendsController < ApplicationController
+  def add
+    usernames = split_param(:usernames)
+    added_users = []
+
+    users = User.includes(:account).where(username: usernames)
+    users.each do |user|
+      next unless user.account.registered?
+
+      added_users << user
+
+      User.redis.multi do
+        current_user.snapchat_friend_ids << user.id
+        user.snapchat_follower_ids << current_user.id
+      end
+    end
+
+    render_json added_users, each_serializer: UserWithEmailsAndPhonesSerializer
+  end
+
   def import
     outgoing_usernames = split_param(:outgoing_usernames)
     outgoing_types = split_param(:outgoing_types)
