@@ -485,6 +485,34 @@ class User < ActiveRecord::Base
     end
   end
 
+  def pending_incoming_friend_ids_key
+    "user:#{id}:pending_incoming_friend_ids"
+  end
+
+  def mutual_friend_ids_key
+    "user:#{id}:mutual_friend_ids"
+  end
+
+  def paginated_pending_incoming_friend_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+
+    redis.sdiffstore(pending_incoming_friend_ids_key, snapchat_follower_ids.key, snapchat_friend_ids.key)
+    redis.sort(pending_incoming_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+  end
+
+  def paginated_mutual_friend_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+
+    redis.sinterstore(mutual_friend_ids_key, snapchat_friend_ids.key, snapchat_follower_ids.key)
+    redis.sort(mutual_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+  end
+
   def deactivate!
     update!(deactivated: true)
   end
