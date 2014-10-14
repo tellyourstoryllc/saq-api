@@ -38,6 +38,8 @@ class ConversationsController < ApplicationController
     messages = []
 
     @one_to_ones.each do |o|
+      next if o.pending?(current_user)
+
       rank = last_seen_ranks[o.id]
       messages += o.paginate_unseen_messages(last_seen_rank: rank, limit: limit)
     end
