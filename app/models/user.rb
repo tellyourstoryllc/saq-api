@@ -692,6 +692,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def outgoing_friend_or_contact?(user)
+    snapchat_friend_ids.include?(user.id) || contact_ids.include?(user.id)
+  end
+
 
   private
 

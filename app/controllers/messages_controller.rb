@@ -158,6 +158,7 @@ class MessagesController < ApplicationController
     one_to_one = OneToOne.new(id: one_to_one_id)
 
     if one_to_one.attrs.blank?
+      one_to_one.creator_id = current_user.id
       one_to_one if one_to_one.save
     else
       one_to_one if one_to_one.authorized?(current_user)

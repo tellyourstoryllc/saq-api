@@ -5,11 +5,11 @@ module Peanut::TwoUserConversation
 
 
   included do
-    attr_accessor :id, :created_at, :sender_id, :recipient_id
+    attr_accessor :id, :creator_id, :created_at, :sender_id, :recipient_id
 
     hash_key :attrs
 
-    validates :sender_id, :recipient_id, presence: true
+    validates :creator_id, :sender_id, :recipient_id, presence: true
     validate :not_blocked?
 
     def initialize(attributes = {})
@@ -27,6 +27,10 @@ module Peanut::TwoUserConversation
 
     def id
       @id ||= self.class.id_for_user_ids(sender_id, recipient_id)
+    end
+
+    def creator
+      @creator ||= User.find_by(id: creator_id) if creator_id
     end
 
     def sender

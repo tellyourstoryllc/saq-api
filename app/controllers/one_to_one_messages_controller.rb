@@ -44,6 +44,7 @@ class OneToOneMessagesController < ApplicationController
     @one_to_one = OneToOne.new(id: params[:one_to_one_id])
 
     if @one_to_one.attrs.blank?
+      @one_to_one.creator_id = current_user.id
       raise Peanut::Redis::RecordNotFound unless @one_to_one.save
     else
       raise Peanut::Redis::RecordNotFound unless @one_to_one.authorized?(current_user)

@@ -3,6 +3,9 @@ class OneToOne
   include Redis::Objects
   include Peanut::TwoUserConversation
 
+  validate :outgoing_friend_or_contact?
+
+
   def save
     return unless valid?
 
@@ -51,8 +54,15 @@ class OneToOne
     errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") if blocked?
   end
 
+  def outgoing_friend_or_contact?
+    return if [sender.id, recipient.id].include?(Robot.user.id)
+
+    other_user = other_user(creator)
+    errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") unless creator.outgoing_friend_or_contact?(other_user)
+  end
+
   def write_attrs
     self.created_at = Time.current.to_i
-    self.attrs.bulk_set(id: id, created_at: created_at)
+    self.attrs.bulk_set(id: id, creator_id: creator_id, created_at: created_at)
   end
 end
