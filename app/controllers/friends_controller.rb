@@ -26,11 +26,7 @@ class FriendsController < ApplicationController
       next unless user.account.registered?
 
       added_users << user
-
-      User.redis.multi do
-        current_user.snapchat_friend_ids << user.id
-        user.snapchat_follower_ids << current_user.id
-      end
+      current_user.add_friend(user)
     end
 
     render_json added_users, each_serializer: UserWithEmailsAndPhonesSerializer
@@ -39,11 +35,7 @@ class FriendsController < ApplicationController
   def remove
     usernames = split_param(:usernames)
     users = User.where(username: usernames)
-
-    User.redis.multi do
-      current_user.snapchat_friend_ids.delete(users.map(&:id))
-      current_user.snapchat_follower_ids.delete(users.map(&:id))
-    end
+    current_user.remove_friends(users)
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
   end

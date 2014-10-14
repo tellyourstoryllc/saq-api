@@ -678,6 +678,20 @@ class User < ActiveRecord::Base
     timestamp.blank? ? nil : Time.zone.at(timestamp)
   end
 
+  def add_friend(user)
+    redis.multi do
+      snapchat_friend_ids << user.id
+      user.snapchat_follower_ids << id
+    end
+  end
+
+  def remove_friends(users)
+    redis.multi do
+      snapchat_friend_ids.delete(users.map(&:id))
+      snapchat_follower_ids.delete(users.map(&:id))
+    end
+  end
+
 
   private
 
