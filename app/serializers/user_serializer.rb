@@ -3,28 +3,17 @@ class UserSerializer < ActiveModel::Serializer
     :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
     :phone_verification_token, :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered
 
-  def status
-    if friends?
-      object.computed_status
-    else
-      'unavailable'
-    end
+
+  def name
+    object.name if outgoing_or_incoming_friend?
   end
 
-  def status_text
-    object.status_text if friends?
-  end
-
-  def idle_duration
-    object.idle_duration if friends?
+  def username
+    object.username if outgoing_or_incoming_friend?
   end
 
   def client_type
-    if friends?
-      object.computed_client_type
-    else
-      'web'
-    end
+    object.computed_client_type
   end
 
   def include_token?
@@ -60,7 +49,8 @@ class UserSerializer < ActiveModel::Serializer
     respond_to?(:current_user) && current_user.try(:id) == id
   end
 
-  def friends?
-    scope && (scope.id == object.id || object.dynamic_friend?(scope))
+  def outgoing_or_incoming_friend?
+    return @outgoing_or_incoming_friend if defined?(@outgoing_or_incoming_friend)
+    @outgoing_or_incoming_friend = scope && (scope.id == object.id || scope.outgoing_or_incoming_friend?(object))
   end
 end
