@@ -4,7 +4,9 @@ class OneToOnesController < ApplicationController
 
   def show
     if @one_to_one.attrs.present?
-      render_json [@one_to_one, @one_to_one.other_user(current_user).account, *@one_to_one.members, @one_to_one.paginate_messages(message_pagination_params)]
+      objects = [@one_to_one, @one_to_one.other_user(current_user).account, *@one_to_one.members]
+      objects += @one_to_one.paginate_messages(message_pagination_params) unless @one_to_one.pending?(current_user)
+      render_json objects
     else
       render_json @one_to_one.members
     end
