@@ -1,8 +1,15 @@
 class ConversationsController < ApplicationController
   def index
-    # TODO: manual ordering
+    limit = params[:limit].presence
+    limit ||= 50 if Robot.bot?(current_user)
 
-    @one_to_ones = current_user.one_to_ones
+    # To be backward compatible with old clients, return all 1-1s when
+    # no limit is specified.
+    if limit.present?
+      @one_to_ones = current_user.paginated_one_to_ones(offset: params[:offset], limit: limit)
+    else
+      @one_to_ones = current_user.one_to_ones
+    end
 
     # Special case the robot user.
     if Robot.bot?(current_user)
@@ -10,20 +17,6 @@ class ConversationsController < ApplicationController
       # robot.
       num_intro_messages = RobotItem.by_trigger('intro').count
       @one_to_ones = @one_to_ones.select{ |o| o.rank.get > num_intro_messages }
-    end
-
-    # To be backward compatible with old clients, return all 1-1s when
-    # no limit is specified.
-    if params[:limit].present?
-      limit = params[:limit].to_i
-      limit = 500 if limit > 500
-      limit = 0 if limit < 0
-      offset = params[:offset].to_i
-
-      # Sort in a way that's consistent between calls.
-      @one_to_ones.sort_by!{ |o| [o.created_at, o.id] }
-
-      @one_to_ones = @one_to_ones[offset, limit]
     end
 
     @one_to_ones.each{ |o| o.viewer = current_user }

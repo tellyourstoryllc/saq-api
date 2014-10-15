@@ -425,6 +425,26 @@ class User < ActiveRecord::Base
     end
   end
 
+  def paginated_one_to_one_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+
+    one_to_one_ids.sort(by: 'one_to_one:*:attrs->created_at', order: 'DESC', limit: [options[:offset], options[:limit]])
+  end
+
+  def paginated_one_to_ones(options = {})
+    ids = paginated_one_to_one_ids(options)
+
+    if ids.present?
+      OneToOne.pipelined_find(ids)
+    else
+      []
+    end
+  end
+
+
   # DEPRECATED?
   def paginated_contact_ids(options = {})
     max = 50
