@@ -33,7 +33,7 @@ describe ConversationsController do
       get :index, {token: current_user.token}
 
       result_must_include 'one_to_one', o.id, {'object_type' => 'one_to_one', 'id' => o.id,
-        'last_message_at' => m.created_at.to_s, 'last_seen_rank' => nil, 'last_deleted_rank' => nil, 'hidden' => false}
+        'last_message_at' => m.created_at, 'last_seen_rank' => nil, 'last_deleted_rank' => nil, 'hidden' => false}
 
       result_wont_include 'message', m.id
     end
@@ -52,7 +52,7 @@ describe ConversationsController do
       get :index, {token: current_user.token}
 
       result_must_include 'one_to_one', o.id, {'object_type' => 'one_to_one', 'id' => o.id,
-        'last_message_at' => m.created_at.to_s, 'last_seen_rank' => nil, 'last_deleted_rank' => nil, 'hidden' => false}
+        'last_message_at' => m.created_at, 'last_seen_rank' => nil, 'last_deleted_rank' => nil, 'hidden' => false}
 
       result_must_include 'message', m.id, {'object_type' => 'message', 'id' => m.id,
         'group_id' => nil, 'one_to_one_id' => o.id, 'user_id' => member.id, 'rank' => 1, 'text' => 'hi',
@@ -74,7 +74,7 @@ describe ConversationsController do
       get :index, {token: current_user.token}
 
       result_must_include 'one_to_one', o.id, {'object_type' => 'one_to_one', 'id' => o.id,
-        'last_message_at' => m.created_at.to_s, 'last_seen_rank' => nil, 'last_deleted_rank' => nil, 'hidden' => false}
+        'last_message_at' => m.created_at, 'last_seen_rank' => nil, 'last_deleted_rank' => nil, 'hidden' => false}
 
       result_must_include 'message', m.id, {'object_type' => 'message', 'id' => m.id,
         'group_id' => nil, 'one_to_one_id' => o.id, 'user_id' => member.id, 'rank' => 1, 'text' => 'hi',
