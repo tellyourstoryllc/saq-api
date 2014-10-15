@@ -91,8 +91,12 @@ module Peanut::Conversation
     redis.eval lua_script, {keys: [message_id_expirations.key, message_ids_without_expiration_gc.key], argv: [Time.current.to_i]}
   end
 
+  # TODO change this to an attribute on the conversation
   def last_message_at
-    @last_message_at ||= Message.redis.hget("message:#{message_ids.last}:attrs", :created_at)
+    @last_message_at ||= begin
+                           created_at = Message.redis.hget("message:#{message_ids.last}:attrs", :created_at)
+                           created_at.to_i if created_at.present?
+                         end
   end
 
   def metadata_key
