@@ -3,6 +3,8 @@ class OneToOne
   include Redis::Objects
   include Peanut::TwoUserConversation
 
+  attr_accessor :fetched_message_ids_count
+
   validate :outgoing_friend_or_contact?
 
 
@@ -11,6 +13,22 @@ class OneToOne
 
     write_attrs
     add_to_lists
+  end
+
+  def self.pipelined_find(ids)
+    return [] if ids.blank?
+
+    attrs = redis.pipelined do
+      ids.map{ |id| redis.hgetall("#{redis_prefix}:#{id}:attrs") }
+    end
+
+    message_ids_counts = redis.pipelined do
+      ids.map{ |id| redis.zcard("#{redis_prefix}:#{id}:message_ids") }
+    end
+
+    attrs.map.with_index do |attrs, i|
+      new(attrs.merge(fetched: true, fetched_message_ids_count: message_ids_counts[i]))
+    end
   end
 
   def add_to_lists
