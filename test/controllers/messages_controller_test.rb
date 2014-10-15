@@ -21,7 +21,7 @@ describe MessagesController do
 
       it "must not create a message for a new 1-1 if sender is not allowed (recipient has sender in contacts)" do
         member = FactoryGirl.create(:registered_user)
-        ContactInviter.new(member).add_user(member, current_user)
+        ContactInviter.add_user(member, current_user)
 
         one_to_one_id = OneToOne.id_for_user_ids(current_user.id, member.id)
         text = 'hey'
@@ -39,7 +39,7 @@ describe MessagesController do
 
       it "must not create a message for a new 1-1 if sender is not allowed (recipient added sender as contact and friend)" do
         member = FactoryGirl.create(:registered_user)
-        ContactInviter.new(member).add_user(member, current_user)
+        ContactInviter.add_user(member, current_user)
         member.add_friend(current_user)
 
         one_to_one_id = OneToOne.id_for_user_ids(current_user.id, member.id)
@@ -58,7 +58,7 @@ describe MessagesController do
 
       it "must create a message for a new 1-1 if sender is allowed (sender added recipient as contact)" do
         member = FactoryGirl.create(:registered_user)
-        ContactInviter.new(current_user).add_user(current_user, member)
+        ContactInviter.add_user(current_user, member)
 
         one_to_one_id = OneToOne.id_for_user_ids(current_user.id, member.id)
         text = 'hey'
@@ -114,7 +114,7 @@ describe MessagesController do
 
     it "must create a message for an existing 1-1" do
       member = FactoryGirl.create(:registered_user)
-      ContactInviter.new(current_user).add_user(current_user, member)
+      ContactInviter.add_user(current_user, member)
 
       one_to_one = OneToOne.new(creator_id: current_user.id, sender_id: current_user.id, recipient_id: member.id)
       raise '1-1 not saved' unless one_to_one.save

@@ -63,7 +63,7 @@ describe ConversationsController do
 
     it "must return 1-1s and their unseen messages if the sender has the recipient in his contacts" do
       member = FactoryGirl.create(:registered_user)
-      ContactInviter.new(member).add_user(member, current_user)
+      ContactInviter.add_user(member, current_user)
 
       o = OneToOne.new(creator_id: member.id, sender_id: member.id, recipient_id: current_user.id)
       raise '1-1 not saved' unless o.save

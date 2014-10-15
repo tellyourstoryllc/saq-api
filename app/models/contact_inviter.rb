@@ -47,8 +47,8 @@ class ContactInviter
                    new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
                    source: options[:source])
 
-    # Add the new or existing user to my contacts and vice versa
-    add_with_reciprocal(user)
+    # Add the new or existing user to my contacts
+    add_user(user)
 
     email
   end
@@ -114,7 +114,7 @@ class ContactInviter
                    source: options[:source])
 
     # Add the user to my contacts list only if he already existed
-    add_user(current_user, user) unless new_user
+    add_user(user) unless new_user
 
     user
   end
@@ -137,8 +137,8 @@ class ContactInviter
     Invite.create!(sender_id: current_user.id, recipient: user, new_user: new_user, can_log_in: account.can_log_in?,
                    skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
 
-    # Add the new or existing user to my friends list
-    add_friend(user)
+    # Add the new or existing user to my contacts list
+    add_user(user)
 
     user
   end
@@ -171,8 +171,8 @@ class ContactInviter
     Invite.create!(sender_id: current_user.id, recipient: user, invited_phone: number, new_user: new_user,
                    can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
 
-    # Add the new or existing user to my friends list
-    add_friend(user)
+    # Add the new or existing user to my contacts list
+    add_user(user)
 
     user
   end
@@ -183,18 +183,22 @@ class ContactInviter
     already_contacts = other_user.contact?(current_user)
 
     User.redis.multi do
-      add_user(current_user, other_user)
-      add_user(other_user, current_user)
+      add_user(other_user)
+      self.class.add_user(other_user, current_user)
     end
 
     other_user.mobile_notifier.create_ios_notifications("#{current_user.name} just added you", {r:'c'}) unless already_contacts
   end
 
-  def add_user(user, other_user)
+  def self.add_user(user, other_user)
     User.redis.multi do
       user.contact_ids << other_user.id
       other_user.reciprocal_contact_ids << user.id
     end
+  end
+
+  def add_user(other_user)
+    self.class.add_user(current_user, other_user)
   end
 
   def remove_users(user_ids)
@@ -219,7 +223,7 @@ class ContactInviter
 
     #  emails.each do |email|
     #    added_users << email.user
-    #    add_with_reciprocal(email.user)
+    #    add_user(email.user)
     #  end
     #end
 
@@ -231,7 +235,7 @@ class ContactInviter
 
       phones.each do |phone|
         added_users << phone.user
-        add_user(current_user, phone.user)
+        add_user(phone.user)
       end
     end
 
