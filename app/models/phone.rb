@@ -44,8 +44,9 @@ class Phone < ActiveRecord::Base
     self.verified = true
     save!
 
-    merge_users(old_user_id)
-    notify_friends if options[:notify_friends]
+    #merge_users(old_user_id)
+    add_as_contact_and_notify_friends if options[:notify_friends]
+    true
   end
 
   def pretty
@@ -67,6 +68,8 @@ class Phone < ActiveRecord::Base
     redis.smembers(phone_contact_of_user_ids_key)
   end
 
+  # Store these so we can notify the user when any of his
+  # phone contacts registers
   def self.add_user_to_phone_contacts(user, hashed_phone_numbers)
     redis.pipelined do
       hashed_phone_numbers.each do |hashed_phone_number|
@@ -76,21 +79,26 @@ class Phone < ActiveRecord::Base
   end
 
   def merge_users(old_user_id)
+    return # Disabled
+
     return if old_user_id.nil?
 
     old_user = User.find_by(id: old_user_id)
     UserMerger.merge(old_user, user)
   end
 
-  def notify_friends
-    # Disabled for now
-    return
-
+  # We want this separate from notifying friends at registration because users might verify some time after registration,
+  # and we want to be able to notify everyone who has him in their contacts at that point
+  def add_as_contact_and_notify_friends
     return if notified_friends.get
     self.notified_friends = '1'
 
+    user_ids = phone_contact_of_user_ids
+    return if user_ids.blank?
+
     # TODO: maybe move to Sidekiq
-    User.where(id: phone_contact_of_user_ids).find_each do |friend|
+    User.where(id: user_ids).find_each do |friend|
+      ContactInviter.add_user(friend, user)
       friend.mobile_notifier.notify_friend_joined(user)
     end
   end
