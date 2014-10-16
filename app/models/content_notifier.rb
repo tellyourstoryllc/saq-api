@@ -7,9 +7,13 @@ class ContentNotifier
   # then every 12 hours 6 times, then every 7 days forever
   # Each device increases levels like this until a checkin occurs
   CONTENT_FREQUENCIES = {
-    0 => nil,
     5 => [
       {frequency: 5, unanswered_count: 3},   # 5 minutes
+      {frequency: 720, unanswered_count: 9}, # 12 hours
+      {frequency: 10080}                     # 7 days
+    ],
+    15 => [
+      {frequency: 15, unanswered_count: 3},  # 15 minutes
       {frequency: 720, unanswered_count: 9}, # 12 hours
       {frequency: 10080}                     # 7 days
     ],
