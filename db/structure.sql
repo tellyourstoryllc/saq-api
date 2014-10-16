@@ -81,8 +81,8 @@ CREATE TABLE `app_reviews` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `index_app_reviews_on_user_id` (`user_id`),
-  KEY `index_app_reviews_on_rating` (`rating`)
+  KEY `index_app_reviews_on_rating` (`rating`),
+  KEY `index_app_reviews_on_user_id_and_rating` (`user_id`,`rating`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -641,7 +641,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-16 12:37:41
+-- Dump completed on 2014-10-16 12:44:43
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -837,3 +837,5 @@ INSERT INTO schema_migrations (version) VALUES ('20140922203758');
 INSERT INTO schema_migrations (version) VALUES ('20141016154437');
 
 INSERT INTO schema_migrations (version) VALUES ('20141016160450');
+
+INSERT INTO schema_migrations (version) VALUES ('20141016164354');
