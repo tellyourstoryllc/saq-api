@@ -59,7 +59,8 @@ class MixpanelClient
       'Snapchat Friends' => snapchat_friends_count,
       'Initial Snapchat Friends in App' => initial_friends_in_app_count,
       'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency,
-      'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil)
+      'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil),
+      'Rating' => user.app_reviews.latest.limit(1).pluck(:rating).first
     )
 
     properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?
@@ -244,6 +245,10 @@ class MixpanelClient
     end
   end
 
+  def created_app_review
+    track('Created App Review', created_app_review_properties)
+  end
+
 
   private
 
@@ -345,5 +350,10 @@ class MixpanelClient
   def imported_snapchat_friends_properties
     {'Snap Invites Allowed' => Bool.parse(user.snap_invites_allowed.value),
       'SMS Invites Allowed' => Bool.parse(user.sms_invites_allowed.value)}
+  end
+
+  def created_app_review_properties
+    app_review = user.app_reviews.latest.first
+    {'Feedback' => app_review.feedback, 'Will Write Review' => app_review.will_write_review}
   end
 end

@@ -113,6 +113,7 @@ KrazyChat::Application.routes.draw do
     match '/friends/import', to: 'friends#import', as: 'import_friends'
 
     match '/blacklisted_usernames/add', to: 'blacklisted_usernames#add', as: 'add_blacklisted_username'
+    match '/app_reviews/create', to: 'app_reviews#create', as: 'create_app_review'
   end
 
   require 'sidekiq/web'

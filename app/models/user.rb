@@ -24,6 +24,7 @@ class User < ActiveRecord::Base
   has_many :emails
   has_many :phones
   has_many :received_invites, class_name: 'Invite', foreign_key: 'recipient_id'
+  has_many :app_reviews
 
   set :group_ids
   sorted_set :group_join_times
