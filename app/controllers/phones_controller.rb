@@ -1,4 +1,7 @@
 class PhonesController < ApplicationController
+  skip_before_action :require_token, only: [:create, :verify]
+
+
   def create
     number = Phone.normalize(params[:phone_number])
     render_error and return if number.blank?
@@ -14,7 +17,7 @@ class PhonesController < ApplicationController
       send_verification
     end
 
-    render_json current_user
+    render_json current_user.presence || []
   end
 
   def verify
@@ -25,8 +28,8 @@ class PhonesController < ApplicationController
     render_error and return if @phone.nil?
 
     if @phone.verify_by_code!(current_user, params[:phone_verification_code], {notify_friends: true})
-      mixpanel.verified_phone(@phone, :entered_phone)
-      render_json current_user
+      mixpanel.verified_phone(@phone, :entered_phone) if current_user
+      render_json current_user.presence || []
     else
       render_error
     end

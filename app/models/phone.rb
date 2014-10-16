@@ -5,7 +5,7 @@ class Phone < ActiveRecord::Base
   before_validation :normalize_number, :set_hashed_number, :set_user_and_account,
     :set_verification_code
 
-  validates :account, :user, :hashed_number, presence: true
+  validates :hashed_number, presence: true
   validates :number, format: /\d+/
   validates :number, :hashed_number, uniqueness: true
 
@@ -36,8 +36,6 @@ class Phone < ActiveRecord::Base
   end
 
   def verify!(current_user, options = {})
-    return if current_user.nil?
-
     self.user = current_user
     old_user_id = user_id_was if user_id_was && user_id_changed?
 
@@ -90,7 +88,7 @@ class Phone < ActiveRecord::Base
   # We want this separate from notifying friends at registration because users might verify some time after registration,
   # and we want to be able to notify everyone who has him in their contacts at that point
   def add_as_contact_and_notify_friends
-    return if notified_friends.get
+    return if user.nil? || notified_friends.get
     self.notified_friends = '1'
 
     user_ids = phone_contact_of_user_ids
