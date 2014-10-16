@@ -65,6 +65,28 @@ CREATE TABLE `android_devices` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `app_reviews`
+--
+
+DROP TABLE IF EXISTS `app_reviews`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `app_reviews` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `device_id` int(11) DEFAULT NULL,
+  `rating` int(11) NOT NULL,
+  `feedback` text COLLATE utf8_unicode_ci,
+  `will_write_review` tinyint(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_app_reviews_on_user_id` (`user_id`),
+  KEY `index_app_reviews_on_rating` (`rating`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `avatar_images`
 --
 
@@ -408,8 +430,8 @@ DROP TABLE IF EXISTS `phones`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `phones` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `account_id` int(11) NOT NULL,
-  `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `account_id` int(11) DEFAULT NULL,
+  `user_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
   `number` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
   `hashed_number` char(64) COLLATE utf8_unicode_ci NOT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT '0',
@@ -619,7 +641,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-09-22 16:39:13
+-- Dump completed on 2014-10-16 12:37:41
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -811,3 +833,7 @@ INSERT INTO schema_migrations (version) VALUES ('20140808195535');
 INSERT INTO schema_migrations (version) VALUES ('20140814175449');
 
 INSERT INTO schema_migrations (version) VALUES ('20140922203758');
+
+INSERT INTO schema_migrations (version) VALUES ('20141016154437');
+
+INSERT INTO schema_migrations (version) VALUES ('20141016160450');
