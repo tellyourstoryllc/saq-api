@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  skip_before_action :require_token, :create_or_update_device, only: [:index, :create]
+  skip_before_action :require_token, :create_or_update_device, only: [:index, :username_status, :create]
 
 
   def me
@@ -18,6 +18,22 @@ class UsersController < ApplicationController
     users += User.includes(:avatar_image, :avatar_video).where(id: ids) if ids.present?
     users += User.includes(:avatar_image, :avatar_video).where(username: usernames) if usernames.present?
     render_json users.uniq.first(limit)
+  end
+
+  def username_status
+    render_error('Missing username param.') and return if params[:username].blank?
+
+    user = User.find_by(username: params[:username])
+
+    status = if user.nil?
+               :available
+             elsif user.account.registered?
+               :registered
+             else
+               :unclaimed
+             end
+
+    render_json status
   end
 
   def create
