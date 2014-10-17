@@ -97,8 +97,6 @@ class ApplicationController < ActionController::Base
   end
 
   def create_or_update_device
-    return unless current_user
-
     if ios_device_params[:device_id].present?
       IosDevice.create_or_assign!(current_user, ios_device_params)
     elsif android_device_params[:android_id].present?
