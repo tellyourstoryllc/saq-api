@@ -70,6 +70,7 @@ KrazyChat::Application.routes.draw do
     match '/phones/create', to: 'phones#create', as: 'create_phone'
     match '/phones/verify', to: 'phones#verify', as: 'verify_phone'
     match '/phones/add', to: 'phones#add', as: 'add_phones'
+    match '/phones/confirm_activation', to: 'phones#confirm_activation', as: 'confirm_phone_activation'
 
     match '/contacts', to: 'contacts#index', as: 'contacts'
     match '/contacts/add', to: 'contacts#add', as: 'add_contacts'

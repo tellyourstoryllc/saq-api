@@ -1,5 +1,5 @@
 class PhonesController < ApplicationController
-  skip_before_action :require_token, only: [:create, :verify]
+  skip_before_action :require_token, only: [:create, :verify, :confirm_activation]
 
 
   def create
@@ -45,6 +45,19 @@ class PhonesController < ApplicationController
     track_sc_users(users, phone_numbers)
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
+  end
+
+  def confirm_activation
+    token = params[:phone_verification_token]
+    klass = BaseDevice.device_class_for_token(token)
+    device_id = BaseDevice.device_ids_by_phone_verification_token[token]
+    device = klass.find_by(id: device_id) if device_id
+
+    if device && device.phones.verified.exists?
+      render_success
+    else
+      render_error
+    end
   end
 
 

@@ -3,6 +3,8 @@ class BaseDevice < ActiveRecord::Base
   self.abstract_class = true
   hash_key :device_ids_by_phone_verification_token, global: true
 
+  has_many :phones, as: :device
+
 
   def self.create_or_assign!(user, attrs)
     device_id = attrs.delete(:device_id) || attrs.delete(:android_id)
@@ -72,11 +74,15 @@ class BaseDevice < ActiveRecord::Base
     self.class.phone_verification_tokens[id] = @phone_verification_token
   end
 
+  def self.device_class_for_token(token)
+    token.starts_with?('a') ? AndroidDevice : IosDevice
+  end
+
   def self.find_by_phone_verification_token(token)
     return if token.blank?
 
     device_id = device_ids_by_phone_verification_token[token]
-    klass = token.starts_with?('a') ? AndroidDevice : IosDevice
+    klass = device_class_for_token(token)
     klass.find_by(id: device_id) if device_id
   end
 end
