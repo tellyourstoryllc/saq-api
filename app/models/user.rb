@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
   before_validation :fix_username
 
   validates :username, presence: true
+  validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
   validate :valid_username?, :username_format?
@@ -720,15 +721,6 @@ class User < ActiveRecord::Base
       end
     else
       self.username = username.gsub(/[+ ]/, '_')
-
-      base_username = username
-      i = 0
-
-      loop do
-        break unless User.where(username: username).where('id != ?', id).exists? || username == Robot.username
-        i += 1
-        self.username = "#{base_username}_#{i}"
-      end
     end
   end
 
