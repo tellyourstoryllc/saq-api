@@ -12,7 +12,7 @@ class BaseDevice < ActiveRecord::Base
 
     device = where(device_id: device_id).first_or_initialize
     old_user_id = device.user_id
-    attrs[:user_id] = user.try(:id)
+    attrs[:user_id] = user.id if user
 
     # If we get a request for a device that was previously
     # uninstalled, it must have since been reinstalled
