@@ -48,8 +48,7 @@ describe "Admin Integration Test" do
       # Create a contact.
       u2 = FactoryGirl.create(:registered_user)
 
-      importer = SnapchatFriendsImporter.new(user)
-      importer.add_friend(u2, :outgoing)
+      user.add_friend(u2)
 
       login!
       get "/admin/users/#{user.id}/friends"

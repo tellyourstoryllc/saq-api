@@ -20,8 +20,10 @@ class Robot
   end
     
   def self.add_friend(current_user)
-    SnapchatFriendsImporter.new(current_user).add_friend(user, :outgoing)
-    SnapchatFriendsImporter.new(user).add_friend(current_user, :outgoing)
+    User.redis.multi do
+      current_user.add_friend(user)
+      user.add_friend(current_user)
+    end
   end
 
   def self.send_messages_by_trigger(current_user, trigger)

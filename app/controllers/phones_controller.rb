@@ -42,8 +42,6 @@ class PhonesController < ApplicationController
     contact_inviter = ContactInviter.new(current_user)
     users = contact_inviter.add_by_phone_numbers(phone_numbers, phone_usernames, {skip_sending: !send_sms_invites?, source: params[:source]})
 
-    track_sc_users(users, phone_numbers)
-
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
 
