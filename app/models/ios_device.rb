@@ -9,6 +9,7 @@ class IosDevice < BaseDevice
   set :mixpanel_installed_device_ids, global: true
   value :existing_user_status # r = registered, s = sent event
   hash_key :content_push_info
+  hash_key :phone_verification_tokens, global: true
 
 
   def preferences

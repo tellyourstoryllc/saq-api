@@ -1,6 +1,8 @@
 class BaseDevice < ActiveRecord::Base
   include Redis::Objects
   self.abstract_class = true
+  hash_key :device_ids_by_phone_verification_token, global: true
+
 
   def self.create_or_assign!(user, attrs)
     device_id = attrs.delete(:device_id) || attrs.delete(:android_id)
@@ -49,5 +51,32 @@ class BaseDevice < ActiveRecord::Base
 
   def lang=(new_lang)
     self[:lang] = new_lang.gsub('_', '-')
+  end
+
+  def fetch_phone_verification_token
+    @phone_verification_token ||= self.class.phone_verification_tokens[id] || create_phone_verification_token if id
+  end
+
+  def create_phone_verification_token
+    chars = [*'a'..'z', *0..9]
+
+    # Prepend with 'i' or 'a' so we know which device type it is
+    prefix = self.class.to_s == 'AndroidDevice' ? 'a' : 'i'
+
+    loop do
+      @phone_verification_token = prefix + Array.new(8){ chars.sample }.join
+      saved = redis.hsetnx(BaseDevice.device_ids_by_phone_verification_token.key, @phone_verification_token, id)
+      break if saved
+    end
+
+    self.class.phone_verification_tokens[id] = @phone_verification_token
+  end
+
+  def self.find_by_phone_verification_token(token)
+    return if token.blank?
+
+    device_id = device_ids_by_phone_verification_token[token]
+    klass = token.starts_with?('a') ? AndroidDevice : IosDevice
+    klass.find_by(id: device_id) if device_id
   end
 end

@@ -45,8 +45,6 @@ class User < ActiveRecord::Base
   sorted_set :blocked_user_ids
   hash_key :group_last_seen_ranks
   hash_key :one_to_one_last_seen_ranks
-  hash_key :phone_verification_tokens, global: true
-  hash_key :user_ids_by_phone_verification_token, global: true
 
   value :last_mobile_digest_notification_at
   counter :mobile_digests_sent
@@ -102,10 +100,6 @@ class User < ActiveRecord::Base
 
   def token
     @token ||= User.api_tokens[id] if id
-  end
-
-  def fetch_phone_verification_token
-    @phone_verification_token ||= User.phone_verification_tokens[id] || create_phone_verification_token if id
   end
 
   def avatar_url
@@ -756,18 +750,6 @@ class User < ActiveRecord::Base
     end
 
     User.api_tokens[id] = @token
-  end
-
-  def create_phone_verification_token
-    chars = [*'a'..'z', *0..9]
-
-    loop do
-      @phone_verification_token = Array.new(8){ chars.sample }.join
-      saved = redis.hsetnx(User.user_ids_by_phone_verification_token.key, @phone_verification_token, id)
-      break if saved
-    end
-
-    User.phone_verification_tokens[id] = @phone_verification_token
   end
 
   def update_sorting_name

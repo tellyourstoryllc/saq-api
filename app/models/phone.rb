@@ -9,10 +9,9 @@ class Phone < ActiveRecord::Base
   validates :number, format: /\d+/
   validates :number, :hashed_number, uniqueness: true
 
-  after_save :delete_verification_token
-
   belongs_to :account, inverse_of: :phones
   belongs_to :user
+  belongs_to :device, polymorphic: true
 
   value :notified_friends
   scope :verified, -> { where(verified: true) }
@@ -31,13 +30,14 @@ class Phone < ActiveRecord::Base
     find_by(number: normalized_number) if normalized_number
   end
 
-  def verify_by_code!(current_user, code, options = {})
-    verify!(current_user, options) if verification_code.present? && verification_code == code
+  def verify_by_code!(current_user, current_device, code, options = {})
+    verify!(current_user, current_device, options) if verification_code.present? && verification_code == code
   end
 
-  def verify!(current_user, options = {})
+  def verify!(current_user, current_device, options = {})
     self.user = current_user
-    old_user_id = user_id_was if user_id_was && user_id_changed?
+    self.device = current_device
+    #old_user_id = user_id_was if user_id_was && user_id_changed?
 
     self.verified = true
     save!
@@ -143,16 +143,5 @@ class Phone < ActiveRecord::Base
 
     chars = [*0..9]
     self.verification_code = Array.new(4){ chars.sample }.join
-  end
-
-  def delete_verification_token
-    return unless !verified_was && verified && user
-
-    token = User.phone_verification_tokens[user.id]
-
-    User.redis.multi do
-      User.phone_verification_tokens.delete(user.id)
-      User.user_ids_by_phone_verification_token.delete(token) if token
-    end
   end
 end

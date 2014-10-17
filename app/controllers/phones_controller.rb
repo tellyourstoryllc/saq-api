@@ -27,7 +27,7 @@ class PhonesController < ApplicationController
     @phone = Phone.find_by(number: number)
     render_error and return if @phone.nil?
 
-    if @phone.verify_by_code!(current_user, params[:phone_verification_code], {notify_friends: true})
+    if @phone.verify_by_code!(current_user, current_device, params[:phone_verification_code], {notify_friends: true})
       mixpanel.verified_phone(@phone, :entered_phone) if current_user
       render_json current_user.presence || []
     else

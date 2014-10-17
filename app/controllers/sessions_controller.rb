@@ -55,7 +55,7 @@ class SessionsController < ApplicationController
 
         if account && !account.registered?
           #account.send_missing_password_email if account.no_login_credentials?
-          invite.phone.try(:verify!, recipient)
+          invite.phone.try(:verify!, recipient, current_device)
 
           unless invite.clicked?
             recipient.clicked_invite_link = 1
