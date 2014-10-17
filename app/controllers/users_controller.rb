@@ -77,6 +77,13 @@ class UsersController < ApplicationController
     current_device.existing_user_status = 'r' if current_device
     @current_user.notify_friends
 
+    # Take ownership of all phones the current device owns
+    current_device.phones.each{ |p| p.update(user_id: @current_user.id) } if current_device
+
+    # For each verified phone, add the new user as a contact for everyone
+    # who has autoconnected his phone
+    @current_user.phones.verified.each(&:add_as_contact_and_notify_friends)
+
     render_json [@current_user, @account, @group].compact
   end
 
