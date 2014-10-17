@@ -70,6 +70,8 @@ class UsersController < ApplicationController
     create_or_update_device
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
+    @current_user.skipped_phone = params[:skipped_phone] if params[:skipped_phone].present?
+
     # Send events to Mixpanel
     @current_user.set_content_frequency
     mixpanel.user_registered(@current_user)

@@ -60,7 +60,7 @@ class MixpanelClient
       'Initial Snapchat Friends in App' => initial_friends_in_app_count,
       'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency,
       'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil),
-      'Rating' => user.app_reviews.latest.limit(1).pluck(:rating).first
+      'Rating' => user.app_reviews.latest.limit(1).pluck(:rating).first, 'Skipped Phone' => Bool.parse(user.skipped_phone.value)
     )
 
     properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?

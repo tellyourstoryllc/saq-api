@@ -84,6 +84,7 @@ class User < ActiveRecord::Base
   value :assigned_like_snap_template_id
   value :assigned_comment_snap_template_id
   value :drip_notifications_enabled
+  value :skipped_phone
 
   delegate :registered, :registered?, to: :account
 
