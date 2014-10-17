@@ -322,8 +322,6 @@ class User < ActiveRecord::Base
 
     one_to_one = OneToOne.new(sender_id: id, recipient_id: user.id)
     one_to_one.remove_from_lists if one_to_one.attrs.exists?
-
-    SnapchatFriendsImporter.new(self).defriend(user)
   end
 
   def unblock(user)
