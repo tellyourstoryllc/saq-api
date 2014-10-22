@@ -73,7 +73,8 @@ DROP TABLE IF EXISTS `app_reviews`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `app_reviews` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `device_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `device_id` int(11) DEFAULT NULL,
   `rating` int(11) NOT NULL,
   `feedback` text COLLATE utf8_unicode_ci,
@@ -430,6 +431,8 @@ DROP TABLE IF EXISTS `phones`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `phones` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `device_type` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `device_id` int(11) DEFAULT NULL,
   `account_id` int(11) DEFAULT NULL,
   `user_id` char(8) COLLATE utf8_unicode_ci DEFAULT NULL,
   `number` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
@@ -444,7 +447,8 @@ CREATE TABLE `phones` (
   UNIQUE KEY `index_phones_on_hashed_number` (`hashed_number`),
   KEY `index_phones_on_account_id` (`account_id`),
   KEY `index_phones_on_user_id` (`user_id`),
-  KEY `index_phones_on_verified` (`verified`)
+  KEY `index_phones_on_verified` (`verified`),
+  KEY `index_phones_on_device_type_and_device_id` (`device_type`,`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -641,7 +645,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-10-16 12:44:43
+-- Dump completed on 2014-10-22 11:43:46
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -839,3 +843,7 @@ INSERT INTO schema_migrations (version) VALUES ('20141016154437');
 INSERT INTO schema_migrations (version) VALUES ('20141016160450');
 
 INSERT INTO schema_migrations (version) VALUES ('20141016164354');
+
+INSERT INTO schema_migrations (version) VALUES ('20141016202631');
+
+INSERT INTO schema_migrations (version) VALUES ('20141022153752');
