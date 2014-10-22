@@ -27,6 +27,17 @@ class MessagesController < ApplicationController
   def delete
     @message.delete(current_user)
     load_my_message
+    one_to_one = load_one_to_one(@message.one_to_one_id)
+
+    unless one_to_one.nil?
+      data = MessageSerializer.new(@message).as_json
+
+      other_user = one_to_one.other_user(current_user)
+      [current_user, other_user].each do |user|
+        faye_publisher.publish_one_to_one_message(user, data)
+      end
+    end
+
     render_json @message
   end
 
