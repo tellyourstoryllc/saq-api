@@ -6,6 +6,7 @@ class CheckinController < ApplicationController
   def index
     send_mixpanel_events
     add_to_daily_users
+    increment_metrics
 
     objects = []
     config_class = case params[:client]
@@ -76,5 +77,9 @@ class CheckinController < ApplicationController
 
     key = User.daily_user_ids_in_eastern_key
     User.redis.sadd(key, current_user.id)
+  end
+
+  def increment_metrics
+    StatsD.increment('api_calls.checkin')
   end
 end
