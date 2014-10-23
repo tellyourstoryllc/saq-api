@@ -171,7 +171,9 @@ class ApplicationController < ActionController::Base
   end
 
   def secure_request?
-    params[:api_secret] == Rails.configuration.app['api']['request_secret']
+    params[:api_secret] == Rails.configuration.app['api']['request_secret'] &&
+      (params[:controller] == 'accounts' && params[:action] == 'send_reset_email') ||
+      (params[:controller] == 'accounts' && params[:action] == 'reset_password')
   end
 
   def split_param(param_name)
