@@ -99,9 +99,9 @@ class MessagesController < ApplicationController
         unless params[:skip_publish]
           data = MessageSerializer.new(message).as_json
 
-          [current_user, other_user].each do |user|
-            faye_publisher.publish_one_to_one_message(user, data)
-          end
+          # Publish only to the recipient since the sender
+          # will get the object from the API response
+          faye_publisher.publish_one_to_one_message(other_user, data)
         end
 
         if !other_user.account.registered?
