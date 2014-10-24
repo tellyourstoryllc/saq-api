@@ -70,6 +70,6 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def friends?
-    scope && (scope.id == object.id || object.dynamic_friend?(scope))
+    scope && (scope.id == object.id || scope.dynamic_friend?(object))
   end
 end
