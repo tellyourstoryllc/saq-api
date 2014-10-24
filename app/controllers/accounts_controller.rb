@@ -1,5 +1,5 @@
 class AccountsController < ApplicationController
-  skip_before_action :require_token, only: [:send_reset_email, :reset_password]
+  skip_before_action :require_token, only: [:send_reset_email, :send_reset_sms, :reset_password]
 
 
   def update
@@ -28,7 +28,7 @@ class AccountsController < ApplicationController
     render_json @account
   end
 
-  # Lost password
+  # Send reset password link via email
   def send_reset_email
     @user = User.find_by(username: params[:login])
     @account = @user.account if @user
@@ -37,6 +37,32 @@ class AccountsController < ApplicationController
     if @account
       token = @account.generate_password_reset_token
       AccountMailer.password_reset(@account, token).deliver! if token
+      render_json []
+    else
+      render_error("Sorry, we couldn't find your account. Please try again.")
+    end
+  end
+
+  # Send reset password link via SMS
+  def send_reset_sms
+    @user = User.find_by(username: params[:login])
+    @account = @user.account if @user
+
+    if @account.nil?
+      @account = Account.joins(:emails).find_by(emails: {email: params[:login]})
+      @user = @account.try(:user)
+    end
+
+    @phones = @user.try(:phones)
+
+    if @phones.present?
+      given_number = Phone.normalize(params[:phone_number])
+      @phone = @phones.detect{ |p| given_number == p.number }
+    end
+
+    if @account && @phone
+      token = @account.generate_password_reset_token
+      HookClient.send_password_reset(@phone.number, token) if token
       render_json []
     else
       render_error("Sorry, we couldn't find your account. Please try again.")

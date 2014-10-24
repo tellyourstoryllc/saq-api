@@ -8,6 +8,7 @@ KrazyChat::Application.routes.draw do
     match '/users/update', to: 'users#update', as: 'update_user'
     match '/accounts/update', to: 'accounts#update', as: 'update_account'
     match '/password/reset_email' => 'accounts#send_reset_email', as: 'send_reset_email'
+    match '/password/reset_sms' => 'accounts#send_reset_sms', as: 'send_reset_sms'
     match '/password/reset/:token' => 'accounts#reset_password', :as => 'reset_password'
 
     match '/preferences/update', to: 'user_preferences#update', as: 'update_user_preferences'

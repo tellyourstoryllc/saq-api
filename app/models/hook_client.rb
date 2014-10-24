@@ -68,6 +68,14 @@ class HookClient
     send_sms(from, recipient_number, text)
   end
 
+  def self.send_password_reset(recipient_number, reset_token)
+    from = Rails.configuration.app['hook']['invite_from']
+    url = Rails.configuration.app['web']['url'] + "/password/reset/#{reset_token}"
+
+    text = render_text("You can reset your #{Rails.configuration.app['app_name']} password by going here: #{url}.")
+    send_sms(from, recipient_number, text)
+  end
+
   def self.increment_sent_sms_counts
     today = Time.zone.today
 
