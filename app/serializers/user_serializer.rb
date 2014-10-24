@@ -15,11 +15,15 @@ class UserSerializer < ActiveModel::Serializer
     object.status_text if friends?
   end
 
+  # Don't need this in SCP
   def idle_duration
-    object.idle_duration if friends?
+    #object.idle_duration if friends?
   end
 
+  # Don't need this in SCP
   def client_type
+    return
+
     if friends?
       object.computed_client_type
     else
@@ -39,8 +43,13 @@ class UserSerializer < ActiveModel::Serializer
     object.fetch_phone_verification_token
   end
 
+  # Don't need this in SCP
   def replaced_user_ids
-    object.replaced_user_ids.members
+    #object.replaced_user_ids.members
+  end
+
+  # Don't need this in SCP
+  def replaced_by_user_id
   end
 
   def registered
