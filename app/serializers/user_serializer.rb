@@ -3,7 +3,10 @@ class UserSerializer < ActiveModel::Serializer
     :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
     :phone_verification_token, :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered
 
+  # Don't need this in SCP
   def status
+    return
+
     if friends?
       object.computed_status
     else
@@ -11,7 +14,10 @@ class UserSerializer < ActiveModel::Serializer
     end
   end
 
+  # Don't need this in SCP
   def status_text
+    return
+
     object.status_text if friends?
   end
 
