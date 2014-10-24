@@ -690,8 +690,20 @@ class User < ActiveRecord::Base
     snapchat_friend_ids.include?(user.id) || contact_ids.include?(user.id)
   end
 
+  def fetched_contact_ids
+    @fetched_contact_ids ||= contact_ids.members
+  end
+
+  def fetched_snapchat_friend_ids
+    @fetched_snapchat_friend_ids ||= snapchat_friend_ids.members
+  end
+
+  def fetched_snapchat_follower_ids
+    @fetched_snapchat_follower_ids ||= snapchat_follower_ids.members
+  end
+
   def outgoing_or_incoming_friend?(user)
-    snapchat_friend_ids.include?(user.id) || snapchat_follower_ids.include?(user.id)
+    fetched_snapchat_friend_ids.include?(user.id) || fetched_snapchat_follower_ids.include?(user.id)
   end
 
 
