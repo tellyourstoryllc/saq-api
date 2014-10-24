@@ -42,7 +42,7 @@ class Account < ActiveRecord::Base
   end
 
   def generate_password_reset_token
-    token = "#{id}-#{SecureRandom.hex}"
+    token = SecureRandom.hex
     redis.setex(self.class.password_reset_token_key(token), 24.hours, id)
     token
   end
