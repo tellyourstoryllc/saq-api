@@ -47,6 +47,10 @@ class Account < ActiveRecord::Base
     token
   end
 
+  def self.delete_password_reset_token(token)
+    redis.del(password_reset_token_key(token))
+  end
+
   def authenticate_facebook(facebook_token)
     self.facebook_token = facebook_token
     verify_facebook_token && self

@@ -50,7 +50,10 @@ class AccountsController < ApplicationController
     @account = Account.find_by_password_reset_token(params[:token])
 
     if @account
-      @account.update!(password: params[:new_password]) if params[:new_password].present?
+      if params[:new_password].present?
+        Account.delete_password_reset_token(params[:token]) if @account.update!(password: params[:new_password])
+      end
+
       render_json @account
     else
       render_error("Sorry, that token does not exist or has expired.")
