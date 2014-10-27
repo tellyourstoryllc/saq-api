@@ -1,6 +1,6 @@
 module Peanut::Conversation
   extend ActiveSupport::Concern
-  attr_accessor :viewer
+  attr_accessor :viewer, :last_message_at
 
 
   included do
@@ -91,12 +91,16 @@ module Peanut::Conversation
     redis.eval lua_script, {keys: [message_id_expirations.key, message_ids_without_expiration_gc.key], argv: [Time.current.to_i]}
   end
 
-  # TODO change this to an attribute on the conversation
+  # TODO remove this method (use only the attrs['last_message_at'] value) if/when we update it on all existing messages
   def last_message_at
-    @last_message_at ||= begin
-                           created_at = Message.redis.hget("message:#{message_ids.last}:attrs", :created_at)
-                           created_at.to_i if created_at.present?
-                         end
+    @fetched_last_message_at ||= begin
+                                   if @last_message_at.present?
+                                     @last_message_at.to_i
+                                   else
+                                     created_at = Message.redis.hget("message:#{message_ids.last}:attrs", :created_at)
+                                     attrs['last_message_at'] = created_at.to_i if created_at.present?
+                                   end
+                                 end
   end
 
   def metadata_key

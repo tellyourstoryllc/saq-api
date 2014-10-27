@@ -12,16 +12,45 @@ class UserSerializer < ActiveModel::Serializer
     object.username if outgoing_or_incoming_friend?
   end
 
+  # Don't need this in SCP
+  def status
+    return
+
+    if friends?
+      object.computed_status
+    else
+      'unavailable'
+    end
+  end
+
+  # Don't need this in SCP
+  def status_text
+    return
+
+    object.status_text if friends?
+  end
+
+  # Don't need this in SCP
+  def idle_duration
+    #object.idle_duration if friends?
+  end
+
+  # Don't need this in SCP
   def client_type
-    object.computed_client_type
+    #object.computed_client_type
   end
 
   def include_token?
     owner?
   end
 
+  # Don't need this in SCP
   def replaced_user_ids
-    object.replaced_user_ids.members
+    #object.replaced_user_ids.members
+  end
+
+  # Don't need this in SCP
+  def replaced_by_user_id
   end
 
   def registered
