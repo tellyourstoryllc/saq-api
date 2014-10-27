@@ -69,6 +69,10 @@ class AdminController < ActionController::Base
     redirect_to admin_settings_path
   end
 
+  def app_reviews
+    @app_reviews = AppReview.includes(:user).latest
+  end
+
 
   protected
 
