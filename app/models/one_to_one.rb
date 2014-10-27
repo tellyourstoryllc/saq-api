@@ -68,7 +68,7 @@ class OneToOne
   # 1-1 is pending if the other user initiated, and the recipient isn't in the sender's contacts,
   # and the sender isn't in the recipient's outgoing list
   def pending?(current_user)
-    creator && creator.id != current_user.id && !creator.contact_ids.include?(current_user.id) && !current_user.snapchat_friend_ids.include?(creator.id)
+    creator_id && creator_id != current_user.id && !current_user.snapchat_friend_ids.include?(creator_id) && !creator.contact_ids.include?(current_user.id)
   end
 
 
