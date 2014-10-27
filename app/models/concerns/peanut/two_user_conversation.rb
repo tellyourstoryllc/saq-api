@@ -33,6 +33,10 @@ module Peanut::TwoUserConversation
       @creator ||= User.find_by(id: creator_id) if creator_id
     end
 
+    def creator=(user)
+      @creator = user
+    end
+
     def sender
       @sender ||= User.find_by(id: sender_id) if sender_id
     end
