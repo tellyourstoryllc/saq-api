@@ -1,0 +1,34 @@
+<style>
+table tr th { text-align: center; }
+table tr td { text-align: center; }
+table tr td.feedback { text-align: left; }
+</style>
+
+
+<div class='admin-content'>
+<h1>App Reviews</h1>
+
+
+<table class="table table-striped table-bordered" style="width: 800px;">
+  <tr>
+    <th>ID</th>
+    <th>User ID</th>
+    <th>Username</th>
+    <th>Rating</th>
+    <th>Feedback</th>
+    <th>Will Write Review?</th>
+    <th>Created At</th>
+  </tr>
+
+  <% @app_reviews.each do |r| %>
+  <tr>
+    <td><%= r.id %></td>
+    <td><%= r.user_id %></td>
+    <td><%= r.user.try(:username) %></td>
+    <td><%= r.rating %></td>
+    <td class="feedback"><%= r.feedback %></td>
+    <td><%= r.will_write_review %></td>
+    <td><%= r.created_at %></td>
+  </tr>
+  <% end %>
+</table>

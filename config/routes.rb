@@ -93,6 +93,7 @@ KrazyChat::Application.routes.draw do
     match '/admin/settings', to: 'admin#settings', as: 'admin_settings'
     match '/admin/settings/:key/edit', to: 'admin#edit_setting', as: 'admin_edit_setting'
     match '/admin/settings/:key/update', to: 'admin#update_setting', as: 'admin_update_setting'
+    match '/admin/app_reviews', to: 'admin#app_reviews', as: 'admin_app_reviews'
 
     match '/logs/event', to: 'logs#event', as: 'logs_event'
 

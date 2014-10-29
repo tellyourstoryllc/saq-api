@@ -45,8 +45,9 @@ class MessagesController < ApplicationController
   private
 
   def message_params
-    params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata,
-                  :received, :original_message_id, :forward_message_id, :created_at).merge(user_id: current_user.id)
+    msg_params = params.permit(:text, :attachment_file, :attachment_metadata, :client_metadata,
+                               :received, :original_message_id, :forward_message_id, :created_at)
+    msg_params.merge(user_id: current_user.id, snapchat_created_at: msg_params.delete(:created_at))
   end
 
   def story_params
