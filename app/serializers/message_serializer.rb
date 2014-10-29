@@ -12,4 +12,8 @@ class MessageSerializer < ActiveModel::Serializer
   def forwards_count
     object.cached_forwards_count || object.forwards.size
   end
+
+  def created_at
+    object.snapchat_created_at || object.created_at
+  end
 end
