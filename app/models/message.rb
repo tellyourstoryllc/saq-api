@@ -65,6 +65,7 @@ class Message
     redis.multi do
       write_attrs
       add_snapchat_media_id if story?
+      update_convo_last_message_at
       add_to_conversation
     end
 
@@ -400,6 +401,11 @@ class Message
         conversation.message_id_expirations[id] = expires_at
       end
     end
+  end
+
+  def update_convo_last_message_at
+    convo = conversation
+    convo.attrs['last_message_at'] = created_at if convo
   end
 
   # Atomically set the rank and add it to the conversation's message list

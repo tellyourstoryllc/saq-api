@@ -3,7 +3,10 @@ class UserSerializer < ActiveModel::Serializer
     :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
     :phone_verification_token, :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered
 
+  # Don't need this in SCP
   def status
+    return
+
     if friends?
       object.computed_status
     else
@@ -11,15 +14,22 @@ class UserSerializer < ActiveModel::Serializer
     end
   end
 
+  # Don't need this in SCP
   def status_text
+    return
+
     object.status_text if friends?
   end
 
+  # Don't need this in SCP
   def idle_duration
-    object.idle_duration if friends?
+    #object.idle_duration if friends?
   end
 
+  # Don't need this in SCP
   def client_type
+    return
+
     if friends?
       object.computed_client_type
     else
@@ -39,8 +49,13 @@ class UserSerializer < ActiveModel::Serializer
     object.fetch_phone_verification_token
   end
 
+  # Don't need this in SCP
   def replaced_user_ids
-    object.replaced_user_ids.members
+    #object.replaced_user_ids.members
+  end
+
+  # Don't need this in SCP
+  def replaced_by_user_id
   end
 
   def registered
@@ -61,6 +76,6 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def friends?
-    scope && (scope.id == object.id || object.dynamic_friend?(scope))
+    scope && (scope.id == object.id || scope.dynamic_friend?(object))
   end
 end
