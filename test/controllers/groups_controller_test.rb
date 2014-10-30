@@ -125,13 +125,13 @@ describe GroupsController do
 
       result_must_include 'user', member.id, {
         'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
-        'status' => 'available', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
+        'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
         'avatar_url' => nil
       }
 
       result_must_include 'user', current_user.id, {
         'object_type' => 'user', 'id' => current_user.id, 'name' => current_user.name, 'username' => current_user.username,
-        'status' => 'available', 'idle_duration' => nil, 'status_text' => nil,
+        'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
         'token' => current_user.token, 'client_type' => nil,
         'avatar_url' => nil
       }
@@ -206,14 +206,14 @@ describe GroupsController do
 
         result_must_include 'user', member.id, {
           'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
-          'status' => 'available', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
+          'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
           'avatar_url' => nil
         }
 
         result_must_include 'user', current_user.id, {
           'object_type' => 'user', 'id' => current_user.id, 'name' => current_user.name, 'username' => current_user.username,
-          'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
-          'token' => current_user.token, 'client_type' => 'phone',
+          'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
+          'token' => current_user.token, 'client_type' => nil,
           'avatar_url' => nil
         }
 
@@ -272,14 +272,14 @@ describe GroupsController do
 
         result_must_include 'user', member.id, {
           'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
-          'status' => 'available', 'idle_duration' => nil, 'status_text' => 'around', 'client_type' => nil,
+          'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
           'avatar_url' => nil
         }
 
         result_must_include 'user', current_user.id, {
           'object_type' => 'user', 'id' => current_user.id, 'name' => current_user.name, 'username' => current_user.username,
-          'status' => 'away', 'idle_duration' => nil, 'status_text' => 'be back soon',
-          'token' => current_user.token, 'client_type' => 'web',
+          'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
+          'token' => current_user.token, 'client_type' => nil,
           'avatar_url' => nil
         }
 

@@ -23,8 +23,8 @@ table tr td.feedback { text-align: left; }
   <% @app_reviews.each do |r| %>
   <tr>
     <td><%= r.id %></td>
-    <td><%= r.user_id %></td>
-    <td><%= r.user.try(:username) %></td>
+    <td><%= link_to(r.user.id, admin_user_path(r.user)) if r.user %></td>
+    <td><%= link_to(r.user.try(:username), admin_user_path(r.user)) if r.user %></td>
     <td><%= r.rating %></td>
     <td class="feedback"><%= r.feedback %></td>
     <td><%= r.will_write_review %></td>
@@ -32,3 +32,7 @@ table tr td.feedback { text-align: left; }
   </tr>
   <% end %>
 </table>
+
+
+<%= page_entries_info @app_reviews %><br />
+<%= paginate @app_reviews %>

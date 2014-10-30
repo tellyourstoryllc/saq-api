@@ -70,7 +70,7 @@ class AdminController < ActionController::Base
   end
 
   def app_reviews
-    @app_reviews = AppReview.includes(:user).latest
+    @app_reviews = AppReview.includes(:user).latest.page(params[:page]).per(50)
   end
 
 
