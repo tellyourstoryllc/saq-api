@@ -405,7 +405,7 @@ class Message
 
   def update_convo_last_message_at
     convo = conversation
-    convo.attrs['last_message_at'] = created_at if convo
+    convo.attrs['last_message_at'] = created_at if convo && convo.respond_to?(:last_message_at)
   end
 
   # Atomically set the rank and add it to the conversation's message list
