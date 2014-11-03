@@ -35,7 +35,7 @@ gem 'active_model_serializers', '0.8.1'
 gem 'faraday', '0.8.8'
 
 gem 'hiredis'
-gem 'redis', '3.0.5', require: ['redis', 'redis/connection/hiredis']
+gem 'redis', '3.1.0', require: ['redis', 'redis/connection/hiredis']
 gem 'redis-objects', '0.7.0'
 gem 'redis_logger', git: 'git://github.com/bray/redis_logger.git'
 
