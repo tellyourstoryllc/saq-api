@@ -1,5 +1,5 @@
 class HookController < ApplicationController
-  skip_before_action :require_token
+  skip_before_action :require_signature, :require_token
   before_action :restrict_domain, :increment_stats, :validate_body
 
 
