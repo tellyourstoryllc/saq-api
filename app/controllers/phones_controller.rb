@@ -9,7 +9,7 @@ class PhonesController < ApplicationController
     @phone = Phone.find_or_initialize_by(number: number)
 
     if @phone.persisted?
-      send_verification if @phone.user_id == current_user.id
+      send_verification if @phone.user_id.blank? || @phone.user_id == current_user.id
     else
       @phone.user = current_user
       @phone.save!
