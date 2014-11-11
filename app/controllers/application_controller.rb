@@ -188,7 +188,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def track_initial_sc_import
+  def track_initial_sc_import(options = {})
     return unless params[:initial_sc_import] == 'true'
 
     unless current_user.set_initial_snapchat_friend_ids_in_app.exists?
@@ -200,7 +200,9 @@ class ApplicationController < ActionController::Base
     end
 
     mixpanel.imported_snapchat_friends
-    mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if sent_snap_invites? || send_sms_invites?
+
+    send_sms_invites = !!(options[:check_sms_invites] && send_sms_invites?)
+    mixpanel.invited_snapchat_friends({}, {delay: 5.seconds}) if sent_snap_invites? || send_sms_invites
   end
 
   def reset_unanswered_content_pushes

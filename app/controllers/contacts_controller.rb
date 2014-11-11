@@ -14,7 +14,7 @@ class ContactsController < ApplicationController
     users = User.includes(:account, :avatar_image, :avatar_video, :phones, :emails).where(id: users.map(&:id))
 
     track_sc_users(users, phone_numbers)
-    track_initial_sc_import
+    track_initial_sc_import(check_sms_invites: true)
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
   end
