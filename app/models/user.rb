@@ -319,6 +319,16 @@ class User < ActiveRecord::Base
     end
   end
 
+  def send_widget_notifications
+    return unless ios_devices.exists?
+
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_widget
+    else
+      email_notifier.notify_widget
+    end
+  end
+
   def block(user)
     return if blocked_user_ids.member?(user.id)
 

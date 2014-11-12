@@ -243,4 +243,12 @@ class MobileNotifier
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)
   end
+
+  def notify_widget
+    alert = "Did you know you can see your most recent snaps and stories in the notification center? Turn on your iOS 8 widget today!"
+    url = Rails.configuration.app['web']['url'] + '/widget-tutorial'
+    custom_data = {object_type: 'command', instruction: 'webview', url: url}
+
+    create_ios_notifications(alert, custom_data)
+  end
 end
