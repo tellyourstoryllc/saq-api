@@ -92,6 +92,9 @@ class UsersController < ApplicationController
     # and if so, schedule them all
     DripNotification.set_up_new_user(@current_user, current_device)
 
+    # Schedule widget notification (and reschedule if user is unavailable)
+    WidgetNotification.schedule(@current_user) if current_device && current_device.is_a?(IosDevice)
+
     current_device.existing_user_status = 'r' if current_device
     @current_user.notify_friends
 
