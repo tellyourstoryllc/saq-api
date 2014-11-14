@@ -27,10 +27,10 @@ table tr td.text { text-align: left; }
     <td class="attachment">
       <% if m.attachment_url.to_s.ends_with?('.mp4') %>
         <video width="169" controls>
-          <source src="<%= m.attachment_url %>">
+          <source src="<%= m.attachment_url.sub('http:', 'https:') %>">
         </video>
-      <% else %>
-        <%= image_tag(m.attachment_preview_url) %>
+      <% elsif m.attachment_preview_url.present? %>
+        <%= image_tag(m.attachment_preview_url.sub('http:', 'https:')) %>
       <% end -%>
     </td>
     <td><%= admin_timestamp(m.created_at, format: :short) %></td>
