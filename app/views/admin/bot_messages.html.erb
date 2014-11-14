@@ -24,7 +24,15 @@ table tr td.text { text-align: left; }
     <td><%= link_to(m.user.id, admin_user_path(m.user)) if m.user %></td>
     <td><%= link_to(m.user.try(:username), admin_user_path(m.user)) if m.user %></td>
     <td class="text"><%= m.text %></td>
-    <td class="attachment"><%= image_tag(m.attachment_preview_url) if m.attachment_preview_url.present? %></td>
+    <td class="attachment">
+      <% if m.attachment_url.to_s.ends_with?('.mp4') %>
+        <video width="169" controls>
+          <source src="<%= m.attachment_url %>">
+        </video>
+      <% else %>
+        <%= image_tag(m.attachment_preview_url) %>
+      <% end -%>
+    </td>
     <td><%= admin_timestamp(m.created_at, format: :short) %></td>
   </tr>
   <% end %>
