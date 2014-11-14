@@ -21,7 +21,7 @@ class SnapchatFriendsImporter
     users = User.where(username: usernames)
 
     usernames.each_with_index do |username, i|
-      user = users.detect{ |u| u.username == username }
+      user = users.detect{ |u| u.username.downcase == username.downcase }
       user = create_missing_user(username, user)
       next if user.nil?
 

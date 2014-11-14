@@ -85,6 +85,7 @@ class User < ActiveRecord::Base
   value :assigned_like_snap_template_id
   value :assigned_comment_snap_template_id
   value :drip_notifications_enabled
+  hash_key :widget_notification_info
 
   delegate :registered, :registered?, to: :account
 
@@ -171,6 +172,10 @@ class User < ActiveRecord::Base
 
   def away_idle_or_unavailable?
     self.class.away_idle_or_unavailable?(computed_status)
+  end
+
+  def unavailable?
+    computed_status == 'unavailable'
   end
 
   def dynamic_contact_ids
@@ -316,6 +321,23 @@ class User < ActiveRecord::Base
       mobile_notifier.notify_drip(drip_notification)
     else
       email_notifier.notify_drip(drip_notification)
+    end
+  end
+
+  def send_widget_notifications
+    return if !ios_devices.exists? || widget_notification_info['received']
+
+    if mobile_notifier.pushes_enabled?
+      if unavailable?
+        widget_notification_info['received'] = 1
+        mobile_notifier.notify_widget
+      else
+        # Reschedule the push notification if the user is online
+        WidgetNotification.schedule(self)
+      end
+    else
+      widget_notification_info['received'] = 1
+      email_notifier.notify_widget
     end
   end
 

@@ -34,7 +34,7 @@
     <li><%= link_to 'Previous', admin_user_friends_path(@user, offset: @offset - @friends.size) %></li>
   <% end %>
   <% if @offset + @friends.size < @friends_count %>
-    <li><%= link_to 'Next', admin_users_path(@user, offset: @offset + @friends_size) %></li>
+    <li><%= link_to 'Next', admin_user_friends_path(@user, offset: @offset + @friends.size) %></li>
   <% end %>
 </ul>
 

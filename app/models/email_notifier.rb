@@ -200,4 +200,16 @@ class EmailNotifier
   def notify_drip!(drip_notification)
     MessageMailer.drip_notification(drip_notification, user).deliver!
   end
+
+  def notify_widget
+    if Settings.enabled?(:queue)
+      AccountMailerWidgetNotificationWorker.perform_async(user.id)
+    else
+      notify_widget!
+    end
+  end
+
+  def notify_widget!
+    AccountMailer.widget_tutorial(user).deliver!
+  end
 end
