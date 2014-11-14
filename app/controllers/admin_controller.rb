@@ -73,6 +73,10 @@ class AdminController < ActionController::Base
     @app_reviews = AppReview.includes(:user).latest.page(params[:page]).per(50)
   end
 
+  def bot_messages
+    @bot_messages = BotMessage.includes(:user).latest.page(params[:page]).per(50)
+  end
+
 
   protected
 
