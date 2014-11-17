@@ -42,13 +42,13 @@ class MobileNotifier
     "user:#{user_id}:mobile_digest_group_chatting_member_ids:#{group_id}"
   end
 
-  def notify(message)
+  def notify_snap(message)
     return if message.user_id == user.id
 
     user.unread_convo_ids << message.conversation.id
 
     notification_type = :all
-    send_notification(message, notification_type)
+    send_snap_notification(message, notification_type)
   end
 
   def pushes_enabled?
@@ -97,7 +97,7 @@ class MobileNotifier
     end
   end
 
-  def send_notification(message, notification_type)
+  def send_snap_notification(message, notification_type)
     convo = message.conversation
     custom_data = {}
 

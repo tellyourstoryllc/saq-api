@@ -47,7 +47,7 @@ class Robot
       if options[:mobile_only]
         recipient.send_mobile_only_notifications(message)
       else
-        recipient.send_notifications(message)
+        recipient.send_snap_notifications(message)
       end
     end
   end
