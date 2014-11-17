@@ -267,8 +267,10 @@ class User < ActiveRecord::Base
   def send_snap_notifications(message)
     return unless away_idle_or_unavailable? && !bot?
 
-    if !mobile_notifier.notify_snap(message)
-      email_notifier.notify_snap(message)  # only send email notification if no mobile notification was sent.
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_snap(message)
+    else
+      email_notifier.notify_snap(message)
     end
   end
 
