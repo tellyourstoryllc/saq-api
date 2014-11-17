@@ -226,7 +226,7 @@ class MobileNotifier
   end
 
   def notify_content_available(ios_device, options = {})
-    return unless ios_device.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION
+    return unless ios_device.version_at_least?(:content_pushes)
 
     options.reverse_merge!(sound: nil)
     options[:content_available] = true

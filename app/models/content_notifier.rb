@@ -1,6 +1,4 @@
 class ContentNotifier
-  MIN_CLIENT_VERSION = 206
-
   # Frequency of 0 means never send content pushes
   # Frequency is in minutes and unanswered_count is cumulative
   # e.g. For the 5 frequency, send every 5 minutes 3 times,
