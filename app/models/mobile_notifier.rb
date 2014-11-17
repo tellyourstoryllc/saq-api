@@ -112,7 +112,7 @@ class MobileNotifier
 
     # Send to all iOS devices
     user.ios_devices.each do |ios_device|
-      if ios_device.notify?(user, convo, message, notification_type)
+      if ios_device.notify?(user, convo, message, notification_type) && ios_device.version_at_least?(:all_server_notifications)
         notified = !!create_ios_notification(ios_device, alert, custom_data)
       end
     end
@@ -205,7 +205,7 @@ class MobileNotifier
     alert = "Your friend has posted a story"
     custom_data = {stories: story.id}
 
-    create_ios_notifications(alert, custom_data)
+    create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
     create_android_notifications(alert, custom_data)
   end
 

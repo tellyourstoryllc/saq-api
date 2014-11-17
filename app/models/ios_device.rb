@@ -11,7 +11,8 @@ class IosDevice < BaseDevice
   hash_key :content_push_info
 
   MIN_CLIENT_VERSIONS = {
-    content_pushes: 206
+    content_pushes: 206,
+    all_server_notifications: 22060
   }
 
 
