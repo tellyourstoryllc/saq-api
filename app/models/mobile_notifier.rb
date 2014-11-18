@@ -127,11 +127,11 @@ class MobileNotifier
     end
 
     # Send to all Android devices
-    user.android_devices.each do |android_device|
-      if android_device.notify?(user, convo, message, notification_type)
-        notified = !!create_android_notification(android_device, alert, custom_data)
-      end
-    end
+#    user.android_devices.each do |android_device|
+#      if android_device.notify?(user, convo, message, notification_type)
+#        notified = !!create_android_notification(android_device, alert, custom_data)
+#      end
+#    end
 
     add_to_imported_snaps_digest(message) if handle_digest
 
@@ -178,7 +178,7 @@ class MobileNotifier
     end
 
     create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
-    create_android_notifications(alert, custom_data)
+    #create_android_notifications(alert, custom_data)
   end
 
   def notification_alert(message, notification_type)
