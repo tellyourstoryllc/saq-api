@@ -87,6 +87,14 @@ class User < ActiveRecord::Base
   value :drip_notifications_enabled
   hash_key :widget_notification_info
 
+  # Miscellaneous flags, counters, timestamps
+  # Use this where possible instead of separate keys, to reduce memory
+  #
+  # pending_imported_digest: bool
+  hash_key :misc
+
+  set :pending_imported_digest_message_ids
+
   delegate :registered, :registered?, to: :account
 
   COHORT_METRICS_TIME_ZONE = 'America/New_York'
@@ -675,6 +683,23 @@ class User < ActiveRecord::Base
   def last_content_push_at
     timestamp = content_push_info['last_content_push_at']
     timestamp.blank? ? nil : Time.zone.at(timestamp)
+  end
+
+  # Reset the imported snaps digest status for the next batch
+  def reset_imported_snaps_digest
+    redis.multi do
+      misc.delete('pending_imported_digest')
+      pending_imported_digest_message_ids.del
+    end
+  end
+
+  # Set the imported snaps digest to cancelled, so when the scheduled job
+  # runs, it won't send the notification
+  def cancel_imported_snaps_digest
+    redis.multi do
+      misc['pending_imported_digest'] = 'cancelled'
+      pending_imported_digest_message_ids.del
+    end
   end
 
 
