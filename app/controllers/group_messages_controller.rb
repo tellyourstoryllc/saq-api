@@ -16,7 +16,7 @@ class GroupMessagesController < ApplicationController
       end
 
       # Potentially notify each user, according to his status and preferences
-      @group.members.each{ |user| user.send_notifications(@message) }
+      @group.members.each{ |user| user.send_snap_notifications(@message) }
 
       # Track activity in Mixpanel
       unless importing_from_sc
