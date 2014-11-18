@@ -89,11 +89,8 @@ class User < ActiveRecord::Base
 
   # Miscellaneous flags, counters, timestamps
   # Use this where possible instead of separate keys, to reduce memory
-  #
-  # pending_imported_digest: bool
   hash_key :misc
 
-  set :pending_imported_digest_message_ids
   set :pending_digest_story_ids
   hash_key :stories_digest_info
 

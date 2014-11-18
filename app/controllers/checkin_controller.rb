@@ -50,8 +50,6 @@ class CheckinController < ApplicationController
         client_config[:comment_title_template] = comment_snap_template.title_overlay
         client_config[:comment_body_template] = comment_snap_template.body_overlay
       end
-
-      current_user.cancel_imported_snaps_digest
     end
 
     objects << current_device.preferences if current_device

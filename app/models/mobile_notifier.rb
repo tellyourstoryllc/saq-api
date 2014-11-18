@@ -106,8 +106,10 @@ class MobileNotifier
   end
 
   def send_snap_notification(message, notification_type)
-    convo = message.conversation
+    alert = notification_alert(message, notification_type)
     custom_data = {}
+
+    convo = message.conversation
 
     if convo.is_a?(Group)
       custom_data[:gid] = convo.id
@@ -115,78 +117,26 @@ class MobileNotifier
       custom_data[:oid] = convo.id
     end
 
-    alert = notification_alert(message, notification_type)
-    handle_digest = false
-
     # Send to all iOS devices
     user.ios_devices.each do |ios_device|
       if ios_device.notify?(user, convo, message, notification_type)
-
-        # If the snap was sent via SCP, send the notification
-        if !message.imported?
-          create_ios_notification(ios_device, alert, custom_data)
-
-        # If it was imported from Snapchat and the device version is
-        # high enough, add it to the digest
-        elsif ios_device.version_at_least?(:all_server_notifications)
-          handle_digest = true
-        end
+        create_ios_notification(ios_device, alert, custom_data)
       end
     end
 
     # Send to all Android devices
-#    user.android_devices.each do |android_device|
-#      if android_device.notify?(user, convo, message, notification_type)
-#        notified = !!create_android_notification(android_device, alert, custom_data)
-#      end
-#    end
-
-    add_to_imported_snaps_digest(message) if handle_digest
+    user.android_devices.each do |android_device|
+      if android_device.notify?(user, convo, message, notification_type)
+        create_android_notification(android_device, alert, custom_data)
+      end
+    end
 
     # Update digest info
-#    if notified && notification_type == :all
-#      user.mobile_digests_sent.incr
-#      user.last_mobile_digest_notification_at = Time.current.to_i
-#      user.delete_mobile_digest_data
-#    end
-  end
-
-  def add_to_imported_snaps_digest(message)
-    status = user.misc['pending_imported_digest']
-
-    # Add the message_id to the digest
-    user.pending_imported_digest_message_ids << message.id unless status == 'cancelled'
-
-    # Create a job to run if this is the first one in the import batch
-    if status.nil?
-      user.misc['pending_imported_digest'] = 1
-      MobileImportedSnapsDigestNotificationWorker.perform_in(1.minute, user.id)
-    end
-  end
-
-  def send_snap_digest_notifications
-    pending_count = user.pending_imported_digest_message_ids.size
-    return if pending_count == 0 # This shouldn't happen
-
-    custom_data = {}
-
-    if pending_count == 1
-      message = Message.new(id: user.pending_imported_digest_message_ids.members.first)
-
-      alert = notification_alert(message, :all)
-      convo = message.conversation
-
-      if convo.is_a?(Group)
-        custom_data[:gid] = convo.id
-      elsif convo.is_a?(OneToOne)
-        custom_data[:oid] = convo.id
-      end
-    else
-      alert = "You have #{pending_count} new snaps"
-    end
-
-    create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
-    #create_android_notifications(alert, custom_data)
+    #if notified && notification_type == :all
+    #  user.mobile_digests_sent.incr
+    #  user.last_mobile_digest_notification_at = Time.current.to_i
+    #  user.delete_mobile_digest_data
+    #end
   end
 
   def notification_alert(message, notification_type)
