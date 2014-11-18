@@ -12,22 +12,23 @@
 </head>
 <body>
 
-  <div class='navbar navbar-default'>
+  <nav class='navbar navbar-default' role='navigation'>
     <div class='container-fluid'>
       <ul class='nav navbar-nav navbar-right'>
         <% if logged_in? %>
-          <li><%= link_to 'Cohort Metrics', admin_cohort_metrics_path %></li>
-          <li><%= link_to 'SMS Stats', admin_sms_stats_path %></li>
-          <li><%= link_to 'Users', admin_users_path %></li>
-          <li><%= link_to 'App Reviews', admin_app_reviews_path %></li>
-          <li><%= link_to 'Settings', admin_settings_path %></li>
+          <li class='<%= 'active' if params[:action] == 'cohort_metrics' %>'><%= link_to 'Cohort Metrics', admin_cohort_metrics_path %></li>
+          <li class='<%= 'active' if params[:action] == 'sms_stats' %>'><%= link_to 'SMS Stats', admin_sms_stats_path %></li>
+          <li class='<%= 'active' if params[:action] == 'users' %>'><%= link_to 'Users', admin_users_path %></li>
+          <li class='<%= 'active' if params[:action] == 'app_reviews' %>'><%= link_to 'App Reviews', admin_app_reviews_path %></li>
+          <li class='<%= 'active' if params[:action] == 'bot_messages' %>'><%= link_to 'Bot Messages', admin_bot_messages_path %></li>
+          <li class='<%= 'active' if params[:action] == 'settings' %>'><%= link_to 'Settings', admin_settings_path %></li>
           <li><%= link_to 'Log Out', admin_logout_path %></li>
         <% else %>
           <li><%= link_to 'Log In', admin_login_path %></li>
         <% end %>
       </ul>
     </div>
-  </div>
+  </nav>
 
   <% flash.each do |type, msg| %>
     <div class='alert <%= alert_class(type) %>'><%= msg %></div>

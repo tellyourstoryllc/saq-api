@@ -34,7 +34,7 @@ class EmailNotifier
     "user:#{user_id}:email_digest_group_chatting_members:#{group_id}"
   end
 
-  def notify(message)
+  def notify_snap(message)
     return if message.user_id == user.id
 
     convo = message.conversation
@@ -42,22 +42,22 @@ class EmailNotifier
 
     # "one_to_one_email" is used as the general switch for controlling email notifcations 
     if user.preferences.server_one_to_one_email
-      send_notification(notification_type, message)
+      send_snap_notification(notification_type, message)
     end
   end
 
-  def send_notification(notification_type, message = nil, options = {})
+  def send_snap_notification(notification_type, message = nil, options = {})
     data = {}
     data[:media_description] = message.message_attachment.try(:friendly_media_type)
 
     if Settings.enabled?(:queue) && options[:skip_queue].blank?
       MessageMailerWorker.perform_async(notification_type, user.id, message.id, data)
     else
-      send_notification!(notification_type, message, data)
+      send_snap_notification!(notification_type, message, data)
     end
   end
 
-  def send_notification!(notification_type, message, data)
+  def send_snap_notification!(notification_type, message, data)
     MessageMailer.send(notification_type, message, user, data).deliver!
   end
 

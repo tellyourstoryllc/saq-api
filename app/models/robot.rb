@@ -47,7 +47,7 @@ class Robot
       if options[:mobile_only]
         recipient.send_mobile_only_notifications(message)
       else
-        recipient.send_notifications(message)
+        recipient.send_snap_notifications(message)
       end
     end
   end
@@ -66,6 +66,7 @@ class Robot
 
     trigger = parse_trigger(message)
     send_messages_by_trigger(current_user, trigger)
+    record_invalid_bot_message(current_user, message)
   end
 
   def self.parse_trigger(message)
@@ -79,6 +80,17 @@ class Robot
       'number error'
     else
       'general error'
+    end
+  end
+
+  def self.record_invalid_bot_message(current_user, message)
+    msg_text = message.text.to_s.strip.downcase
+    valid_trigger = RobotItem.valid_triggers.include?(msg_text)
+
+    unless valid_trigger
+      BotMessage.create(user_id: current_user.id, message_id: message.id,
+                        text: message.text, attachment_url: message.attachment_url,
+                        attachment_preview_url: message.attachment_preview_url)
     end
   end
 end

@@ -1,0 +1,43 @@
+<style>
+table tr th, table tr td { text-align: center; }
+table tr td.text { text-align: left; }
+</style>
+
+
+<div class='admin-content'>
+<h1>Bot Messages</h1>
+
+
+<table class="table table-striped table-bordered" style="width: 800px;">
+  <tr>
+    <th>ID</th>
+    <th>User ID</th>
+    <th>Username</th>
+    <th>Text</th>
+    <th>Attachment</th>
+    <th style="width: 140px">Created At (EST)</th>
+  </tr>
+
+  <% @bot_messages.each do |m| %>
+  <tr>
+    <td><%= m.id %></td>
+    <td><%= link_to(m.user.id, admin_user_path(m.user)) if m.user %></td>
+    <td><%= link_to(m.user.try(:username), admin_user_path(m.user)) if m.user %></td>
+    <td class="text"><%= m.text %></td>
+    <td class="attachment">
+      <% if m.attachment_url.to_s.ends_with?('.mp4') %>
+        <video width="169" controls>
+          <source src="<%= m.attachment_url.sub('http:', 'https:') %>">
+        </video>
+      <% elsif m.attachment_preview_url.present? %>
+        <%= image_tag(m.attachment_preview_url.sub('http:', 'https:')) %>
+      <% end -%>
+    </td>
+    <td><%= admin_timestamp(m.created_at, format: :short) %></td>
+  </tr>
+  <% end %>
+</table>
+
+
+<%= page_entries_info @bot_messages %><br />
+<%= paginate @bot_messages %>

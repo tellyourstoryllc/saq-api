@@ -64,7 +64,7 @@ class AdminAuthController < AdminController
 
   def redirect_to_default
     if @sysop.superuser?
-      redirect_to :admin_users
+      redirect_to :admin
     elsif @sysop.permissions.members.any?
       redirect_to "admin_#{@sysop.permissions.members.first}".to_sym
     end

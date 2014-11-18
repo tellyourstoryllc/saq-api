@@ -69,7 +69,7 @@ class MessagesController < ApplicationController
         end
 
         # Potentially notify each user, according to his status and preferences
-        group.members.each{ |user| user.send_notifications(message) }
+        group.members.each{ |user| user.send_snap_notifications(message) }
 
         # Track activity in Mixpanel
         unless importing_from_sc
@@ -109,7 +109,7 @@ class MessagesController < ApplicationController
           send_invites(message, other_user)
         else
           # Potentially notify the other user, according to his status and preferences
-          other_user.send_notifications(message)
+          other_user.send_snap_notifications(message)
         end
 
         # Track activity in Mixpanel

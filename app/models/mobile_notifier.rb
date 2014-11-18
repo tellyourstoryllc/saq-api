@@ -2,6 +2,14 @@ class MobileNotifier
   attr_accessor :user
   NOTIFICATION_DELAYS = [5.minutes, 10.minutes, 20.minutes, 30.minutes, 1.hour, 2.hours, 4.hours, 8.hours, 24.hours] # approximate 2^n exponential backoff
 
+  # Frequency is in minutes
+  # Frequency of -1 means don't send any digests - send notifications for every story
+  STORIES_DIGEST_FREQUENCIES = [
+    -1,  # No digests; regular story notifications for every story
+    480, # Max one digest notification per 8 hours
+    1440 # Max one digest notification per 24 hours
+  ]
+
 
   def initialize(user)
     self.user = user
@@ -42,13 +50,13 @@ class MobileNotifier
     "user:#{user_id}:mobile_digest_group_chatting_member_ids:#{group_id}"
   end
 
-  def notify(message)
+  def notify_snap(message)
     return if message.user_id == user.id
 
     user.unread_convo_ids << message.conversation.id
 
     notification_type = :all
-    send_notification(message, notification_type)
+    send_snap_notification(message, notification_type)
   end
 
   def pushes_enabled?
@@ -97,7 +105,7 @@ class MobileNotifier
     end
   end
 
-  def send_notification(message, notification_type)
+  def send_snap_notification(message, notification_type)
     convo = message.conversation
     custom_data = {}
 
@@ -108,31 +116,77 @@ class MobileNotifier
     end
 
     alert = notification_alert(message, notification_type)
-    notified = false
+    handle_digest = false
 
     # Send to all iOS devices
     user.ios_devices.each do |ios_device|
       if ios_device.notify?(user, convo, message, notification_type)
-        notified = !!create_ios_notification(ios_device, alert, custom_data)
+
+        # If the snap was sent via SCP, send the notification
+        if !message.imported?
+          create_ios_notification(ios_device, alert, custom_data)
+
+        # If it was imported from Snapchat and the device version is
+        # high enough, add it to the digest
+        elsif ios_device.version_at_least?(:all_server_notifications)
+          handle_digest = true
+        end
       end
     end
 
     # Send to all Android devices
-    user.android_devices.each do |android_device|
-      if android_device.notify?(user, convo, message, notification_type)
-        notified = !!create_android_notification(android_device, alert, custom_data)
-      end
-    end
+#    user.android_devices.each do |android_device|
+#      if android_device.notify?(user, convo, message, notification_type)
+#        notified = !!create_android_notification(android_device, alert, custom_data)
+#      end
+#    end
+
+    add_to_imported_snaps_digest(message) if handle_digest
 
     # Update digest info
-    if notified && notification_type == :all
-      user.mobile_digests_sent.incr
-      user.last_mobile_digest_notification_at = Time.current.to_i
-      user.delete_mobile_digest_data
+#    if notified && notification_type == :all
+#      user.mobile_digests_sent.incr
+#      user.last_mobile_digest_notification_at = Time.current.to_i
+#      user.delete_mobile_digest_data
+#    end
+  end
+
+  def add_to_imported_snaps_digest(message)
+    status = user.misc['pending_imported_digest']
+
+    # Add the message_id to the digest
+    user.pending_imported_digest_message_ids << message.id unless status == 'cancelled'
+
+    # Create a job to run if this is the first one in the import batch
+    if status.nil?
+      user.misc['pending_imported_digest'] = 1
+      MobileImportedSnapsDigestNotificationWorker.perform_in(1.minute, user.id)
+    end
+  end
+
+  def send_snap_digest_notifications
+    pending_count = user.pending_imported_digest_message_ids.size
+    return if pending_count == 0 # This shouldn't happen
+
+    custom_data = {}
+
+    if pending_count == 1
+      message = Message.new(id: user.pending_imported_digest_message_ids.members.first)
+
+      alert = notification_alert(message, :all)
+      convo = message.conversation
+
+      if convo.is_a?(Group)
+        custom_data[:gid] = convo.id
+      elsif convo.is_a?(OneToOne)
+        custom_data[:oid] = convo.id
+      end
+    else
+      alert = "You have #{pending_count} new snaps"
     end
 
-    # returns true if a notification was sent
-    notified
+    create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
+    #create_android_notifications(alert, custom_data)
   end
 
   def notification_alert(message, notification_type)
@@ -199,14 +253,70 @@ class MobileNotifier
     create_android_notifications(alert, custom_data)
   end
 
-  def notify_story(story)
+  def send_story_notification(ios_device, story)
     return if story.user_id == user.id
 
     alert = "Your friend has posted a story"
     custom_data = {stories: story.id}
 
-    create_ios_notifications(alert, custom_data)
-    create_android_notifications(alert, custom_data)
+    create_ios_notification(ios_device, alert, custom_data)
+    #create_android_notifications(alert, custom_data)
+  end
+
+  def notify_story(story)
+    return if story.user_id == user.id
+
+    handle_digest = false
+    frequency = user.stories_digest_frequency
+
+    user.ios_devices.each do |ios_device|
+      # If the device is old and the story was sent via SCP, send the notification
+      if !ios_device.version_at_least?(:all_server_notifications)
+        send_story_notification(ios_device, story) unless story.imported?
+
+      # If the device is new but wasn't assigned to receive digests, send the notification
+      elsif frequency == -1
+        send_story_notification(ios_device, story)
+
+      # If the device is new and was assigned to receive digests, handle the digest
+      else
+        handle_digest = true
+      end
+    end
+
+    notify_or_add_to_stories_digest(story) if handle_digest
+  end
+
+  def add_to_stories_digest(story)
+    user.pending_digest_story_ids << story.id
+  end
+
+  def send_stories_digest_notifications
+    pending_count, _ = user.redis.multi do
+      user.pending_digest_story_ids.size
+      user.pending_digest_story_ids.del
+      user.stories_digest_info['last_stories_digest_at'] = Time.current.to_i
+    end
+
+    alert = "You have #{pending_count} new #{pending_count == 1 ? 'story' : 'stories'}"
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
+    #create_android_notifications(alert, custom_data)
+  end
+
+  def notify_or_add_to_stories_digest(story)
+    frequency = user.stories_digest_frequency
+    last_stories_digest_at = user.stories_digest_info['last_stories_digest_at']
+
+    # Add the story to the digest
+    add_to_stories_digest(story)
+
+    # If this is the user's first digest or his frequency has elapsed
+    # since the last digest, send a story digest
+    if last_stories_digest_at.nil? || Time.zone.at(last_stories_digest_at.to_i) < frequency.minutes.ago
+      send_stories_digest_notifications
+    end
   end
 
   def notify_story_comment(comment)
@@ -226,7 +336,7 @@ class MobileNotifier
   end
 
   def notify_content_available(ios_device, options = {})
-    return unless ios_device.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION
+    return unless ios_device.version_at_least?(:content_pushes)
 
     options.reverse_merge!(sound: nil)
     options[:content_available] = true

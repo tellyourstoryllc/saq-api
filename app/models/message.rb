@@ -265,7 +265,7 @@ class Message
     end
   end
 
-  def sent_externally?
+  def imported?
     !received.nil?
   end
 
@@ -521,7 +521,7 @@ class Message
       if recipient.bot?
         StatsD.increment("messages.one_to_one.by_user_type.bot.received")
       elsif !user.bot?
-        unless sent_externally?
+        unless imported?
           registered_qualifier = recipient.account.registered? ? 'registered' : 'nonregistered'
           StatsD.increment("messages.one_to_one.#{registered_qualifier}.sent")
           StatsD.increment("messages.one_to_one.#{registered_qualifier}.received")
@@ -529,7 +529,7 @@ class Message
 
         if recipient.account.registered?
           # Was this a message that was fetched/imported from another service?
-          sender_qualifier = sent_externally? ? 'external' : 'internal'
+          sender_qualifier = imported? ? 'external' : 'internal'
           StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.sent")
           StatsD.increment("messages.one_to_one.by_source.#{sender_qualifier}.received")
         end

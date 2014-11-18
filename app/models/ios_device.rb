@@ -10,6 +10,11 @@ class IosDevice < BaseDevice
   value :existing_user_status # r = registered, s = sent event
   hash_key :content_push_info
 
+  MIN_CLIENT_VERSIONS = {
+    content_pushes: 206,
+    all_server_notifications: 22060
+  }
+
 
   def preferences
     @preferences ||= IosDevicePreferences.new(id: id)
@@ -52,6 +57,10 @@ class IosDevice < BaseDevice
 
   def client
     'ios'
+  end
+
+  def version_at_least?(feature)
+    client_version.to_i >= MIN_CLIENT_VERSIONS[feature]
   end
 
 

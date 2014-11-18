@@ -24,7 +24,7 @@ class OneToOneMessagesController < ApplicationController
 
       # Potentially notify the other user, according to his status and preferences
       recipient = @one_to_one.other_user(current_user)
-      recipient.send_notifications(@message)
+      recipient.send_snap_notifications(@message)
 
       # Track activity in Mixpanel
       mixpanel.daily_message_events(@message) unless importing_from_sc

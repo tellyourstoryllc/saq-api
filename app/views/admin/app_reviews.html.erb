@@ -17,7 +17,7 @@ table tr td.feedback { text-align: left; }
     <th>Rating</th>
     <th>Feedback</th>
     <th>Will Write Review?</th>
-    <th>Created At</th>
+    <th style="width: 140px">Created At (EST)</th>
   </tr>
 
   <% @app_reviews.each do |r| %>
@@ -28,7 +28,7 @@ table tr td.feedback { text-align: left; }
     <td><%= r.rating %></td>
     <td class="feedback"><%= r.feedback %></td>
     <td><%= r.will_write_review %></td>
-    <td><%= r.created_at %></td>
+    <td><%= admin_timestamp(r.created_at, format: :short) %></td>
   </tr>
   <% end %>
 </table>
