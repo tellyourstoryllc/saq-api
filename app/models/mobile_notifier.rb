@@ -115,7 +115,7 @@ class MobileNotifier
       if ios_device.notify?(user, convo, message, notification_type)
 
         # If the snap was sent via SCP, send the notification
-        if !message.sent_externally?
+        if !message.imported?
           create_ios_notification(ios_device, alert, custom_data)
 
         # If it was imported from Snapchat and the device version is
@@ -251,7 +251,7 @@ class MobileNotifier
     alert = "Your friend has posted a story"
     custom_data = {stories: story.id}
 
-    if !story.sent_externally?
+    if !story.imported?
       create_ios_notifications(alert, custom_data)
     else
       create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
