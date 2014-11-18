@@ -1,4 +1,7 @@
 module AdminHelper
+  TIME_FORMATS = {long: '%B %-d, %Y %l:%M %P %Z',
+                  short: '%m/%d/%y %l:%M %P'}
+
   def alert_class(type)
     case type.to_s
     when 'info'
@@ -19,7 +22,11 @@ module AdminHelper
 
   def admin_timestamp(datetime, options = {})
     return datetime unless datetime
-    str = datetime.in_time_zone('Eastern Time (US & Canada)').strftime("%B %-d, %Y %l:%M %P %Z")
+
+    format = TIME_FORMATS[options[:format] || :long]
+
+    str = datetime.in_time_zone('Eastern Time (US & Canada)')
+    str = str.strftime(format)
     str += " (#{time_ago_in_words datetime} ago)" if options[:time_ago]
 
     str

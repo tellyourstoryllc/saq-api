@@ -82,6 +82,7 @@ KrazyChat::Application.routes.draw do
 
     match '/hook/callback', to: 'hook#callback', as: 'hook_callback'
 
+    match '/admin', to: 'admin#app_reviews', as: 'admin'
     match '/admin/login', to: 'admin_auth#login', as: 'admin_login'
     match '/admin/logout', to: 'admin_auth#logout', as: 'admin_logout'
     match '/admin/forgot_password', to: 'admin_auth#forgot_password', as: 'admin_forgot_password'
@@ -97,6 +98,7 @@ KrazyChat::Application.routes.draw do
     match '/admin/settings/:key/edit', to: 'admin#edit_setting', as: 'admin_edit_setting'
     match '/admin/settings/:key/update', to: 'admin#update_setting', as: 'admin_update_setting'
     match '/admin/app_reviews', to: 'admin#app_reviews', as: 'admin_app_reviews'
+    match '/admin/bot_messages', to: 'admin#bot_messages', as: 'admin_bot_messages'
 
     match '/logs/event', to: 'logs#event', as: 'logs_event'
 

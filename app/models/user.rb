@@ -87,6 +87,16 @@ class User < ActiveRecord::Base
   hash_key :widget_notification_info
   value :skipped_phone
 
+  # Miscellaneous flags, counters, timestamps
+  # Use this where possible instead of separate keys, to reduce memory
+  #
+  # pending_imported_digest: bool
+  hash_key :misc
+
+  set :pending_imported_digest_message_ids
+  set :pending_digest_story_ids
+  hash_key :stories_digest_info
+
   delegate :registered, :registered?, to: :account
 
   COHORT_METRICS_TIME_ZONE = 'America/New_York'
@@ -260,22 +270,24 @@ class User < ActiveRecord::Base
   end
 
   # Send notifications via all the user's channels, taking into account his preferences for each
-  def send_notifications(message)
-    return unless away_idle_or_unavailable? && !bot? && !message.received
+  def send_snap_notifications(message)
+    return unless away_idle_or_unavailable? && !bot?
 
-    if !mobile_notifier.notify(message)
-      email_notifier.notify(message)  # only send email notification if no mobile notification was sent.
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_snap(message)
+    else
+      email_notifier.notify_snap(message)
     end
   end
 
   def send_mobile_only_notifications(message)
-    return unless away_idle_or_unavailable? && !bot? && !message.received
+    return unless away_idle_or_unavailable? && !bot?
 
-    mobile_notifier.notify(message)
+    mobile_notifier.notify_snap(message)
   end
 
   def send_story_notifications(story)
-    return unless away_idle_or_unavailable? && !bot? && !story.received
+    return unless away_idle_or_unavailable? && !bot?
 
     if mobile_notifier.pushes_enabled?
       mobile_notifier.notify_story(story)
@@ -673,7 +685,7 @@ class User < ActiveRecord::Base
   # To be safe, make sure not to overwrite an existing frequency
   # and get the existing one if it already exists
   def set_content_frequency
-    return unless ios_devices.any?{ |d| d.client_version.to_i >= ContentNotifier::MIN_CLIENT_VERSION }
+    return unless ios_devices.any?{ |d| d.version_at_least?(:content_pushes) }
 
     frequency = ContentNotifier::CONTENT_FREQUENCIES.keys.sample
     newly_set = redis.hsetnx(content_push_info.key, 'frequency', frequency)
@@ -726,6 +738,40 @@ class User < ActiveRecord::Base
 
   def outgoing_or_incoming_friend?(user)
     fetched_snapchat_friend_ids.include?(user.id) || fetched_snapchat_follower_ids.include?(user.id)
+  end
+
+  # Reset the imported snaps digest status for the next batch
+  def reset_imported_snaps_digest
+    redis.multi do
+      misc.delete('pending_imported_digest')
+      pending_imported_digest_message_ids.del
+    end
+  end
+
+  # Set the imported snaps digest to cancelled, so when the scheduled job
+  # runs, it won't send the notification
+  def cancel_imported_snaps_digest
+    redis.multi do
+      misc['pending_imported_digest'] = 'cancelled'
+      pending_imported_digest_message_ids.del
+    end
+  end
+
+  def set_stories_digest_frequency
+    return unless ios_devices.any?{ |d| d.version_at_least?(:all_server_notifications) }
+
+    frequency = MobileNotifier::STORIES_DIGEST_FREQUENCIES.sample
+    newly_set = redis.hsetnx(stories_digest_info.key, 'frequency', frequency)
+    newly_set ? frequency : get_stories_digest_frequency
+  end
+
+  def get_stories_digest_frequency
+    frequency = stories_digest_info['frequency']
+    frequency.blank? ? nil : frequency.to_i
+  end
+
+  def stories_digest_frequency
+    @stories_digest_frequency ||= get_stories_digest_frequency || set_stories_digest_frequency
   end
 
 

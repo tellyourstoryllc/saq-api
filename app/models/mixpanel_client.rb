@@ -54,13 +54,12 @@ class MixpanelClient
       'Time Zone' => user.account.time_zone, 'Status' => user.computed_status, 'Invited' => user.invited?,
       'Sent Messages' => user.metrics[:sent_messages_count].to_i,
       'Received Messages' => user.metrics[:received_messages_count].to_i,
-      'Phone Contacts' => user.phone_contacts.size,
-      'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
-      'Snapchat Friends' => snapchat_friends_count,
-      'Initial Snapchat Friends in App' => initial_friends_in_app_count,
+      'Phone Contacts' => user.phone_contacts.size, 'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
+      'Snapchat Friends' => snapchat_friends_count, 'Initial Snapchat Friends in App' => initial_friends_in_app_count,
       'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency,
       'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil),
-      'Rating' => user.app_reviews.latest.limit(1).pluck(:rating).first, 'Skipped Phone' => Bool.parse(user.skipped_phone.value)
+      'Rating' => user.app_reviews.latest.limit(1).pluck(:rating).first, 'Skipped Phone' => Bool.parse(user.skipped_phone.value),
+      'Stories Digest Frequency' => user.stories_digest_frequency
     )
 
     properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?
