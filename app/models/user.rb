@@ -94,6 +94,8 @@ class User < ActiveRecord::Base
   hash_key :misc
 
   set :pending_imported_digest_message_ids
+  set :pending_digest_story_ids
+  hash_key :stories_digest_info
 
   delegate :registered, :registered?, to: :account
 
@@ -700,6 +702,23 @@ class User < ActiveRecord::Base
       misc['pending_imported_digest'] = 'cancelled'
       pending_imported_digest_message_ids.del
     end
+  end
+
+  def set_stories_digest_frequency
+    return unless ios_devices.any?{ |d| d.version_at_least?(:all_server_notifications) }
+
+    frequency = MobileNotifier::STORIES_DIGEST_FREQUENCIES.sample
+    newly_set = redis.hsetnx(stories_digest_info.key, 'frequency', frequency)
+    newly_set ? frequency : get_stories_digest_frequency
+  end
+
+  def get_stories_digest_frequency
+    frequency = stories_digest_info['frequency']
+    frequency.blank? ? nil : frequency.to_i
+  end
+
+  def stories_digest_frequency
+    @stories_digest_frequency ||= get_stories_digest_frequency || set_stories_digest_frequency
   end
 
 

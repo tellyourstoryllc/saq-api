@@ -52,8 +52,11 @@ class UsersController < ApplicationController
     create_or_update_device
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
-    # Send events to Mixpanel
     @current_user.set_content_frequency
+    @current_user.set_stories_digest_frequency
+
+
+    # Send events to Mixpanel
     mixpanel.user_registered(@current_user)
     group_mixpanel.group_created(@group) if @group
 

@@ -2,6 +2,14 @@ class MobileNotifier
   attr_accessor :user
   NOTIFICATION_DELAYS = [5.minutes, 10.minutes, 20.minutes, 30.minutes, 1.hour, 2.hours, 4.hours, 8.hours, 24.hours] # approximate 2^n exponential backoff
 
+  # Frequency is in minutes
+  # Frequency of -1 means don't send any digests - send notifications for every story
+  STORIES_DIGEST_FREQUENCIES = [
+    -1,  # No digests; regular story notifications for every story
+    480, # Max one digest notification per 8 hours
+    1440 # Max one digest notification per 24 hours
+  ]
+
 
   def initialize(user)
     self.user = user
@@ -245,19 +253,70 @@ class MobileNotifier
     create_android_notifications(alert, custom_data)
   end
 
-  def notify_story(story)
+  def send_story_notification(ios_device, story)
     return if story.user_id == user.id
 
     alert = "Your friend has posted a story"
     custom_data = {stories: story.id}
 
-    if !story.imported?
-      create_ios_notifications(alert, custom_data)
-    else
-      create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
+    create_ios_notification(ios_device, alert, custom_data)
+    #create_android_notifications(alert, custom_data)
+  end
+
+  def notify_story(story)
+    return if story.user_id == user.id
+
+    handle_digest = false
+    frequency = user.stories_digest_frequency
+
+    user.ios_devices.each do |ios_device|
+      # If the device is old and the story was sent via SCP, send the notification
+      if !ios_device.version_at_least?(:all_server_notifications)
+        send_story_notification(ios_device, story) unless story.imported?
+
+      # If the device is new but wasn't assigned to receive digests, send the notification
+      elsif frequency == -1
+        send_story_notification(ios_device, story)
+
+      # If the device is new and was assigned to receive digests, handle the digest
+      else
+        handle_digest = true
+      end
     end
 
-    create_android_notifications(alert, custom_data)
+    notify_or_add_to_stories_digest(story) if handle_digest
+  end
+
+  def add_to_stories_digest(story)
+    user.pending_digest_story_ids << story.id
+  end
+
+  def send_stories_digest_notifications
+    pending_count, _ = user.redis.multi do
+      user.pending_digest_story_ids.size
+      user.pending_digest_story_ids.del
+      user.stories_digest_info['last_stories_digest_at'] = Time.current.to_i
+    end
+
+    alert = "You have #{pending_count} new #{pending_count == 1 ? 'story' : 'stories'}"
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
+    #create_android_notifications(alert, custom_data)
+  end
+
+  def notify_or_add_to_stories_digest(story)
+    frequency = user.stories_digest_frequency
+    last_stories_digest_at = user.stories_digest_info['last_stories_digest_at']
+
+    # Add the story to the digest
+    add_to_stories_digest(story)
+
+    # If this is the user's first digest or his frequency has elapsed
+    # since the last digest, send a story digest
+    if last_stories_digest_at.nil? || Time.zone.at(last_stories_digest_at.to_i) < frequency.minutes.ago
+      send_stories_digest_notifications
+    end
   end
 
   def notify_story_comment(comment)
