@@ -1,7 +1,7 @@
 require 'active_record/validations'
 
 class ApplicationController < ActionController::Base
-  before_action :disable_android, :require_signature, :require_token, :set_locale, :create_or_update_device
+  before_action :require_signature, :require_token, :set_locale, :create_or_update_device
   around_action :set_client
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
   rescue_from Peanut::UnauthorizedError, with: :render_401
@@ -41,10 +41,6 @@ class ApplicationController < ActionController::Base
 
 
   private
-
-  def disable_android
-    render_error('Android is currently disabled.') if params[:client] == 'android'
-  end
 
   def require_signature
     return if secure_request? || Settings.enabled?(:skip_request_signature) || Rails.env.test?
