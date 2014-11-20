@@ -691,7 +691,7 @@ class User < ActiveRecord::Base
 
   def get_content_frequency
     frequency = content_push_info['frequency']
-    frequency.blank? ? nil : frequency.to_i
+    frequency.blank? ? nil : frequency
   end
 
   def content_frequency
@@ -701,6 +701,13 @@ class User < ActiveRecord::Base
   def last_content_push_at
     timestamp = content_push_info['last_content_push_at']
     timestamp.blank? ? nil : Time.zone.at(timestamp)
+  end
+
+  def content_frequency_cohort
+    case content_frequency
+    when '5_more_retries', '15_more_retries', '60_more_retries' then :more_retries
+    else :original
+    end
   end
 
   def add_friend(user)
