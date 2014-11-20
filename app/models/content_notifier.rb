@@ -48,6 +48,7 @@ class ContentNotifier
           user_content_push_infos[user.id] = User.redis.hmget(user.content_push_info.key, :frequency)
 
           user.ios_devices.each do |device|
+            next unless device.can_send_content_push?
             device_content_push_infos[device.id] = User.redis.hmget(device.content_push_info.key, :current_frequency, :last_content_push_at, :unanswered_count)
           end
         end
@@ -60,6 +61,8 @@ class ContentNotifier
         next if user_frequency.nil? || user_frequency == '0'
 
         user.ios_devices.each do |device|
+          next unless device_content_push_infos.has_key?(device.id)
+
           device_info = device_content_push_infos[device.id].value
 
           device_frequency = device_info[0].to_i
