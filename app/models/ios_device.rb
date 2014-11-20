@@ -30,7 +30,7 @@ class IosDevice < BaseDevice
 
     frequency = if user_frequency.blank?
                   nil
-                elsif user_frequency.to_i == 0
+                elsif user_frequency == '0'
                   0
                 else
                   levels = ContentNotifier::CONTENT_FREQUENCIES[user_frequency]

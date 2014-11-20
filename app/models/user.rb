@@ -675,7 +675,7 @@ class User < ActiveRecord::Base
 
   def get_content_frequency
     frequency = content_push_info['frequency']
-    frequency.blank? ? nil : frequency.to_i
+    frequency.blank? ? nil : frequency
   end
 
   def content_frequency

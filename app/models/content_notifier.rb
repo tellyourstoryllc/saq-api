@@ -5,20 +5,35 @@ class ContentNotifier
   # then every 12 hours 6 times, then every 7 days forever
   # Each device increases levels like this until a checkin occurs
   CONTENT_FREQUENCIES = {
-    5 => [
+    '5' => [
       {frequency: 5, unanswered_count: 3},   # 5 minutes
       {frequency: 720, unanswered_count: 9}, # 12 hours
       {frequency: 10080}                     # 7 days
     ],
-    15 => [
+    '5_more_retries' => [
+      {frequency: 5, unanswered_count: 10},   # 5 minutes
+      {frequency: 720, unanswered_count: 16}, # 12 hours
+      {frequency: 10080}                      # 7 days
+    ],
+    '15' => [
       {frequency: 15, unanswered_count: 3},  # 15 minutes
       {frequency: 720, unanswered_count: 9}, # 12 hours
       {frequency: 10080}                     # 7 days
     ],
-    60 => [
+    '15_more_retries' => [
+      {frequency: 15, unanswered_count: 10},  # 15 minutes
+      {frequency: 720, unanswered_count: 16}, # 12 hours
+      {frequency: 10080}                      # 7 days
+    ],
+    '60' => [
       {frequency: 60, unanswered_count: 3},  # 60 minutes
       {frequency: 720, unanswered_count: 9}, # 12 hours
       {frequency: 10080}                     # 7 days
+    ],
+    '60_more_retries' => [
+      {frequency: 60, unanswered_count: 10},  # 60 minutes
+      {frequency: 720, unanswered_count: 16}, # 12 hours
+      {frequency: 10080}                      # 7 days
     ]
   }
 
@@ -41,8 +56,8 @@ class ContentNotifier
       group.each do |user|
         info = user_content_push_infos[user.id].value
 
-        user_frequency = (info[0] || user.set_content_frequency).to_i
-        next if user_frequency == 0
+        user_frequency = info[0] || user.set_content_frequency
+        next if user_frequency.nil? || user_frequency == '0'
 
         user.ios_devices.each do |device|
           device_info = device_content_push_infos[device.id].value
