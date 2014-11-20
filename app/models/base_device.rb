@@ -19,14 +19,6 @@ class BaseDevice < ActiveRecord::Base
     attrs[:uninstalled] = false
 
     result = device.update!(attrs)
-
-    # If the device changes ownership to a different user,
-    # delete the existing content push info
-    new_user_id = device.user_id
-    if new_user_id != old_user_id && device.respond_to?(:content_push_info)
-      device.content_push_info.del
-    end
-
     result
   end
 
@@ -41,10 +33,6 @@ class BaseDevice < ActiveRecord::Base
 
   def can_send?
     !uninstalled? && has_auth? && preferences.server_pushes_enabled
-  end
-
-  def can_send_content_push?
-    !uninstalled? && has_auth?
   end
 
   def notify_new_member?(user)

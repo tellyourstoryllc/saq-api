@@ -39,7 +39,6 @@ class User < ActiveRecord::Base
   value :last_mixpanel_checkin_at
   value :last_mixpanel_message_at
   value :last_mixpanel_message_to_bot_at
-  value :last_mixpanel_received_content_push_at
   value :invited
   value :sorting_name # Used for sorting contacts lists
   hash_key :metrics
@@ -79,7 +78,6 @@ class User < ActiveRecord::Base
   set :unviewed_message_user_ids, global: true
   value :snap_invites_allowed
   value :sms_invites_allowed
-  hash_key :content_push_info
   hash_key :story_snapchat_media_ids
   value :assigned_like_snap_template_id
   value :assigned_comment_snap_template_id
@@ -677,37 +675,6 @@ class User < ActiveRecord::Base
 
     today = Time.current.to_date
     today.year - birthday.year - ((today.month > birthday.month || (today.month == birthday.month && today.day >= birthday.day)) ? 0 : 1)
-  end
-
-  # To be safe, make sure not to overwrite an existing frequency
-  # and get the existing one if it already exists
-  def set_content_frequency
-    return unless ios_devices.any?{ |d| d.version_at_least?(:content_pushes) }
-
-    frequency = ContentNotifier::CONTENT_FREQUENCIES.keys.sample
-    newly_set = redis.hsetnx(content_push_info.key, 'frequency', frequency)
-    newly_set ? frequency : get_content_frequency
-  end
-
-  def get_content_frequency
-    frequency = content_push_info['frequency']
-    frequency.blank? ? nil : frequency
-  end
-
-  def content_frequency
-    @content_frequency ||= get_content_frequency || set_content_frequency
-  end
-
-  def last_content_push_at
-    timestamp = content_push_info['last_content_push_at']
-    timestamp.blank? ? nil : Time.zone.at(timestamp)
-  end
-
-  def content_frequency_cohort
-    case content_frequency
-    when '5_more_retries', '15_more_retries', '60_more_retries' then :more_retries
-    else :original
-    end
   end
 
   def add_friend(user)

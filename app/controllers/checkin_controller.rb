@@ -1,6 +1,5 @@
 class CheckinController < ApplicationController
   skip_before_action :require_token, only: :index
-  before_action :reset_unanswered_content_pushes, only: :index
 
 
   def index

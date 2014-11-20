@@ -71,7 +71,6 @@ class UsersController < ApplicationController
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
     @current_user.skipped_phone = params[:skipped_phone] if params[:skipped_phone].present?
-    @current_user.set_content_frequency
     @current_user.set_stories_digest_frequency
 
 

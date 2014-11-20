@@ -64,22 +64,12 @@ class MobileNotifier
   end
 
   def create_ios_notification(ios_device, alert, custom_data = {}, options = {})
-    return unless (options[:content_available] && ios_device.can_send_content_push?) || ios_device.can_send?
+    return unless ios_device.can_send?
 
     options[:device_token] = ios_device.push_token
 
     n = ios_notifier.build_notification(alert, custom_data, options)
     saved = n.save!
-
-    # Updates for content-available pushes
-    if saved && options[:content_available]
-      ios_device.content_push_info['last_content_push_at'] = Time.current.to_i
-      ios_device.content_push_info.incr('unanswered_count')
-
-      User.redis.incr("user::content_pushes_count:#{Time.zone.today}")
-      StatsD.increment('content_available_pushes.server_sent')
-      StatsD.increment("content_available_pushes.#{user.content_frequency_cohort}.server_sent")
-    end
 
     saved
   end
@@ -323,15 +313,6 @@ class MobileNotifier
 
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)
-  end
-
-  def notify_content_available(ios_device, options = {})
-    return unless ios_device.version_at_least?(:content_pushes)
-
-    options.reverse_merge!(sound: nil)
-    options[:content_available] = true
-
-    create_ios_notification(ios_device, nil, {}, options)
   end
 
   def notify_drip(drip_notification)

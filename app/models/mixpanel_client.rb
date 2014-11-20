@@ -56,7 +56,7 @@ class MixpanelClient
       'Received Messages' => user.metrics[:received_messages_count].to_i,
       'Phone Contacts' => user.phone_contacts.size, 'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
       'Snapchat Friends' => snapchat_friends_count, 'Initial Snapchat Friends in App' => initial_friends_in_app_count,
-      'Notifications Enabled' => user.mobile_notifier.pushes_enabled?, 'Content Frequency' => user.content_frequency,
+      'Notifications Enabled' => user.mobile_notifier.pushes_enabled?,
       'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil),
       'Rating' => user.app_reviews.latest.limit(1).pluck(:rating).first, 'Skipped Phone' => Bool.parse(user.skipped_phone.value),
       'Stories Digest Frequency' => user.stories_digest_frequency
@@ -232,16 +232,6 @@ class MixpanelClient
 
   def received_comment_snap(properties)
     track('Received Comment Snap', received_comment_snap_properties(properties))
-  end
-
-  def received_daily_content_push
-    last_push = user.last_mixpanel_received_content_push_at.get
-    last_push = Time.zone.at(last_push.to_i) if last_push
-
-    if last_push.nil? || last_push < 24.hours.ago
-      user.last_mixpanel_received_content_push_at = Time.current.to_i
-      track('Received Daily Content Push')
-    end
   end
 
   def created_app_review
