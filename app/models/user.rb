@@ -687,6 +687,13 @@ class User < ActiveRecord::Base
     timestamp.blank? ? nil : Time.zone.at(timestamp)
   end
 
+  def content_frequency_cohort
+    case content_frequency
+    when '5_more_retries', '15_more_retries', '60_more_retries' then :more_retries
+    else :original
+    end
+  end
+
   # Reset the imported snaps digest status for the next batch
   def reset_imported_snaps_digest
     redis.multi do

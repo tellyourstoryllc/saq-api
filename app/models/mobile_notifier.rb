@@ -75,8 +75,10 @@ class MobileNotifier
     if saved && options[:content_available]
       ios_device.content_push_info['last_content_push_at'] = Time.current.to_i
       ios_device.content_push_info.incr('unanswered_count')
+
       User.redis.incr("user::content_pushes_count:#{Time.zone.today}")
       StatsD.increment('content_available_pushes.server_sent')
+      StatsD.increment("content_available_pushes.#{user.content_frequency_cohort}.server_sent")
     end
 
     saved
