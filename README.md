@@ -13,7 +13,7 @@ rake db:create
 Update the db to *not* add all new columns as utf8mb4:
 
 ```sql
-ALTER DATABASE chat_app_dev DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER DATABASE knowme_dev DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ```
 
 Migrate db:
@@ -22,7 +22,7 @@ Migrate db:
 rake db:migrate
 ```
 
-Install Redis (>= 2.6.12) if not already installed:
+Install Redis (>= 2.8.17) if not already installed:
 
 ```shell
 brew install redis
