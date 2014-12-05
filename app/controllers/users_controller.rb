@@ -134,7 +134,7 @@ class UsersController < ApplicationController
 
   def update_user_params
     params.permit(:name, :username, :status, :status_text, :avatar_image_file, :avatar_image_url, :avatar_video_file, :birthday,
-                  :latitude, :longitude, :location_name)
+                  :latitude, :longitude, :location_name, :reset_friend_code)
   end
 
   def group_params

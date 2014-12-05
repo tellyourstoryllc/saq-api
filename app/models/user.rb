@@ -753,6 +753,10 @@ class User < ActiveRecord::Base
     @stories_digest_frequency ||= get_stories_digest_frequency || set_stories_digest_frequency
   end
 
+  def reset_friend_code=(bool)
+    set_friend_code if Bool.parse(bool)
+  end
+
 
   private
 

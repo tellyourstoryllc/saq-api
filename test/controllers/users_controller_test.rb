@@ -208,6 +208,8 @@ describe UsersController do
   describe "POST /users/update" do
     it "must update the user" do
       FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
+      old_friend_code = current_user.friend_code
+
       post :update, {token: current_user.token, username: 'Johnny', status: 'away', status_text: 'be back soon',
                      latitude: '50.19361', longitude: '-74.0192', location_name: 'Anytown, USA'}
 
@@ -215,7 +217,25 @@ describe UsersController do
       result_must_include 'user', current_user.id, {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny',
         'username' => 'Johnny', 'token' => current_user.token, 'status' => nil, 'idle_duration' => nil,
         'status_text' => nil, 'client_type' => nil, 'avatar_url' => nil, 'latitude' => 50.19361, 'longitude' => -74.0192,
+        'location_name' => 'Anytown, USA', 'friend_code' => current_user.friend_code}
+
+      current_user.reload.friend_code.must_equal old_friend_code
+    end
+
+    it "must update the user's friend_code" do
+      FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
+      old_friend_code = current_user.friend_code
+
+      post :update, {token: current_user.token, username: 'Johnny', status: 'away', status_text: 'be back soon',
+                     latitude: '50.19361', longitude: '-74.0192', location_name: 'Anytown, USA', reset_friend_code: 'true'}
+
+      result.size.must_equal 1
+      result_must_include 'user', current_user.id, {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny',
+        'username' => 'Johnny', 'token' => current_user.token, 'status' => nil, 'idle_duration' => nil,
+        'status_text' => nil, 'client_type' => nil, 'avatar_url' => nil, 'latitude' => 50.19361, 'longitude' => -74.0192,
         'location_name' => 'Anytown, USA'}
+
+      current_user.reload.friend_code.wont_equal old_friend_code
     end
 
     it "must not update the user's status to idle" do
