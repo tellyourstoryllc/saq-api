@@ -5,7 +5,7 @@ class SnapMailer < BaseMailer
 
     id = OneToOne.id_for_user_ids(@recipient.id, @sender.id)
     @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
-    subject = "#{@sender.username} sent you a snap"
+    subject = "#{@sender.public_username || 'Someone'} sent you a snap"
 
     mail(to: @recipient.emails.map(&:email), subject: subject)
   end

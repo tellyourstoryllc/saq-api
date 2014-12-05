@@ -35,7 +35,7 @@ class MessageMailer < BaseMailer
     id = @message.conversation.id
     @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
 
-    subject = "#{@actor.username} forwarded your #{@message_description}"
+    subject = "#{@actor.public_username || 'Someone'} forwarded your #{@message_description}"
 
     mail(to: @user.emails.map(&:email), subject: subject)
   end
@@ -54,7 +54,7 @@ class MessageMailer < BaseMailer
       @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
     end
 
-    subject = "#{@actor.username} liked your #{@message_description}"
+    subject = "#{@actor.public_username || 'Someone'} liked your #{@message_description}"
 
     mail(to: @user.emails.map(&:email), subject: subject)
   end
@@ -80,9 +80,9 @@ class MessageMailer < BaseMailer
 
     friendly_media_type = @comment.message_attachment.try(:comment_friendly_media_type)
     @subject = if friendly_media_type.present?
-              "Somebody posted #{friendly_media_type} comment on #{@user.username}'s story"
+              "Somebody posted #{friendly_media_type} comment on #{@user.public_username || 'someone'}'s story"
             else
-              "Somebody commented on #{@user.username}'s story"
+              "Somebody commented on #{@user.public_username || 'someone'}'s story"
             end
 
     mail(to: @recipient.emails.map(&:email), subject: @subject)

@@ -1,5 +1,5 @@
 Hey,
 
-<%= @actor.username %> forwarded your <%= @message_description %>.
+<%= @actor.public_username || 'Somebody' %> forwarded your <%= @message_description %>.
 
 See it here: <%= @url %>

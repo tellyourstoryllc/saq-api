@@ -97,6 +97,14 @@ class User < ActiveRecord::Base
   COHORT_METRICS_TIME_ZONE = 'America/New_York'
 
 
+  def generated_username?
+    username.first == '_'
+  end
+
+  def public_username
+    username unless generated_username?
+  end
+
   def first_name
     name.present? ? name.split(' ').first : username
   end

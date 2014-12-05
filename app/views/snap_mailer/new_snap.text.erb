@@ -1,5 +1,5 @@
 Hey,
 
-You have a new snap from <%= @sender.username %> waiting for you in <%= Rails.configuration.app['app_name'] %>!
+You have a new snap from <%= @sender.public_username || 'somebody' %> waiting for you in <%= Rails.configuration.app['app_name'] %>!
 
 See it here: <%= @url %>

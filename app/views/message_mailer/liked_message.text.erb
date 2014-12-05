@@ -1,5 +1,5 @@
 Hey,
 
-<%= @actor.username %> liked your <%= @message_description %>.
+<%= @actor.public_username || 'Somebody' %> liked your <%= @message_description %>.
 
 See it here: <%= @url %>

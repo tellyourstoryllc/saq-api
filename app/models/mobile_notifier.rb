@@ -188,7 +188,7 @@ class MobileNotifier
   def notify_friend_joined(friend)
     return if friend.id == user.id
 
-    alert = "Your friend #{friend.username} just joined! Send a snap to say hi!"
+    alert = "Your friend#{' ' + friend.public_username if friend.public_username} just joined! Send a snap to say hi!"
     custom_data = {}
 
     create_ios_notifications(alert, custom_data)
@@ -198,7 +198,7 @@ class MobileNotifier
   def notify_forward(message, actor)
     return if message.user_id == actor.id
 
-    alert = "#{actor.username} forwarded your #{message.message_attachment.media_type_name}"
+    alert = "#{actor.public_username || 'Somebody'} forwarded your #{message.message_attachment.media_type_name}"
     custom_data = {}
 
     create_ios_notifications(alert, custom_data)
@@ -209,7 +209,7 @@ class MobileNotifier
     return if message.user_id == actor.id
 
     description = message.story? ? 'story' : (message.message_attachment.try(:media_type_name) || 'message')
-    alert = "#{actor.username} liked your #{description}"
+    alert = "#{actor.public_username || 'Somebody'} liked your #{description}"
     custom_data = {}
 
     create_ios_notifications(alert, custom_data)
@@ -222,9 +222,9 @@ class MobileNotifier
 
     msg_desc = message.story? ? 'story' : (message.message_attachment.try(:media_type_name) || 'message')
     alert = case method
-            when 'screenshot' then "#{actor.username} took a screenshot of your #{msg_desc}"
-            when 'library' then "#{actor.username} saved your #{msg_desc} to their camera roll"
-            else "#{actor.username} shared your #{msg_desc}"
+            when 'screenshot' then "#{actor.public_username || 'Somebody'} took a screenshot of your #{msg_desc}"
+            when 'library' then "#{actor.public_username || 'Somebody'} saved your #{msg_desc} to their camera roll"
+            else "#{actor.public_username || 'Somebody'} shared your #{msg_desc}"
             end
 
     custom_data = {}
@@ -304,9 +304,9 @@ class MobileNotifier
 
     friendly_media_type = comment.message_attachment.try(:comment_friendly_media_type)
     alert = if friendly_media_type.present?
-              "Somebody posted #{friendly_media_type} comment on #{comment.conversation.user.username}'s story"
+              "Somebody posted #{friendly_media_type} comment on #{comment.conversation.user.public_username || 'someone'}'s story"
             else
-              "Somebody commented on #{comment.conversation.user.username}'s story"
+              "Somebody commented on #{comment.conversation.user.public_username || 'someone'}'s story"
             end
 
     custom_data = {stories: comment.conversation.id}

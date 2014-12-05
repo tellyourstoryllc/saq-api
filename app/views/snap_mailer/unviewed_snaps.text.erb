@@ -3,7 +3,7 @@ Hey,
 We wanted to let you know that you have one or more unviewed snaps from the following <%= 'friend'.pluralize(@senders.size) %> on <%= Rails.configuration.app['app_name'] %>:
 
 <% @senders.each do |sender| -%>
-- <%= sender.username %>
+- <%= sender.public_username %>
 <% end -%>
 
 Click here to view your <%= 'snap'.pluralize(@messages.size) %>:  <%= @url %>
