@@ -45,7 +45,7 @@ describe UsersController do
         result.size.must_equal 2
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
           'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-          'client_type' => nil, 'avatar_url' => nil}
+          'client_type' => nil, 'avatar_url' => nil, 'friend_code' => user.friend_code}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
           'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
       end
@@ -59,7 +59,7 @@ describe UsersController do
         result.size.must_equal 2
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => user.username, 'username' => user.username,
           'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-          'client_type' => nil, 'avatar_url' => nil}
+          'client_type' => nil, 'avatar_url' => nil, 'friend_code' => user.friend_code}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
           'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
 
@@ -78,7 +78,7 @@ describe UsersController do
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => user.username, 'username' => user.username,
           'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
           'client_type' => nil, 'avatar_url' => nil, 'gender' => 'male', 'latitude' => 39.9525840,
-          'longitude' => -75.1652220, 'location_name' => 'Northern Liberties'}
+          'longitude' => -75.1652220, 'location_name' => 'Northern Liberties', 'friend_code' => user.friend_code}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
           'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
 
@@ -97,7 +97,7 @@ describe UsersController do
           result.size.must_equal 3
           result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => user.name,
             'username' => 'JohnDoe', 'token' => user.token, 'status' => nil,
-            'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil, 'avatar_url' => nil}
+            'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil, 'avatar_url' => nil, 'friend_code' => user.friend_code}
 
           result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
             'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
@@ -123,7 +123,7 @@ describe UsersController do
           result.size.must_equal 2
           result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'JohnDoe', 'username' => 'JohnDoe',
             'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-            'client_type' => nil, 'avatar_url' => nil}
+            'client_type' => nil, 'avatar_url' => nil, 'friend_code' => user.friend_code}
           result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
             'one_to_one_wallpaper_url' => nil, 'facebook_id' => '100002345', 'time_zone' => 'America/New_York'}
         end
@@ -142,7 +142,7 @@ describe UsersController do
         result.size.must_equal 2
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'BruceLee', 'username' => 'BruceLee',
           'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-          'client_type' => nil, 'avatar_url' => nil}
+          'client_type' => nil, 'avatar_url' => nil, 'friend_code' => user.friend_code}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
           'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
 
@@ -165,7 +165,7 @@ describe UsersController do
         result.size.must_equal 2
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'BruceLee', 'username' => 'BruceLee',
           'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-          'client_type' => nil, 'avatar_url' => nil, 'registered' => true}
+          'client_type' => nil, 'avatar_url' => nil, 'registered' => true, 'friend_code' => user.friend_code}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
           'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
 
@@ -195,7 +195,7 @@ describe UsersController do
         result.size.must_equal 2
         result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => 'BruceLee', 'username' => 'BruceLee',
           'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-          'client_type' => nil, 'avatar_url' => nil}
+          'client_type' => nil, 'avatar_url' => nil, 'friend_code' => user.friend_code}
         result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
           'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York'}
 

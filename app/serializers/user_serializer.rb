@@ -2,7 +2,7 @@ class UserSerializer < ActiveModel::Serializer
   attributes :object_type, :id, :token, :name, :username, :status, :status_text,
     :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
     :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered, :gender,
-    :latitude, :longitude, :location_name
+    :latitude, :longitude, :location_name, :friend_code
 
 
   def name
@@ -78,6 +78,10 @@ class UserSerializer < ActiveModel::Serializer
     else
       object.longitude.to_f.try(:round, 2)
     end
+  end
+
+  def friend_code
+    object.friend_code if owner?
   end
 
 
