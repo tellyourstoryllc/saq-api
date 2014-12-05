@@ -7,6 +7,7 @@ class Account < ActiveRecord::Base
   has_secure_password validations: false
 
   before_validation :set_time_zone, on: :create
+  validates :emails, presence: true
   validate :valid_facebook_credentials?, on: :create
   validate :time_zone_set?
   before_save :set_registered_at

@@ -4,12 +4,10 @@ describe UsersController do
   describe "POST /users/create" do
     describe "invalid" do
       it "must not create a user if it's invalid" do
-        # Currently always valid ...
-
-        #post :create
-        #old_count = User.count
-        #result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Email is invalid."})
-        #User.count.must_equal old_count
+        post :create
+        old_count = User.count
+        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Emails can't be blank."})
+        User.count.must_equal old_count
       end
 
       it "must not create a user using Facebook authentication if the given Facebook id and token are not valid" do
@@ -52,8 +50,8 @@ describe UsersController do
           'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
       end
 
-      it "must create a user and account without a username, password, or email" do
-        post :create, {}
+      it "must create a user and account without a username or password" do
+        post :create, {email: 'joe@example.com'}
 
         user = User.order('created_at DESC').first
         account = Account.order('created_at DESC').first
@@ -69,8 +67,9 @@ describe UsersController do
         user_hash['username'].starts_with?('_user').must_equal true
       end
 
-      it "must create a user and account without a username, password, or email and with additional attributes" do
-        post :create, {gender: 'male', latitude: '39.9525840', longitude: '-75.1652220', location_name: 'Northern Liberties'}
+      it "must create a user and account without a username or password, and with additional attributes" do
+        post :create, {email: 'joe@example.com', gender: 'male', latitude: '39.9525840', longitude: '-75.1652220',
+                       location_name: 'Northern Liberties'}
 
         user = User.order('created_at DESC').first
         account = Account.order('created_at DESC').first
