@@ -5,9 +5,10 @@ describe OneToOneMessagesController do
     it "must create a message for an existing one-to-one" do
       member = FactoryGirl.create(:user)
       FactoryGirl.create(:account, user_id: member.id)
+      ContactInviter.add_user(current_user, member)
 
-      one_to_one = OneToOne.new(sender_id: current_user.id, recipient_id: member.id)
-      one_to_one.save
+      one_to_one = OneToOne.new(creator_id: current_user.id, sender_id: current_user.id, recipient_id: member.id)
+      raise '1-1 not saved' unless one_to_one.save
 
       text = 'hey'
 
@@ -36,6 +37,7 @@ describe OneToOneMessagesController do
 
       text = 'hey'
       one_to_one_id = [current_user.id, member.id].sort.join('-')
+      ContactInviter.add_user(current_user, member)
 
       Time.stub :current, now = Time.parse('2013-10-07 15:08') do
         post :create, {one_to_one_id: one_to_one_id, text: text, token: current_user.token}

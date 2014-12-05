@@ -20,12 +20,14 @@ class Robot
   end
     
   def self.add_friend(current_user)
-    SnapchatFriendsImporter.new(current_user).add_friend(user, :outgoing)
-    SnapchatFriendsImporter.new(user).add_friend(current_user, :outgoing)
+    User.redis.multi do
+      current_user.add_friend(user)
+      user.add_friend(current_user)
+    end
   end
 
   def self.send_messages_by_trigger(current_user, trigger)
-    one_to_one = OneToOne.new(sender_id: current_user.id, recipient_id: user.id)
+    one_to_one = OneToOne.new(creator_id: user.id, sender_id: current_user.id, recipient_id: user.id)
 
     items = RobotItem.by_trigger(trigger)
     items.each do |item|
@@ -38,7 +40,7 @@ class Robot
   end
 
   def self.send_arbitrary_message(recipient, msg_text, options = {})
-    one_to_one = OneToOne.new(sender_id: user.id, recipient_id: recipient.id)
+    one_to_one = OneToOne.new(creator_id: user.id, sender_id: user.id, recipient_id: recipient.id)
     message = Message.new(one_to_one_id: one_to_one.id, user_id: user.id, text: msg_text)
 
     if message.save
@@ -53,7 +55,7 @@ class Robot
   end
 
   def self.send_initial_messages(current_user)
-    one_to_one = OneToOne.new(sender_id: user.id, recipient_id: current_user.id)
+    one_to_one = OneToOne.new(creator_id: user.id, sender_id: user.id, recipient_id: current_user.id)
     one_to_one.save if one_to_one.attrs.blank?
 
     send_messages_by_trigger(current_user, 'intro')

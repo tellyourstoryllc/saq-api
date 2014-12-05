@@ -3,11 +3,11 @@ development:
     username: USERNAME
     password: PASSWORD
   api:
-    url: http://localhost:3008
+    url: http://localhost:3009
     request_secret: SECRET
     signature_secret: SECRET
-  app_name: SnapCracklePop
-  app_name_short: SnapCracklePop
+  app_name: KnowMe
+  app_name_short: KnowMe
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -18,11 +18,11 @@ development:
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
-    config_prefix: snap
+    config_prefix: knowme
   facebook:
     app_access_token: TOKEN
   faye:
-    url: https://local.snap.io:8080/faye
+    url: https://local.know.me:8084/faye
     server_secret: SECRET
   hook:
     passcode: PASSCODE
@@ -30,36 +30,36 @@ development:
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
-  robot_username: teamsnapcrackle
+  robot_username: teamknowme
   rpush:
-    db_ios_app_name: snap_ios
-    db_android_app_name: snap_android
+    db_ios_app_name: knowme_ios
+    db_android_app_name: knowme_android
   redis:
     persisted:
       host: 127.0.0.1
-      port: 6384
+      port: 6385
       db: 0
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: snap.io
+    domain: know.me
   statsd:
     server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
-    prefix: snap
+    prefix: knowme
   web:
-    domain: localhost:3001
-    url: http://localhost:3001
+    domain: localhost:3002
+    url: http://localhost:3002
 
 test:
   admin:
     username: USERNAME
     password: PASSWORD
   api:
-    url: http://localhost:3008
+    url: http://localhost:3009
     request_secret: SECRET
     signature_secret: SECRET
-  app_name: SnapCracklePop
-  app_name_short: SnapCracklePop
+  app_name: KnowMe
+  app_name_short: KnowMe
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -70,11 +70,11 @@ test:
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
-    config_prefix: snap
+    config_prefix: knowme
   facebook:
     app_access_token: TOKEN
   faye:
-    url: https://local.snap.io:8080/faye_TEST
+    url: https://local.know.me:8084/faye_TEST
     server_secret: SECRET
   hook:
     passcode: 'invalid'
@@ -82,22 +82,22 @@ test:
   mixpanel:
     token: TOKEN
     group_token: GROUP_TOKEN
-  robot_username: teamsnapcrackle
+  robot_username: teamknowme
   rpush:
     db_ios_app_name: ~
     db_android_app_name: ~
   redis:
     persisted:
       host: 127.0.0.1
-      port: 6381
+      port: 6385
       db: 10
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: snap.io
+    domain: know.me
   statsd:
     server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
-    prefix: snap
+    prefix: knowme
   web:
     domain: test.host
     url: http://test.host

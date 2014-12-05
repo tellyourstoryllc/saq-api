@@ -3,10 +3,12 @@ KrazyChat::Application.routes.draw do
     match '/health_check' => 'monitor#health_check'
     match '/me', to: 'users#me', as: 'me'
     match '/users', to: 'users#index', as: 'users'
+    match '/users/username_status', to: 'users#username_status', as: 'check_username_status'
     match '/users/create', to: 'users#create', as: 'create_user'
     match '/users/update', to: 'users#update', as: 'update_user'
     match '/accounts/update', to: 'accounts#update', as: 'update_account'
     match '/password/reset_email' => 'accounts#send_reset_email', as: 'send_reset_email'
+    match '/password/reset_sms' => 'accounts#send_reset_sms', as: 'send_reset_sms'
     match '/password/reset/:token' => 'accounts#reset_password', :as => 'reset_password'
 
     match '/preferences/update', to: 'user_preferences#update', as: 'update_user_preferences'
@@ -70,6 +72,7 @@ KrazyChat::Application.routes.draw do
     match '/phones/create', to: 'phones#create', as: 'create_phone'
     match '/phones/verify', to: 'phones#verify', as: 'verify_phone'
     match '/phones/add', to: 'phones#add', as: 'add_phones'
+    match '/phones/confirm_activation', to: 'phones#confirm_activation', as: 'confirm_phone_activation'
 
     match '/contacts', to: 'contacts#index', as: 'contacts'
     match '/contacts/add', to: 'contacts#add', as: 'add_contacts'
@@ -113,7 +116,9 @@ KrazyChat::Application.routes.draw do
     match '/stories/:id/comments', to: 'story_comments#index', as: 'story_comments'
     match '/stories/:story_id/comments/:id/delete', to: 'story_comments#delete', as: 'delete_story_comment'
 
-    match '/friends/import', to: 'friends#import', as: 'import_friends'
+    match '/friends', to: 'friends#index', as: 'friends'
+    match '/friends/add', to: 'friends#add', as: 'add_friends'
+    match '/friends/remove', to: 'friends#remove', as: 'remove_friends'
 
     match '/blacklisted_usernames/add', to: 'blacklisted_usernames#add', as: 'add_blacklisted_username'
     match '/app_reviews/create', to: 'app_reviews#create', as: 'create_app_review'

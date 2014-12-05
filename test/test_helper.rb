@@ -62,6 +62,11 @@ Spork.prefork do
       actual = result.detect{ |obj| obj['object_type'] == object_type && obj['id'] == object_id }
       hash_must_include actual, expected
     end
+
+    def result_wont_include(object_type, object_id)
+      actual = result.detect{ |obj| obj['object_type'] == object_type && obj['id'] == object_id }
+      actual.must_be_nil
+    end
   end
 end
 

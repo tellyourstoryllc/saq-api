@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
   before_validation :fix_username
 
   validates :username, presence: true
+  validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
   validate :valid_username?, :username_format?
@@ -38,15 +39,12 @@ class User < ActiveRecord::Base
   value :last_mixpanel_checkin_at
   value :last_mixpanel_message_at
   value :last_mixpanel_message_to_bot_at
-  value :last_mixpanel_received_content_push_at
   value :invited
   value :sorting_name # Used for sorting contacts lists
   hash_key :metrics
   sorted_set :blocked_user_ids
   hash_key :group_last_seen_ranks
   hash_key :one_to_one_last_seen_ranks
-  hash_key :phone_verification_tokens, global: true
-  hash_key :user_ids_by_phone_verification_token, global: true
 
   value :last_mobile_digest_notification_at
   counter :mobile_digests_sent
@@ -80,20 +78,17 @@ class User < ActiveRecord::Base
   set :unviewed_message_user_ids, global: true
   value :snap_invites_allowed
   value :sms_invites_allowed
-  hash_key :content_push_info
   hash_key :story_snapchat_media_ids
   value :assigned_like_snap_template_id
   value :assigned_comment_snap_template_id
   value :drip_notifications_enabled
   hash_key :widget_notification_info
+  value :skipped_phone
 
   # Miscellaneous flags, counters, timestamps
   # Use this where possible instead of separate keys, to reduce memory
-  #
-  # pending_imported_digest: bool
   hash_key :misc
 
-  set :pending_imported_digest_message_ids
   set :pending_digest_story_ids
   hash_key :stories_digest_info
 
@@ -113,10 +108,6 @@ class User < ActiveRecord::Base
 
   def token
     @token ||= User.api_tokens[id] if id
-  end
-
-  def fetch_phone_verification_token
-    @phone_verification_token ||= User.phone_verification_tokens[id] || create_phone_verification_token if id
   end
 
   def avatar_url
@@ -360,8 +351,6 @@ class User < ActiveRecord::Base
 
     one_to_one = OneToOne.new(sender_id: id, recipient_id: user.id)
     one_to_one.remove_from_lists if one_to_one.attrs.exists?
-
-    SnapchatFriendsImporter.new(self).defriend(user)
   end
 
   def unblock(user)
@@ -479,8 +468,6 @@ class User < ActiveRecord::Base
     end
   end
 
-
-  # DEPRECATED?
   def paginated_contact_ids(options = {})
     max = 50
     options[:limit] ||= 10
@@ -490,7 +477,6 @@ class User < ActiveRecord::Base
     contact_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
-  # DEPRECATED?
   def paginated_contacts(options = {})
     user_ids = paginated_contact_ids(options)
 
@@ -520,6 +506,34 @@ class User < ActiveRecord::Base
     else
       []
     end
+  end
+
+  def pending_incoming_friend_ids_key
+    "user:#{id}:pending_incoming_friend_ids"
+  end
+
+  def mutual_friend_ids_key
+    "user:#{id}:mutual_friend_ids"
+  end
+
+  def paginated_pending_incoming_friend_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+
+    redis.sdiffstore(pending_incoming_friend_ids_key, snapchat_follower_ids.key, snapchat_friend_ids.key)
+    redis.sort(pending_incoming_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+  end
+
+  def paginated_mutual_friend_ids(options = {})
+    max = 50
+    options[:limit] ||= 10
+    options[:limit] = 1 if options[:limit].to_i <= 0
+    options[:limit] = max if options[:limit].to_i > max
+
+    redis.sinterstore(mutual_friend_ids_key, snapchat_friend_ids.key, snapchat_follower_ids.key)
+    redis.sort(mutual_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
   def deactivate!
@@ -663,35 +677,38 @@ class User < ActiveRecord::Base
     today.year - birthday.year - ((today.month > birthday.month || (today.month == birthday.month && today.day >= birthday.day)) ? 0 : 1)
   end
 
-  # To be safe, make sure not to overwrite an existing frequency
-  # and get the existing one if it already exists
-  def set_content_frequency
-    return unless ios_devices.any?{ |d| d.version_at_least?(:content_pushes) }
-
-    frequency = ContentNotifier::CONTENT_FREQUENCIES.keys.sample
-    newly_set = redis.hsetnx(content_push_info.key, 'frequency', frequency)
-    newly_set ? frequency : get_content_frequency
-  end
-
-  def get_content_frequency
-    frequency = content_push_info['frequency']
-    frequency.blank? ? nil : frequency
-  end
-
-  def content_frequency
-    @content_frequency ||= get_content_frequency || set_content_frequency
-  end
-
-  def last_content_push_at
-    timestamp = content_push_info['last_content_push_at']
-    timestamp.blank? ? nil : Time.zone.at(timestamp)
-  end
-
-  def content_frequency_cohort
-    case content_frequency
-    when '5_more_retries', '15_more_retries', '60_more_retries' then :more_retries
-    else :original
+  def add_friend(user)
+    redis.multi do
+      snapchat_friend_ids << user.id
+      user.snapchat_follower_ids << id
     end
+  end
+
+  def remove_friends(users)
+    redis.multi do
+      snapchat_friend_ids.delete(users.map(&:id))
+      snapchat_follower_ids.delete(users.map(&:id))
+    end
+  end
+
+  def outgoing_friend_or_contact?(user)
+    snapchat_friend_ids.include?(user.id) || contact_ids.include?(user.id)
+  end
+
+  def fetched_contact_ids
+    @fetched_contact_ids ||= contact_ids.members
+  end
+
+  def fetched_snapchat_friend_ids
+    @fetched_snapchat_friend_ids ||= snapchat_friend_ids.members
+  end
+
+  def fetched_snapchat_follower_ids
+    @fetched_snapchat_follower_ids ||= snapchat_follower_ids.members
+  end
+
+  def outgoing_or_incoming_friend?(user)
+    fetched_snapchat_friend_ids.include?(user.id) || fetched_snapchat_follower_ids.include?(user.id)
   end
 
   # Reset the imported snaps digest status for the next batch
@@ -754,15 +771,6 @@ class User < ActiveRecord::Base
       end
     else
       self.username = username.gsub(/[+ ]/, '_')
-
-      base_username = username
-      i = 0
-
-      loop do
-        break unless User.where(username: username).where('id != ?', id).exists? || username == Robot.username
-        i += 1
-        self.username = "#{base_username}_#{i}"
-      end
     end
   end
 
@@ -784,18 +792,6 @@ class User < ActiveRecord::Base
     end
 
     User.api_tokens[id] = @token
-  end
-
-  def create_phone_verification_token
-    chars = [*'a'..'z', *0..9]
-
-    loop do
-      @phone_verification_token = Array.new(8){ chars.sample }.join
-      saved = redis.hsetnx(User.user_ids_by_phone_verification_token.key, @phone_verification_token, id)
-      break if saved
-    end
-
-    User.phone_verification_tokens[id] = @phone_verification_token
   end
 
   def update_sorting_name

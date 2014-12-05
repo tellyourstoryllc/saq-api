@@ -64,22 +64,12 @@ class MobileNotifier
   end
 
   def create_ios_notification(ios_device, alert, custom_data = {}, options = {})
-    return unless (options[:content_available] && ios_device.can_send_content_push?) || ios_device.can_send?
+    return unless ios_device.can_send?
 
     options[:device_token] = ios_device.push_token
 
     n = ios_notifier.build_notification(alert, custom_data, options)
     saved = n.save!
-
-    # Updates for content-available pushes
-    if saved && options[:content_available]
-      ios_device.content_push_info['last_content_push_at'] = Time.current.to_i
-      ios_device.content_push_info.incr('unanswered_count')
-
-      User.redis.incr("user::content_pushes_count:#{Time.zone.today}")
-      StatsD.increment('content_available_pushes.server_sent')
-      StatsD.increment("content_available_pushes.#{user.content_frequency_cohort}.server_sent")
-    end
 
     saved
   end
@@ -108,8 +98,10 @@ class MobileNotifier
   end
 
   def send_snap_notification(message, notification_type)
-    convo = message.conversation
+    alert = notification_alert(message, notification_type)
     custom_data = {}
+
+    convo = message.conversation
 
     if convo.is_a?(Group)
       custom_data[:gid] = convo.id
@@ -117,31 +109,19 @@ class MobileNotifier
       custom_data[:oid] = convo.id
     end
 
-    alert = notification_alert(message, notification_type)
-    handle_digest = false
-
     # Send to all iOS devices
     user.ios_devices.each do |ios_device|
       if ios_device.notify?(user, convo, message, notification_type)
-
-        # If the snap was sent via SCP, send the notification
-        if !message.imported?
-          create_ios_notification(ios_device, alert, custom_data)
-
-        # If it was imported from Snapchat and the device version is
-        # high enough, add it to the digest
-        elsif ios_device.version_at_least?(:all_server_notifications)
-          handle_digest = true
-        end
+        create_ios_notification(ios_device, alert, custom_data)
       end
     end
 
     # Send to all Android devices
-#    user.android_devices.each do |android_device|
-#      if android_device.notify?(user, convo, message, notification_type)
-#        notified = !!create_android_notification(android_device, alert, custom_data)
-#      end
-#    end
+    user.android_devices.each do |android_device|
+      if android_device.notify?(user, convo, message, notification_type)
+        create_android_notification(android_device, alert, custom_data)
+      end
+    end
 
     add_to_imported_snaps_digest(message) if handle_digest
 
@@ -183,12 +163,10 @@ class MobileNotifier
       elsif convo.is_a?(OneToOne)
         custom_data[:oid] = convo.id
       end
-    else
-      alert = "You have #{pending_count} new snaps"
     end
 
     create_ios_notifications(alert, custom_data){ |d| d.version_at_least?(:all_server_notifications) }
-    #create_android_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
   end
 
   def notification_alert(message, notification_type)
@@ -335,15 +313,6 @@ class MobileNotifier
 
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)
-  end
-
-  def notify_content_available(ios_device, options = {})
-    return unless ios_device.version_at_least?(:content_pushes)
-
-    options.reverse_merge!(sound: nil)
-    options[:content_available] = true
-
-    create_ios_notification(ios_device, nil, {}, options)
   end
 
   def notify_drip(drip_notification)

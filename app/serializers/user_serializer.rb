@@ -1,7 +1,16 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :object_type, :id, :token, :name, :username, :status, :status_text,
     :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
-    :phone_verification_token, :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered
+    :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered
+
+
+  def name
+    object.name if outgoing_or_incoming_friend?
+  end
+
+  def username
+    object.username if outgoing_or_incoming_friend?
+  end
 
   # Don't need this in SCP
   def status
@@ -28,25 +37,11 @@ class UserSerializer < ActiveModel::Serializer
 
   # Don't need this in SCP
   def client_type
-    return
-
-    if friends?
-      object.computed_client_type
-    else
-      'web'
-    end
+    #object.computed_client_type
   end
 
   def include_token?
     owner?
-  end
-
-  def include_phone_verification_token?
-    owner? && !current_user.phones.where(verified: true).exists? && !Rails.env.test?
-  end
-
-  def phone_verification_token
-    object.fetch_phone_verification_token
   end
 
   # Don't need this in SCP
@@ -75,7 +70,8 @@ class UserSerializer < ActiveModel::Serializer
     respond_to?(:current_user) && current_user.try(:id) == id
   end
 
-  def friends?
-    scope && (scope.id == object.id || scope.dynamic_friend?(object))
+  def outgoing_or_incoming_friend?
+    return @outgoing_or_incoming_friend if defined?(@outgoing_or_incoming_friend)
+    @outgoing_or_incoming_friend = scope && (scope.id == object.id || scope.outgoing_or_incoming_friend?(object))
   end
 end

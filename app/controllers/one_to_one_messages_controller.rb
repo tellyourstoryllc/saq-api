@@ -3,7 +3,8 @@ class OneToOneMessagesController < ApplicationController
 
 
   def index
-    render_json @one_to_one.paginate_messages(message_pagination_params)
+    objects = !@one_to_one.pending?(current_user) ? @one_to_one.paginate_messages(message_pagination_params) : []
+    render_json objects
   end
 
   def create
@@ -44,6 +45,7 @@ class OneToOneMessagesController < ApplicationController
     @one_to_one = OneToOne.new(id: params[:one_to_one_id])
 
     if @one_to_one.attrs.blank?
+      @one_to_one.creator_id = current_user.id
       raise Peanut::Redis::RecordNotFound unless @one_to_one.save
     else
       raise Peanut::Redis::RecordNotFound unless @one_to_one.authorized?(current_user)

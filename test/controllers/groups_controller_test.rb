@@ -124,7 +124,7 @@ describe GroupsController do
       }
 
       result_must_include 'user', member.id, {
-        'object_type' => 'user', 'id' => member.id, 'name' => member.name, 'username' => 'JaneDoe',
+        'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
         'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
         'avatar_url' => nil
       }
@@ -205,7 +205,7 @@ describe GroupsController do
         }
 
         result_must_include 'user', member.id, {
-          'object_type' => 'user', 'id' => member.id, 'name' => member.name, 'username' => 'JaneDoe',
+          'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
           'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
           'avatar_url' => nil
         }
@@ -271,7 +271,7 @@ describe GroupsController do
         }
 
         result_must_include 'user', member.id, {
-          'object_type' => 'user', 'id' => member.id, 'name' => member.name, 'username' => 'JaneDoe',
+          'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
           'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
           'avatar_url' => nil
         }

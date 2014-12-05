@@ -6,6 +6,6 @@ class UserWithEmailsAndPhonesSerializer < UserSerializer
   end
 
   def hashed_phone_numbers
-    object.phones.map(&:hashed_number)
+    object.phones.select(&:verified?).map(&:hashed_number)
   end
 end

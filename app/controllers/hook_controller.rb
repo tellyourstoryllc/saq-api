@@ -55,12 +55,17 @@ class HookController < ApplicationController
     @from_phone = Phone.find_or_create_by(number: number) if number
   end
 
-  def user
-    return @user if defined?(@user)
+  def device
+    return @device if defined?(@device)
 
     content =~ /: (\w+)$/
-    user_id = User.user_ids_by_phone_verification_token[$1] if $1
-    @user = User.find_by(id: user_id) if user_id
+    phone_verification_token = $1
+    @device = BaseDevice.find_by_phone_verification_token(phone_verification_token)
+  end
+
+  def user
+    return @user if defined?(@user)
+    @user = device.try(:user)
   end
 
   def handle_incoming_sms
@@ -75,7 +80,7 @@ class HookController < ApplicationController
 
     from_phone.save!
 
-    from_phone.verify!(user, {notify_friends: true})
-    mixpanel.verified_phone(from_phone, :sent_sms)
+    from_phone.verify!(user, device, {notify_friends: true})
+    mixpanel.verified_phone(from_phone, :sent_sms) if user
   end
 end

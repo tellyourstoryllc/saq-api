@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  skip_before_action :require_token, :create_or_update_device, only: [:index, :create]
+  skip_before_action :require_token, :create_or_update_device, only: [:index, :username_status, :create]
 
 
   def me
@@ -20,6 +20,22 @@ class UsersController < ApplicationController
     render_json users.uniq.first(limit)
   end
 
+  def username_status
+    render_error('Missing username param.') and return if params[:username].blank?
+
+    user = User.find_by(username: params[:username])
+
+    status = if user.nil?
+               :available
+             elsif user.account.registered?
+               :registered
+             else
+               :unclaimed
+             end
+
+    render_json status
+  end
+
   def create
     @invite = Invite.find_by(invite_token: params[:invite_token]) if params[:invite_token].present?
     @current_user = @invite.try(:recipient)
@@ -30,13 +46,15 @@ class UsersController < ApplicationController
     # yet been 'claimed' by registering, just update that user
     if @current_user && @account && !@account.registered?
       @current_user.update!(user_params)
-      attrs = account_params.merge(emails_attributes: [{email: params[:email]}])
+      attrs = account_params
+      attrs[:emails_attributes] = [{email: params[:email]}] if params[:email].present?
       attrs[:phones_attributes] = [{number: params[:phone_number]}] if params[:phone_number].present? && !Phone.get(params[:phone_number])
       @account.update!(attrs)
 
     # Otherwise, create a new user, account, etc.
     else
-      attrs = account_params.merge(user_attributes: user_params, emails_attributes: [{email: params[:email]}])
+      attrs = account_params.merge(user_attributes: user_params)
+      attrs[:emails_attributes] = [{email: params[:email]}] if params[:email].present?
       attrs[:phones_attributes] = [{number: params[:phone_number]}] if params[:phone_number].present? && !Phone.get(params[:phone_number])
       @account = Account.create!(attrs)
       @current_user = @account.user
@@ -52,7 +70,7 @@ class UsersController < ApplicationController
     create_or_update_device
     @group = Group.create!(group_params.merge(creator_id: @current_user.id)) if group_params.present?
 
-    @current_user.set_content_frequency
+    @current_user.skipped_phone = params[:skipped_phone] if params[:skipped_phone].present?
     @current_user.set_stories_digest_frequency
 
 
@@ -80,6 +98,13 @@ class UsersController < ApplicationController
 
     current_device.existing_user_status = 'r' if current_device
     @current_user.notify_friends
+
+    # Take ownership of all phones the current device owns
+    current_device.phones.each{ |p| p.update(user_id: @current_user.id) } if current_device
+
+    # For each verified phone, add the new user as a contact for everyone
+    # who has autoconnected his phone
+    @current_user.phones.verified.each(&:add_as_contact_and_notify_friends)
 
     render_json [@current_user, @account, @group].compact
   end

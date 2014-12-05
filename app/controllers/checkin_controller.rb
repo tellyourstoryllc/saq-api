@@ -1,6 +1,5 @@
 class CheckinController < ApplicationController
   skip_before_action :require_token, only: :index
-  before_action :reset_unanswered_content_pushes, only: :index
 
 
   def index
@@ -18,6 +17,7 @@ class CheckinController < ApplicationController
 
     client_config = {object_type: 'configuration'}.merge(config_class.config)
     client_config[:phone_verification_destination] = Rails.configuration.app['hook']['invite_from'] if params[:client] == 'ios'
+    client_config[:phone_verification_token] = current_device.fetch_phone_verification_token if current_device && !current_device.phones.verified.exists?
     client_config[:client_version] = current_device.try(:client_version)
     client_config[:has_push_token] = current_device.try(:has_auth?)
     client_config[:blacklisted_usernames] = Settings.get_list(:blacklisted_usernames)
@@ -49,8 +49,6 @@ class CheckinController < ApplicationController
         client_config[:comment_title_template] = comment_snap_template.title_overlay
         client_config[:comment_body_template] = comment_snap_template.body_overlay
       end
-
-      current_user.cancel_imported_snaps_digest
     end
 
     objects << current_device.preferences if current_device

@@ -5,14 +5,13 @@ class Phone < ActiveRecord::Base
   before_validation :normalize_number, :set_hashed_number, :set_user_and_account,
     :set_verification_code
 
-  validates :account, :user, :hashed_number, presence: true
+  validates :hashed_number, presence: true
   validates :number, format: /\d+/
   validates :number, :hashed_number, uniqueness: true
 
-  after_save :delete_verification_token
-
   belongs_to :account, inverse_of: :phones
   belongs_to :user
+  belongs_to :device, polymorphic: true
 
   value :notified_friends
   scope :verified, -> { where(verified: true) }
@@ -31,21 +30,21 @@ class Phone < ActiveRecord::Base
     find_by(number: normalized_number) if normalized_number
   end
 
-  def verify_by_code!(current_user, code, options = {})
-    verify!(current_user, options) if verification_code.present? && verification_code == code
+  def verify_by_code!(current_user, current_device, code, options = {})
+    verify!(current_user, current_device, options) if verification_code.present? && verification_code == code
   end
 
-  def verify!(current_user, options = {})
-    return if current_user.nil?
-
+  def verify!(current_user, current_device, options = {})
     self.user = current_user
-    old_user_id = user_id_was if user_id_was && user_id_changed?
+    self.device = current_device
+    #old_user_id = user_id_was if user_id_was && user_id_changed?
 
     self.verified = true
     save!
 
-    merge_users(old_user_id)
-    notify_friends if options[:notify_friends]
+    #merge_users(old_user_id)
+    add_as_contact_and_notify_friends if options[:notify_friends]
+    true
   end
 
   def pretty
@@ -67,6 +66,8 @@ class Phone < ActiveRecord::Base
     redis.smembers(phone_contact_of_user_ids_key)
   end
 
+  # Store these so we can notify the user when any of his
+  # phone contacts registers
   def self.add_user_to_phone_contacts(user, hashed_phone_numbers)
     redis.pipelined do
       hashed_phone_numbers.each do |hashed_phone_number|
@@ -76,21 +77,26 @@ class Phone < ActiveRecord::Base
   end
 
   def merge_users(old_user_id)
+    return # Disabled
+
     return if old_user_id.nil?
 
     old_user = User.find_by(id: old_user_id)
     UserMerger.merge(old_user, user)
   end
 
-  def notify_friends
-    # Disabled for now
-    return
-
-    return if notified_friends.get
+  # We want this separate from notifying friends at registration because users might verify some time after registration,
+  # and we want to be able to notify everyone who has him in their contacts at that point
+  def add_as_contact_and_notify_friends
+    return if user.nil? || notified_friends.get
     self.notified_friends = '1'
 
+    user_ids = phone_contact_of_user_ids
+    return if user_ids.blank?
+
     # TODO: maybe move to Sidekiq
-    User.where(id: phone_contact_of_user_ids).find_each do |friend|
+    User.where(id: user_ids).find_each do |friend|
+      ContactInviter.add_user(friend, user)
       friend.mobile_notifier.notify_friend_joined(user)
     end
   end
@@ -137,16 +143,5 @@ class Phone < ActiveRecord::Base
 
     chars = [*0..9]
     self.verification_code = Array.new(4){ chars.sample }.join
-  end
-
-  def delete_verification_token
-    return unless !verified_was && verified && user
-
-    token = User.phone_verification_tokens[user.id]
-
-    User.redis.multi do
-      User.phone_verification_tokens.delete(user.id)
-      User.user_ids_by_phone_verification_token.delete(token) if token
-    end
   end
 end

@@ -42,9 +42,13 @@ class Account < ActiveRecord::Base
   end
 
   def generate_password_reset_token
-    token = "#{id}-#{SecureRandom.hex}"
+    token = SecureRandom.hex
     redis.setex(self.class.password_reset_token_key(token), 24.hours, id)
     token
+  end
+
+  def self.delete_password_reset_token(token)
+    redis.del(password_reset_token_key(token))
   end
 
   def authenticate_facebook(facebook_token)

@@ -40,7 +40,7 @@ class UserMerger
       unless new_user.one_to_one_user_ids.include?(other_user.id)
         Rails.logger.debug "Copying 1-1 for user #{other_user.id} ..."
 
-        o = OneToOne.new(sender_id: other_user.id, recipient_id: new_user.id)
+        o = OneToOne.new(creator_id: new_user.id, sender_id: other_user.id, recipient_id: new_user.id)
         o.save
 
         if o.attrs.exists?

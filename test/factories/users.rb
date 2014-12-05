@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :user do
-    username 'JohnDoe'
+    sequence(:username){ |n| "JohnDoe_#{n}" }
 
     trait :male do
       gender 'male'

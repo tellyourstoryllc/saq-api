@@ -3,11 +3,32 @@ class OneToOne
   include Redis::Objects
   include Peanut::TwoUserConversation
 
+  attr_accessor :fetched_message_ids_count
+
+  validate :outgoing_friend_or_contact?
+
+
   def save
     return unless valid?
 
     write_attrs
     add_to_lists
+  end
+
+  def self.pipelined_find(ids)
+    return [] if ids.blank?
+
+    attrs = redis.pipelined do
+      ids.map{ |id| redis.hgetall("#{redis_prefix}:#{id}:attrs") }
+    end
+
+    message_ids_counts = redis.pipelined do
+      ids.map{ |id| redis.zcard("#{redis_prefix}:#{id}:message_ids") }
+    end
+
+    attrs.map.with_index do |attrs, i|
+      new(attrs.merge(fetched: true, fetched_message_ids_count: message_ids_counts[i]))
+    end
   end
 
   def add_to_lists
@@ -44,6 +65,12 @@ class OneToOne
     end
   end
 
+  # 1-1 is pending if the other user initiated, and the recipient isn't in the sender's contacts,
+  # and the sender isn't in the recipient's outgoing list
+  def pending?(current_user)
+    creator_id && creator_id != current_user.id && !current_user.snapchat_friend_ids.include?(creator_id) && !creator.contact_ids.include?(current_user.id)
+  end
+
 
   private
 
@@ -51,8 +78,15 @@ class OneToOne
     errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") if blocked?
   end
 
+  def outgoing_friend_or_contact?
+    return if [sender.id, recipient.id].include?(Robot.user.id)
+
+    other_user = other_user(creator)
+    errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") unless creator.outgoing_friend_or_contact?(other_user)
+  end
+
   def write_attrs
     self.created_at = Time.current.to_i
-    self.attrs.bulk_set(id: id, created_at: created_at)
+    self.attrs.bulk_set(id: id, creator_id: creator_id, created_at: created_at)
   end
 end

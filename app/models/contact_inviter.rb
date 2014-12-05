@@ -7,16 +7,6 @@ class ContactInviter
     self.current_user = current_user
   end
 
-  def snapchat_friends_importer
-    @snapchat_friends_importer ||= SnapchatFriendsImporter.new(current_user)
-  end
-
-  def add_users(user_ids)
-    User.where(id: user_ids.map(&:to_s)).each do |user|
-      add_with_reciprocal(user)
-    end
-  end
-
   def add_by_emails(emails_addresses, options = {})
     emails = []
     emails_addresses.each do |email_address|
@@ -57,8 +47,8 @@ class ContactInviter
                    new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
                    source: options[:source])
 
-    # Add the new or existing user to my contacts and vice versa
-    add_with_reciprocal(user)
+    # Add the new or existing user to my contacts
+    add_user(user)
 
     email
   end
@@ -67,6 +57,14 @@ class ContactInviter
     users = []
     usernames.each_with_index do |username, i|
       users << add_by_phone_number(numbers[i], username, options)
+    end
+    users.compact
+  end
+
+  def add_by_phone_numbers_only(numbers, options = {})
+    users = []
+    numbers.each do |number|
+      users << add_by_phone_number(number, nil, options)
     end
     users.compact
   end
@@ -115,8 +113,8 @@ class ContactInviter
                    new_user: new_user, can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]),
                    source: options[:source])
 
-    # Add the new or existing user to my friends list
-    add_friend(user)
+    # Add the user to my contacts list only if he already existed
+    add_user(user) unless new_user
 
     user
   end
@@ -139,8 +137,8 @@ class ContactInviter
     Invite.create!(sender_id: current_user.id, recipient: user, new_user: new_user, can_log_in: account.can_log_in?,
                    skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
 
-    # Add the new or existing user to my friends list
-    add_friend(user)
+    # Add the new or existing user to my contacts list
+    add_user(user)
 
     user
   end
@@ -173,8 +171,8 @@ class ContactInviter
     Invite.create!(sender_id: current_user.id, recipient: user, invited_phone: number, new_user: new_user,
                    can_log_in: account.can_log_in?, skip_sending: !!self.class.to_bool(options[:skip_sending]), source: options[:source])
 
-    # Add the new or existing user to my friends list
-    add_friend(user)
+    # Add the new or existing user to my contacts list
+    add_user(user)
 
     user
   end
@@ -185,18 +183,22 @@ class ContactInviter
     already_contacts = other_user.contact?(current_user)
 
     User.redis.multi do
-      add_user(current_user, other_user)
-      add_user(other_user, current_user)
+      add_user(other_user)
+      self.class.add_user(other_user, current_user)
     end
 
     other_user.mobile_notifier.create_ios_notifications("#{current_user.name} just added you", {r:'c'}) unless already_contacts
   end
 
-  def add_user(user, other_user)
+  def self.add_user(user, other_user)
     User.redis.multi do
       user.contact_ids << other_user.id
       other_user.reciprocal_contact_ids << user.id
     end
+  end
+
+  def add_user(other_user)
+    self.class.add_user(current_user, other_user)
   end
 
   def remove_users(user_ids)
@@ -212,10 +214,6 @@ class ContactInviter
     end
   end
 
-  def add_friend(user)
-    snapchat_friends_importer.add_friend(user, :outgoing)
-  end
-
   def autoconnect(hashed_emails, hashed_phone_numbers)
     added_users = []
 
@@ -225,7 +223,7 @@ class ContactInviter
 
     #  emails.each do |email|
     #    added_users << email.user
-    #    add_with_reciprocal(email.user)
+    #    add_user(email.user)
     #  end
     #end
 
@@ -233,14 +231,12 @@ class ContactInviter
       current_user.phone_contacts << hashed_phone_numbers
       Phone.add_user_to_phone_contacts(current_user, hashed_phone_numbers)
 
-      # Don't actually add contacts in SCP
-      # Just use this for funnels & metrics
-      #phones = Phone.includes(user: [:emails, :phones]).where(hashed_number: hashed_phone_numbers).verified
+      phones = Phone.joins(:account).includes(user: [:emails, :phones]).verified.where(hashed_number: hashed_phone_numbers, accounts: {registered: true})
 
-      #phones.each do |phone|
-      #  added_users << phone.user
-      #  add_with_reciprocal(phone.user)
-      #end
+      phones.each do |phone|
+        added_users << phone.user
+        add_user(phone.user)
+      end
     end
 
     added_users

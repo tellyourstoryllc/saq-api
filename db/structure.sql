@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.5.29, for osx10.8 (i386)
 --
--- Host: localhost    Database: snap_dev
+-- Host: localhost    Database: knowme_dev
 -- ------------------------------------------------------
 -- Server version	5.5.29
 
@@ -665,7 +665,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-11-14 15:32:38
+-- Dump completed on 2014-12-04 15:17:41
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
