@@ -65,17 +65,17 @@ class UserSerializer < ActiveModel::Serializer
 
   def latitude
     if owner?
-      object.latitude
+      object.latitude.to_f
     else
-      object.latitude.try(:round, 2)
+      object.latitude.to_f.try(:round, 2)
     end
   end
 
   def longitude
     if owner?
-      object.longitude
+      object.longitude.to_f
     else
-      object.longitude.try(:round, 2)
+      object.longitude.to_f.try(:round, 2)
     end
   end
 
