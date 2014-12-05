@@ -52,6 +52,41 @@ describe UsersController do
           'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
       end
 
+      it "must create a user and account without a username, password, or email" do
+        post :create, {}
+
+        user = User.order('created_at DESC').first
+        account = Account.order('created_at DESC').first
+
+        result.size.must_equal 2
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => user.username, 'username' => user.username,
+          'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
+          'client_type' => nil, 'avatar_url' => nil}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
+          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
+
+        user_hash = result.detect{ |r| r['object_type'] == 'user' && r['id'] == user.id }
+        user_hash['username'].starts_with?('_user').must_equal true
+      end
+
+      it "must create a user and account without a username, password, or email and with additional attributes" do
+        post :create, {gender: 'male', latitude: '39.9525840', longitude: '-75.1652220', location_name: 'Northern Liberties'}
+
+        user = User.order('created_at DESC').first
+        account = Account.order('created_at DESC').first
+
+        result.size.must_equal 2
+        result_must_include 'user', user.id, {'object_type' => 'user', 'id' => user.id, 'name' => user.username, 'username' => user.username,
+          'token' => user.token, 'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
+          'client_type' => nil, 'avatar_url' => nil, 'gender' => 'male', 'latitude' => 39.9525840,
+          'longitude' => -75.1652220, 'location_name' => 'Northern Liberties'}
+        result_must_include 'account', account.id, {'object_type' => 'account', 'id' => account.id, 'user_id' => user.id,
+          'one_to_one_wallpaper_url' => nil, 'facebook_id' => nil, 'time_zone' => 'America/New_York', 'needs_password' => true}
+
+        user_hash = result.detect{ |r| r['object_type'] == 'user' && r['id'] == user.id }
+        user_hash['username'].starts_with?('_user').must_equal true
+      end
+
       it "must create a user and a group" do
         Time.stub :now, now = Time.parse('2013-12-26 15:08') do
           post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf', group_name: 'Cool Dudes'}
@@ -174,13 +209,14 @@ describe UsersController do
   describe "POST /users/update" do
     it "must update the user" do
       FactoryGirl.create(:faye_client, user_id: current_user.id, status: 'active')
-      post :update, {username: 'Johnny', status: 'away', status_text: 'be back soon', token: current_user.token}
+      post :update, {token: current_user.token, username: 'Johnny', status: 'away', status_text: 'be back soon',
+                     latitude: '50.19361', longitude: '-74.0192', location_name: 'Anytown, USA'}
 
       result.size.must_equal 1
       result_must_include 'user', current_user.id, {'object_type' => 'user', 'id' => current_user.id, 'name' => 'Johnny',
-        'username' => 'Johnny', 'token' => current_user.token,
-        'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-        'avatar_url' => nil}
+        'username' => 'Johnny', 'token' => current_user.token, 'status' => nil, 'idle_duration' => nil,
+        'status_text' => nil, 'client_type' => nil, 'avatar_url' => nil, 'latitude' => 50.19361, 'longitude' => -74.0192,
+        'location_name' => 'Anytown, USA'}
     end
 
     it "must not update the user's status to idle" do

@@ -1,7 +1,8 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :object_type, :id, :token, :name, :username, :status, :status_text,
     :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
-    :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered, :latitude, :longitude
+    :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered, :gender,
+    :latitude, :longitude, :location_name
 
 
   def name
