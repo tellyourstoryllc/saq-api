@@ -13,7 +13,7 @@ describe UsersController do
       end
 
       it "must not create a user using Facebook authentication if the given Facebook id and token are not valid" do
-        stub_request(:any, /.*facebook.com/).to_return(body: {})
+        stub_request(:any, /.*facebook.com/).to_return(body: '{}')
 
         post :create, {username: 'JohnDoe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'invalidtoken'}
         old_count = User.count
