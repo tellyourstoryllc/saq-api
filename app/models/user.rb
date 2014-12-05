@@ -3,10 +3,10 @@ class User < ActiveRecord::Base
   include Redis::Objects
   attr_accessor :avatar_image_file, :avatar_image_url, :avatar_video_file, :invite_type
 
-  before_validation :set_id, on: :create
+  before_validation :set_id, :set_friend_code, on: :create
   before_validation :fix_username
 
-  validates :username, presence: true
+  validates :username, :friend_code, presence: true
   validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
@@ -755,6 +755,16 @@ class User < ActiveRecord::Base
     loop do
       self.id = Array.new(8){ chars.sample }.join
       break unless User.where(id: id).exists?
+    end
+  end
+
+  def set_friend_code
+    # Exclude L to avoid any confusion
+    chars = [*'a'..'k', *'m'..'z']
+
+    loop do
+      self.friend_code = Array.new(6){ chars.sample }.join
+      break unless User.where(friend_code: friend_code).exists?
     end
   end
 
