@@ -80,8 +80,8 @@ class UserSerializer < ActiveModel::Serializer
     end
   end
 
-  def friend_code
-    object.friend_code if owner?
+  def include_friend_code?
+    owner?
   end
 
 
