@@ -1,7 +1,11 @@
 class StoriesController < ApplicationController
-  before_action :load_story, only: :export
+  before_action :load_story, only: [:show, :export]
   before_action :load_my_story, only: :delete
 
+
+  def show
+    render_json @story
+  end
 
   def search
     story_usernames = split_param(:story_usernames)

@@ -10,7 +10,7 @@ class StoriesListsController < ApplicationController
   private
 
   def load_stories_list
-    @stories_list = StoriesList.new(creator_id: params[:user_id], viewer_id: current_user.id)
+    @stories_list = StoriesList.new(creator_id: params[:id], viewer_id: current_user.id)
 
     if @stories_list.attrs.blank?
       raise Peanut::Redis::RecordNotFound unless @stories_list.save
