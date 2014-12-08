@@ -112,10 +112,6 @@ KrazyChat::Application.routes.draw do
     match '/stories/:id/export', to: 'stories#export', as: 'export_story'
     match '/stories/:id/delete', to: 'stories#delete', as: 'delete_story'
 
-    match '/stories/:id/comments/create', to: 'story_comments#create', as: 'create_story_comment'
-    match '/stories/:id/comments', to: 'story_comments#index', as: 'story_comments'
-    match '/stories/:story_id/comments/:id/delete', to: 'story_comments#delete', as: 'delete_story_comment'
-
     match '/friends', to: 'friends#index', as: 'friends'
     match '/friends/add', to: 'friends#add', as: 'add_friends'
     match '/friends/remove', to: 'friends#remove', as: 'remove_friends'
