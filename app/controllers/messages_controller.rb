@@ -124,8 +124,7 @@ class MessagesController < ApplicationController
 
   # Create a story
   def create_story
-    return unless Bool.parse(params[:create_story]) &&
-      params[:snapchat_media_id].present? && params[:story_creator_id].present?
+    return unless Bool.parse(params[:create_story]) && params[:story_creator_id].present?
 
     stories_list = load_stories_list(params[:story_creator_id])
     return if stories_list.nil?
