@@ -38,7 +38,12 @@ class FriendsController < ApplicationController
 
   def remove
     usernames = split_param(:usernames)
-    users = User.where(username: usernames)
+    friend_codes = split_param(:friend_codes)
+
+    users = []
+    users += User.where(username: usernames) if usernames.present?
+    users += User.where(friend_code: friend_codes) if friend_codes.present?
+
     current_user.remove_friends(users)
 
     render_json users, each_serializer: UserWithEmailsAndPhonesSerializer
