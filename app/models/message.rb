@@ -42,12 +42,8 @@ class Message
       ids.map{ |id| redis.llen("#{redis_prefix}:#{id}:likes") }
     end
 
-    forwards_counts = redis.pipelined do
-      ids.map{ |id| redis.llen("#{redis_prefix}:#{id}:forwards") }
-    end
-
     messages = attrs.map.with_index do |attrs, i|
-      new(attrs.merge(fetched: true, cached_likes_count: likes_counts[i], cached_forwards_count: forwards_counts[i]))
+      new(attrs.merge(fetched: true, cached_likes_count: likes_counts[i]))
     end
   end
 
