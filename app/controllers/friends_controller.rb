@@ -19,9 +19,13 @@ class FriendsController < ApplicationController
 
   def add
     usernames = split_param(:usernames)
+    friend_codes = split_param(:friend_codes)
     added_users = []
 
-    users = User.includes(:account).where(username: usernames)
+    users = []
+    users += User.includes(:account).where(username: usernames) if usernames.present?
+    users += User.includes(:account).where(friend_code: friend_codes) if friend_codes.present?
+
     users.each do |user|
       next unless user.account.registered?
 
