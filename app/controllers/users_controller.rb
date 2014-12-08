@@ -9,14 +9,15 @@ class UsersController < ApplicationController
   def index
     limit = 20 # Max of 20 users at a time
 
-    ids = split_param(:ids)
-    ids = ids.first(limit)
     usernames = split_param(:usernames)
     usernames = usernames.first(limit)
 
+    friend_codes = split_param(:friend_codes)
+    friend_codes = friend_codes.first(limit)
+
     users = []
-    users += User.includes(:avatar_image, :avatar_video).where(id: ids) if ids.present?
-    users += User.includes(:avatar_image, :avatar_video).where(username: usernames) if usernames.present?
+    users += User.includes(:avatar_image, :avatar_video).where(username: usernames).order(:id) if usernames.present?
+    users += User.includes(:avatar_image, :avatar_video).where(friend_code: friend_codes).order(:id) if friend_codes.present?
     render_json users.uniq.first(limit)
   end
 
