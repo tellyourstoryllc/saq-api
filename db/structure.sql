@@ -657,7 +657,8 @@ CREATE TABLE `users` (
   `location_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `friend_code` char(6) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `index_users_on_username` (`username`)
+  UNIQUE KEY `index_users_on_username` (`username`),
+  UNIQUE KEY `index_users_on_friend_code` (`friend_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -670,7 +671,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-05 13:59:52
+-- Dump completed on 2014-12-08 11:27:19
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -878,3 +879,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141022195114');
 INSERT INTO schema_migrations (version) VALUES ('20141114201203');
 
 INSERT INTO schema_migrations (version) VALUES ('20141205163020');
+
+INSERT INTO schema_migrations (version) VALUES ('20141208162635');
