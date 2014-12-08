@@ -6,7 +6,9 @@ class Redis
       return yield unless Rails.logger.debug?
 
       queries = commands.map do |name, *args|
-        "#{name.to_s.upcase} #{args.map(&:to_s).join(" ")}"
+        line = "#{name.to_s.upcase} #{args.map(&:to_s).join(" ")}"
+        #line << "\n#{caller.grep(/\/app\//).first(4).map{ |line| '    ' + line }.join("\n")}" if Rails.env.development?
+        line
       end
 
       ::ActiveSupport::Notifications.instrument('query.redis_logger', :query => queries.join(' | ')) do
