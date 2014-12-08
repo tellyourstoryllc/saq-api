@@ -61,11 +61,11 @@ class User < ActiveRecord::Base
   set :unread_convo_ids
   set :phone_contacts
   set :matching_phone_contact_user_ids
-  set :snapchat_friend_ids   # Users I added in Snapchat
-  set :snapchat_follower_ids # Users who added me in Snapchat
-  set :snapchat_friend_phone_numbers
-  value :set_initial_snapchat_friend_ids_in_app
-  set :initial_snapchat_friend_ids_in_app
+  set :friend_ids   # Users I added
+  set :follower_ids # Users who added me
+  set :friend_phone_numbers
+  value :set_initial_friend_ids_in_app
+  set :initial_friend_ids_in_app
 
   value :assigned_ios_snap_invite_ad_id
   value :assigned_android_snap_invite_ad_id
@@ -216,7 +216,7 @@ class User < ActiveRecord::Base
   end
 
   def dynamic_friend_ids
-    @dynamic_friend_ids ||= redis.sunion(snapchat_friend_ids.key, one_to_one_user_ids.key)
+    @dynamic_friend_ids ||= redis.sunion(friend_ids.key, one_to_one_user_ids.key)
   end
 
   def dynamic_friend?(user)
@@ -496,17 +496,17 @@ class User < ActiveRecord::Base
     end
   end
 
-  def paginated_snapchat_friend_ids(options = {})
+  def paginated_friend_ids(options = {})
     max = 50
     options[:limit] ||= 10
     options[:limit] = 1 if options[:limit].to_i <= 0
     options[:limit] = max if options[:limit].to_i > max
 
-    snapchat_friend_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+    friend_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
-  def paginated_snapchat_friends(options = {})
-    user_ids = paginated_snapchat_friend_ids(options)
+  def paginated_friends(options = {})
+    user_ids = paginated_friend_ids(options)
 
     if user_ids.present?
       field_order = user_ids.map{ |id| "'#{id}'" }.join(',')
@@ -530,7 +530,7 @@ class User < ActiveRecord::Base
     options[:limit] = 1 if options[:limit].to_i <= 0
     options[:limit] = max if options[:limit].to_i > max
 
-    redis.sdiffstore(pending_incoming_friend_ids_key, snapchat_follower_ids.key, snapchat_friend_ids.key)
+    redis.sdiffstore(pending_incoming_friend_ids_key, follower_ids.key, friend_ids.key)
     redis.sort(pending_incoming_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
@@ -540,7 +540,7 @@ class User < ActiveRecord::Base
     options[:limit] = 1 if options[:limit].to_i <= 0
     options[:limit] = max if options[:limit].to_i > max
 
-    redis.sinterstore(mutual_friend_ids_key, snapchat_friend_ids.key, snapchat_follower_ids.key)
+    redis.sinterstore(mutual_friend_ids_key, friend_ids.key, follower_ids.key)
     redis.sort(mutual_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
@@ -637,7 +637,7 @@ class User < ActiveRecord::Base
     self.notified_friends = '1'
 
     # TODO: maybe move to Sidekiq
-    User.where(id: snapchat_follower_ids.members).find_each do |friend|
+    User.where(id: follower_ids.members).find_each do |friend|
       friend.mobile_notifier.notify_friend_joined(self)
     end
   end
@@ -654,8 +654,8 @@ class User < ActiveRecord::Base
     @active_on[date] = redis.sismember(key, id)
   end
 
-  def snapchat_friend_ids_in_app
-    @snapchat_friend_ids_in_app ||= Account.where(user_id: snapchat_friend_ids.members).registered.pluck(:user_id)
+  def friend_ids_in_app
+    @friend_ids_in_app ||= Account.where(user_id: friend_ids.members).registered.pluck(:user_id)
   end
 
   def bot?
@@ -668,14 +668,14 @@ class User < ActiveRecord::Base
     unviewed_message_user_ids.delete(user.id) unless user.unviewed_message_ids.exists?
   end
 
-  def snapchat_mutual_friend_ids
-    snapchat_friend_ids & snapchat_follower_ids
+  def mutual_friend_ids
+    friend_ids & follower_ids
   end
 
   def custom_story_friend_ids
     blocked_usernames = preferences.server_story_friends_to_block.members
     blocked_friend_ids = blocked_usernames.present? ? User.where(username: blocked_usernames).pluck(:id) : []
-    snapchat_mutual_friend_ids - blocked_friend_ids
+    mutual_friend_ids - blocked_friend_ids
   end
 
   def age
@@ -687,36 +687,36 @@ class User < ActiveRecord::Base
 
   def add_friend(user)
     redis.multi do
-      snapchat_friend_ids << user.id
-      user.snapchat_follower_ids << id
+      friend_ids << user.id
+      user.follower_ids << id
     end
   end
 
   def remove_friends(users)
     redis.multi do
-      snapchat_friend_ids.delete(users.map(&:id))
-      snapchat_follower_ids.delete(users.map(&:id))
+      friend_ids.delete(users.map(&:id))
+      follower_ids.delete(users.map(&:id))
     end
   end
 
   def outgoing_friend_or_contact?(user)
-    snapchat_friend_ids.include?(user.id) || contact_ids.include?(user.id)
+    friend_ids.include?(user.id) || contact_ids.include?(user.id)
   end
 
   def fetched_contact_ids
     @fetched_contact_ids ||= contact_ids.members
   end
 
-  def fetched_snapchat_friend_ids
-    @fetched_snapchat_friend_ids ||= snapchat_friend_ids.members
+  def fetched_friend_ids
+    @fetched_friend_ids ||= friend_ids.members
   end
 
-  def fetched_snapchat_follower_ids
-    @fetched_snapchat_follower_ids ||= snapchat_follower_ids.members
+  def fetched_follower_ids
+    @fetched_follower_ids ||= follower_ids.members
   end
 
   def outgoing_or_incoming_friend?(user)
-    fetched_snapchat_friend_ids.include?(user.id) || fetched_snapchat_follower_ids.include?(user.id)
+    fetched_friend_ids.include?(user.id) || fetched_follower_ids.include?(user.id)
   end
 
   # Reset the imported snaps digest status for the next batch

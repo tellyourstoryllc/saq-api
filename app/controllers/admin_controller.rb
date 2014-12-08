@@ -48,8 +48,8 @@ class AdminController < ActionController::Base
 
   def show_user_friends
     @offset = params[:offset].to_i
-    @friends = @user.paginated_snapchat_friends(limit: 50, offset: @offset)
-    @friends_count = @user.snapchat_friend_ids.size
+    @friends = @user.paginated_friends(limit: 50, offset: @offset)
+    @friends_count = @user.friend_ids.size
   end
 
   def settings

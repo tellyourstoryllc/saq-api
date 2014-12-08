@@ -25,19 +25,19 @@ class MixpanelClient
     properties = common_properties
     return properties if user.nil?
 
-    snapchat_friends_count, friends_bot_included, set_initial_exists, initial_friends_in_app_count, initial_bot_included = User.redis.pipelined do
-      user.snapchat_friend_ids.size
-      user.snapchat_friend_ids.include?(Robot.user.id)
+    friends_count, friends_bot_included, set_initial_exists, initial_friends_in_app_count, initial_bot_included = User.redis.pipelined do
+      user.friend_ids.size
+      user.friend_ids.include?(Robot.user.id)
 
-      user.set_initial_snapchat_friend_ids_in_app.exists?
-      user.initial_snapchat_friend_ids_in_app.size
-      user.initial_snapchat_friend_ids_in_app.include?(Robot.user.id)
+      user.set_initial_friend_ids_in_app.exists?
+      user.initial_friend_ids_in_app.size
+      user.initial_friend_ids_in_app.include?(Robot.user.id)
     end
 
-    if snapchat_friends_count > 0
-      snapchat_friends_count -= 1 if friends_bot_included
+    if friends_count > 0
+      friends_count -= 1 if friends_bot_included
     else
-      snapchat_friends_count = nil
+      friends_count = nil
     end
 
     if set_initial_exists
@@ -55,14 +55,14 @@ class MixpanelClient
       'Sent Messages' => user.metrics[:sent_messages_count].to_i,
       'Received Messages' => user.metrics[:received_messages_count].to_i,
       'Phone Contacts' => user.phone_contacts.size, 'Matching Phone Contacts' => user.matching_phone_contact_user_ids.size,
-      'Snapchat Friends' => snapchat_friends_count, 'Initial Snapchat Friends in App' => initial_friends_in_app_count,
+      'Friends' => friends_count, 'Initial Friends in App' => initial_friends_in_app_count,
       'Notifications Enabled' => user.mobile_notifier.pushes_enabled?,
       'Drip Notifications Enabled' => (!drip_enabled.blank? ? %w(1 2).include?(drip_enabled) : nil),
       'Rating' => user.app_reviews.latest.limit(1).pluck(:rating).first, 'Skipped Phone' => Bool.parse(user.skipped_phone.value),
       'Stories Digest Frequency' => user.stories_digest_frequency
     )
 
-    properties.merge!('Snapchat Friends w/ Phone' => user.snapchat_friend_phone_numbers.size) if user.phone_contacts.exists?
+    properties.merge!('Friends w/ Phone' => user.friend_phone_numbers.size) if user.phone_contacts.exists?
 
     properties
   end
@@ -211,11 +211,11 @@ class MixpanelClient
   end
 
   def imported_snapchat_friends
-    track('Imported Snapchat Friends', imported_snapchat_friends_properties)
+    track('Imported Snapchat Friends', imported_friends_properties)
   end
 
-  def invited_snapchat_friends(properties = {}, options = {})
-    track('Invited Snapchat Friends', properties, options)
+  def invited_friends(properties = {}, options = {})
+    track('Invited Friends', properties, options)
   end
 
   def shared_contacts
@@ -295,11 +295,11 @@ class MixpanelClient
     sender = properties[:sender]
     return {} if sender.blank?
 
-    friend_ids = sender.snapchat_friend_ids_in_app
+    friend_ids = sender.friend_ids_in_app
     friend_ids.delete(Robot.user.id)
 
     {'Sender ID' => sender.id, 'Sender Username' => sender.username,
-      'Sender Snapchat Friends in App' => friend_ids.size}
+      'Sender Friends in App' => friend_ids.size}
   end
 
   def received_snap_invite_properties(properties)
@@ -313,7 +313,7 @@ class MixpanelClient
     props['Invite Channel'] = invite_channel
     props['Snap Invite Ad'] = ad_name if %w(snap snap_and_sms).include?(invite_channel)
     props['Phone Country'] = phone_country_code if phone_country_code
-    props['Mutual Friends'] = user.snapchat_friend_ids.member?(sender.id)
+    props['Mutual Friends'] = user.friend_ids.member?(sender.id)
 
     props
   end
@@ -336,7 +336,7 @@ class MixpanelClient
     {'Trigger' => trigger, 'Bot Reply' => robot_item.try(:name)}
   end
 
-  def imported_snapchat_friends_properties
+  def imported_friends_properties
     {'Snap Invites Allowed' => Bool.parse(user.snap_invites_allowed.value),
       'SMS Invites Allowed' => Bool.parse(user.sms_invites_allowed.value)}
   end

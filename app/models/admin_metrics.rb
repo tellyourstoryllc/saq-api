@@ -55,7 +55,7 @@ class AdminMetrics
 
       User.joins(:account).where('accounts.registered_at BETWEEN ? AND ?', registered_from, registered_to).find_each do |u|
         # Exclude yourself and the bot
-        friend_ids = u.snapchat_friend_ids.members - [u.id, Robot.user.id]
+        friend_ids = u.friend_ids.members - [u.id, Robot.user.id]
         friends_count = friend_ids.size
         friends = User.includes(:account).where(id: friend_ids).to_a
 

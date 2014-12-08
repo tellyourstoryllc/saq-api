@@ -62,8 +62,8 @@ class UsersController < ApplicationController
 
     # Ensure you are your own friend
     User.redis.pipelined do
-      @current_user.snapchat_friend_ids << @current_user.id
-      @current_user.initial_snapchat_friend_ids_in_app << @current_user.id
+      @current_user.friend_ids << @current_user.id
+      @current_user.initial_friend_ids_in_app << @current_user.id
     end
 
     # Create or update device and group
