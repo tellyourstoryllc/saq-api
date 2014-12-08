@@ -530,8 +530,12 @@ class User < ActiveRecord::Base
     options[:limit] = 1 if options[:limit].to_i <= 0
     options[:limit] = max if options[:limit].to_i > max
 
-    redis.sdiffstore(pending_incoming_friend_ids_key, follower_ids.key, friend_ids.key)
-    redis.sort(pending_incoming_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+    _, user_ids = redis.multi do
+      redis.sdiffstore(pending_incoming_friend_ids_key, follower_ids.key, friend_ids.key)
+      redis.sort(pending_incoming_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+    end
+
+    user_ids
   end
 
   def paginated_mutual_friend_ids(options = {})
@@ -540,8 +544,12 @@ class User < ActiveRecord::Base
     options[:limit] = 1 if options[:limit].to_i <= 0
     options[:limit] = max if options[:limit].to_i > max
 
-    redis.sinterstore(mutual_friend_ids_key, friend_ids.key, follower_ids.key)
-    redis.sort(mutual_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+    _, user_ids = redis.multi do
+      redis.sinterstore(mutual_friend_ids_key, friend_ids.key, follower_ids.key)
+      redis.sort(mutual_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
+    end
+
+    user_ids
   end
 
   def deactivate!
