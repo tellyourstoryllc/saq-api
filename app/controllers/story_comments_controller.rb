@@ -24,11 +24,6 @@ class StoryCommentsController < ApplicationController
         user.send_story_comment_notifications(@comment)
       end
 
-      if Bool.parse(params[:sent_snap])
-        mp = MixpanelClient.new(@story.user)
-        mp.received_comment_snap(sender: current_user, comment_snap_template: current_user.comment_snap_template)
-      end
-
       render_json @comment
     else
       render_error

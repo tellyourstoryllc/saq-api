@@ -80,7 +80,6 @@ class User < ActiveRecord::Base
   value :sms_invites_allowed
   hash_key :story_snapchat_media_ids
   value :assigned_like_snap_template_id
-  value :assigned_comment_snap_template_id
   value :drip_notifications_enabled
   hash_key :widget_notification_info
   value :skipped_phone
@@ -613,23 +612,6 @@ class User < ActiveRecord::Base
     end
 
     @like_snap_template
-  end
-
-  def comment_snap_template
-    return @comment_snap_template if defined?(@comment_snap_template)
-
-    comment_snap_template_id = assigned_comment_snap_template_id.value
-    unless comment_snap_template_id && (@comment_snap_template = CommentSnapTemplate.active.find_by(id: comment_snap_template_id))
-      @comment_snap_template = CommentSnapTemplate.active.order('RAND()').first
-
-      if @comment_snap_template
-        self.assigned_comment_snap_template_id = @comment_snap_template.id
-      else
-        assigned_comment_snap_template_id.del
-      end
-    end
-
-    @comment_snap_template
   end
 
   def self.cohort_metrics_key(date)

@@ -230,10 +230,6 @@ class MixpanelClient
     track('Received Like Snap', received_like_snap_properties(properties))
   end
 
-  def received_comment_snap(properties)
-    track('Received Comment Snap', received_comment_snap_properties(properties))
-  end
-
   def created_app_review
     track('Created App Review', created_app_review_properties)
   end
@@ -321,12 +317,6 @@ class MixpanelClient
   def received_like_snap_properties(properties)
     props = received_snap_properties(properties)
     props['Like Snap Template'] = properties[:like_snap_template].try(:name)
-    props
-  end
-
-  def received_comment_snap_properties(properties)
-    props = received_snap_properties(properties)
-    props['Comment Snap Template'] = properties[:comment_snap_template].try(:name)
     props
   end
 

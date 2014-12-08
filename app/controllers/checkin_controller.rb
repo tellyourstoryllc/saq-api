@@ -42,13 +42,6 @@ class CheckinController < ApplicationController
 
       like_snap_template = current_user.like_snap_template
       client_config[:like_template] = like_snap_template.text_overlay if like_snap_template
-
-      comment_snap_template = current_user.comment_snap_template
-
-      if comment_snap_template
-        client_config[:comment_title_template] = comment_snap_template.title_overlay
-        client_config[:comment_body_template] = comment_snap_template.body_overlay
-      end
     end
 
     objects << current_device.preferences if current_device
