@@ -656,10 +656,13 @@ CREATE TABLE `users` (
   `longitude` decimal(10,7) DEFAULT NULL,
   `location_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `friend_code` char(6) COLLATE utf8_unicode_ci NOT NULL,
+  `last_public_story_id` char(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `last_public_story_created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_users_on_username` (`username`),
   UNIQUE KEY `index_users_on_friend_code` (`friend_code`),
-  KEY `index_users_on_created_at` (`created_at`)
+  KEY `index_users_on_created_at` (`created_at`),
+  KEY `index_users_on_last_public_story_created_at` (`last_public_story_created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -672,7 +675,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-08 17:51:41
+-- Dump completed on 2014-12-09 14:54:23
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -884,3 +887,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141114201203');
 INSERT INTO schema_migrations (version) VALUES ('20141205163020');
 
 INSERT INTO schema_migrations (version) VALUES ('20141208162635');
+
+INSERT INTO schema_migrations (version) VALUES ('20141209195234');
