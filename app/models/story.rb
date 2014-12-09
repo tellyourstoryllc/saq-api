@@ -18,6 +18,12 @@ class Story < Message
   def send_like_meta_messages(*args); end
   def send_export_meta_messages(*args); end
 
+  # Permissions convenience methods
+  def private?; story_permission == 'private' end
+  def friends?; story_permission == 'friends' end
+  def public?; story_permission == 'public' end
+
+
   def self.media_id_exists?(user, snapchat_media_id)
     user.story_snapchat_media_ids.include?(snapchat_media_id)
   end
@@ -43,6 +49,8 @@ class Story < Message
 
     saved = super
     return unless saved
+
+    user.update_last_public_story(self) if self.public?
 
     true
   end
