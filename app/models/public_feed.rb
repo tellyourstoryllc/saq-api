@@ -40,7 +40,7 @@ class PublicFeed
   end
 
   def bound_by_location?
-    current_radius && options[:sort] != 'nearest'
+    current_radius && options[:sort] != 'closest'
   end
 
   def current_radius
@@ -59,7 +59,7 @@ class PublicFeed
     scope = scope.near([o[:latitude], o[:longitude]], current_radius, { select: '1', bearing: false }) if bound_by_location?
 
     # Sort.
-    order_by = if o[:sort] == 'nearest' && o[:latitude] && o[:longitude]
+    order_by = if o[:sort] == 'closest' && o[:latitude] && o[:longitude]
       User.coordinate_order_options(o[:latitude], o[:longitude])
     else # newest
       # Use id so that it's stable.
