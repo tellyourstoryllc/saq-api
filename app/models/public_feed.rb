@@ -1,4 +1,4 @@
-class Feed
+class PublicFeed
   include Peanut::Model
   include Redis::Objects
 

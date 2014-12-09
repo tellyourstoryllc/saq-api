@@ -23,8 +23,6 @@ KrazyChat::Application.routes.draw do
 
     match '/conversations', to: 'conversations#index', as: 'conversations'
 
-    match '/feed', to: 'feed#index', as: 'feed'
-
     match '/groups/create', to: 'groups#create', as: 'create_group'
     match '/groups/:id/update', to: 'groups#update', as: 'update_group'
     match '/groups/join/:join_code', to: 'groups#join', as: 'join_group'
@@ -108,6 +106,7 @@ KrazyChat::Application.routes.draw do
 
     match '/stories/search', to: 'stories#search', as: 'search_stories'
     match '/stories_feed', to: 'stories_feeds#show', as: 'stories_feed'
+    match '/public_feed', to: 'public_feed#index', as: 'public_feed'
     match '/users/:id/stories', to: 'stories_lists#show', as: 'stories_list'
     match '/stories/:id', to: 'stories#show', as: 'show_story'
     match '/stories/:id/likes', to: 'story_likes#index', as: 'story_likes'
