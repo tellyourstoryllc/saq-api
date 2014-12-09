@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
   before_validation :set_id, :set_friend_code, on: :create
   before_validation :fix_username
 
-  validates :username, :friend_code, presence: true
+  validates :username, :gender, :friend_code, presence: true
   validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 

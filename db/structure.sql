@@ -651,7 +651,7 @@ CREATE TABLE `users` (
   `deactivated` tinyint(1) NOT NULL DEFAULT '0',
   `birthday` date DEFAULT NULL,
   `uninstalled` tinyint(1) NOT NULL DEFAULT '0',
-  `gender` enum('male','female') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `gender` enum('male','female') COLLATE utf8_unicode_ci NOT NULL,
   `latitude` decimal(10,7) DEFAULT NULL,
   `longitude` decimal(10,7) DEFAULT NULL,
   `location_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -675,7 +675,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-09 14:54:23
+-- Dump completed on 2014-12-09 15:14:22
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -889,3 +889,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141205163020');
 INSERT INTO schema_migrations (version) VALUES ('20141208162635');
 
 INSERT INTO schema_migrations (version) VALUES ('20141209195234');
+
+INSERT INTO schema_migrations (version) VALUES ('20141209201135');
