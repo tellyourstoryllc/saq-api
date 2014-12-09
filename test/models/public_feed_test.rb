@@ -17,9 +17,8 @@ class PublicFeedTest < ActiveSupport::TestCase
     end
 
     it "must order by newest public story" do
-      user1 = current_user = FactoryGirl.create(:registered_user, :female, created_at: 2.minutes.ago,
-                                                last_public_story_created_at: 2.minutes.ago)
-      user2 = FactoryGirl.create(:registered_user, :female, created_at: 1.minute.ago, last_public_story_created_at: 1.minute.ago)
+      user1 = current_user = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago)
+      user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago)
       user3 = FactoryGirl.create(:registered_user, :female)
 
       results = PublicFeed.paginate_feed(current_user, sort: 'newest')
@@ -29,10 +28,10 @@ class PublicFeedTest < ActiveSupport::TestCase
     end
 
     it "must order by newest public story with radius" do
-      user1 = current_user = FactoryGirl.create(:registered_user, :female, created_at: 2.minutes.ago,
-                                                last_public_story_created_at: 2.minutes.ago, latitude: 39.9475787, longitude: -75.1564073)
-      user2 = FactoryGirl.create(:registered_user, :female, created_at: 1.minute.ago, last_public_story_created_at: 1.minute.ago,
-                                 latitude: 39.7, longitude: -75.2)
+      user1 = current_user = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago,
+                                                latitude: 39.9475787, longitude: -75.1564073)
+      user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago, latitude: 39.7,
+                                 longitude: -75.2)
       FactoryGirl.create(:registered_user, :female, latitude: 40.0, longitude: -76.0)
 
       results = PublicFeed.paginate_feed(current_user, sort: 'newest', radius: 25)

@@ -62,10 +62,10 @@ class PublicFeed
       User.coordinate_order_options(o[:latitude], o[:longitude])
     else # newest
       # Use id so that it's stable.
-      'users.created_at DESC, users.id'
+      'users.last_public_story_created_at DESC, users.id'
     end
-    scope = scope.reorder(order_by)
 
+    scope = scope.reorder(order_by)
     scope = scope.limit(USER_LIMIT)
 
     scope
