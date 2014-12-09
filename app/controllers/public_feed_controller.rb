@@ -1,7 +1,7 @@
 class PublicFeedController < ApplicationController
 
   def index
-    render_json PublicFeed.feed_api(current_user, feed_params)
+    render_json PublicFeed.paginate_feed(current_user, feed_params)
   end
 
   private

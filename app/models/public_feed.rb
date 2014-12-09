@@ -148,7 +148,7 @@ class PublicFeed
     user_ids
   end
 
-  def self.feed_api(current_user, options)
+  def self.paginate_feed(current_user, options)
     return [] if current_user.blank?
 
     feed = new
