@@ -129,11 +129,11 @@ class ApplicationController < ActionController::Base
   end
 
   def ios_device_params
-    params.permit(:device_id, :client_version, :os_version, :lang)
+    params.slice(:device_id, :client_version, :os_version, :lang)
   end
 
   def android_device_params
-    params.permit(:android_id, :v, :os_version, :lang)
+    params.slice(:android_id, :v, :os_version, :lang)
   end
 
   def render_json(objects, options = {})
@@ -197,11 +197,11 @@ class ApplicationController < ActionController::Base
   end
 
   def pagination_params
-    params.permit(:limit, :offset)
+    params.slice(:limit, :offset)
   end
 
   def message_pagination_params
-    params.permit(:limit, :below_rank, :below_message_id, :below_story_id, :above_comment_id)
+    params.slice(:limit, :below_rank, :below_message_id, :below_story_id, :above_comment_id)
   end
 
   def track_sc_users(users, phone_numbers = [])
