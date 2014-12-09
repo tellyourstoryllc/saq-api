@@ -5,10 +5,11 @@ class PublicFeed
   attr_accessor :current_user, :user_ids, :expanded_radius
   attr_reader :options
 
-  MALE_PERCENTAGE = 0.5
   FEMALE_PERCENTAGE = 0.5
+  MALE_PERCENTAGE = 1 - FEMALE_PERCENTAGE
   USER_LIMIT = 500
   RADII = [25, 50, 100, :any]
+
 
   def self.results_expiration
     1.hour
