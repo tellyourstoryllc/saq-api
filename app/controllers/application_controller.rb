@@ -129,11 +129,11 @@ class ApplicationController < ActionController::Base
   end
 
   def ios_device_params
-    params.slice(:device_id, :client_version, :os_version, :lang)
+    params.permit(:device_id, :client_version, :os_version, :lang)
   end
 
   def android_device_params
-    params.slice(:android_id, :v, :os_version, :lang)
+    params.permit(:android_id, :v, :os_version, :lang)
   end
 
   def render_json(objects, options = {})
