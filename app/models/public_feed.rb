@@ -33,7 +33,7 @@ class PublicFeed
     @options[:longitude] ||= current_user.longitude
     @options[:radius] = @options[:radius].present? ? @options[:radius].to_i : nil
 
-    @options[:limit] = (@options[:limit] || 10).to_i
+    @options[:limit] = (@options[:limit] || 20).to_i
     @options[:limit] = 100 if @options[:limit] > 100
 
     @options[:offset] = @options[:offset].to_i
