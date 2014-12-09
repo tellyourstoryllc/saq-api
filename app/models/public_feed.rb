@@ -53,6 +53,7 @@ class PublicFeed
 
     scope = User.select('users.id')
     scope = scope.where(deactivated: false)
+    scope = scope.where('users.last_public_story_created_at IS NOT NULL')
     scope = scope.joins(:account).where(accounts: { registered: true })
     scope = scope.near([o[:latitude], o[:longitude]], current_radius, { select: '1', bearing: false }) if bound_by_location?
 
