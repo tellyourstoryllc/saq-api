@@ -6,8 +6,8 @@ class Message
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
     :attachment_metadata, :client_metadata, :received, :original_message_id, :forward_message_id,
-    :actor_id, :attachment_message_id, :type, :snapchat_media_id, :created_at, :snapchat_created_at,
-    :expires_in, :expires_at, :cached_likes_count, :cached_forwards_count
+    :actor_id, :attachment_message_id, :type, :story_permission, :snapchat_media_id, :created_at,
+    :snapchat_created_at, :expires_in, :expires_at, :cached_likes_count, :cached_forwards_count
 
   hash_key :attrs
   list :ancestor_message_ids
@@ -389,7 +389,7 @@ class Message
                           attachment_preview_height: attachment_preview_height, attachment_metadata: attachment_metadata,
                           client_metadata: client_metadata, received: received, original_message_id: original_message_id,
                           forward_message_id: forward_message_id, actor_id: actor_id, attachment_message_id: attachment_message_id,
-                          type: type, snapchat_media_id: snapchat_media_id, created_at: created_at,
+                          type: type, story_permission: story_permission, snapchat_media_id: snapchat_media_id, created_at: created_at,
                           snapchat_created_at: snapchat_created_at, expires_in: expires_in, expires_at: expires_at)
 
       if expires_in.present?

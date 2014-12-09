@@ -1,6 +1,8 @@
 class Story < Message
   include Peanut::CommentsCollection
 
+  validate :valid_permission?
+
 
   def initialize(attributes = {})
     super
@@ -33,6 +35,16 @@ class Story < Message
     else
       story if story.save
     end
+  end
+
+  def save
+    # Default permission to private if not given
+    self.story_permission ||= 'private'
+
+    saved = super
+    return unless saved
+
+    true
   end
 
   def add_to_stories_list_and_feed(other_user_id)
@@ -141,6 +153,10 @@ class Story < Message
   def text_or_attachment_set?
     errors.add(:base, "Either text or an attachment is required.") unless media_id_exists? || text.present? || attachment_file.present? ||
       attachment_url.present? || (forward_message && forward_message.attachment_url.present?) || meta_message?
+  end
+
+  def valid_permission?
+    errors.add(:base, "Story permission must be one of 'private', 'friends', or 'public'.") unless %w(private friends public).include?(story_permission)
   end
 
   def add_snapchat_media_id
