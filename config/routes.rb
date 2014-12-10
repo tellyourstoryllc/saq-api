@@ -109,6 +109,7 @@ KrazyChat::Application.routes.draw do
     match '/public_feed', to: 'public_feed#index', as: 'public_feed'
     match '/users/:id/stories', to: 'stories_lists#show', as: 'stories_list'
     match '/stories/:id', to: 'stories#show', as: 'show_story'
+    match '/stories/:id/update', to: 'stories#update', as: 'update_story'
     match '/stories/:id/likes', to: 'story_likes#index', as: 'story_likes'
     match '/stories/:id/like', to: 'story_likes#create', as: 'like_story'
     match '/stories/:id/export', to: 'stories#export', as: 'export_story'

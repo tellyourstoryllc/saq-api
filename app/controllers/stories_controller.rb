@@ -1,9 +1,15 @@
 class StoriesController < ApplicationController
   before_action :load_story, only: [:show, :export]
-  before_action :load_my_story, only: :delete
+  before_action :load_my_story, only: [:update, :delete]
 
 
   def show
+    render_json @story
+  end
+
+  def update
+    @story.attrs.bulk_set(story_params)
+    load_my_story
     render_json @story
   end
 
@@ -36,5 +42,9 @@ class StoriesController < ApplicationController
     @story = Story.new(id: params[:id])
     raise Peanut::Redis::RecordNotFound unless @story.attrs.exists? &&
       @story.user_id == current_user.id
+  end
+
+  def story_params
+    params.slice(:latitude, :longitude)
   end
 end
