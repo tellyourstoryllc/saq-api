@@ -31,6 +31,11 @@ class PublicFeed
 
     @options[:latitude] ||= current_user.latitude
     @options[:longitude] ||= current_user.longitude
+
+    # Round lat/long so if you're moving, you don't keep getting new feeds when your location barely changes
+    @options[:latitude] = @options[:latitude].to_f.round(3) if @options[:latitude].present?
+    @options[:longitude] = @options[:longitude].to_f.round(3) if @options[:longitude].present?
+
     @options[:radius] = @options[:radius].present? ? @options[:radius].to_i : nil
 
     @options[:limit] = (@options[:limit] || 20).to_i
