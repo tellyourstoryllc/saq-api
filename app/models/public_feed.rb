@@ -176,9 +176,10 @@ class PublicFeed
     return [] if user_ids.blank?
 
     # Preserve order when fetching from the db.
-    user_objects = User.includes(:account, :avatar_image, :avatar_video).where(id: user_ids).reorder("field(id, #{user_ids.map(&:inspect).join(',')})")
+    users = User.includes(:account, :avatar_image, :avatar_video).where(id: user_ids).reorder("field(id, #{user_ids.map(&:inspect).join(',')})")
+    stories = Story.pipelined_find(users.map(&:last_public_story_id))
 
-    user_objects
+    users + stories
   end
 
 end
