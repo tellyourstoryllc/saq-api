@@ -752,7 +752,9 @@ class User < ActiveRecord::Base
 
   def update_last_public_story(story)
     story_created_at = Time.zone.at(story.created_at)
-    update(last_public_story_id: story.id, last_public_story_created_at: story_created_at) if last_public_story_created_at.nil? || story_created_at >= last_public_story_created_at
+    attrs = {last_public_story_id: story.id, last_public_story_created_at: story_created_at,
+             last_public_story_latitude: story.latitude, last_public_story_longitude: story.longitude}
+    update(attrs) if last_public_story_created_at.nil? || story_created_at >= last_public_story_created_at
   end
 
 
