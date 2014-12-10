@@ -6,7 +6,7 @@ describe UsersController do
       it "must not create a user if it's invalid" do
         post :create
         old_count = User.count
-        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Emails can't be blank."})
+        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Emails can't be blank, User gender can't be blank."})
         User.count.must_equal old_count
       end
 
@@ -15,7 +15,7 @@ describe UsersController do
 
         post :create, {username: 'JohnDoe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'invalidtoken'}
         old_count = User.count
-        result.must_equal('error' => {'message' => 'Sorry, that could not be saved: Validation failed: Invalid Facebook credentials.'})
+        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Invalid Facebook credentials, User gender can't be blank."})
         User.count.must_equal old_count
       end
     end
@@ -23,7 +23,7 @@ describe UsersController do
 
     describe "valid" do
       it "must create a user and account" do
-        post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf'}
+        post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf', gender: 'male'}
 
         user = User.order('created_at DESC').first
         account = Account.order('created_at DESC').first
@@ -37,7 +37,7 @@ describe UsersController do
       end
 
       it "must create a user and account without a password" do
-        post :create, {username: 'JohnDoe', email: 'joe@example.com'}
+        post :create, {username: 'JohnDoe', email: 'joe@example.com', gender: 'male'}
 
         user = User.order('created_at DESC').first
         account = Account.order('created_at DESC').first
@@ -51,7 +51,7 @@ describe UsersController do
       end
 
       it "must create a user and account without a username or password" do
-        post :create, {email: 'joe@example.com'}
+        post :create, {email: 'joe@example.com', gender: 'male'}
 
         user = User.order('created_at DESC').first
         account = Account.order('created_at DESC').first
@@ -88,7 +88,7 @@ describe UsersController do
 
       it "must create a user and a group" do
         Time.stub :now, now = Time.parse('2013-12-26 15:08') do
-          post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf', group_name: 'Cool Dudes'}
+          post :create, {username: 'JohnDoe', email: 'joe@example.com', password: 'asdf', gender: 'male', group_name: 'Cool Dudes'}
 
           user = User.order('created_at DESC').first
           account = Account.order('created_at DESC').first
@@ -115,7 +115,7 @@ describe UsersController do
         def api.get_connections(id, connection); [] end
 
         Koala::Facebook::API.stub :new, api do
-          post :create, {username: 'JohnDoe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
+          post :create, {username: 'JohnDoe', email: 'joe@example.com', gender: 'male', facebook_id: '100002345', facebook_token: 'fb_asdf1234'}
 
           user = User.order('created_at DESC').first
           account = Account.order('created_at DESC').first
@@ -187,7 +187,7 @@ describe UsersController do
         invite = FactoryGirl.create(:invite, sender_id: sender.id, recipient_id: user.id, invited_email: 'bruce@example.com')
         user_count = User.count
 
-        post :create, {username: 'BruceLee', email: 'bruce@example.com', password: 'asdf', invite_token: invite.invite_token}
+        post :create, {username: 'BruceLee', email: 'bruce@example.com', password: 'asdf', gender: 'male', invite_token: invite.invite_token}
 
         user = User.find_by(username: 'BruceLee')
         account = user.account

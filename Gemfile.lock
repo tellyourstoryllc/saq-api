@@ -110,6 +110,7 @@ GEM
       nokogiri (~> 1.5)
       ruby-hmac
     formatador (0.2.4)
+    geocoder (1.2.6)
     globalize (4.0.1)
       activemodel (>= 4.0.0, < 5)
       activerecord (>= 4.0.0, < 5)
@@ -276,6 +277,7 @@ DEPENDENCIES
   faraday (= 0.8.8)
   faye (= 1.0.0)
   fog (= 1.19.0)
+  geocoder (~> 1.2.0)
   globalize (~> 4.0.1)
   hiredis
   httparty

@@ -65,18 +65,24 @@ class UserSerializer < ActiveModel::Serializer
   end
 
   def latitude
+    latitude = object.latitude
+    return if latitude.blank?
+
     if owner?
-      object.latitude.to_f
+      latitude.to_f
     else
-      object.latitude.to_f.try(:round, 2)
+      latitude.to_f.round(2)
     end
   end
 
   def longitude
+    longitude = object.longitude
+    return if longitude.blank?
+
     if owner?
-      object.longitude.to_f
+      longitude.to_f
     else
-      object.longitude.to_f.try(:round, 2)
+      longitude.to_f.round(2)
     end
   end
 

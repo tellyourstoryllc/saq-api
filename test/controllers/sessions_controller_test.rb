@@ -6,13 +6,13 @@ describe SessionsController do
       post :create, {login: 'login_test@example.com', password: 'incorrect'}
       result.must_equal('error' => {'message' => 'Incorrect credentials.'})
 
-      FactoryGirl.create(:account, password: 'asdf', user_attributes: {name: 'John'}, emails_attributes: [{email: 'login_test@example.com'}])
+      FactoryGirl.create(:account, password: 'asdf', user_attributes: {name: 'John', gender: 'male'}, emails_attributes: [{email: 'login_test@example.com'}])
       post :create, {login: 'login_test@example.com', password: 'incorrect'}
       result.must_equal('error' => {'message' => 'Incorrect credentials.'})
     end
 
     it "must not log in user when the user has no password nor Facebook id" do
-      FactoryGirl.create(:account, user_attributes: {name: 'John'}, emails_attributes: [{email: 'login_test@example.com'}])
+      FactoryGirl.create(:account, user_attributes: {name: 'John', gender: 'male'}, emails_attributes: [{email: 'login_test@example.com'}])
       post :create, {login: 'login_test@example.com', password: 'incorrect'}
       result.must_equal('error' => {'message' => 'Incorrect credentials.'})
     end

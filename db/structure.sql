@@ -651,14 +651,22 @@ CREATE TABLE `users` (
   `deactivated` tinyint(1) NOT NULL DEFAULT '0',
   `birthday` date DEFAULT NULL,
   `uninstalled` tinyint(1) NOT NULL DEFAULT '0',
-  `gender` enum('male','female') COLLATE utf8_unicode_ci DEFAULT NULL,
+  `gender` enum('male','female') COLLATE utf8_unicode_ci NOT NULL,
   `latitude` decimal(10,7) DEFAULT NULL,
   `longitude` decimal(10,7) DEFAULT NULL,
   `location_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `friend_code` char(6) COLLATE utf8_unicode_ci NOT NULL,
+  `last_public_story_id` char(10) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `last_public_story_created_at` datetime DEFAULT NULL,
+  `last_public_story_latitude` decimal(10,7) DEFAULT NULL,
+  `last_public_story_longitude` decimal(10,7) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_users_on_username` (`username`),
-  UNIQUE KEY `index_users_on_friend_code` (`friend_code`)
+  UNIQUE KEY `index_users_on_friend_code` (`friend_code`),
+  KEY `index_users_on_created_at` (`created_at`),
+  KEY `index_users_on_last_public_story_created_at` (`last_public_story_created_at`),
+  KEY `index_users_on_latitude_and_longitude` (`latitude`,`longitude`),
+  KEY `index_on_last_public_story_location` (`last_public_story_latitude`,`last_public_story_longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -671,7 +679,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-08 11:27:19
+-- Dump completed on 2014-12-10 11:34:45
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -814,6 +822,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140408204911');
 
 INSERT INTO schema_migrations (version) VALUES ('20140409134155');
 
+INSERT INTO schema_migrations (version) VALUES ('20140421172132');
+
 INSERT INTO schema_migrations (version) VALUES ('20140423155654');
 
 INSERT INTO schema_migrations (version) VALUES ('20140424163441');
@@ -825,6 +835,8 @@ INSERT INTO schema_migrations (version) VALUES ('20140505144600');
 INSERT INTO schema_migrations (version) VALUES ('20140509161115');
 
 INSERT INTO schema_migrations (version) VALUES ('20140513214441');
+
+INSERT INTO schema_migrations (version) VALUES ('20140516224025');
 
 INSERT INTO schema_migrations (version) VALUES ('20140519222919');
 
@@ -881,3 +893,9 @@ INSERT INTO schema_migrations (version) VALUES ('20141114201203');
 INSERT INTO schema_migrations (version) VALUES ('20141205163020');
 
 INSERT INTO schema_migrations (version) VALUES ('20141208162635');
+
+INSERT INTO schema_migrations (version) VALUES ('20141209195234');
+
+INSERT INTO schema_migrations (version) VALUES ('20141209201135');
+
+INSERT INTO schema_migrations (version) VALUES ('20141210162912');

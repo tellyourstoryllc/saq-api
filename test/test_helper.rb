@@ -41,7 +41,7 @@ Spork.prefork do
 
     def set_up_robot
       Robot.instance_variable_set(:@user, nil)
-      robot = User.create!(created_at: 10.years.ago)
+      robot = User.create!(gender: 'male', created_at: 10.years.ago)
       FactoryGirl.create(:account, registered: true, user_id: robot.id, created_at: 10.years.ago)
       User.where(id: robot.id).update_all(username: Robot.username)
     end

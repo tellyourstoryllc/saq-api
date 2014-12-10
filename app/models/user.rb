@@ -1,12 +1,13 @@
 class User < ActiveRecord::Base
   include Peanut::Model
   include Redis::Objects
+  include Peanut::Geolocation
   attr_accessor :avatar_image_file, :avatar_image_url, :avatar_video_file, :invite_type
 
   before_validation :set_id, :set_friend_code, on: :create
   before_validation :fix_username
 
-  validates :username, :friend_code, presence: true
+  validates :username, :gender, :friend_code, presence: true
   validates :username, uniqueness: true
   validates :status, inclusion: {in: %w[available away do_not_disturb]}
 
@@ -92,6 +93,8 @@ class User < ActiveRecord::Base
   hash_key :stories_digest_info
 
   delegate :registered, :registered?, to: :account
+
+  reverse_geocoded_by :latitude, :longitude
 
   COHORT_METRICS_TIME_ZONE = 'America/New_York'
 
@@ -745,6 +748,13 @@ class User < ActiveRecord::Base
 
   def reset_friend_code=(bool)
     set_friend_code if Bool.parse(bool)
+  end
+
+  def update_last_public_story(story)
+    story_created_at = Time.zone.at(story.created_at)
+    attrs = {last_public_story_id: story.id, last_public_story_created_at: story_created_at,
+             last_public_story_latitude: story.latitude, last_public_story_longitude: story.longitude}
+    update(attrs) if last_public_story_created_at.nil? || story_created_at >= last_public_story_created_at
   end
 
 

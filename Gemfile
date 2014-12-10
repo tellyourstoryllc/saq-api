@@ -55,6 +55,8 @@ gem 'sinatra', '>= 1.3.0', require: nil
 gem 'sidekiq', '2.17.0'
 gem 'mixpanel', '4.1.1'
 
+gem 'geocoder', '~> 1.2.0'
+
 gem 'phony'
 gem 'daemons', '1.1.9'
 gem 'globalize', '~> 4.0.1'
