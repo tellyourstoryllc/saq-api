@@ -29,12 +29,13 @@ class PublicFeedTest < ActiveSupport::TestCase
 
     it "must order by newest public story with radius" do
       user1 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago,
-                                                latitude: 39.9475787, longitude: -75.1564073)
-      user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago, latitude: 39.7,
-                                 longitude: -75.2)
-      FactoryGirl.create(:registered_user, :female, latitude: 40.0, longitude: -76.0)
+                                 last_public_story_latitude: 39.9475787, last_public_story_longitude: -75.1564073)
+      user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago,
+                                 last_public_story_latitude: 39.7, last_public_story_longitude: -75.2)
+      FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 3.minutes.ago,
+                         last_public_story_latitude: 40.0, last_public_story_longitude: -76.0)
 
-      results = PublicFeed.paginate_feed(current_user, sort: 'newest', radius: 25)
+      results = PublicFeed.paginate_feed(current_user, sort: 'newest', radius: 25, latitude: 39.9510010, longitude: -75.1627290)
       results.size.must_equal 2
       results[0].must_equal user2
       results[1].must_equal user1
@@ -42,9 +43,9 @@ class PublicFeedTest < ActiveSupport::TestCase
 
     it "must order by closest public story" do
       user1 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago,
-                                 latitude: 39.9475787, longitude: -75.1564073)
+                                 last_public_story_latitude: 39.9475787, last_public_story_longitude: -75.1564073)
       user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago,
-                                 latitude: 39.7, longitude: -75.2)
+                                 last_public_story_latitude: 39.7, last_public_story_longitude: -75.2)
       FactoryGirl.create(:registered_user, :female, latitude: 40.0, longitude: -76.0)
 
       results = PublicFeed.paginate_feed(current_user, sort: 'closest', latitude: 39.98, longitude: -75.152)
@@ -54,11 +55,11 @@ class PublicFeedTest < ActiveSupport::TestCase
 
     it "must order by closest public story with explicit radius" do
       user1 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago,
-                                 latitude: 39.9475787, longitude: -75.1564073)
+                                 last_public_story_latitude: 39.9475787, last_public_story_longitude: -75.1564073)
       user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago,
-                                 latitude: 39.7, longitude: -75.2)
-      FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 5.minutes.ago, latitude: 45.0,
-                         longitude: -78.0)
+                                 last_public_story_latitude: 39.7, last_public_story_longitude: -75.2)
+      FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 5.minutes.ago,
+                         last_public_story_latitude: 45.0, last_public_story_longitude: -78.0)
 
       results = PublicFeed.paginate_feed(current_user, sort: 'closest', latitude: 39.9475787, longitude: -75.1564073, radius: 25)
       results.size.must_equal 3

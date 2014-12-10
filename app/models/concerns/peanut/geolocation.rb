@@ -42,11 +42,11 @@ module Peanut::Geolocation
       { :latitude => n_lat..x_lat, :longitude => n_lon..x_lon }
     end
 
-    def coordinate_order_options(latitude, longitude)
+    def coordinate_order_options(latitude, longitude, options = {})
       lat_column = table_name.present? ? "`#{table_name}`." : ''
       long_column = table_name.present? ? "`#{table_name}`." : ''
-      lat_column << "`latitude`"
-      long_column << "`longitude`"
+      lat_column << "`#{options[:latitude].presence || 'latitude'}`"
+      long_column << "`#{options[:longitude].presence || 'longitude'}`"
 
       <<-CODE
         ISNULL(#{lat_column}),
