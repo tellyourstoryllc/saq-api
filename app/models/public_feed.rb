@@ -176,7 +176,7 @@ class PublicFeed
     return [] if user_ids.blank?
 
     # Preserve order when fetching from the db.
-    user_objects = User.where(id: user_ids).reorder("field(id, #{user_ids.map(&:inspect).join(',')})")
+    user_objects = User.includes(:account, :avatar_image, :avatar_video).where(id: user_ids).reorder("field(id, #{user_ids.map(&:inspect).join(',')})")
 
     user_objects
   end
