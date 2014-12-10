@@ -6,7 +6,7 @@ class Message
     :mentioned_user_ids, :message_attachment_id, :attachment_url, :attachment_content_type,
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
     :attachment_metadata, :client_metadata, :received, :original_message_id, :forward_message_id,
-    :actor_id, :attachment_message_id, :type, :story_permission, :snapchat_media_id, :latitude, :longitude,
+    :actor_id, :attachment_message_id, :type, :story_permission, :snapchat_media_id, :latitude, :longitude, :source,
     :created_at, :snapchat_created_at, :expires_in, :expires_at, :cached_likes_count, :cached_forwards_count
 
   hash_key :attrs
@@ -390,7 +390,7 @@ class Message
                           client_metadata: client_metadata, received: received, original_message_id: original_message_id,
                           forward_message_id: forward_message_id, actor_id: actor_id, attachment_message_id: attachment_message_id,
                           type: type, story_permission: story_permission, snapchat_media_id: snapchat_media_id, latitude: latitude,
-                          longitude: longitude, created_at: created_at, snapchat_created_at: snapchat_created_at,
+                          longitude: longitude, source: source, created_at: created_at, snapchat_created_at: snapchat_created_at,
                           expires_in: expires_in, expires_at: expires_at)
 
       if expires_in.present?

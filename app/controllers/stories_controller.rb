@@ -45,6 +45,6 @@ class StoriesController < ApplicationController
   end
 
   def story_params
-    params.slice(:latitude, :longitude)
+    params.slice(:latitude, :longitude, :source)
   end
 end
