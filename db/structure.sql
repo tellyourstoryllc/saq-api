@@ -393,6 +393,28 @@ CREATE TABLE `like_snap_templates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `message_attachment_overlays`
+--
+
+DROP TABLE IF EXISTS `message_attachment_overlays`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_attachment_overlays` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `one_to_one_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `message_id` char(10) COLLATE utf8_unicode_ci NOT NULL,
+  `overlay` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `file_size` int(11) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_message_attachment_overlays_on_one_to_one_id` (`one_to_one_id`),
+  KEY `index_message_attachment_overlays_on_message_id` (`message_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `message_attachments`
 --
 
@@ -679,7 +701,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-10 11:34:45
+-- Dump completed on 2014-12-10 18:10:36
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -899,3 +921,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141209195234');
 INSERT INTO schema_migrations (version) VALUES ('20141209201135');
 
 INSERT INTO schema_migrations (version) VALUES ('20141210162912');
+
+INSERT INTO schema_migrations (version) VALUES ('20141210212510');

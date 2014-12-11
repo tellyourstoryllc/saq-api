@@ -7,7 +7,8 @@ class Message
     :attachment_preview_url, :attachment_preview_width, :attachment_preview_height,
     :attachment_metadata, :client_metadata, :received, :original_message_id, :forward_message_id,
     :actor_id, :attachment_message_id, :type, :story_permission, :snapchat_media_id, :latitude, :longitude, :source,
-    :created_at, :snapchat_created_at, :expires_in, :expires_at, :cached_likes_count, :cached_forwards_count
+    :created_at, :snapchat_created_at, :expires_in, :expires_at, :cached_likes_count, :cached_forwards_count,
+    :message_attachment_overlay_id, :attachment_overlay_file, :attachment_overlay_url, :attachment_overlay_text
 
   hash_key :attrs
   list :ancestor_message_ids
@@ -57,6 +58,7 @@ class Message
     generate_id
     sanitize_mentioned_user_ids
     save_message_attachment
+    save_message_attachment_overlay
 
     redis.multi do
       write_attrs
@@ -354,6 +356,13 @@ class Message
     end
   end
 
+  def save_message_attachment_overlay
+    return unless @message_attachment && attachment_overlay_file.present?
+
+    @message_attachment_overlay = MessageAttachmentOverlay.new(message_id: id, message: self, overlay: attachment_overlay_file)
+    @message_attachment_overlay.save!
+  end
+
   def write_attrs
     self.created_at = Time.current.to_i
     self.snapchat_created_at = snapchat_created_at.to_i if snapchat_created_at.present?
@@ -379,6 +388,11 @@ class Message
       self.message_attachment_id = @message_attachment.id
     end
 
+    if @message_attachment_overlay && @message_attachment_overlay.overlay.present?
+      self.attachment_overlay_url = @message_attachment_overlay.overlay.url
+      self.message_attachment_overlay_id = @message_attachment_overlay.id
+    end
+
     # If this message was received, change the sender
     if received && !story?
       self.user_id = one_to_one.other_user_id(user)
@@ -394,8 +408,9 @@ class Message
                           client_metadata: client_metadata, received: received, original_message_id: original_message_id,
                           forward_message_id: forward_message_id, actor_id: actor_id, attachment_message_id: attachment_message_id,
                           type: type, story_permission: story_permission, snapchat_media_id: snapchat_media_id, latitude: latitude,
-                          longitude: longitude, source: source, created_at: created_at, snapchat_created_at: snapchat_created_at,
-                          expires_in: expires_in, expires_at: expires_at)
+                          longitude: longitude, source: source, message_attachment_overlay_id: message_attachment_overlay_id,
+                          attachment_overlay_url: attachment_overlay_url, attachment_overlay_text: attachment_overlay_text,
+                          created_at: created_at, snapchat_created_at: snapchat_created_at, expires_in: expires_in, expires_at: expires_at)
 
       if expires_in.present?
         redis.expire(attrs.key, expires_in)

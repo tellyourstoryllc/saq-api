@@ -51,9 +51,11 @@ class MessagesController < ApplicationController
   end
 
   def story_params
-    message_params.merge(user_id: params[:story_creator_id], story_permission: params[:story_permission],
-                         snapchat_media_id: params[:snapchat_media_id], latitude: params[:latitude],
-                         longitude: params[:longitude], source: params[:source])
+    additional_params = params.slice(:story_permission, :story_permission, :snapchat_media_id,
+                                     :latitude, :longitude, :source, :attachment_metadata,
+                                     :attachment_overlay_file, :attachment_overlay_text)
+
+    message_params.merge(additional_params).merge(user_id: params[:story_creator_id])
   end
 
   # Create a message for each group
