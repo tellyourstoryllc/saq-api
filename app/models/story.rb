@@ -55,6 +55,24 @@ class Story < Message
     true
   end
 
+  def update(update_attrs)
+    update_attrs.each do |k, v|
+      send("#{k}=", v)
+    end
+
+    # Update attachment overlay file and/or text
+    overlay_file = update_attrs[:attachment_overlay_file]
+    overlay_text = update_attrs[:attachment_overlay_text]
+    update_message_attachment_overlay(overlay_file, overlay_text) if overlay_file.present?
+
+    # Update simple attrs
+    simple_attrs = update_attrs.slice(:latitude, :longitude, :source)
+    attrs.bulk_set(simple_attrs) if simple_attrs.present?
+    user.update_last_public_story(self) if self.public?
+
+    true
+  end
+
   def add_to_stories_list_and_feed(other_user_id)
     stories_list = StoriesList.new(creator_id: user.id, viewer_id: other_user_id)
     return unless stories_list.save

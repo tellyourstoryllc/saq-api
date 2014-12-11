@@ -285,6 +285,21 @@ class Message
                         attachment_preview_height: nil, attachment_message_id: nil)
   end
 
+  def update_message_attachment_overlay(attachment_overlay_file, attachment_overlay_text)
+    return unless message_attachment_id.present? && attachment_overlay_file.present?
+
+    @message_attachment_overlay = MessageAttachmentOverlay.new(message_id: id, message: self, overlay: attachment_overlay_file)
+    @message_attachment_overlay.save!
+
+    if @message_attachment_overlay.overlay.present?
+      self.attachment_overlay_url = @message_attachment_overlay.overlay.url
+      self.message_attachment_overlay_id = @message_attachment_overlay.id
+
+      self.attrs.bulk_set(message_attachment_overlay_id: message_attachment_overlay_id,
+                          attachment_overlay_url: attachment_overlay_url, attachment_overlay_text: attachment_overlay_text)
+    end
+  end
+
 
   private
 

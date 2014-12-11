@@ -8,7 +8,7 @@ class StoriesController < ApplicationController
   end
 
   def update
-    @story.attrs.bulk_set(story_params)
+    @story.update(update_params)
     load_my_story
     render_json @story
   end
@@ -44,7 +44,7 @@ class StoriesController < ApplicationController
       @story.user_id == current_user.id
   end
 
-  def story_params
-    params.slice(:latitude, :longitude, :source)
+  def update_params
+    params.slice(:latitude, :longitude, :source, :attachment_overlay_file, :attachment_overlay_text)
   end
 end
