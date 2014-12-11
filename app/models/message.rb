@@ -291,11 +291,15 @@ class Message
 
     # Exclude L to avoid any confusion
     chars = [*'a'..'k', *'m'..'z', *0..9]
+    prefix = self.class.redis_prefix
+    possible_id = nil
 
     loop do
-      self.id = Array.new(10){ chars.sample }.join
-      break unless attrs.exists?
+      possible_id = Array.new(10){ chars.sample }.join
+      break unless redis.exists("#{prefix}:#{possible_id}:attrs")
     end
+
+    self.id = possible_id
   end
 
   def sanitize_mentioned_user_ids
