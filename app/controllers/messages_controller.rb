@@ -137,10 +137,9 @@ class MessagesController < ApplicationController
       pushed_user_ids = story.push_to_lists_and_feeds
 
       # Notify the users to whose feed this story was just added
-      # FIXME
-      #User.where(id: pushed_user_ids).find_each do |user|
-      #  user.send_story_notifications(story)
-      #end
+      User.where(id: pushed_user_ids).find_each do |user|
+        user.send_story_notifications(story)
+      end
 
       # Track activity in Mixpanel
       mixpanel.daily_message_events(story) unless importing_from_sc

@@ -47,7 +47,7 @@ module Peanut::Conversation
     min = deleted_rank ? deleted_rank + 1 : '-inf'
 
     ids = message_ids.revrangebyscore(max, min, {limit: limit}).reverse
-    klass = [StoriesList, StoriesFeed, Peanut::StoriesCollection].any?{ |c| is_a?(c) } ? Story : Message
+    klass = [StoriesList, FriendFeed, Peanut::StoriesCollection].any?{ |c| is_a?(c) } ? Story : Message
 
     messages = klass.pipelined_find(ids)
 

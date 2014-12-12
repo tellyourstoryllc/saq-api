@@ -105,8 +105,8 @@ KrazyChat::Application.routes.draw do
     match '/snaps/fetched', to: 'snaps#fetched', as: 'fetched_snaps'
 
     match '/stories/search', to: 'stories#search', as: 'search_stories'
-    match '/stories_feed', to: 'stories_feeds#show', as: 'stories_feed'
     match '/public_feed', to: 'public_feed#index', as: 'public_feed'
+    match '/friend_feed', to: 'friend_feed#index', as: 'friend_feed'
     match '/users/:id/stories', to: 'stories_lists#show', as: 'stories_list'
     match '/stories/:id', to: 'stories#show', as: 'show_story'
     match '/stories/:id/update', to: 'stories#update', as: 'update_story'

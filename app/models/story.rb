@@ -86,15 +86,32 @@ class Story < Message
     end
   end
 
-  def add_to_friend_feed(other_user_id)
-    # TODO
+  def add_to_friend_feeds
+    friend_ids = if public?
+                   user.follower_ids.members
+                 elsif friends?
+                   user.mutual_friend_ids
+                 else
+                   []
+                 end
+
+    pushed_user_ids = []
+
+    friend_ids.each do |friend_id|
+      feed = FriendFeed.new(id: friend_id)
+      added = feed.add_message(self)
+
+      pushed_user_ids << friend_id if added
+    end
+
+    pushed_user_ids
   end
 
   # Push to the creator's stories list(s) and the relevant friend feeds
   def push_to_lists_and_feeds
     add_to_stories_lists
-    # TODO call add_to_friend_feed for all relevant friends
-    #pushed_user_ids
+    pushed_user_ids = add_to_friend_feeds
+    pushed_user_ids
   end
 
   def self.existing_snapchat_media_ids(story_usernames, snapchat_media_ids)
