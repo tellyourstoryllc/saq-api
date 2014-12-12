@@ -14,7 +14,7 @@ class FriendsController < ApplicationController
     user_ids = outgoing_friend_ids | incoming_friend_ids | mutual_friend_ids
     users = user_ids.empty? ? [] : User.includes(:account, :avatar_image, :avatar_video, :emails, :phones).where(id: user_ids)
 
-    render_json [friend_lists, *users.map{ |u| UserWithEmailsAndPhonesSerializer.new(u).as_json }]
+    render_json [friend_lists, *users.map{ |u| UserWithEmailsAndPhonesSerializer.new(u, scope: current_user).as_json }]
   end
 
   def add

@@ -9,7 +9,7 @@ class UserPreferencesController < ApplicationController
 
     if @preferences.save
       @preferences.update_blocks(params[:server_story_friends_to_block]) if params.has_key?(:server_story_friends_to_block)
-      faye_publisher.publish_preferences(current_user, UserPreferencesSerializer.new(@preferences).as_json)
+      faye_publisher.publish_preferences(current_user, UserPreferencesSerializer.new(@preferences, scope: current_user).as_json)
       render_json @preferences
     else
       render_error @preferences.errors.full_messages
