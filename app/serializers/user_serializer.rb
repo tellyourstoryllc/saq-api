@@ -6,11 +6,11 @@ class UserSerializer < ActiveModel::Serializer
 
 
   def name
-    object.name if outgoing_or_incoming_friend?
+    object.name if acquaintance?
   end
 
   def username
-    object.username if outgoing_or_incoming_friend?
+    object.username if acquaintance?
   end
 
   # Don't need this in SCP
@@ -97,8 +97,8 @@ class UserSerializer < ActiveModel::Serializer
     respond_to?(:current_user) && current_user.try(:id) == id
   end
 
-  def outgoing_or_incoming_friend?
-    return @outgoing_or_incoming_friend if defined?(@outgoing_or_incoming_friend)
-    @outgoing_or_incoming_friend = scope && (scope.id == object.id || scope.outgoing_or_incoming_friend?(object))
+  def acquaintance?
+    return @acquaintance if defined?(@acquaintance)
+    @acquaintance = scope && (scope.id == object.id || scope.acquaintance?(object))
   end
 end

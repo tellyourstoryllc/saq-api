@@ -62,8 +62,9 @@ class User < ActiveRecord::Base
   set :unread_convo_ids
   set :phone_contacts
   set :matching_phone_contact_user_ids
-  set :friend_ids   # Users I added
-  set :follower_ids # Users who added me
+  set :friend_ids          # Users who I've added and haven't removed
+  set :follower_ids        # Users who have added me and haven't removed me
+  set :pending_friend_ids  # Users who have added me and I haven't yet responded (added or removed them)
   set :friend_phone_numbers
   value :set_initial_friend_ids_in_app
   set :initial_friend_ids_in_app
@@ -526,20 +527,17 @@ class User < ActiveRecord::Base
     "user:#{id}:mutual_friend_ids"
   end
 
+  # Users who have added me at some point, even if they've removed me since, but I haven't added or removed yet
   def paginated_pending_incoming_friend_ids(options = {})
     max = 50
     options[:limit] ||= 10
     options[:limit] = 1 if options[:limit].to_i <= 0
     options[:limit] = max if options[:limit].to_i > max
 
-    _, user_ids = redis.multi do
-      redis.sdiffstore(pending_incoming_friend_ids_key, follower_ids.key, friend_ids.key)
-      redis.sort(pending_incoming_friend_ids_key, by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
-    end
-
-    user_ids
+    pending_friend_ids.sort(by: 'user:*:sorting_name', limit: [options[:offset], options[:limit]], order: 'ALPHA')
   end
 
+  # Users who I've added and not removed and who have added me and not removed
   def paginated_mutual_friend_ids(options = {})
     max = 50
     options[:limit] ||= 10
@@ -679,16 +677,21 @@ class User < ActiveRecord::Base
   end
 
   def add_friend(user)
+    is_follower = user.friend_ids.include?(id)
+
     redis.multi do
       friend_ids << user.id
       user.follower_ids << id
+      pending_friend_ids.delete(user.id)
+      user.pending_friend_ids << id unless is_follower
     end
   end
 
   def remove_friends(users)
     redis.multi do
       friend_ids.delete(users.map(&:id))
-      follower_ids.delete(users.map(&:id))
+      users.each{ |u| u.follower_ids.delete(id) }
+      pending_friend_ids.delete(users.map(&:id))
     end
   end
 
@@ -708,8 +711,13 @@ class User < ActiveRecord::Base
     @fetched_follower_ids ||= follower_ids.members
   end
 
-  def outgoing_or_incoming_friend?(user)
-    fetched_friend_ids.include?(user.id) || fetched_follower_ids.include?(user.id)
+  def fetched_pending_friend_ids
+    @fetched_pending_friend_ids ||= pending_friend_ids.members
+  end
+
+  # Have either of us friended the other?
+  def acquaintance?(user)
+    fetched_friend_ids.include?(user.id) || fetched_follower_ids.include?(user.id) || fetched_pending_friend_ids.include?(user.id)
   end
 
   # Reset the imported snaps digest status for the next batch
