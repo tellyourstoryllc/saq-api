@@ -125,15 +125,12 @@ describe GroupsController do
 
       result_must_include 'user', member.id, {
         'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
-        'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
         'avatar_url' => nil
       }
 
       result_must_include 'user', current_user.id, {
         'object_type' => 'user', 'id' => current_user.id, 'name' => current_user.name, 'username' => current_user.username,
-        'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-        'token' => current_user.token, 'client_type' => nil,
-        'avatar_url' => nil
+        'token' => current_user.token, 'avatar_url' => nil
       }
 
       result_must_include 'message', message.id, {
@@ -205,16 +202,12 @@ describe GroupsController do
         }
 
         result_must_include 'user', member.id, {
-          'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
-          'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-          'avatar_url' => nil
+          'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil, 'avatar_url' => nil
         }
 
         result_must_include 'user', current_user.id, {
           'object_type' => 'user', 'id' => current_user.id, 'name' => current_user.name, 'username' => current_user.username,
-          'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-          'token' => current_user.token, 'client_type' => nil,
-          'avatar_url' => nil
+          'token' => current_user.token, 'avatar_url' => nil
         }
 
         result_must_include 'message', m2.id, {
@@ -271,16 +264,12 @@ describe GroupsController do
         }
 
         result_must_include 'user', member.id, {
-          'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil,
-          'status' => nil, 'idle_duration' => nil, 'status_text' => nil, 'client_type' => nil,
-          'avatar_url' => nil
+          'object_type' => 'user', 'id' => member.id, 'name' => nil, 'username' => nil, 'avatar_url' => nil
         }
 
         result_must_include 'user', current_user.id, {
           'object_type' => 'user', 'id' => current_user.id, 'name' => current_user.name, 'username' => current_user.username,
-          'status' => nil, 'idle_duration' => nil, 'status_text' => nil,
-          'token' => current_user.token, 'client_type' => nil,
-          'avatar_url' => nil
+          'token' => current_user.token, 'avatar_url' => nil
         }
 
         result_must_include 'message', m1.id, {

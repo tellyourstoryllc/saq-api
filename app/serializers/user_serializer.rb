@@ -1,8 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
-  attributes :object_type, :id, :token, :name, :username, :status, :status_text,
-    :idle_duration, :client_type, :avatar_url, :avatar_video_url, :avatar_video_preview_url,
-    :replaced_user_ids, :replaced_by_user_id, :deactivated, :registered, :gender,
-    :latitude, :longitude, :location_name, :friend_code
+  attributes :object_type, :id, :token, :name, :username, :avatar_url, :avatar_video_url,
+    :avatar_video_preview_url, :deactivated, :registered, :gender, :latitude, :longitude,
+    :location_name, :friend_code
 
 
   def name
@@ -13,45 +12,8 @@ class UserSerializer < ActiveModel::Serializer
     object.username if acquaintance?
   end
 
-  # Don't need this in SCP
-  def status
-    return
-
-    if friends?
-      object.computed_status
-    else
-      'unavailable'
-    end
-  end
-
-  # Don't need this in SCP
-  def status_text
-    return
-
-    object.status_text if friends?
-  end
-
-  # Don't need this in SCP
-  def idle_duration
-    #object.idle_duration if friends?
-  end
-
-  # Don't need this in SCP
-  def client_type
-    #object.computed_client_type
-  end
-
   def include_token?
     owner?
-  end
-
-  # Don't need this in SCP
-  def replaced_user_ids
-    #object.replaced_user_ids.members
-  end
-
-  # Don't need this in SCP
-  def replaced_by_user_id
   end
 
   def registered
