@@ -130,19 +130,17 @@ class MessagesController < ApplicationController
   def create_story
     return unless Bool.parse(params[:create_story]) && params[:story_creator_id].present?
 
-    stories_list = load_stories_list(params[:story_creator_id])
-    return if stories_list.nil?
-
-    story = Story.find_or_create(story_params.merge(stories_list_id: stories_list.id))
+    story = Story.find_or_create(story_params)
 
     if story
-      # Push the story to the relevant users' stories lists and feeds
-      pushed_user_ids = story.push_to_feeds(current_user)
+      # Push the story to the creator's stories lists and the relevant friend feeds
+      pushed_user_ids = story.push_to_lists_and_feeds
 
       # Notify the users to whose feed this story was just added
-      User.where(id: pushed_user_ids).find_each do |user|
-        user.send_story_notifications(story)
-      end
+      # FIXME
+      #User.where(id: pushed_user_ids).find_each do |user|
+      #  user.send_story_notifications(story)
+      #end
 
       # Track activity in Mixpanel
       mixpanel.daily_message_events(story) unless importing_from_sc
@@ -166,16 +164,6 @@ class MessagesController < ApplicationController
       one_to_one if one_to_one.save
     else
       one_to_one if one_to_one.authorized?(current_user)
-    end
-  end
-
-  def load_stories_list(story_creator_id)
-    stories_list = StoriesList.new(creator_id: story_creator_id, viewer_id: current_user.id)
-
-    if stories_list.attrs.blank?
-      stories_list if stories_list.save
-    else
-      stories_list if stories_list.authorized?(current_user)
     end
   end
 

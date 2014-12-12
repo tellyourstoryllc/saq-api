@@ -110,7 +110,7 @@ class Message
   end
 
   def mentioned_users
-    if mentioned_user_ids.present?
+    if mentioned_user_ids.present? && conversation
       user_ids = mentioned_all? ? conversation.fetched_member_ids : mentioned_user_ids
       user_ids.delete(user_id)
       User.where(id: user_ids)
@@ -176,7 +176,7 @@ class Message
   end
 
   def conversation
-    one_to_one || stories_list || group
+    one_to_one || group
   end
 
   def has_attachment?
@@ -334,8 +334,8 @@ class Message
   end
 
   def conversation_id?
-    convo_ids = [group_id, one_to_one_id, stories_list_id]
-    errors.add(:base, "Must specify exactly one of group_id, one_to_one_id, or stories_list_id.") unless convo_ids.count(&:present?) == 1
+    convo_ids = [group_id, one_to_one_id]
+    errors.add(:base, "Must specify only one of group_id or one_to_one_id.") unless conversation.nil? || convo_ids.count(&:present?) == 1
   end
 
   def blacklisted_recipient?

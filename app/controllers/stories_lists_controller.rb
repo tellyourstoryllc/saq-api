@@ -10,12 +10,17 @@ class StoriesListsController < ApplicationController
   private
 
   def load_stories_list
-    @stories_list = StoriesList.new(creator_id: params[:id], viewer_id: current_user.id)
+    target = User.find(params[:id])
 
-    if @stories_list.attrs.blank?
-      raise Peanut::Redis::RecordNotFound unless @stories_list.save
-    else
-      raise Peanut::Redis::RecordNotFound unless @stories_list.authorized?(current_user)
-    end
+    list_class = if target.id == current_user.id
+                   MyStoriesList
+                 elsif target.friend_ids.include?(current_user.id)
+                   FriendStoriesList
+                 else
+                   NonFriendStoriesList
+                 end
+
+    @stories_list = list_class.new(id: target.id, viewer_id: current_user.id)
+    raise Peanut::Redis::RecordNotFound unless @stories_list.authorized?(current_user)
   end
 end
