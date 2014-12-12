@@ -3,6 +3,7 @@ class StoriesList
 
   # id is the creator's user id
   attr_accessor :id, :viewer_id
+  def no_attrs; true end
 
   validate :not_blocked?
 
