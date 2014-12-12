@@ -12,7 +12,7 @@ class UserGroupPreferencesController < ApplicationController
     end
 
     if @preferences.save
-      faye_publisher.publish_preferences(current_user, UserGroupPreferencesSerializer.new(@preferences).as_json)
+      faye_publisher.publish_preferences(current_user, UserGroupPreferencesSerializer.new(@preferences, scope: current_user).as_json)
       render_json @preferences
     else
       render_error @preferences.errors.full_messages
