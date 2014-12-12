@@ -39,12 +39,8 @@ class Message
       ids.map{ |id| redis.hgetall("#{redis_prefix}:#{id}:attrs") }
     end
 
-    likes_counts = redis.pipelined do
-      ids.map{ |id| redis.llen("#{redis_prefix}:#{id}:likes") }
-    end
-
     messages = attrs.map.with_index do |attrs, i|
-      new(attrs.merge(fetched: true, cached_likes_count: likes_counts[i]))
+      new(attrs.merge(fetched: true))
     end
   end
 

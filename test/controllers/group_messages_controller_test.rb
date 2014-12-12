@@ -14,7 +14,7 @@ describe GroupMessagesController do
         result_must_include('message', message_id, 'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1,
                             'text' => text, 'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
                             'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-                            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i)
+                            'client_metadata' => nil, 'created_at' => now.to_i)
       end
     end
 
@@ -29,7 +29,7 @@ describe GroupMessagesController do
         result_must_include('message', message_id, 'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1,
                             'text' => text, 'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
                             'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-                            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i)
+                            'client_metadata' => nil, 'created_at' => now.to_i)
       end
     end
 
@@ -51,7 +51,7 @@ describe GroupMessagesController do
                             'user_id' => current_user.id, 'rank' => 1, 'text' => text, 'mentioned_user_ids' => [user.id],
                             'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
                             'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-                            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i)
+                            'client_metadata' => nil, 'created_at' => now.to_i)
       end
     end
 
@@ -76,7 +76,7 @@ describe GroupMessagesController do
         result_must_include('message', message_id, 'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1,
                             'text' => text, 'mentioned_user_ids' => [u1.id, u2.id], 'attachment_url' => nil, 'attachment_content_type' => nil,
                             'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-                            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i)
+                            'client_metadata' => nil, 'created_at' => now.to_i)
       end
     end
 
@@ -97,7 +97,7 @@ describe GroupMessagesController do
         result_must_include('message', message_id, 'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1,
                             'text' => text, 'mentioned_user_ids' => [u1.id], 'attachment_url' => nil, 'attachment_content_type' => nil,
                             'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-                            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i)
+                            'client_metadata' => nil, 'created_at' => now.to_i)
       end
     end
 
@@ -114,7 +114,7 @@ describe GroupMessagesController do
         result_must_include('message', message_id, 'group_id' => group.id, 'one_to_one_id' => nil, 'user_id' => current_user.id, 'rank' => 1,
                             'text' => text, 'mentioned_user_ids' => ['-1'], 'attachment_url' => nil, 'attachment_content_type' => nil,
                             'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-                            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i)
+                            'client_metadata' => nil, 'created_at' => now.to_i)
       end
     end
   end
@@ -144,13 +144,13 @@ describe GroupMessagesController do
           'user_id' => current_user.id, 'rank' => 2, 'text' => 'oh hai', 'mentioned_user_ids' => [],
           'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at}
+          'client_metadata' => nil, 'created_at' => m2.created_at}
 
         result_must_include 'message', m3.id, {'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => member.id, 'rank' => 3, 'text' => 'hi again', 'mentioned_user_ids' => [],
           'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at}
+          'client_metadata' => nil, 'created_at' => m3.created_at}
       end
     end
 
@@ -177,19 +177,19 @@ describe GroupMessagesController do
           'user_id' => member.id, 'rank' => 1, 'text' => 'hey guys', 'mentioned_user_ids' => [],
           'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m1.created_at}
+          'client_metadata' => nil, 'created_at' => m1.created_at}
 
         result_must_include 'message', m2.id, {'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => current_user.id, 'rank' => 2, 'text' => 'oh hai', 'mentioned_user_ids' => [],
           'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at}
+          'client_metadata' => nil, 'created_at' => m2.created_at}
 
         result_must_include 'message', m3.id, {'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => member.id, 'rank' => 3, 'text' => 'hi again', 'mentioned_user_ids' => [],
           'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at}
+          'client_metadata' => nil, 'created_at' => m3.created_at}
       end
     end
 
@@ -219,13 +219,13 @@ describe GroupMessagesController do
           'user_id' => current_user.id, 'rank' => 2, 'text' => 'oh hai', 'mentioned_user_ids' => [],
           'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m2.created_at}
+          'client_metadata' => nil, 'created_at' => m2.created_at}
 
         result_must_include 'message', m3.id, {'group_id' => group.id, 'one_to_one_id' => nil,
           'user_id' => member.id, 'rank' => 3, 'text' => 'hi again', 'mentioned_user_ids' => [],
           'attachment_url' => nil, 'attachment_content_type' => nil, 'attachment_preview_url' => nil,
           'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m3.created_at}
+          'client_metadata' => nil, 'created_at' => m3.created_at}
       end
     end
   end

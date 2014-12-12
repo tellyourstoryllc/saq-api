@@ -58,7 +58,7 @@ describe ConversationsController do
         'group_id' => nil, 'one_to_one_id' => o.id, 'user_id' => member.id, 'rank' => 1, 'text' => 'hi',
         'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
         'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-        'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m.created_at}
+        'client_metadata' => nil, 'created_at' => m.created_at}
     end
 
     it "must return 1-1s and their unseen messages if the sender has the recipient in his contacts" do
@@ -80,7 +80,7 @@ describe ConversationsController do
         'group_id' => nil, 'one_to_one_id' => o.id, 'user_id' => member.id, 'rank' => 1, 'text' => 'hi',
         'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
         'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-        'client_metadata' => nil, 'likes_count' => 0, 'created_at' => m.created_at}
+        'client_metadata' => nil, 'created_at' => m.created_at}
     end
   end
 end
