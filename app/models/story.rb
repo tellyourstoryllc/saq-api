@@ -43,6 +43,10 @@ class Story < Message
     end
   end
 
+  def allowed_permission?
+    %w(private friends public).include?(story_permission)
+  end
+
   def save
     # Default permission to private if not given
     self.story_permission ||= 'private'
@@ -55,7 +59,108 @@ class Story < Message
     true
   end
 
+  # If changing to private:
+  # Remove from my followers' feeds
+  # Remove from my FriendStoriesList (and NonFriendStoriesList if changing from public)
+  def change_to_private(old_permission)
+    friend_feeds = user.follower_ids.members.map{ |user_id| FriendFeed.new(id: user_id) }
+
+    redis.pipelined do
+      friend_feeds.each do |ff|
+        ff.message_ids.delete(id)
+      end
+    end
+
+    FriendStoriesList.new(id: user.id).message_ids.delete(id)
+    NonFriendStoriesList.new(id: user.id).message_ids.delete(id) if old_permission == 'public'
+  end
+
+  # If changing to friends:
+  def change_to_friends(old_permission)
+    # From private:
+    # Add to my mutual friends' feeds
+    # Add to my FriendStoriesList
+    if old_permission == 'private'
+      friend_feeds = user.mutual_friend_ids.map{ |user_id| FriendFeed.new(id: user_id) }
+
+      redis.pipelined do
+        friend_feeds.each do |ff|
+          ff.add_message(self)
+        end
+      end
+
+      FriendStoriesList.new(id: user.id).add_message(self)
+
+    # From public:
+    # Remove from the feeds of my followers who I haven't added back
+    # Remove from my NonFriendStoriesList
+    elsif old_permission == 'public'
+      friend_feeds = (user.follower_ids - user.friend_ids).map{ |user_id| FriendFeed.new(id: user_id) }
+
+      redis.pipelined do
+        friend_feeds.each do |ff|
+          ff.message_ids.delete(id)
+        end
+      end
+
+      NonFriendStoriesList.new(id: user.id).message_ids.delete(id)
+    end
+  end
+
+  # If changing to public:
+  def change_to_public(old_permission)
+    # From private:
+    # Add to my followers' feeds
+    # Add to my FriendStoriesList and NonFriendStoriesList
+    if old_permission == 'private'
+      friend_feeds = user.follower_ids.members.map{ |user_id| FriendFeed.new(id: user_id) }
+
+      redis.pipelined do
+        friend_feeds.each do |ff|
+          ff.add_message(self)
+        end
+      end
+
+      FriendStoriesList.new(id: user.id).add_message(self)
+      NonFriendStoriesList.new(id: user.id).add_message(self)
+
+    # From friends:
+    # Add to the feeds of my followers who I haven't added back
+    # Add to my NonFriendStoriesList
+    elsif old_permission == 'friends'
+      friend_feeds = (user.follower_ids - user.friend_ids).map{ |user_id| FriendFeed.new(id: user_id) }
+
+      redis.pipelined do
+        friend_feeds.each do |ff|
+          ff.add_message(self)
+        end
+      end
+
+      NonFriendStoriesList.new(id: user.id).add_message(self)
+    end
+  end
+
+  def update_permission(permission)
+    return if permission == story_permission
+
+    old_permission = story_permission
+    self.story_permission = permission
+    return unless allowed_permission?
+
+    attrs[:story_permission] = story_permission
+
+    if private?
+      change_to_private(old_permission)
+    elsif friends?
+      change_to_friends(old_permission)
+    elsif public?
+      change_to_public(old_permission)
+    end
+  end
+
   def update(update_attrs)
+    permission = update_attrs.delete(:story_permission)
+
     update_attrs.each do |k, v|
       send("#{k}=", v)
     end
@@ -64,6 +169,9 @@ class Story < Message
     overlay_file = update_attrs[:attachment_overlay_file]
     overlay_text = update_attrs[:attachment_overlay_text]
     update_message_attachment_overlay(overlay_file, overlay_text) if overlay_file.present?
+
+    # Update permission
+    update_permission(permission)
 
     # Update simple attrs
     simple_attrs = update_attrs.slice(:latitude, :longitude, :source)
@@ -172,7 +280,7 @@ class Story < Message
   end
 
   def valid_permission?
-    errors.add(:base, "Story permission must be one of 'private', 'friends', or 'public'.") unless %w(private friends public).include?(story_permission)
+    errors.add(:base, "Story permission must be one of 'private', 'friends', or 'public'.") unless allowed_permission?
   end
 
   def add_snapchat_media_id
