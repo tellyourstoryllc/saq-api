@@ -59,17 +59,34 @@ class Story < Message
     true
   end
 
+  # Add its id to the FriendFeeds of the given friends, unless it's already there
+  def add_to_friend_feeds(friend_ids)
+    friend_feeds = friend_ids.map{ |user_id| FriendFeed.new(id: user_id) }
+
+    redis.pipelined do
+      friend_feeds.each do |f|
+        f.add_message(self)
+      end
+    end
+  end
+
+  # Delete its id from the FriendFeeds of the given friends
+  def delete_from_friend_feeds(friend_ids)
+    friend_feeds = friend_ids.map{ |user_id| FriendFeed.new(id: user_id) }
+
+    redis.pipelined do
+      friend_feeds.each do |f|
+        f.message_ids.delete(id)
+      end
+    end
+  end
+
   # If changing to private:
   # Remove from my followers' feeds
   # Remove from my FriendStoriesList (and NonFriendStoriesList if changing from public)
   def change_to_private(old_permission)
-    friend_feeds = user.follower_ids.members.map{ |user_id| FriendFeed.new(id: user_id) }
-
-    redis.pipelined do
-      friend_feeds.each do |ff|
-        ff.message_ids.delete(id)
-      end
-    end
+    friend_ids = user.follower_ids.members
+    delete_from_friend_feeds(friend_ids)
 
     FriendStoriesList.new(id: user.id).message_ids.delete(id)
     NonFriendStoriesList.new(id: user.id).message_ids.delete(id) if old_permission == 'public'
@@ -81,13 +98,8 @@ class Story < Message
     # Add to my mutual friends' feeds
     # Add to my FriendStoriesList
     if old_permission == 'private'
-      friend_feeds = user.mutual_friend_ids.map{ |user_id| FriendFeed.new(id: user_id) }
-
-      redis.pipelined do
-        friend_feeds.each do |ff|
-          ff.add_message(self)
-        end
-      end
+      friend_ids = user.mutual_friend_ids
+      add_to_friend_feeds(friend_ids)
 
       FriendStoriesList.new(id: user.id).add_message(self)
 
@@ -95,13 +107,8 @@ class Story < Message
     # Remove from the feeds of my followers who I haven't added back
     # Remove from my NonFriendStoriesList
     elsif old_permission == 'public'
-      friend_feeds = (user.follower_ids - user.friend_ids).map{ |user_id| FriendFeed.new(id: user_id) }
-
-      redis.pipelined do
-        friend_feeds.each do |ff|
-          ff.message_ids.delete(id)
-        end
-      end
+      friend_ids = user.follower_ids - user.friend_ids
+      delete_from_friend_feeds(friend_ids)
 
       NonFriendStoriesList.new(id: user.id).message_ids.delete(id)
     end
@@ -113,13 +120,8 @@ class Story < Message
     # Add to my followers' feeds
     # Add to my FriendStoriesList and NonFriendStoriesList
     if old_permission == 'private'
-      friend_feeds = user.follower_ids.members.map{ |user_id| FriendFeed.new(id: user_id) }
-
-      redis.pipelined do
-        friend_feeds.each do |ff|
-          ff.add_message(self)
-        end
-      end
+      friend_ids = user.follower_ids.members
+      add_to_friend_feeds(friend_ids)
 
       FriendStoriesList.new(id: user.id).add_message(self)
       NonFriendStoriesList.new(id: user.id).add_message(self)
@@ -128,13 +130,8 @@ class Story < Message
     # Add to the feeds of my followers who I haven't added back
     # Add to my NonFriendStoriesList
     elsif old_permission == 'friends'
-      friend_feeds = (user.follower_ids - user.friend_ids).map{ |user_id| FriendFeed.new(id: user_id) }
-
-      redis.pipelined do
-        friend_feeds.each do |ff|
-          ff.add_message(self)
-        end
-      end
+      friend_ids = user.follower_ids - user.friend_ids
+      add_to_friend_feeds(friend_ids)
 
       NonFriendStoriesList.new(id: user.id).add_message(self)
     end
