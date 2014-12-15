@@ -8,7 +8,13 @@ class StoriesController < ApplicationController
   end
 
   def update
-    @story.update(update_params)
+    pushed_user_ids = @story.update(update_params)
+
+    # Notify the users to whose feed this story was just added
+    User.where(id: pushed_user_ids).find_each do |user|
+      user.send_story_notifications(@story)
+    end
+
     load_my_story
     render_json @story
   end

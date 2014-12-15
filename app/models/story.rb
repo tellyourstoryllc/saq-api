@@ -59,28 +59,6 @@ class Story < Message
     true
   end
 
-  # Add its id to the FriendFeeds of the given friends, unless it's already there
-  def add_to_friend_feeds(friend_ids)
-    friend_feeds = friend_ids.map{ |user_id| FriendFeed.new(id: user_id) }
-
-    redis.pipelined do
-      friend_feeds.each do |f|
-        f.add_message(self)
-      end
-    end
-  end
-
-  # Delete its id from the FriendFeeds of the given friends
-  def delete_from_friend_feeds(friend_ids)
-    friend_feeds = friend_ids.map{ |user_id| FriendFeed.new(id: user_id) }
-
-    redis.pipelined do
-      friend_feeds.each do |f|
-        f.message_ids.delete(id)
-      end
-    end
-  end
-
   # If changing to private:
   # Remove from my followers' feeds
   # Remove from my FriendStoriesList (and NonFriendStoriesList if changing from public)
@@ -99,7 +77,7 @@ class Story < Message
     # Add to my FriendStoriesList
     if old_permission == 'private'
       friend_ids = user.mutual_friend_ids
-      add_to_friend_feeds(friend_ids)
+      pushed_user_ids = add_to_friend_feeds(friend_ids)
 
       FriendStoriesList.new(id: user.id).add_message(self)
 
@@ -112,6 +90,8 @@ class Story < Message
 
       NonFriendStoriesList.new(id: user.id).message_ids.delete(id)
     end
+
+    pushed_user_ids
   end
 
   # If changing to public:
@@ -121,7 +101,7 @@ class Story < Message
     # Add to my FriendStoriesList and NonFriendStoriesList
     if old_permission == 'private'
       friend_ids = user.follower_ids.members
-      add_to_friend_feeds(friend_ids)
+      pushed_user_ids = add_to_friend_feeds(friend_ids)
 
       FriendStoriesList.new(id: user.id).add_message(self)
       NonFriendStoriesList.new(id: user.id).add_message(self)
@@ -131,10 +111,12 @@ class Story < Message
     # Add to my NonFriendStoriesList
     elsif old_permission == 'friends'
       friend_ids = user.follower_ids - user.friend_ids
-      add_to_friend_feeds(friend_ids)
+      pushed_user_ids = add_to_friend_feeds(friend_ids)
 
       NonFriendStoriesList.new(id: user.id).add_message(self)
     end
+
+    pushed_user_ids
   end
 
   def update_permission(permission)
@@ -146,6 +128,7 @@ class Story < Message
 
     attrs[:story_permission] = story_permission
 
+    # Return pushed user ids from the change_to_* methods
     if private?
       change_to_private(old_permission)
     elsif friends?
@@ -168,14 +151,14 @@ class Story < Message
     update_message_attachment_overlay(overlay_file, overlay_text) if overlay_file.present?
 
     # Update permission
-    update_permission(permission)
+    pushed_user_ids = update_permission(permission)
 
     # Update simple attrs
     simple_attrs = update_attrs.slice(:latitude, :longitude, :source)
     attrs.bulk_set(simple_attrs) if simple_attrs.present?
     user.update_last_public_story(self) if self.public?
 
-    true
+    pushed_user_ids
   end
 
   # Add to the creator's stories list(s), depending on the story's permission
@@ -191,14 +174,17 @@ class Story < Message
     end
   end
 
-  def add_to_friend_feeds
-    friend_ids = if public?
-                   user.follower_ids.members
-                 elsif friends?
-                   user.mutual_friend_ids
-                 else
-                   []
-                 end
+  # Add its id to the FriendFeeds of the given friends, unless it's already there
+  def add_to_friend_feeds(friend_ids = nil)
+    # If friend_ids is not given (i.e. this is the first time setting the permission),
+    # add it to the default friend ids for the permission
+    friend_ids ||= if public?
+                     user.follower_ids.members
+                   elsif friends?
+                     user.mutual_friend_ids
+                   else
+                     []
+                   end
 
     pushed_user_ids = []
 
@@ -210,6 +196,17 @@ class Story < Message
     end
 
     pushed_user_ids
+  end
+
+  # Delete its id from the FriendFeeds of the given friends
+  def delete_from_friend_feeds(friend_ids)
+    friend_feeds = friend_ids.map{ |user_id| FriendFeed.new(id: user_id) }
+
+    redis.pipelined do
+      friend_feeds.each do |f|
+        f.message_ids.delete(id)
+      end
+    end
   end
 
   # Push to the creator's stories list(s) and the relevant friend feeds
