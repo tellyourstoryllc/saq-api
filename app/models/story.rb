@@ -63,6 +63,12 @@ class Story < Message
     public? && source == 'camera'
   end
 
+  def has_permission?(viewer)
+    public? ||
+      (private? && viewer.id == user_id) ||
+      (friends? && (viewer.id == user_id || viewer.fetched_follower_ids.member?(user_id)))
+  end
+
   # Update the user's last public story attrs if this was the last public
   # story but it's been changed to friends or private
   def check_last_public_story

@@ -42,6 +42,7 @@ class StoriesController < ApplicationController
 
   def load_story
     @story = Story.new(id: params[:id])
+    raise Peanut::UnauthorizedError unless @story.has_permission?(current_user)
   end
 
   def load_my_story
