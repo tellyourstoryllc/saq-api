@@ -221,11 +221,10 @@ class Story < Message
 
   # Delete its id from the FriendFeeds of the given friends
   def delete_from_friend_feeds(friend_ids)
-    friend_feeds = friend_ids.map{ |user_id| FriendFeed.new(id: user_id) }
-
     redis.pipelined do
-      friend_feeds.each do |f|
-        f.message_ids.delete(id)
+      friend_ids.each do |friend_id|
+        feed = FriendFeed.new(id: friend_id)
+        feed.message_ids.delete(id)
       end
     end
   end
