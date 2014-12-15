@@ -20,24 +20,6 @@ describe ConversationsController do
         'last_message_at' => nil, 'last_seen_rank' => nil, 'last_deleted_rank' => nil, 'hidden' => false}
     end
 
-    it "must return 1-1s but not their unseen messages if the 1-1 is pending" do
-      member = FactoryGirl.create(:registered_user)
-      member.add_friend(current_user)
-
-      o = OneToOne.new(creator_id: member.id, sender_id: member.id, recipient_id: current_user.id)
-      raise '1-1 not saved' unless o.save
-
-      m = Message.new(one_to_one_id: o.id, user_id: member.id, text: 'hi')
-      raise 'msg not saved' unless m.save
-
-      get :index, {token: current_user.token}
-
-      result_must_include 'one_to_one', o.id, {'object_type' => 'one_to_one', 'id' => o.id,
-        'last_message_at' => m.created_at, 'last_seen_rank' => nil, 'last_deleted_rank' => nil, 'hidden' => false}
-
-      result_wont_include 'message', m.id
-    end
-
     it "must return 1-1s and their unseen messages if they're mutual friends" do
       member = FactoryGirl.create(:registered_user)
       member.add_friend(current_user)

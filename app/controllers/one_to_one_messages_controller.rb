@@ -3,7 +3,7 @@ class OneToOneMessagesController < ApplicationController
 
 
   def index
-    objects = !@one_to_one.pending?(current_user) ? @one_to_one.paginate_messages(message_pagination_params) : []
+    objects = @one_to_one.paginate_messages(message_pagination_params)
     render_json objects
   end
 
