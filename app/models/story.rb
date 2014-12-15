@@ -59,6 +59,16 @@ class Story < Message
     true
   end
 
+  # Update the user's last public story attrs if this was the last public
+  # story but it's been changed to friends or private
+  def check_last_public_story
+    return if user.last_public_story_id != id || public?
+
+    # Get the next most recent public story, if there is one
+    story = NonFriendStoriesList.new(id: user.id).paginate_messages(limit: 1).first
+    user.update_last_public_story(story, true)
+  end
+
   # If changing to private:
   # Remove from my followers' feeds
   # Remove from my FriendStoriesList (and NonFriendStoriesList if changing from public)
@@ -67,7 +77,11 @@ class Story < Message
     delete_from_friend_feeds(friend_ids)
 
     FriendStoriesList.new(id: user.id).message_ids.delete(id)
-    NonFriendStoriesList.new(id: user.id).message_ids.delete(id) if old_permission == 'public'
+
+    if old_permission == 'public'
+      NonFriendStoriesList.new(id: user.id).message_ids.delete(id)
+      check_last_public_story
+    end
   end
 
   # If changing to friends:
@@ -89,6 +103,8 @@ class Story < Message
       delete_from_friend_feeds(friend_ids)
 
       NonFriendStoriesList.new(id: user.id).message_ids.delete(id)
+
+      check_last_public_story
     end
 
     pushed_user_ids
