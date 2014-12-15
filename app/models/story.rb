@@ -73,54 +73,44 @@ class Story < Message
     true
   end
 
-  def add_to_stories_list_and_feed(other_user_id)
-    stories_list = StoriesList.new(creator_id: user.id, viewer_id: other_user_id)
-    return unless stories_list.save
+  # Add to the creator's stories list(s), depending on the story's permission
+  def add_to_stories_lists
+    non_friend_stories_list = NonFriendStoriesList.new(id: user.id)
+    friend_stories_list = FriendStoriesList.new(id: user.id)
+    my_stories_list = MyStoriesList.new(id: user.id)
 
-    stories_feed = StoriesFeed.new(user_id: other_user_id)
-    return unless stories_feed.save
-
-    added_to_feed = false
     redis.pipelined do
-      # Add to the friend's view of the creator's stories
-      stories_list.add_message(self)
-
-      # Add to the friend's feed
-      added_to_feed = stories_feed.add_message(self)
+      non_friend_stories_list.add_message(self) if public?
+      friend_stories_list.add_message(self) if public? || friends?
+      my_stories_list.add_message(self)
     end
-
-    !!added_to_feed.value
   end
 
-  # For each user who should be able to view this story
-  # according to the creator's current story preference,
-  # push the story's ID to his feed and his view of the
-  # creator's stories
-  def push_to_feeds(current_user)
-    user_ids = [user_id, current_user.id]
-
-    if current_user.id == user_id
-      story_privacy = current_user.preferences.server_story_privacy
-
-      friend_ids = case story_privacy
-                   when 'everyone'
-                     current_user.follower_ids.members
-                   when 'custom'
-                     current_user.custom_story_friend_ids
-                   else
-                     current_user.mutual_friend_ids
-                   end
-
-      user_ids += friend_ids
-    end
+  def add_to_friend_feeds
+    friend_ids = if public?
+                   user.follower_ids.members
+                 elsif friends?
+                   user.mutual_friend_ids
+                 else
+                   []
+                 end
 
     pushed_user_ids = []
 
-    user_ids.uniq.each do |friend_id|
-      added = add_to_stories_list_and_feed(friend_id)
+    friend_ids.each do |friend_id|
+      feed = FriendFeed.new(id: friend_id)
+      added = feed.add_message(self)
+
       pushed_user_ids << friend_id if added
     end
 
+    pushed_user_ids
+  end
+
+  # Push to the creator's stories list(s) and the relevant friend feeds
+  def push_to_lists_and_feeds
+    add_to_stories_lists
+    pushed_user_ids = add_to_friend_feeds
     pushed_user_ids
   end
 

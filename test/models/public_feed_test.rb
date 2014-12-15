@@ -37,12 +37,10 @@ class PublicFeedTest < ActiveSupport::TestCase
       FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 3.minutes.ago,
                          last_public_story_latitude: 40.0, last_public_story_longitude: -76.0)
 
-      sl1 = StoriesList.new(creator_id: user1.id, viewer_id: current_user.id)
-      story1 = Story.new(id: 'awv14vmc1l', user_id: user1.id, stories_list_id: sl1.id, text: 'foo')
+      story1 = Story.new(id: 'awv14vmc1l', user_id: user1.id, text: 'foo')
       story1.save
 
-      sl2 = StoriesList.new(creator_id: user2.id, viewer_id: current_user.id)
-      story2 = Story.new(id: 'vmqv10xmao', user_id: user2.id, stories_list_id: sl2.id, text: 'bar')
+      story2 = Story.new(id: 'vmqv10xmao', user_id: user2.id, text: 'bar')
       story2.save
 
       results = PublicFeed.paginate_feed(current_user, sort: 'newest', radius: 25, latitude: 39.9510010, longitude: -75.1627290)
@@ -79,12 +77,10 @@ class PublicFeedTest < ActiveSupport::TestCase
                                  last_public_story_created_at: 1.minute.ago, last_public_story_latitude: 39.7,
                                  last_public_story_longitude: -75.2)
 
-      sl1 = StoriesList.new(creator_id: user1.id, viewer_id: current_user.id)
-      story1 = Story.new(id: 'awv14vmc1l', user_id: user1.id, stories_list_id: sl1.id, text: 'foo')
+      story1 = Story.new(id: 'awv14vmc1l', user_id: user1.id, text: 'foo')
       story1.save
 
-      sl2 = StoriesList.new(creator_id: user2.id, viewer_id: current_user.id)
-      story2 = Story.new(id: 'vmqv10xmao', user_id: user2.id, stories_list_id: sl2.id, text: 'bar')
+      story2 = Story.new(id: 'vmqv10xmao', user_id: user2.id, text: 'bar')
       story2.save
 
       results = PublicFeed.paginate_feed(current_user, sort: 'closest', latitude: 39.9510010, longitude: -75.1627290)

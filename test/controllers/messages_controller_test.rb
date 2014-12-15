@@ -73,7 +73,7 @@ describe MessagesController do
             'user_id' => current_user.id, 'rank' => 1, 'text' => text,
             'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
             'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}
+            'client_metadata' => nil, 'created_at' => now.to_i}
 
           current_user.one_to_one_ids.members.must_include one_to_one.id
           current_user.one_to_one_user_ids.members.must_include member.id
@@ -100,7 +100,7 @@ describe MessagesController do
             'user_id' => current_user.id, 'rank' => 1, 'text' => text,
             'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
             'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-            'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}
+            'client_metadata' => nil, 'created_at' => now.to_i}
 
           current_user.one_to_one_ids.members.must_include one_to_one.id
           current_user.one_to_one_user_ids.members.must_include member.id
@@ -130,7 +130,7 @@ describe MessagesController do
           'user_id' => current_user.id, 'rank' => 1, 'text' => text,
           'mentioned_user_ids' => [], 'attachment_url' => nil, 'attachment_content_type' => nil,
           'attachment_preview_url' => nil, 'attachment_preview_width' => nil, 'attachment_preview_height' => nil,
-          'client_metadata' => nil, 'likes_count' => 0, 'created_at' => now.to_i}
+          'client_metadata' => nil, 'created_at' => now.to_i}
 
         current_user.one_to_one_ids.members.must_include one_to_one.id
         current_user.one_to_one_user_ids.members.must_include member.id

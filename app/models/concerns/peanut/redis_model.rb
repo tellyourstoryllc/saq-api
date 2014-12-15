@@ -23,20 +23,22 @@ module Peanut::RedisModel
     # Set all the instance variables
     super
 
-    # If the attributes have already been fetched (e.g. pipelined fetches for performance),
-    # then just set the attributes
-    # Else if an id is specified, fetch the attributes from Redis
-    attributes = attributes.with_indifferent_access
-    fetched_attrs = if attributes.delete(:fetched)
-                      attributes
-                    elsif id.present?
-                      attrs.all
-                    end
+    unless respond_to?(:no_attrs) && no_attrs
+      # If the attributes have already been fetched (e.g. pipelined fetches for performance),
+      # then just set the attributes
+      # Else if an id is specified, fetch the attributes from Redis
+      attributes = attributes.with_indifferent_access
+      fetched_attrs = if attributes.delete(:fetched)
+                        attributes
+                      elsif id.present?
+                        attrs.all
+                      end
 
-    if fetched_attrs
-      fetched_attrs.each do |k,v|
-        v = nil if v.blank?
-        send("#{k}=", v)
+      if fetched_attrs
+        fetched_attrs.each do |k,v|
+          v = nil if v.blank?
+          send("#{k}=", v)
+        end
       end
     end
   end
