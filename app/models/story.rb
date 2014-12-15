@@ -54,9 +54,13 @@ class Story < Message
     saved = super
     return unless saved
 
-    user.update_last_public_story(self) if self.public?
+    user.update_last_public_story(self)
 
     true
+  end
+
+  def allowed_in_public_feed?
+    public? && source == 'camera'
   end
 
   # Update the user's last public story attrs if this was the last public
@@ -64,8 +68,9 @@ class Story < Message
   def check_last_public_story
     return if user.last_public_story_id != id || public?
 
-    # Get the next most recent public story, if there is one
-    story = NonFriendStoriesList.new(id: user.id).paginate_messages(limit: 1).first
+    # Get the next most recent public story that's allowed in the public feed, if there is one
+    stories = NonFriendStoriesList.new(id: user.id).paginate_messages(limit: 20)
+    story = stories.reverse.detect{ |story| story.allowed_in_public_feed? }
     user.update_last_public_story(story, true)
   end
 
@@ -172,7 +177,7 @@ class Story < Message
     # Update simple attrs
     simple_attrs = update_attrs.slice(:latitude, :longitude, :source)
     attrs.bulk_set(simple_attrs) if simple_attrs.present?
-    user.update_last_public_story(self) if self.public?
+    user.update_last_public_story(self)
 
     pushed_user_ids
   end

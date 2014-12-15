@@ -760,6 +760,8 @@ class User < ActiveRecord::Base
 
   # Force this if the last public story is changed from public to friends or private
   def update_last_public_story(story, force = false)
+    return unless story.nil? || story.allowed_in_public_feed?
+
     story_created_at = Time.zone.at(story.created_at) if story
     attrs = {last_public_story_id: story.try(:id), last_public_story_created_at: story_created_at,
              last_public_story_latitude: story.try(:latitude), last_public_story_longitude: story.try(:longitude)}
