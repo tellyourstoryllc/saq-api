@@ -209,11 +209,15 @@ class Story < Message
 
     pushed_user_ids = []
 
-    friend_ids.each do |friend_id|
-      feed = FriendFeed.new(id: friend_id)
-      added = feed.add_message(self)
+    results = redis.pipelined do
+      friend_ids.each do |friend_id|
+        feed = FriendFeed.new(id: friend_id)
+        feed.add_message(self)
+      end
+    end
 
-      pushed_user_ids << friend_id if added
+    results.each_with_index do |added, i|
+      pushed_user_ids << friend_ids[i] if added
     end
 
     pushed_user_ids
