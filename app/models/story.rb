@@ -19,9 +19,9 @@ class Story < Message
   def send_export_meta_messages(*args); end
 
   # Permissions convenience methods
-  def private?; story_permission == 'private' end
-  def friends?; story_permission == 'friends' end
-  def public?; story_permission == 'public' end
+  def private?; permission == 'private' end
+  def friends?; permission == 'friends' end
+  def public?; permission == 'public' end
 
 
   def self.media_id_exists?(user, snapchat_media_id)
@@ -44,12 +44,12 @@ class Story < Message
   end
 
   def allowed_permission?
-    %w(private friends public).include?(story_permission)
+    %w(private friends public).include?(permission)
   end
 
   def save
     # Default permission to private if not given
-    self.story_permission ||= 'private'
+    self.permission ||= 'private'
 
     saved = super
     return unless saved
@@ -140,14 +140,14 @@ class Story < Message
     pushed_user_ids
   end
 
-  def update_permission(permission)
-    return if permission == story_permission
+  def update_permission(new_permission)
+    return if new_permission == permission
 
-    old_permission = story_permission
-    self.story_permission = permission
+    old_permission = permission
+    self.permission = new_permission
     return unless allowed_permission?
 
-    attrs[:story_permission] = story_permission
+    attrs[:permission] = permission
 
     # Return pushed user ids from the change_to_* methods
     if private?
@@ -160,7 +160,7 @@ class Story < Message
   end
 
   def update(update_attrs)
-    permission = update_attrs.delete(:story_permission)
+    permission = update_attrs.delete(:permission)
 
     update_attrs.each do |k, v|
       send("#{k}=", v)

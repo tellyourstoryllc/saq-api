@@ -51,9 +51,9 @@ class MessagesController < ApplicationController
   end
 
   def story_params
-    additional_params = params.slice(:story_permission, :story_permission, :snapchat_media_id,
-                                     :latitude, :longitude, :source, :attachment_metadata,
-                                     :attachment_overlay_file, :attachment_overlay_text)
+    additional_params = params.slice(:permission, :snapchat_media_id, :latitude, :longitude,
+                                     :source, :attachment_metadata, :attachment_overlay_file,
+                                     :attachment_overlay_text)
 
     message_params.merge(additional_params).merge(user_id: params[:story_creator_id])
   end
