@@ -92,6 +92,7 @@ class User < ActiveRecord::Base
 
   set :pending_digest_story_ids
   hash_key :stories_digest_info
+  set :all_time_friend_request_ids
 
   delegate :registered, :registered?, to: :account
 
@@ -683,7 +684,11 @@ class User < ActiveRecord::Base
       friend_ids << user.id
       user.follower_ids << id
       pending_friend_ids.delete(user.id)
-      user.pending_friend_ids << id unless is_follower
+
+      unless is_follower
+        user.pending_friend_ids << id
+        user.all_time_friend_request_ids << id
+      end
     end
   end
 
