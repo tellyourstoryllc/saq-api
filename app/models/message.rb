@@ -119,12 +119,12 @@ class Message
     user.id != user_id && (mentioned_all? || mentioned_user_ids.include?(user.id))
   end
 
-  def like(user)
-    return false if meta_message? || liker_ids.member?(user.id)
+  def like(actor)
+    return false if meta_message? || liker_ids.member?(actor.id)
 
     now = Time.current.to_f
-    liker_ids[user.id] = now
-    like_json = {message_id: id, user_id: user.id, timestamp: now}.to_json
+    liker_ids[actor.id] = now
+    like_json = {message_id: id, actor_id: actor.id, timestamp: now}.to_json
 
     if forward_message
       ancestor_ids = ancestor_message_ids.values
@@ -136,6 +136,11 @@ class Message
       end
     else
       likes << like_json
+    end
+
+    unless actor.id == user.id
+      actor.misc.incr('likes_given')
+      user.misc.incr('likes_received')
     end
 
     true

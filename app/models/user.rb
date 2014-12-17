@@ -88,6 +88,8 @@ class User < ActiveRecord::Base
 
   # Miscellaneous flags, counters, timestamps
   # Use this where possible instead of separate keys, to reduce memory
+  # likes_received
+  # likes_given
   hash_key :misc
 
   set :pending_digest_story_ids
