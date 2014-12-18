@@ -249,7 +249,7 @@ describe UsersController do
 
       before do
         stub_request(:any, /#{Rails.configuration.app['aws']['bucket_name']}/).to_return(headers: { 'ETag' => 'abc' })
-        @moderator_post = stub_request(:post, "#{Moderator.url}/api/photo/submit").to_return(body: {})
+        @moderator_post = stub_request(:post, "#{Moderator.url}/api/photo/submit").to_return(body: '{}')
       end
 
       let(:image_file) { File.open(File.expand_path('test/data/rubygem.png')) }
