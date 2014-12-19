@@ -1,9 +1,8 @@
 class ModerationController < ApplicationController
   skip_before_action :require_token
+  before_action :require_secure_request
 
   def callback
-    # TODO: Check `secure_request?` to authenticate?
-
     if (image_id = params[:image_id]) and (image = AvatarImage.find(image_id))
       if params[:passed].try(:include?, 'nudity')
         image.approve!

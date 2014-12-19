@@ -173,7 +173,12 @@ class ApplicationController < ActionController::Base
   def secure_request?
     params[:api_secret] == Rails.configuration.app['api']['request_secret'] &&
       ((params[:controller] == 'accounts' && params[:action] == 'send_reset_email') ||
-       (params[:controller] == 'accounts' && params[:action] == 'reset_password'))
+       (params[:controller] == 'accounts' && params[:action] == 'reset_password') ||
+       (params[:controller] == 'moderation' && params[:action] == 'callback'))
+  end
+
+  def require_secure_request
+    raise Peanut::UnauthorizedError, 'Secure request required' unless secure_request?
   end
 
   def split_param(param_name)
