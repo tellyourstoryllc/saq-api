@@ -17,7 +17,7 @@ module Peanut::SubmittedForYourApproval
 
   def self.included(base)
     base.class_eval do
-      after_save :submit_to_moderator
+      #after_save :submit_to_moderator
       define_model_callbacks :moderation_approve, :moderation_censor
     end
   end
