@@ -236,6 +236,23 @@ CREATE TABLE `emoticons` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `flag_reasons`
+--
+
+DROP TABLE IF EXISTS `flag_reasons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `flag_reasons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `text` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `group_avatar_images`
 --
 
@@ -724,7 +741,7 @@ CREATE TABLE `video_thumbnails` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-19 10:59:47
+-- Dump completed on 2014-12-19 12:45:05
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -956,3 +973,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141219000001');
 INSERT INTO schema_migrations (version) VALUES ('20141219000002');
 
 INSERT INTO schema_migrations (version) VALUES ('20141219000003');
+
+INSERT INTO schema_migrations (version) VALUES ('20141219174214');
