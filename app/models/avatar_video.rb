@@ -12,10 +12,10 @@ class AvatarVideo < ActiveRecord::Base
   mount_uploader :video, AvatarVideoUploader
 
 
-  def flag(actor)
+  def flag(actor, flag_reason)
     return unless pending?
 
-    submit_to_moderator
+    submit_to_moderator if flag_reason.moderate?
 
     actor.misc.incr('flags_given')
     user.misc.incr('flags_received')

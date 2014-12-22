@@ -249,6 +249,7 @@ CREATE TABLE `flag_reasons` (
   `active` tinyint(1) NOT NULL DEFAULT '1',
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `moderate` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -742,7 +743,7 @@ CREATE TABLE `video_thumbnails` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-22 15:50:35
+-- Dump completed on 2014-12-22 17:30:30
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -978,3 +979,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141219000003');
 INSERT INTO schema_migrations (version) VALUES ('20141219174214');
 
 INSERT INTO schema_migrations (version) VALUES ('20141222205012');
+
+INSERT INTO schema_migrations (version) VALUES ('20141222222618');
