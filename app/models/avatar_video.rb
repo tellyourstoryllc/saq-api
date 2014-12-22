@@ -13,9 +13,7 @@ class AvatarVideo < ActiveRecord::Base
 
 
   def flag(actor, flag_reason)
-    return unless pending?
-
-    submit_to_moderator if flag_reason.moderate?
+    submit_to_moderator if flag_reason.moderate? && pending?
 
     actor.misc.incr('flags_given')
     user.misc.incr('flags_received')
