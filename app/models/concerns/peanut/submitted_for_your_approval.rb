@@ -5,6 +5,7 @@
 #   #moderation_url that returns the URL of the image that moderators will
 #     actually see.
 #   #moderation_description that returns a string displayed to moderators
+#   #moderation_type that returns either :photo or :video. default: :photo
 #
 # Preconditions:
 #   #status must == 'pending' in order to submit to the moderator for reviewing.
@@ -28,6 +29,10 @@ module Peanut::SubmittedForYourApproval
   def censored?; self.status == 'censored'; end
   def approved?; self.status == 'normal';   end
 
+  def moderation_type
+    :photo
+  end
+
   def submit_to_moderator
     return unless pending?
 
@@ -43,11 +48,17 @@ module Peanut::SubmittedForYourApproval
     description ||= "(#{Rails.env}): #{self.class.name} #{self.id}"
     info_url = nil
 
-    response = HTTParty.post("#{Moderator.url}/api/photo/submit", body: {
+    type = moderation_type
+    return unless [:photo, :video].include?(type)
+
+    endpoint = "#{Moderator.url}/api/#{type}/submit"
+
+    response = HTTParty.post(endpoint, body: {
       url: url, callback_url: Moderator.callback_url,
       key: Moderator.token, tasks: ['nudity'],
       passthru: {
-        image_id: self.id,
+        model_id: self.id,
+        model_class: self.class.to_s,
         api_secret: Rails.configuration.app['api']['request_secret'],
       },
       description: description, info_url: info_url,
