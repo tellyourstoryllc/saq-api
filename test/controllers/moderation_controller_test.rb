@@ -19,7 +19,7 @@ describe ModerationController do
       user.avatar_image.must_be :in_review?
 
       # Call the callback.
-      post :callback, image_id: image.id, passed: ['nudity'], api_secret: Rails.configuration.app['api']['request_secret']
+      post :callback, model_id: image.id, model_class: 'AvatarImage', passed: ['nudity'], api_secret: Rails.configuration.app['api']['request_secret']
 
       # Postcondition.
       user.reload
@@ -44,7 +44,7 @@ describe ModerationController do
       user.avatar_image.must_be :in_review?
 
       # Call the callback.
-      post :callback, image_id: image.id, failed: ['nudity'], api_secret: Rails.configuration.app['api']['request_secret']
+      post :callback, model_id: image.id, model_class: 'AvatarImage', failed: ['nudity'], api_secret: Rails.configuration.app['api']['request_secret']
 
       # Postcondition.
       user.reload

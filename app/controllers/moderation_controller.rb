@@ -3,16 +3,17 @@ class ModerationController < ApplicationController
   before_action :require_secure_request
 
   def callback
-    if (image_id = params[:image_id]) and (image = AvatarImage.find(image_id))
+    model = params[:model_class].constantize.find(params[:model_id]) rescue nil
+
+    if model
       if params[:passed].try(:include?, 'nudity')
-        image.approve!
+        model.approve!
       elsif params[:failed].try(:include?, 'nudity')
-        image.censor!
+        model.censor!
       end
       render_success
     else
-      render_error("Expected image_id of an AvatarImage")
+      render_error("Could not find a record for the given model_class and model_id.")
     end
   end
-
 end
