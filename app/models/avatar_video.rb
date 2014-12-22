@@ -8,7 +8,11 @@ class AvatarVideo < ActiveRecord::Base
 
 
   def preview_url
-    video.animated_gif.url if video.version_exists?(:animated_gif)
+    if video.version_exists?(:animated_gif)
+      video.animated_gif.url
+    elsif video.version_exists?(:screenshot)
+      video.screenshot.url
+    end
   end
 
   def update_creator!

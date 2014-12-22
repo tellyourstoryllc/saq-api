@@ -1,7 +1,8 @@
 # encoding: utf-8
 
 class AvatarVideoUploader < BaseUploader
-  include Peanut::AnimatedGif
+  #include Peanut::AnimatedGif
+  include Peanut::VideoThumbnail
 
 #  version :thumbnails, {if: :flagged?} do
 #    process :recreate_thumbnails
