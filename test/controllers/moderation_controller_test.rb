@@ -2,12 +2,6 @@ require "test_helper"
 
 describe ModerationController do
   before do
-    Email.destroy_all
-    Account.destroy_all
-    User.destroy_all
-  end
-
-  before do
     stub_request(:any, /#{Rails.configuration.app['aws']['bucket_name']}/).to_return(status: 204, headers: { 'ETag' => 'abc' })
   end
 
