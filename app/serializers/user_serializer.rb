@@ -20,6 +20,14 @@ class UserSerializer < ActiveModel::Serializer
     object.avatar_url unless object.avatar_image.try(:censored?)
   end
 
+  def avatar_video_url
+    object.avatar_video_url unless object.avatar_video.try(:censored?)
+  end
+
+  def avatar_video_preview_url
+    object.avatar_video_preview_url unless object.avatar_video.try(:censored?)
+  end
+
   def registered
     if Settings.get_list(:blacklisted_usernames).include?(object.username)
       true

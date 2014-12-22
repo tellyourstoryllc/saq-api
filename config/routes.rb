@@ -64,6 +64,7 @@ KrazyChat::Application.routes.draw do
     match '/users/:id/block', to: 'blocked_users#create', as: 'block_user'
     match '/users/:id/unblock', to: 'blocked_users#destroy', as: 'unblock_user'
     match '/users/:id/avatar_image/flag', to: 'user_avatar_images#flag', as: 'flag_avatar_image'
+    match '/users/:id/avatar_video/flag', to: 'user_avatar_videos#flag', as: 'flag_avatar_video'
 
     match '/emails', to: 'emails#index', as: 'emails'
     match '/emails/create', to: 'emails#create', as: 'create_email'

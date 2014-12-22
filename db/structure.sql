@@ -126,6 +126,7 @@ CREATE TABLE `avatar_videos` (
   `file_size` int(11) NOT NULL,
   `preview_width` int(11) DEFAULT NULL,
   `preview_height` int(11) DEFAULT NULL,
+  `status` enum('pending','review','normal','censored') COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_avatar_videos_on_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -741,7 +742,7 @@ CREATE TABLE `video_thumbnails` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-19 12:45:05
+-- Dump completed on 2014-12-22 15:50:35
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -975,3 +976,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141219000002');
 INSERT INTO schema_migrations (version) VALUES ('20141219000003');
 
 INSERT INTO schema_migrations (version) VALUES ('20141219174214');
+
+INSERT INTO schema_migrations (version) VALUES ('20141222205012');
