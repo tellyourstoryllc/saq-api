@@ -5,7 +5,11 @@ class UserAvatarImagesController < ApplicationController
     @avatar_image = @user.avatar_image
     render_success and return if @avatar_image.nil?
 
-    if @avatar_image.flag(current_user)
+    @flag_reason = FlagReason.find(params[:flag_reason_id]) if params[:flag_reason_id].present?
+
+    if @flag_reason.nil?
+      render_error 'Invalid flag_reason_id'
+    elsif @avatar_image.flag(current_user)
       render_json @user
     else
       render_error
