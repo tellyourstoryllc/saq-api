@@ -3,7 +3,7 @@ class VideoThumbnail < ActiveRecord::Base
 
   after_initialize :init_status
   validates :video_id, :image, :offset, presence: true
-  belongs_to :video, class_name: 'AvatarVideo'
+  belongs_to :video, class_name: 'AvatarVideo', foreign_key: 'video_id'
 
   after_save :update_creator!
   after_destroy :update_creator!

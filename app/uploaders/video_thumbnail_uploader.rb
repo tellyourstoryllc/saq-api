@@ -17,7 +17,7 @@ class VideoThumbnailUploader < BaseUploader
 
   def take_snapshot
     offset = model.offset
-    movie = FFMPEG.Movie.new(current_path)
+    movie = FFMPEG::Movie.new(current_path)
     movie.screenshot(current_path, seek_time: offset)
   end
 end
