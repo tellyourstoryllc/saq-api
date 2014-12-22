@@ -12,15 +12,18 @@ describe ModerationController do
       image = FactoryGirl.build(:avatar_image, user: user)
       image[:image] = 'fake.png'
       image.save!
+      image.submit_to_moderator
+
       # Precondition.  Avatar is in review.
       user.reload
       user.avatar_image.must_be :in_review?
 
       # Call the callback.
-      post :callback, image_id: image.id, passed: ['nudity']
+      post :callback, image_id: image.id, passed: ['nudity'], api_secret: Rails.configuration.app['api']['request_secret']
 
       # Postcondition.
       user.reload
+      user.avatar_image.must_be :approved?
       user.public_avatar_image.must_equal true
     end
   end
@@ -29,18 +32,23 @@ describe ModerationController do
     let(:user) { FactoryGirl.create(:registered_user, public_avatar_image: true) }
 
     it "should set user public_avatar_image to false" do
+      user.update(public_avatar_image: true)
+
       image = FactoryGirl.build(:avatar_image, user: user)
       image[:image] = 'fake.png'
       image.save!
+      image.submit_to_moderator
+
       # Precondition.  Avatar is in review.
       user.reload
       user.avatar_image.must_be :in_review?
 
       # Call the callback.
-      post :callback, image_id: image.id, failed: ['nudity']
+      post :callback, image_id: image.id, failed: ['nudity'], api_secret: Rails.configuration.app['api']['request_secret']
 
       # Postcondition.
       user.reload
+      user.avatar_image.must_be :censored?
       user.public_avatar_image.must_equal false
     end
   end

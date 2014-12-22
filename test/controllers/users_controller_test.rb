@@ -259,12 +259,12 @@ describe UsersController do
         )
       end
 
-      it "should submit to the moderator" do
-        post :update, {token: user.token, avatar_image_file: uploaded_file_object}
-        assert_requested @moderator_post
-        user.reload
-        user.avatar_image.must_be :in_review?
-      end
+      #it "should submit to the moderator" do
+      #  post :update, {token: user.token, avatar_image_file: uploaded_file_object}
+      #  assert_requested @moderator_post
+      #  user.reload
+      #  user.avatar_image.must_be :in_review?
+      #end
     end
   end
 end
