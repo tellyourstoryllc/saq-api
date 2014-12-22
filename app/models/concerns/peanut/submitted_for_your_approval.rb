@@ -22,13 +22,14 @@ module Peanut::SubmittedForYourApproval
     end
   end
 
+  def pending?; self.status == 'pending'; end
   def in_review?; self.status == 'review'; end
   alias_method :review?, :in_review?
   def censored?; self.status == 'censored'; end
   def approved?; self.status == 'normal';   end
 
   def submit_to_moderator
-    return unless self.status == 'pending'
+    return unless pending?
 
     url = moderation_url
     return unless url && self.id

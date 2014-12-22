@@ -4,6 +4,10 @@ class UserSerializer < ActiveModel::Serializer
     :location_name, :friend_code
 
 
+  def include_token?
+    owner?
+  end
+
   def name
     object.name if acquaintance?
   end
@@ -12,8 +16,8 @@ class UserSerializer < ActiveModel::Serializer
     object.username if acquaintance?
   end
 
-  def include_token?
-    owner?
+  def avatar_url
+    object.avatar_url unless object.avatar_image.try(:censored?)
   end
 
   def registered

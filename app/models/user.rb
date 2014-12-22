@@ -90,6 +90,8 @@ class User < ActiveRecord::Base
   # Use this where possible instead of separate keys, to reduce memory
   # likes_received
   # likes_given
+  # flags_received
+  # flags_given
   hash_key :misc
 
   set :pending_digest_story_ids

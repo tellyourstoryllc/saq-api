@@ -12,6 +12,16 @@ class AvatarImage < ActiveRecord::Base
   mount_uploader :image, AvatarImageUploader
 
 
+  def flag(actor)
+    return unless pending?
+
+    submit_to_moderator
+
+    actor.misc.incr('flags_given')
+    user.misc.incr('flags_received')
+  end
+
+
   protected
 
   def moderation_description
