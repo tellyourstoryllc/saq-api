@@ -61,7 +61,7 @@ class Story < Message
   end
 
   def allowed_in_public_feed?
-    public? && source == 'camera'
+    public? && !review? && !censored? && source == 'camera'
   end
 
   def has_permission?(viewer)
@@ -73,7 +73,8 @@ class Story < Message
   # Update the user's last public story attrs if this was the last public
   # story but it's been changed to friends or private
   def check_last_public_story
-    return if user.last_public_story_id != id || public?
+    return unless (user.last_public_story_id == id && !allowed_in_public_feed?) ||
+      (user.last_public_story_id != id && allowed_in_public_feed?)
 
     # Get the next most recent public story that's allowed in the public feed, if there is one
     stories = NonFriendStoriesList.new(id: user.id).paginate_messages(limit: 20)
@@ -308,20 +309,23 @@ class Story < Message
   end
 
   def review!
-    attrs['status'] = 'review'
+    attrs['status'] = self.status = 'review'
+    check_last_public_story
   end
 
   def approve!
     run_callbacks :moderation_approve do
       # TODO
-      attrs['status'] = 'normal'
+      attrs['status'] = self.status= 'normal'
+      check_last_public_story
     end
   end
 
   def censor!
     run_callbacks :moderation_censor do
       # TODO
-      attrs['status'] = 'censored'
+      attrs['status'] = self.status= 'censored'
+      check_last_public_story
     end
   end
 
