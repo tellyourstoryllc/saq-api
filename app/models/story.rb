@@ -1,5 +1,6 @@
 class Story < Message
   include Peanut::CommentsCollection
+  include Peanut::Flaggable
   include Peanut::SubmittedForYourApproval
 
   validate :valid_permission?
@@ -315,11 +316,8 @@ class Story < Message
     status.blank? || super
   end
 
-  def flag(actor, flag_reason)
-    submit_to_moderator if has_attachment? && flag_reason.moderate? && pending?
-
-    actor.misc.incr('flags_given')
-    user.misc.incr('flags_received')
+  def submit_to_moderator?
+    has_attachment? && super
   end
 
   def review!

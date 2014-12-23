@@ -1,4 +1,5 @@
 class AvatarVideo < ActiveRecord::Base
+  include Peanut::Flaggable
   include Peanut::SubmittedForYourApproval
 
   after_initialize :init_status
@@ -11,13 +12,6 @@ class AvatarVideo < ActiveRecord::Base
 
   mount_uploader :video, AvatarVideoUploader
 
-
-  def flag(actor, flag_reason)
-    submit_to_moderator if flag_reason.moderate? && pending?
-
-    actor.misc.incr('flags_given')
-    user.misc.incr('flags_received')
-  end
 
   def preview_url
     if video.version_exists?(:animated_gif)
