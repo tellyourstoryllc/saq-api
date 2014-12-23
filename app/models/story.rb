@@ -144,6 +144,7 @@ class Story < Message
       NonFriendStoriesList.new(id: user.id).add_message(self)
     end
 
+    check_last_public_story
     pushed_user_ids
   end
 
@@ -178,13 +179,12 @@ class Story < Message
     overlay_text = update_attrs[:attachment_overlay_text]
     update_message_attachment_overlay(overlay_file, overlay_text) if overlay_file.present?
 
-    # Update permission
-    pushed_user_ids = update_permission(permission)
-
     # Update simple attrs
     simple_attrs = update_attrs.slice(:latitude, :longitude)
     attrs.bulk_set(simple_attrs) if simple_attrs.present?
-    user.update_last_public_story(self)
+
+    # Update permission
+    pushed_user_ids = update_permission(permission)
 
     pushed_user_ids
   end
