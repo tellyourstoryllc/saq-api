@@ -9,10 +9,9 @@ class UserAvatarImagesController < ApplicationController
 
     if @flag_reason.nil?
       render_error 'Invalid flag_reason_id'
-    elsif @avatar_image.flag(current_user, @flag_reason)
-      render_json @user
     else
-      render_error
+      @avatar_image.flag(current_user, @flag_reason)
+      render_json @user
     end
   end
 

@@ -42,10 +42,9 @@ class StoriesController < ApplicationController
 
     if @flag_reason.nil?
       render_error 'Invalid flag_reason_id'
-    elsif @story.flag(current_user, @flag_reason)
-      render_json @story
     else
-      render_error
+      @story.flag(current_user, @flag_reason)
+      render_json @story
     end
   end
 
