@@ -177,6 +177,8 @@ class PublicFeed
 
     # Preserve order when fetching from the db.
     users = User.includes(:account, :avatar_image, :avatar_video).where(id: user_ids).reorder("field(id, #{user_ids.map(&:inspect).join(',')})")
+    users.delete_if{ |u| u.deactivated? || u.last_public_story_id.nil? }
+
     stories = Story.pipelined_find(users.map(&:last_public_story_id))
 
     users + stories
