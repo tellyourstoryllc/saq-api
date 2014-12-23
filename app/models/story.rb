@@ -359,6 +359,10 @@ class Story < Message
   end
 
   def moderation_url
-    attachment_preview_url
+    attachment_url
+  end
+
+  def moderation_type
+    message_attachment.media_type == 'video' ? :video : :photo
   end
 end
