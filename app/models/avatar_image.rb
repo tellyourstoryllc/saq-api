@@ -1,4 +1,5 @@
 class AvatarImage < ActiveRecord::Base
+  include Redis::Objects
   include Peanut::Flaggable
   include Peanut::SubmittedForYourApproval
 
