@@ -44,6 +44,10 @@ class Story < Message
     end
   end
 
+  def deleted?
+    !attrs.exists?
+  end
+
   def allowed_permission?
     %w(private friends public).include?(permission)
   end
@@ -61,7 +65,7 @@ class Story < Message
   end
 
   def allowed_in_public_feed?
-    public? && !review? && !censored? && source == 'camera'
+    public? && !review? && !censored? && source == 'camera' && !deleted?
   end
 
   def has_permission?(viewer)
@@ -285,7 +289,17 @@ class Story < Message
 
   def delete
     # TODO delete all its likes, exports, etc. to clean up and delete unused memory?
+
+    friend_ids = user.follower_ids.members
+    delete_from_friend_feeds(friend_ids)
+
+    NonFriendStoriesList.new(id: user.id).message_ids.delete(id)
+    FriendStoriesList.new(id: user.id).message_ids.delete(id)
+    MyStoriesList.new(id: user.id).message_ids.delete(id)
+
     attrs.del
+
+    check_last_public_story
   end
 
   def commenter_ids
