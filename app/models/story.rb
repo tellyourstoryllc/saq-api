@@ -1,5 +1,6 @@
 class Story < Message
   include Peanut::CommentsCollection
+  include Peanut::SubmittedForYourApproval
 
   validate :valid_permission?
 
@@ -295,6 +296,35 @@ class Story < Message
     end.uniq
   end
 
+  def pending?
+    status.blank? || super
+  end
+
+  def flag(actor, flag_reason)
+    submit_to_moderator if has_attachment? && flag_reason.moderate? && pending?
+
+    actor.misc.incr('flags_given')
+    user.misc.incr('flags_received')
+  end
+
+  def review!
+    attrs['status'] = 'review'
+  end
+
+  def approve!
+    run_callbacks :moderation_approve do
+      # TODO
+      attrs['status'] = 'normal'
+    end
+  end
+
+  def censor!
+    run_callbacks :moderation_censor do
+      # TODO
+      attrs['status'] = 'censored'
+    end
+  end
+
 
   private
 
@@ -322,5 +352,13 @@ class Story < Message
     # Was this a message that was fetched/imported from another service?
     sender_qualifier = imported? ? 'external' : 'internal'
     StatsD.increment("stories.by_source.#{sender_qualifier}.received")
+  end
+
+  def moderation_description
+    "#{self.user.username} (#{Rails.env}): #{self.class.name} #{self.id}"
+  end
+
+  def moderation_url
+    attachment_preview_url
   end
 end

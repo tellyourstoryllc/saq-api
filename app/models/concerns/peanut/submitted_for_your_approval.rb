@@ -63,10 +63,15 @@ module Peanut::SubmittedForYourApproval
       },
       description: description, info_url: info_url,
     })
+
     if [200,201,202].include?(response.code)
-      self.status = 'review'
-      self.save
+      review!
     end
+  end
+
+  def review!
+    self.status = 'review'
+    self.save
   end
 
   def approve!

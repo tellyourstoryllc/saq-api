@@ -8,7 +8,8 @@ class Message
     :attachment_metadata, :client_metadata, :received, :original_message_id, :forward_message_id,
     :actor_id, :attachment_message_id, :type, :permission, :snapchat_media_id, :latitude, :longitude, :source,
     :created_at, :snapchat_created_at, :expires_in, :expires_at, :cached_likes_count, :cached_forwards_count,
-    :message_attachment_overlay_id, :attachment_overlay_file, :attachment_overlay_url, :attachment_overlay_text
+    :message_attachment_overlay_id, :attachment_overlay_file, :attachment_overlay_url, :attachment_overlay_text,
+    :status
 
   hash_key :attrs
   list :ancestor_message_ids
@@ -425,7 +426,7 @@ class Message
                           forward_message_id: forward_message_id, actor_id: actor_id, attachment_message_id: attachment_message_id,
                           type: type, permission: permission, snapchat_media_id: snapchat_media_id, latitude: latitude,
                           longitude: longitude, source: source, message_attachment_overlay_id: message_attachment_overlay_id,
-                          attachment_overlay_url: attachment_overlay_url, attachment_overlay_text: attachment_overlay_text,
+                          attachment_overlay_url: attachment_overlay_url, attachment_overlay_text: attachment_overlay_text, status: status,
                           created_at: created_at, snapchat_created_at: snapchat_created_at, expires_in: expires_in, expires_at: expires_at)
 
       if expires_in.present?
