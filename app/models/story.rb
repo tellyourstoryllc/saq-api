@@ -182,7 +182,7 @@ class Story < Message
     pushed_user_ids = update_permission(permission)
 
     # Update simple attrs
-    simple_attrs = update_attrs.slice(:latitude, :longitude, :source)
+    simple_attrs = update_attrs.slice(:latitude, :longitude)
     attrs.bulk_set(simple_attrs) if simple_attrs.present?
     user.update_last_public_story(self)
 
