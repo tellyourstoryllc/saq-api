@@ -97,6 +97,7 @@ class User < ActiveRecord::Base
   set :pending_digest_story_ids
   hash_key :stories_digest_info
   set :all_time_friend_request_ids
+  set :flagger_ids
 
   delegate :registered, :registered?, to: :account
 

@@ -34,6 +34,12 @@ class FlaggedScreenshot < ActiveRecord::Base
     user.censor_profile! if censored?
   end
 
+  # In addition to preventing multiple flags per screenshot,
+  # also prevent multiple flags on the user itself
+  def update_flag_metrics(flag_giver)
+    super if user.flagger_ids.add(flag_giver.id)
+  end
+
 
   private
 
