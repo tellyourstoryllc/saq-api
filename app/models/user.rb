@@ -105,6 +105,8 @@ class User < ActiveRecord::Base
   reverse_geocoded_by :latitude, :longitude
 
   COHORT_METRICS_TIME_ZONE = 'America/New_York'
+  CENSORED_WARNING_LEVEL = 3
+  CENSORED_CRITICAL_LEVEL = 10
 
 
   def generated_username?
@@ -794,6 +796,18 @@ class User < ActiveRecord::Base
   def add_censored_object(object)
     value = "#{object.class.to_s}:#{object.id}"
     censored_objects << value
+  end
+
+  def censor_level
+    @censor_level ||= censored_objects.size
+  end
+
+  def censor_warning?
+    censor_level >= CENSORED_WARNING_LEVEL
+  end
+
+  def censor_critical?
+    censor_level >= CENSORED_CRITICAL_LEVEL
   end
 
 

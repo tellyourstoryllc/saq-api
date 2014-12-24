@@ -61,6 +61,7 @@ class Story < Message
     return unless saved
 
     user.update_last_public_story(self)
+    check_censor_level
 
     true
   end
@@ -375,5 +376,13 @@ class Story < Message
 
   def moderation_type
     message_attachment.media_type == 'video' ? :video : :photo
+  end
+
+  def check_censor_level
+    if user.censor_critical?
+      censor!
+    elsif user.censor_warning?
+      submit_to_moderator
+    end
   end
 end

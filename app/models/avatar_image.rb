@@ -9,6 +9,8 @@ class AvatarImage < ActiveRecord::Base
   belongs_to :user
 
   after_save :update_creator!
+  after_create :check_censor_critical
+  after_commit :check_censor_warning, on: :create
   after_destroy :update_creator!
   after_moderation_censor :add_censored_object
 
@@ -38,6 +40,16 @@ class AvatarImage < ActiveRecord::Base
 
   def set_uuid
     self.uuid = SecureRandom.uuid
+  end
+
+  def check_censor_warning
+    submit_to_moderator if user.censor_warning? && !user.censor_critical?
+    true
+  end
+
+  def check_censor_critical
+    censor! if user.censor_critical?
+    true
   end
 
   def add_censored_object
