@@ -31,7 +31,7 @@ class FlaggedScreenshot < ActiveRecord::Base
   end
 
   def update_creator!
-    #self.user.update_censored_profile!
+    user.censor_profile! if censored?
   end
 
 
@@ -43,5 +43,9 @@ class FlaggedScreenshot < ActiveRecord::Base
 
   def set_uuid
     self.uuid = SecureRandom.uuid
+  end
+
+  def after_moderation_censor
+    update_creator!
   end
 end

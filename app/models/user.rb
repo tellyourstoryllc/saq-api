@@ -569,6 +569,10 @@ class User < ActiveRecord::Base
     update!(public_avatar_video: !! (self.avatar_video.try(:approved?)))
   end
 
+  def censor_profile!
+    update!(censored_profile: true)
+  end
+
   def snap_invite_ad(client)
     send("#{client}_snap_invite_ad") if client.present?
   end

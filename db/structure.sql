@@ -725,6 +725,7 @@ CREATE TABLE `users` (
   `last_public_story_longitude` decimal(10,7) DEFAULT NULL,
   `public_avatar_image` tinyint(1) NOT NULL DEFAULT '0',
   `public_avatar_video` tinyint(1) NOT NULL DEFAULT '0',
+  `censored_profile` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_users_on_username` (`username`),
   UNIQUE KEY `index_users_on_friend_code` (`friend_code`),
@@ -764,7 +765,7 @@ CREATE TABLE `video_thumbnails` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-24 10:25:17
+-- Dump completed on 2014-12-24 11:25:08
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -1004,3 +1005,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141222205012');
 INSERT INTO schema_migrations (version) VALUES ('20141222222618');
 
 INSERT INTO schema_migrations (version) VALUES ('20141224151920');
+
+INSERT INTO schema_migrations (version) VALUES ('20141224162301');
