@@ -10,6 +10,8 @@ class PublicFeedTest < ActiveSupport::TestCase
                                             last_public_story_id: 'asdf2')
       uninstalled_user = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago, last_public_story_id: 'asdf4',
                                             uninstalled: true)
+      censored_user = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago, last_public_story_id: 'asdf4',
+                                         censored_profile: true)
 
       FactoryGirl.create(:account, :unregistered, user: unregistered_user)
 
@@ -18,7 +20,7 @@ class PublicFeedTest < ActiveSupport::TestCase
       results.must_include valid_user
       results.wont_include unregistered_user
       results.wont_include deactivated_user
-      results.wont_include uninstalled_user
+      results.wont_include censored_user
     end
 
     it "must order by newest public story" do
