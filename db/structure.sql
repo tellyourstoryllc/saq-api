@@ -730,9 +730,9 @@ CREATE TABLE `users` (
   UNIQUE KEY `index_users_on_username` (`username`),
   UNIQUE KEY `index_users_on_friend_code` (`friend_code`),
   KEY `index_users_on_created_at` (`created_at`),
-  KEY `index_users_on_last_public_story_created_at` (`last_public_story_created_at`),
   KEY `index_users_on_latitude_and_longitude` (`latitude`,`longitude`),
-  KEY `index_on_last_public_story_location` (`last_public_story_latitude`,`last_public_story_longitude`)
+  KEY `index_on_last_public_story_location` (`last_public_story_latitude`,`last_public_story_longitude`),
+  KEY `for_feed` (`last_public_story_created_at`,`deactivated`,`uninstalled`,`censored_profile`,`gender`,`latitude`,`longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -765,7 +765,7 @@ CREATE TABLE `video_thumbnails` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-24 11:25:08
+-- Dump completed on 2014-12-24 12:01:20
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -1007,3 +1007,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141222222618');
 INSERT INTO schema_migrations (version) VALUES ('20141224151920');
 
 INSERT INTO schema_migrations (version) VALUES ('20141224162301');
+
+INSERT INTO schema_migrations (version) VALUES ('20141224165850');
