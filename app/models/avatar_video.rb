@@ -10,6 +10,7 @@ class AvatarVideo < ActiveRecord::Base
 
   after_save :update_creator!
   after_destroy :update_creator!
+  after_moderation_censor :add_censored_object
 
   mount_uploader :video, AvatarVideoUploader
 
@@ -68,5 +69,9 @@ class AvatarVideo < ActiveRecord::Base
 
   def moderation_type
     :video
+  end
+
+  def add_censored_object
+    user.add_censored_object(self)
   end
 end

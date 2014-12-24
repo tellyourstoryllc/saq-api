@@ -98,6 +98,7 @@ class User < ActiveRecord::Base
   hash_key :stories_digest_info
   set :all_time_friend_request_ids
   set :flagger_ids
+  set :censored_objects
 
   delegate :registered, :registered?, to: :account
 
@@ -788,6 +789,11 @@ class User < ActiveRecord::Base
     attrs = {last_public_story_id: story.try(:id), last_public_story_created_at: story_created_at,
              last_public_story_latitude: story.try(:latitude), last_public_story_longitude: story.try(:longitude)}
     update(attrs) if last_public_story_created_at.nil? || force || story_created_at >= last_public_story_created_at
+  end
+
+  def add_censored_object(object)
+    value = "#{object.class.to_s}:#{object.id}"
+    censored_objects << value
   end
 
 

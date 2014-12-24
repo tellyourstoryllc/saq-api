@@ -10,6 +10,7 @@ class FlaggedScreenshot < ActiveRecord::Base
 
   after_save :update_creator!
   after_commit :submit_to_moderator
+  after_moderation_censor :add_censored_object
 
   mount_uploader :image, FlaggedScreenshotUploader
 
@@ -49,5 +50,9 @@ class FlaggedScreenshot < ActiveRecord::Base
 
   def set_uuid
     self.uuid = SecureRandom.uuid
+  end
+
+  def add_censored_object
+    user.add_censored_object(self)
   end
 end

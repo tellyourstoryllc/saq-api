@@ -326,13 +326,14 @@ class Story < Message
   end
 
   def approve!
-    attrs['status'] = self.status= 'normal'
+    attrs['status'] = self.status = 'normal'
     check_last_public_story
   end
 
   def censor!
-    attrs['status'] = self.status= 'censored'
+    attrs['status'] = self.status = 'censored'
     check_last_public_story
+    user.add_censored_object(self)
   end
 
 
