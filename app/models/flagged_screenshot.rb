@@ -50,8 +50,4 @@ class FlaggedScreenshot < ActiveRecord::Base
   def set_uuid
     self.uuid = SecureRandom.uuid
   end
-
-  def after_moderation_censor
-    update_creator!
-  end
 end
