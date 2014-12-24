@@ -9,7 +9,7 @@ class FlaggedScreenshot < ActiveRecord::Base
   belongs_to :user
 
   after_save :update_creator!
-  after_commit :submit_to_moderator
+  after_commit :submit_to_moderator, on: :create
   after_moderation_censor :add_censored_object
 
   mount_uploader :image, FlaggedScreenshotUploader
