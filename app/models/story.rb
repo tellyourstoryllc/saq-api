@@ -326,19 +326,13 @@ class Story < Message
   end
 
   def approve!
-    run_callbacks :moderation_approve do
-      # TODO
-      attrs['status'] = self.status= 'normal'
-      check_last_public_story
-    end
+    attrs['status'] = self.status= 'normal'
+    check_last_public_story
   end
 
   def censor!
-    run_callbacks :moderation_censor do
-      # TODO
-      attrs['status'] = self.status= 'censored'
-      check_last_public_story
-    end
+    attrs['status'] = self.status= 'censored'
+    check_last_public_story
   end
 
 
