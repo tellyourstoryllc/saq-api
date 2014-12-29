@@ -49,6 +49,10 @@ class Story < Message
     !attrs.exists?
   end
 
+  def has_face=(val)
+    @has_face = val if %w(yes no unknown).include?(val)
+  end
+
   def allowed_permission?
     %w(private friends public).include?(permission)
   end
@@ -187,7 +191,7 @@ class Story < Message
     update_message_attachment_overlay(overlay_file, overlay_text) if overlay_file.present?
 
     # Update simple attrs
-    simple_attrs = update_attrs.slice(:latitude, :longitude)
+    simple_attrs = update_attrs.slice(:latitude, :longitude, :has_face)
     attrs.bulk_set(simple_attrs) if simple_attrs.present?
 
     # Update permission

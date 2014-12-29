@@ -64,6 +64,6 @@ class StoriesController < ApplicationController
 
   def update_params
     params.slice(:permission, :latitude, :longitude, :source, :attachment_overlay_file,
-                 :attachment_overlay_text)
+                 :attachment_overlay_text, :has_face)
   end
 end
