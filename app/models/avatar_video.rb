@@ -73,6 +73,10 @@ class AvatarVideo < ActiveRecord::Base
     :video
   end
 
+  def moderation_increment_flags_censored?
+    true
+  end
+
   def check_censor_warning
     submit_to_moderator if user.censor_warning? && !user.censor_critical?
     true

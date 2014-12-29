@@ -335,6 +335,7 @@ class Story < Message
     attrs['status'] = self.status = 'censored'
     check_last_public_story
     user.add_censored_object(self)
+    increment_flags_censored
   end
 
 

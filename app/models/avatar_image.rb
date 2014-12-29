@@ -27,6 +27,10 @@ class AvatarImage < ActiveRecord::Base
     image.thumb.url
   end
 
+  def moderation_increment_flags_censored?
+    true
+  end
+
   def update_creator!
     self.user.update_avatar_status!
   end

@@ -92,6 +92,8 @@ class User < ActiveRecord::Base
   # likes_given
   # flags_received
   # flags_given
+  # initial_flags_given
+  # initial_flags_censored
   hash_key :misc
 
   set :pending_digest_story_ids

@@ -30,6 +30,10 @@ class FlaggedScreenshot < ActiveRecord::Base
     image.url
   end
 
+  def moderation_increment_flags_censored?
+    true
+  end
+
   def update_creator!
     user.censor_profile! if censored?
   end

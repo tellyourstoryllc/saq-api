@@ -6,6 +6,7 @@
 #     actually see.
 #   #moderation_description that returns a string displayed to moderators
 #   #moderation_type that returns either :photo or :video. default: :photo
+#   #moderation_increment_flags_censored? that areturns either true or false
 #
 # Preconditions:
 #   #status must == 'pending' in order to submit to the moderator for reviewing.
@@ -31,6 +32,10 @@ module Peanut::SubmittedForYourApproval
 
   def moderation_type
     :photo
+  end
+
+  def moderation_increment_flags_censored?
+    false
   end
 
   def submit_to_moderator
@@ -85,7 +90,18 @@ module Peanut::SubmittedForYourApproval
     run_callbacks :moderation_censor do
       self.status = 'censored'
       self.save
+
+      increment_flags_censored if moderation_increment_flags_censored?
     end
   end
 
+  def increment_flags_censored
+    flagger_ids = initial_flagger_ids.members
+
+    if flagger_ids.present?
+      User.where(id: flagger_ids).find_each do |flagger|
+        flagger.misc.incr('initial_flags_censored')
+      end
+    end
+  end
 end
