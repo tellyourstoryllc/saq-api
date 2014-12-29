@@ -101,6 +101,7 @@ CREATE TABLE `avatar_images` (
   `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `status` enum('pending','review','normal','censored') COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_avatar_images_on_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -125,6 +126,7 @@ CREATE TABLE `avatar_videos` (
   `file_size` int(11) NOT NULL,
   `preview_width` int(11) DEFAULT NULL,
   `preview_height` int(11) DEFAULT NULL,
+  `status` enum('pending','review','normal','censored') COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_avatar_videos_on_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -231,6 +233,45 @@ CREATE TABLE `emoticons` (
   `local_file_path` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `sha1` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `flag_reasons`
+--
+
+DROP TABLE IF EXISTS `flag_reasons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `flag_reasons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `text` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `moderate` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `flagged_screenshots`
+--
+
+DROP TABLE IF EXISTS `flagged_screenshots`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `flagged_screenshots` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `flagger_id` char(8) COLLATE utf8_unicode_ci NOT NULL,
+  `image` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `uuid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `status` enum('pending','review','normal','censored') COLLATE utf8_unicode_ci NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_flagged_screenshots_on_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -682,13 +723,16 @@ CREATE TABLE `users` (
   `last_public_story_created_at` datetime DEFAULT NULL,
   `last_public_story_latitude` decimal(10,7) DEFAULT NULL,
   `last_public_story_longitude` decimal(10,7) DEFAULT NULL,
+  `public_avatar_image` tinyint(1) NOT NULL DEFAULT '0',
+  `public_avatar_video` tinyint(1) NOT NULL DEFAULT '0',
+  `censored_profile` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_users_on_username` (`username`),
   UNIQUE KEY `index_users_on_friend_code` (`friend_code`),
   KEY `index_users_on_created_at` (`created_at`),
-  KEY `index_users_on_last_public_story_created_at` (`last_public_story_created_at`),
   KEY `index_users_on_latitude_and_longitude` (`latitude`,`longitude`),
-  KEY `index_on_last_public_story_location` (`last_public_story_latitude`,`last_public_story_longitude`)
+  KEY `index_on_last_public_story_location` (`last_public_story_latitude`,`last_public_story_longitude`),
+  KEY `for_feed` (`last_public_story_created_at`,`deactivated`,`uninstalled`,`censored_profile`,`gender`,`latitude`,`longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -701,7 +745,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-17 13:43:31
+-- Dump completed on 2014-12-29 12:42:39
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -925,3 +969,25 @@ INSERT INTO schema_migrations (version) VALUES ('20141209201135');
 INSERT INTO schema_migrations (version) VALUES ('20141210162912');
 
 INSERT INTO schema_migrations (version) VALUES ('20141210212510');
+
+INSERT INTO schema_migrations (version) VALUES ('20141219000000');
+
+INSERT INTO schema_migrations (version) VALUES ('20141219000001');
+
+INSERT INTO schema_migrations (version) VALUES ('20141219000002');
+
+INSERT INTO schema_migrations (version) VALUES ('20141219000003');
+
+INSERT INTO schema_migrations (version) VALUES ('20141219174214');
+
+INSERT INTO schema_migrations (version) VALUES ('20141222205012');
+
+INSERT INTO schema_migrations (version) VALUES ('20141222222618');
+
+INSERT INTO schema_migrations (version) VALUES ('20141224151920');
+
+INSERT INTO schema_migrations (version) VALUES ('20141224162301');
+
+INSERT INTO schema_migrations (version) VALUES ('20141224165850');
+
+INSERT INTO schema_migrations (version) VALUES ('20141229174138');

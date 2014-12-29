@@ -1,5 +1,7 @@
 class Story < Message
   include Peanut::CommentsCollection
+  include Peanut::Flaggable
+  include Peanut::SubmittedForYourApproval
 
   validate :valid_permission?
 
@@ -43,6 +45,10 @@ class Story < Message
     end
   end
 
+  def deleted?
+    !attrs.exists?
+  end
+
   def allowed_permission?
     %w(private friends public).include?(permission)
   end
@@ -55,12 +61,13 @@ class Story < Message
     return unless saved
 
     user.update_last_public_story(self)
+    check_censor_level
 
     true
   end
 
   def allowed_in_public_feed?
-    public? && source == 'camera'
+    public? && !review? && !censored? && source == 'camera' && !deleted?
   end
 
   def has_permission?(viewer)
@@ -72,7 +79,8 @@ class Story < Message
   # Update the user's last public story attrs if this was the last public
   # story but it's been changed to friends or private
   def check_last_public_story
-    return if user.last_public_story_id != id || public?
+    return unless (user.last_public_story_id == id && !allowed_in_public_feed?) ||
+      (user.last_public_story_id != id && allowed_in_public_feed?)
 
     # Get the next most recent public story that's allowed in the public feed, if there is one
     stories = NonFriendStoriesList.new(id: user.id).paginate_messages(limit: 20)
@@ -143,6 +151,7 @@ class Story < Message
       NonFriendStoriesList.new(id: user.id).add_message(self)
     end
 
+    check_last_public_story
     pushed_user_ids
   end
 
@@ -177,13 +186,12 @@ class Story < Message
     overlay_text = update_attrs[:attachment_overlay_text]
     update_message_attachment_overlay(overlay_file, overlay_text) if overlay_file.present?
 
+    # Update simple attrs
+    simple_attrs = update_attrs.slice(:latitude, :longitude)
+    attrs.bulk_set(simple_attrs) if simple_attrs.present?
+
     # Update permission
     pushed_user_ids = update_permission(permission)
-
-    # Update simple attrs
-    simple_attrs = update_attrs.slice(:latitude, :longitude, :source)
-    attrs.bulk_set(simple_attrs) if simple_attrs.present?
-    user.update_last_public_story(self)
 
     pushed_user_ids
   end
@@ -283,7 +291,17 @@ class Story < Message
 
   def delete
     # TODO delete all its likes, exports, etc. to clean up and delete unused memory?
+
+    friend_ids = user.follower_ids.members
+    delete_from_friend_feeds(friend_ids)
+
+    NonFriendStoriesList.new(id: user.id).message_ids.delete(id)
+    FriendStoriesList.new(id: user.id).message_ids.delete(id)
+    MyStoriesList.new(id: user.id).message_ids.delete(id)
+
     attrs.del
+
+    check_last_public_story
   end
 
   def commenter_ids
@@ -293,6 +311,31 @@ class Story < Message
     redis.pipelined do
       ids.map{ |id| redis.hget("#{comment_prefix}:#{id}:attrs", :user_id) }
     end.uniq
+  end
+
+  def pending?
+    status.blank? || super
+  end
+
+  def submit_to_moderator?
+    has_attachment? && super
+  end
+
+  def review!
+    attrs['status'] = self.status = 'review'
+    check_last_public_story
+  end
+
+  def approve!
+    attrs['status'] = self.status = 'normal'
+    check_last_public_story
+  end
+
+  def censor!
+    attrs['status'] = self.status = 'censored'
+    check_last_public_story
+    user.add_censored_object(self)
+    increment_flags_censored
   end
 
 
@@ -322,5 +365,25 @@ class Story < Message
     # Was this a message that was fetched/imported from another service?
     sender_qualifier = imported? ? 'external' : 'internal'
     StatsD.increment("stories.by_source.#{sender_qualifier}.received")
+  end
+
+  def moderation_description
+    "#{self.user.username} (#{Rails.env}): #{self.class.name} #{self.id}"
+  end
+
+  def moderation_url
+    attachment_url
+  end
+
+  def moderation_type
+    message_attachment.media_type == 'video' ? :video : :photo
+  end
+
+  def check_censor_level
+    if user.censor_critical?
+      censor!
+    elsif user.censor_warning?
+      submit_to_moderator
+    end
   end
 end

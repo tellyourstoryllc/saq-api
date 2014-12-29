@@ -46,6 +46,7 @@ class CheckinController < ApplicationController
 
     objects << current_device.preferences if current_device
     objects += Emoticon.active
+    objects += FlagReason.active
 
     render_json objects
   end

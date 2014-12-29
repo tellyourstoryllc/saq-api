@@ -1,5 +1,5 @@
 class StoriesController < ApplicationController
-  before_action :load_story, only: [:show, :export]
+  before_action :load_story, only: [:show, :export, :flag]
   before_action :load_my_story, only: [:update, :delete]
 
 
@@ -35,6 +35,17 @@ class StoriesController < ApplicationController
   def delete
     @story.delete
     render_success
+  end
+
+  def flag
+    @flag_reason = FlagReason.find(params[:flag_reason_id]) if params[:flag_reason_id].present?
+
+    if @flag_reason.nil?
+      render_error 'Invalid flag_reason_id'
+    else
+      @story.flag(current_user, @flag_reason)
+      render_json @story
+    end
   end
 
 

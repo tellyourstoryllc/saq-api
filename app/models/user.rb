@@ -90,17 +90,25 @@ class User < ActiveRecord::Base
   # Use this where possible instead of separate keys, to reduce memory
   # likes_received
   # likes_given
+  # flags_received
+  # flags_given
+  # initial_flags_given
+  # initial_flags_censored
   hash_key :misc
 
   set :pending_digest_story_ids
   hash_key :stories_digest_info
   set :all_time_friend_request_ids
+  set :flagger_ids
+  set :censored_objects
 
   delegate :registered, :registered?, to: :account
 
   reverse_geocoded_by :latitude, :longitude
 
   COHORT_METRICS_TIME_ZONE = 'America/New_York'
+  CENSORED_WARNING_LEVEL = 3
+  CENSORED_CRITICAL_LEVEL = 10
 
 
   def generated_username?
@@ -559,6 +567,18 @@ class User < ActiveRecord::Base
     update!(deactivated: true)
   end
 
+  def update_avatar_status!
+    update!(public_avatar_image: !! (self.avatar_image.try(:approved?)))
+  end
+
+  def update_avatar_video_status!
+    update!(public_avatar_video: !! (self.avatar_video.try(:approved?)))
+  end
+
+  def censor_profile!
+    update!(censored_profile: true)
+  end
+
   def snap_invite_ad(client)
     send("#{client}_snap_invite_ad") if client.present?
   end
@@ -773,6 +793,23 @@ class User < ActiveRecord::Base
     attrs = {last_public_story_id: story.try(:id), last_public_story_created_at: story_created_at,
              last_public_story_latitude: story.try(:latitude), last_public_story_longitude: story.try(:longitude)}
     update(attrs) if last_public_story_created_at.nil? || force || story_created_at >= last_public_story_created_at
+  end
+
+  def add_censored_object(object)
+    value = "#{object.class.to_s}:#{object.id}"
+    censored_objects << value
+  end
+
+  def censor_level
+    @censor_level ||= censored_objects.size
+  end
+
+  def censor_warning?
+    censor_level >= CENSORED_WARNING_LEVEL
+  end
+
+  def censor_critical?
+    censor_level >= CENSORED_CRITICAL_LEVEL
   end
 
 

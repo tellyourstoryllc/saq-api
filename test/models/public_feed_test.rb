@@ -3,22 +3,29 @@ require "test_helper"
 class PublicFeedTest < ActiveSupport::TestCase
   describe "PublicFeed#paginate_feed" do
 
-    it "must not return deactivated or unregistered users" do
-      valid_user = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago)
-      deactivated_user = FactoryGirl.create(:registered_user, :female, :deactivated, last_public_story_created_at: 1.minute.ago)
-      unregistered_user = FactoryGirl.create(:user, :female, last_public_story_created_at: 1.minute.ago)
+    it "must not return unregistered, deactivated, or uninstalled users" do
+      valid_user = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago, last_public_story_id: 'asdf1')
+      unregistered_user = FactoryGirl.create(:user, :female, last_public_story_created_at: 1.minute.ago, last_public_story_id: 'asdf3')
+      deactivated_user = FactoryGirl.create(:registered_user, :female, :deactivated, last_public_story_created_at: 1.minute.ago,
+                                            last_public_story_id: 'asdf2')
+      uninstalled_user = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago, last_public_story_id: 'asdf4',
+                                            uninstalled: true)
+      censored_user = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago, last_public_story_id: 'asdf4',
+                                         censored_profile: true)
+
       FactoryGirl.create(:account, :unregistered, user: unregistered_user)
 
       results = PublicFeed.paginate_feed(current_user, {})
       results.must_be :present?
       results.must_include valid_user
-      results.wont_include deactivated_user
       results.wont_include unregistered_user
+      results.wont_include deactivated_user
+      results.wont_include censored_user
     end
 
     it "must order by newest public story" do
-      user1 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago)
-      user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago)
+      user1 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago, last_public_story_id: 'asdf1')
+      user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago, last_public_story_id: 'asdf2')
       user3 = FactoryGirl.create(:registered_user, :female)
 
       results = PublicFeed.paginate_feed(current_user, sort: 'newest')
@@ -59,9 +66,10 @@ class PublicFeedTest < ActiveSupport::TestCase
 
     it "must order by closest public story" do
       user1 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 2.minutes.ago,
-                                 last_public_story_latitude: 39.9475787, last_public_story_longitude: -75.1564073)
+                                 last_public_story_id: 'asdf1', last_public_story_latitude: 39.9475787,
+                                 last_public_story_longitude: -75.1564073)
       user2 = FactoryGirl.create(:registered_user, :female, last_public_story_created_at: 1.minute.ago,
-                                 last_public_story_latitude: 39.7, last_public_story_longitude: -75.2)
+                                 last_public_story_id: 'asdf3', last_public_story_latitude: 39.7, last_public_story_longitude: -75.2)
       FactoryGirl.create(:registered_user, :female, latitude: 40.0, longitude: -76.0)
 
       results = PublicFeed.paginate_feed(current_user, sort: 'closest', latitude: 39.98, longitude: -75.152)

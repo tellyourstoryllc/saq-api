@@ -63,6 +63,9 @@ KrazyChat::Application.routes.draw do
     match '/blocked_users', to: 'blocked_users#index', as: 'blocked_users'
     match '/users/:id/block', to: 'blocked_users#create', as: 'block_user'
     match '/users/:id/unblock', to: 'blocked_users#destroy', as: 'unblock_user'
+    match '/users/:id/avatar_image/flag', to: 'user_avatar_images#flag', as: 'flag_avatar_image'
+    match '/users/:id/avatar_video/flag', to: 'user_avatar_videos#flag', as: 'flag_avatar_video'
+    match '/users/:id/flag', to: 'users#flag', as: 'flag_user'
 
     match '/emails', to: 'emails#index', as: 'emails'
     match '/emails/create', to: 'emails#create', as: 'create_email'
@@ -79,6 +82,8 @@ KrazyChat::Application.routes.draw do
     match '/contacts/remove', to: 'contacts#remove', as: 'remove_contacts'
     match '/contacts/autoconnect', to: 'contacts#autoconnect', as: 'remove_autoconnect'
     match '/groups/:id/add_users', to: 'groups#add_users', as: 'groups_add_users'
+
+    match '/moderation/callback', to: 'moderation#callback', as: 'moderation_callback'
 
     match '/hook/callback', to: 'hook#callback', as: 'hook_callback'
 
@@ -114,6 +119,7 @@ KrazyChat::Application.routes.draw do
     match '/stories/:id/like', to: 'story_likes#create', as: 'like_story'
     match '/stories/:id/export', to: 'stories#export', as: 'export_story'
     match '/stories/:id/delete', to: 'stories#delete', as: 'delete_story'
+    match '/stories/:id/flag', to: 'stories#flag', as: 'flag_story'
 
     match '/friends', to: 'friends#index', as: 'friends'
     match '/friends/add', to: 'friends#add', as: 'add_friends'

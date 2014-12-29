@@ -1,20 +1,23 @@
-class AvatarImage < ActiveRecord::Base
+class FlaggedScreenshot < ActiveRecord::Base
   include Redis::Objects
   include Peanut::Flaggable
   include Peanut::SubmittedForYourApproval
 
   after_initialize :init_status
   before_validation :set_uuid, on: :create
-  validates :user_id, :image, :uuid, presence: true
+  validates :user_id, :flagger_id, :image, :uuid, presence: true
   belongs_to :user
 
   after_save :update_creator!
-  after_create :check_censor_critical
-  after_commit :check_censor_warning, on: :create
-  after_destroy :update_creator!
+  after_commit :submit_to_moderator, on: :create
   after_moderation_censor :add_censored_object
 
-  mount_uploader :image, AvatarImageUploader
+  mount_uploader :image, FlaggedScreenshotUploader
+
+
+  def submit_to_moderator?
+    pending?
+  end
 
 
   protected
@@ -24,7 +27,7 @@ class AvatarImage < ActiveRecord::Base
   end
 
   def moderation_url
-    image.thumb.url
+    image.url
   end
 
   def moderation_increment_flags_censored?
@@ -32,7 +35,13 @@ class AvatarImage < ActiveRecord::Base
   end
 
   def update_creator!
-    self.user.update_avatar_status!
+    user.censor_profile! if censored?
+  end
+
+  # In addition to preventing multiple flags per screenshot,
+  # also prevent multiple flags on the user itself
+  def update_flag_metrics(flag_giver)
+    super if user.flagger_ids.add(flag_giver.id)
   end
 
 
@@ -44,16 +53,6 @@ class AvatarImage < ActiveRecord::Base
 
   def set_uuid
     self.uuid = SecureRandom.uuid
-  end
-
-  def check_censor_warning
-    submit_to_moderator if user.censor_warning? && !user.censor_critical?
-    true
-  end
-
-  def check_censor_critical
-    censor! if user.censor_critical?
-    true
   end
 
   def add_censored_object

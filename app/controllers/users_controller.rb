@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   skip_before_action :require_token, :create_or_update_device, only: [:index, :username_status, :create]
+  before_action :load_user, only: :flag
 
 
   def me
@@ -116,6 +117,13 @@ class UsersController < ApplicationController
     render_json current_user
   end
 
+  def flag
+    @flagged_screenshot = FlaggedScreenshot.create!(user_id: params[:id], flagger_id: current_user.id, image: params[:screenshot_file])
+    @flagged_screenshot.flag(current_user)
+
+    render_json @user
+  end
+
 
   private
 
@@ -146,5 +154,9 @@ class UsersController < ApplicationController
   def set_invite_flags
     @current_user.snap_invites_allowed = (rand < Settings.get(:snap_invites_percentage).to_f) ? '1' : '0'
     @current_user.sms_invites_allowed = (rand < Settings.get(:sms_invites_percentage).to_f) ? '1' : '0'
+  end
+
+  def load_user
+    @user = User.find(params[:id])
   end
 end

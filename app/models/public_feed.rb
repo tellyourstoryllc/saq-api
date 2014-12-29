@@ -59,7 +59,9 @@ class PublicFeed
 
     scope = User.select('users.id')
     scope = scope.where(deactivated: false)
+    scope = scope.where(uninstalled: false)
     scope = scope.where('users.last_public_story_created_at IS NOT NULL')
+    scope = scope.where(censored_profile: false)
     scope = scope.joins(:account).where(accounts: { registered: true })
 
     if bound_by_location?
@@ -177,6 +179,8 @@ class PublicFeed
 
     # Preserve order when fetching from the db.
     users = User.includes(:account, :avatar_image, :avatar_video).where(id: user_ids).reorder("field(id, #{user_ids.map(&:inspect).join(',')})")
+    users.delete_if{ |u| u.deactivated? || u.last_public_story_id.nil? }
+
     stories = Story.pipelined_find(users.map(&:last_public_story_id))
 
     users + stories

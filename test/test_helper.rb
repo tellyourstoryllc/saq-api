@@ -33,8 +33,10 @@ Spork.prefork do
       set_up_robot
 
       stub_request(:any, Rails.configuration.app['faye']['url'])
-      stub_request(:any, /.*mixpanel.com/)
-      stub_request(:any, /.*facebook.com/)
+      stub_request(:any, /#{Rails.configuration.app['moderator']['url']}/)
+      stub_request(:any, /mixpanel.com/)
+      stub_request(:any, /facebook.com/)
+      stub_request(:any, /amazonaws.com/)
 
       FactoryGirl.create(:snap_invite_ad)
     end
