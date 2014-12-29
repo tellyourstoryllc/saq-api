@@ -195,6 +195,16 @@ class MobileNotifier
     create_android_notifications(alert, custom_data)
   end
 
+  def notify_new_friend(friend, mutual)
+    return if friend.id == user.id
+
+    alert = "#{friend.public_username || 'Somebody'} just friended you#{' back' if mutual}!"
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
+
   def notify_forward(message, actor)
     return if message.user_id == actor.id
 

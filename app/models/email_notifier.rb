@@ -212,4 +212,19 @@ class EmailNotifier
   def notify_widget!
     AccountMailer.widget_tutorial(user).deliver!
   end
+
+  def notify_new_friend(friend, mutual)
+    return if friend.id == user.id
+
+    if Settings.enabled?(:queue)
+      UserMailerNewFriendWorker.perform_async(user.id, friend.id, mutual)
+    else
+      notify_new_friend!(user, friend, mutual)
+    end
+  end
+
+  def notify_new_friend!(user, friend, mutual)
+    return if friend.id == user.id
+    UserMailer.new_friend(user, friend, mutual).deliver!
+  end
 end

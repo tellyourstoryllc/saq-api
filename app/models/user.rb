@@ -349,6 +349,16 @@ class User < ActiveRecord::Base
     end
   end
 
+  def send_new_friend_notifications(friend)
+    mutual = friend_ids.include?(friend.id)
+
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_new_friend(friend, mutual)
+    else
+      email_notifier.notify_new_friend(friend, mutual)
+    end
+  end
+
   def send_widget_notifications
     return if !ios_devices.exists? || widget_notification_info['received']
 
@@ -699,11 +709,12 @@ class User < ActiveRecord::Base
     today.year - birthday.year - ((today.month > birthday.month || (today.month == birthday.month && today.day >= birthday.day)) ? 0 : 1)
   end
 
+  # Returns true if the other user was not yet a friend
   def add_friend(user)
     is_follower = user.friend_ids.include?(id)
 
     redis.multi do
-      friend_ids << user.id
+      @newly_added = friend_ids.add(user.id)
       user.follower_ids << id
       pending_friend_ids.delete(user.id)
 
@@ -712,6 +723,8 @@ class User < ActiveRecord::Base
         user.all_time_friend_request_ids << id
       end
     end
+
+    @newly_added.value
   end
 
   def remove_friends(users)

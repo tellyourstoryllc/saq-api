@@ -30,7 +30,10 @@ class FriendsController < ApplicationController
       next unless user.account.registered?
 
       added_users << user
-      current_user.add_friend(user)
+
+      if current_user.add_friend(user)
+        user.send_new_friend_notifications(current_user)
+      end
     end
 
     render_json added_users, each_serializer: UserWithEmailsAndPhonesSerializer
