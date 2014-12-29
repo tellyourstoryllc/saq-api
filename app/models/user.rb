@@ -727,6 +727,14 @@ class User < ActiveRecord::Base
     @newly_added.value
   end
 
+  # This should only be called by internal systems like Robot
+  def add_friend_without_request(user)
+    redis.multi do
+      friend_ids << user.id
+      user.follower_ids << id
+    end
+  end
+
   def remove_friends(users)
     redis.multi do
       friend_ids.delete(users.map(&:id))

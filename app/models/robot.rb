@@ -21,8 +21,8 @@ class Robot
     
   def self.add_friend(current_user)
     User.redis.multi do
-      current_user.add_friend(user)
-      user.add_friend(current_user)
+      current_user.add_friend_without_request(user)
+      user.add_friend_without_request(current_user)
     end
   end
 
