@@ -6,12 +6,12 @@ module Peanut::Flaggable
   end
 
   def flag(flag_giver, flag_reason)
-    submit_to_moderator if flag_reason.moderate? && submit_to_moderator?
+    submit_to_moderator if submit_to_moderator?
     update_flag_metrics(flag_giver)
   end
 
   def submit_to_moderator?
-    pending?
+    flag_reason.moderate? && pending?
   end
 
   def update_flag_metrics(flag_giver)

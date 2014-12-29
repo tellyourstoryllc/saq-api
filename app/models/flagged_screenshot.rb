@@ -15,9 +15,8 @@ class FlaggedScreenshot < ActiveRecord::Base
   mount_uploader :image, FlaggedScreenshotUploader
 
 
-  def flag(flag_giver)
-    submit_to_moderator if submit_to_moderator?
-    update_flag_metrics(flag_giver)
+  def submit_to_moderator?
+    pending?
   end
 
 
