@@ -12,7 +12,7 @@ class PublicFeed
 
 
   def self.results_expiration
-    1.hour
+    5.minutes
   end
 
   def users_key
