@@ -6,7 +6,7 @@
 #     actually see.
 #   #moderation_description that returns a string displayed to moderators
 #   #moderation_type that returns either :photo or :video. default: :photo
-#   #moderation_increment_flags_censored? that areturns either true or false
+#   #moderation_increment_flags_censored? that returns either true or false
 #
 # Preconditions:
 #   #status must == 'pending' in order to submit to the moderator for reviewing.
