@@ -338,7 +338,7 @@ class Story < Message
   def censor!
     attrs['status'] = self.status = 'censored'
     check_last_public_story
-    user.add_censored_object(self)
+    add_censored_object
     increment_flags_censored
   end
 
@@ -385,7 +385,7 @@ class Story < Message
 
   def check_censor_level
     if user.censor_critical?
-      censor!
+      auto_censor!
     elsif user.censor_warning?
       submit_to_moderator
     end

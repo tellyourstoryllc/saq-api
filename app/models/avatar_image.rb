@@ -52,11 +52,7 @@ class AvatarImage < ActiveRecord::Base
   end
 
   def check_censor_critical
-    censor! if user.censor_critical?
+    auto_censor! if user.censor_critical?
     true
-  end
-
-  def add_censored_object
-    user.add_censored_object(self)
   end
 end

@@ -104,4 +104,13 @@ module Peanut::SubmittedForYourApproval
       end
     end
   end
+
+  def auto_censor!
+    @auto_censored = true
+    censor!
+  end
+
+  def add_censored_object
+    user.add_censored_object(self) unless @auto_censored
+  end
 end
