@@ -1,5 +1,5 @@
 class StorySerializer < MessageSerializer
-  attributes :snapchat_media_id, :latitude, :longitude, :source, :permission
+  attributes :snapchat_media_id, :latitude, :longitude, :source, :permission, :has_face
 
   def latitude
     latitude = object.latitude
