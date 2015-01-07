@@ -15,7 +15,8 @@ class FayePublisher
       ext: ext.merge(token: token, server_secret: SECRET)
     }
 
-    HTTParty.post(ENDPOINT, body: {message: message.to_json})
+    # Skip publishing when developing and the local Faye server isn't up
+    HTTParty.post(ENDPOINT, body: {message: message.to_json}) unless (Rails.env.development? || Rails.env.test?) && !HTTParty.head(FayePublisher::ENDPOINT) rescue nil
   end
 
   def broadcast_to_contacts
