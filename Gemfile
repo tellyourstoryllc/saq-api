@@ -61,3 +61,7 @@ gem 'phony'
 gem 'daemons', '1.1.9'
 gem 'globalize', '~> 4.0.1'
 gem 'kaminari'
+
+gem 'typhoeus', '0.7.0'
+gem 'elasticsearch-model', '0.1.6'
+gem 'elasticsearch-rails', '0.1.6'
