@@ -44,3 +44,5 @@ module KrazyChat
     config.autoload_paths += %W(#{config.root}/lib)
   end
 end
+
+require 'elasticsearch/rails/instrumentation'
