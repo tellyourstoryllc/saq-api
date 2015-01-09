@@ -42,6 +42,36 @@ bundle exec unicorn -c config/unicorn.rb
 ```
 
 
+
+## Add Static Data
+
+Import emoticons:
+
+```ruby
+Emoticon.reload
+```
+
+Create robot user:
+
+```ruby
+robot_username = 'teamsnapcracklepop'; Robot.class_eval{ def self.username; 'foo' end }; Account.create!(registered: true, password: STDIN.noecho(&:gets).chomp, user_attributes: {username: robot_username}, emails_attributes: [{email: 'bot@snap.io'}])
+```
+
+Create mobile push apps:
+
+```ruby
+Rpush::Apns::App.create!(name: 'snap_ios', certificate: File.read('/path/to/apn_snap_prod.pem'), environment: 'production', connections: 5)
+```
+
+Insert flag reasons:
+
+```sql
+INSERT INTO flag_reasons (`text`, moderate, created_at, updated_at) VALUES ('Nudity or sexual content', 1, NOW(), NOW());
+INSERT INTO flag_reasons (`text`, moderate, created_at, updated_at) VALUES ('Offensive content', 0, NOW(), NOW());
+```
+
+
+
 ## Tests
 
 Copy dev db schema to test db:
@@ -67,6 +97,7 @@ And in another tab:
 ```shell
 testdrb test/**/*_test.rb
 ```
+
 
 ## Admin
 
