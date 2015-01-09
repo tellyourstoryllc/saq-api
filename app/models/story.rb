@@ -2,8 +2,19 @@ class Story < Message
   include Peanut::CommentsCollection
   include Peanut::Flaggable
   include Peanut::SubmittedForYourApproval
+  include Peanut::Search
 
   validate :valid_permission?
+
+  # For some reason, this isn't inherited from Message > Peanut::Search
+  index_name Rails.configuration.app['app_name_short'].downcase
+
+  # Define fields we want searchable in Elasticsearch, and how they're analyzed
+  mappings dynamic: 'false' do
+    indexes :id, type: 'string', index: 'no'
+    indexes :created_at, type: 'date', format: 'date_time_no_millis'
+    indexes :tags, type: 'string', analyzer: 'english'
+  end
 
 
   def initialize(attributes = {})
@@ -340,6 +351,10 @@ class Story < Message
     check_last_public_story
     add_censored_object
     increment_flags_censored
+  end
+
+  def as_indexed_json(options = {})
+    StorySearchSerializer.new(self).as_json
   end
 
 
