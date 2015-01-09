@@ -70,6 +70,14 @@ INSERT INTO flag_reasons (`text`, moderate, created_at, updated_at) VALUES ('Nud
 INSERT INTO flag_reasons (`text`, moderate, created_at, updated_at) VALUES ('Offensive content', 0, NOW(), NOW());
 ```
 
+In nanny console:
+
+```ruby
+Client.new(name: 'knowme').save
+```
+
+Copy the nanny client token to the "moderator.token" knowme config.
+
 
 
 ## Tests
