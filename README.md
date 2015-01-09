@@ -54,13 +54,13 @@ Emoticon.reload
 Create robot user:
 
 ```ruby
-robot_username = 'teamsnapcracklepop'; Robot.class_eval{ def self.username; 'foo' end }; Account.create!(registered: true, password: STDIN.noecho(&:gets).chomp, user_attributes: {username: robot_username}, emails_attributes: [{email: 'bot@snap.io'}])
+robot_username = 'teamknowme'; Robot.class_eval{ def self.username; 'foo' end }; Account.create!(registered: true, password: STDIN.noecho(&:gets).chomp, user_attributes: {username: robot_username}, emails_attributes: [{email: 'bot@know.me'}])
 ```
 
 Create mobile push apps:
 
 ```ruby
-Rpush::Apns::App.create!(name: 'snap_ios', certificate: File.read('/path/to/apn_snap_prod.pem'), environment: 'production', connections: 5)
+Rpush::Apns::App.create!(name: 'knowme_ios', certificate: File.read('/path/to/apn_knowme_prod.pem'), environment: 'production', connections: 5)
 ```
 
 Insert flag reasons:
