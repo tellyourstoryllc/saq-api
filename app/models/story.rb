@@ -77,6 +77,7 @@ class Story < Message
 
     user.update_last_public_story(self)
     check_censor_level
+    add_to_elasticsearch
 
     true
   end
@@ -404,5 +405,9 @@ class Story < Message
     elsif user.censor_warning?
       submit_to_moderator
     end
+  end
+
+  def add_to_elasticsearch
+    __elasticsearch__.index_document if allowed_in_public_feed?
   end
 end
