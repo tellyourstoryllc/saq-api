@@ -354,6 +354,11 @@ class Story < Message
     increment_flags_censored
   end
 
+  def tags
+    text = attachment_overlay_text
+    text.present? ? text.scan(/#([\w-]+)/).flatten : []
+  end
+
   def as_indexed_json(options = {})
     StorySearchSerializer.new(self).as_json
   end
