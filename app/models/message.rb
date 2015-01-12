@@ -223,6 +223,9 @@ class Message
   end
 
   def send_forward_meta_messages
+    # Disable for now
+    return
+
     return if forward_message.nil?
 
     attrs = {attachment_content_type: 'meta/forward', actor_id: user.id}
