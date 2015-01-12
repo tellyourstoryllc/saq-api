@@ -377,10 +377,17 @@ class Message
   end
 
   def save_message_attachment_overlay
-    return unless @message_attachment && attachment_overlay_file.present?
+    return unless @message_attachment
+    
+    if attachment_overlay_file.present?
+      @message_attachment_overlay = MessageAttachmentOverlay.new(message_id: id, message: self, overlay: attachment_overlay_file)
+      @message_attachment_overlay.save!
+    elsif forward_message && forward_message.attachment_overlay_url.present?
+      @message_attachment_overlay = MessageAttachmentOverlay.new(message_id: id, message: self, remote_overlay_url: forward_message.attachment_overlay_url)
+      @message_attachment_overlay.save!
 
-    @message_attachment_overlay = MessageAttachmentOverlay.new(message_id: id, message: self, overlay: attachment_overlay_file)
-    @message_attachment_overlay.save!
+      self.attachment_overlay_text = forward_message.attachment_overlay_text
+    end
   end
 
   def write_attrs
