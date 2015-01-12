@@ -208,6 +208,7 @@ class Story < Message
 
     # Update permission
     pushed_user_ids = update_permission(permission)
+    update_on_elasticsearch
 
     pushed_user_ids
   end
@@ -414,5 +415,9 @@ class Story < Message
 
   def add_to_elasticsearch
     __elasticsearch__.index_document if allowed_in_public_feed?
+  end
+
+  def update_on_elasticsearch
+    __elasticsearch__.update_document_attributes(tags: tags)
   end
 end
