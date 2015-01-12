@@ -364,6 +364,31 @@ class Story < Message
     StorySearchSerializer.new(self).as_json
   end
 
+  def self.search_by_tag(tag, search_options = {})
+    request = {query: {match: {tags: tag}}}
+
+    options = {}
+    options[:size] = (search_options[:limit].presence || 20).to_i
+    options[:size] = 1 if options[:size] <= 0
+    options[:size] = 200 if options[:size] > 200
+    options[:from] = search_options[:offset].to_i
+
+    # Set a hard cap of 1000 total results through paging,
+    # since performance can suffer due to the shards being distributed
+    total = options[:size] + options[:from]
+    options[:size] = [1000 - options[:from], 0].max if total > 1000
+
+    results = search(request, options)
+
+    story_ids = results.map(&:_id)
+    return [] if story_ids.empty?
+
+    stories = Story.pipelined_find(story_ids)
+    users = User.includes(:account, :avatar_image, :avatar_video).where(id: stories.map(&:user_id).uniq)
+
+    stories + users
+  end
+
 
   private
 
