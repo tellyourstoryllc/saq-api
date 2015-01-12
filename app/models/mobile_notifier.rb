@@ -123,8 +123,6 @@ class MobileNotifier
       end
     end
 
-    add_to_imported_snaps_digest(message) if handle_digest
-
     # Update digest info
 #    if notified && notification_type == :all
 #      user.mobile_digests_sent.incr
