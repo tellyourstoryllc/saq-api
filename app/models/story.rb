@@ -15,7 +15,7 @@ class Story < Message
   def self.redis_prefix; 'message' end
 
   # Disable some message functionality
-  def forward_message_id=(*args); end
+  #def forward_message_id=(*args); end
   def send_forward_meta_messages(*args); end
   def send_like_meta_messages(*args); end
   def send_export_meta_messages(*args); end
