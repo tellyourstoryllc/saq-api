@@ -316,6 +316,8 @@ class Story < Message
     FriendStoriesList.new(id: user.id).message_ids.delete(id)
     MyStoriesList.new(id: user.id).message_ids.delete(id)
 
+    delete_from_elasticsearch
+
     attrs.del
 
     check_last_public_story
@@ -444,5 +446,9 @@ class Story < Message
 
   def update_on_elasticsearch
     __elasticsearch__.update_document_attributes(tags: tags)
+  end
+
+  def delete_from_elasticsearch
+    __elasticsearch__.delete_document
   end
 end
