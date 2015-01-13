@@ -441,14 +441,14 @@ class Story < Message
   end
 
   def add_to_elasticsearch
-    __elasticsearch__.index_document if allowed_in_public_feed?
+    ES.index(self) if allowed_in_public_feed?
   end
 
   def update_on_elasticsearch
-    __elasticsearch__.update_document_attributes(tags: tags)
+    ES.update_attributes(self, tags: tags)
   end
 
   def delete_from_elasticsearch
-    __elasticsearch__.delete_document
+    ES.delete(self)
   end
 end
