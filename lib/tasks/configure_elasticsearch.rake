@@ -9,7 +9,7 @@ namespace :elasticsearch do
 
 
     # Set/update all models' mappings
-    models = []
+    models = [Story]
 
     models.each do |model|
       ES.es_req(:put, "/#{ES.index_name}/_mapping/#{model.document_type}", {}, model.mappings.to_hash)

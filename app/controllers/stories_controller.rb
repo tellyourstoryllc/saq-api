@@ -48,6 +48,10 @@ class StoriesController < ApplicationController
     end
   end
 
+  def tagged
+    render_json Story.search_by_tag(params[:tag], pagination_params)
+  end
+
 
   private
 

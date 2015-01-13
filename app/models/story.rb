@@ -2,8 +2,19 @@ class Story < Message
   include Peanut::CommentsCollection
   include Peanut::Flaggable
   include Peanut::SubmittedForYourApproval
+  include Peanut::Search
 
   validate :valid_permission?
+
+  # For some reason, this isn't inherited from Message > Peanut::Search
+  index_name Rails.configuration.app['app_name_short'].downcase
+
+  # Define fields we want searchable in Elasticsearch, and how they're analyzed
+  mappings dynamic: 'false' do
+    indexes :id, type: 'string', index: 'no'
+    indexes :created_at, type: 'date', format: 'date_time_no_millis'
+    indexes :tags, type: 'string', analyzer: 'english'
+  end
 
 
   def initialize(attributes = {})
@@ -66,6 +77,7 @@ class Story < Message
 
     user.update_last_public_story(self)
     check_censor_level
+    add_to_elasticsearch
 
     true
   end
@@ -196,6 +208,7 @@ class Story < Message
 
     # Update permission
     pushed_user_ids = update_permission(permission)
+    update_on_elasticsearch
 
     pushed_user_ids
   end
@@ -303,6 +316,8 @@ class Story < Message
     FriendStoriesList.new(id: user.id).message_ids.delete(id)
     MyStoriesList.new(id: user.id).message_ids.delete(id)
 
+    delete_from_elasticsearch
+
     attrs.del
 
     check_last_public_story
@@ -340,6 +355,40 @@ class Story < Message
     check_last_public_story
     add_censored_object
     increment_flags_censored
+  end
+
+  def tags
+    text = attachment_overlay_text
+    text.present? ? text.scan(/#([\w-]+)/).flatten : []
+  end
+
+  def as_indexed_json(options = {})
+    StorySearchSerializer.new(self).as_json
+  end
+
+  def self.search_by_tag(tag, search_options = {})
+    request = {query: {match: {tags: tag}}}
+
+    options = {}
+    options[:size] = (search_options[:limit].presence || 20).to_i
+    options[:size] = 1 if options[:size] <= 0
+    options[:size] = 200 if options[:size] > 200
+    options[:from] = search_options[:offset].to_i
+
+    # Set a hard cap of 1000 total results through paging,
+    # since performance can suffer due to the shards being distributed
+    total = options[:size] + options[:from]
+    options[:size] = [1000 - options[:from], 0].max if total > 1000
+
+    results = search(request, options)
+
+    story_ids = results.map(&:_id)
+    return [] if story_ids.empty?
+
+    stories = Story.pipelined_find(story_ids)
+    users = User.includes(:account, :avatar_image, :avatar_video).where(id: stories.map(&:user_id).uniq)
+
+    stories + users
   end
 
 
@@ -389,5 +438,17 @@ class Story < Message
     elsif user.censor_warning?
       submit_to_moderator
     end
+  end
+
+  def add_to_elasticsearch
+    __elasticsearch__.index_document if allowed_in_public_feed?
+  end
+
+  def update_on_elasticsearch
+    __elasticsearch__.update_document_attributes(tags: tags)
+  end
+
+  def delete_from_elasticsearch
+    __elasticsearch__.delete_document
   end
 end
