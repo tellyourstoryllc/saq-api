@@ -79,6 +79,13 @@ Client.new(name: 'knowme').save
 Copy the nanny client token to the "moderator.token" knowme config.
 
 
+Create the one app-level index if it doesn't yet exist (# of shards can never be changed!), and set/update all models' field mappings:
+
+```shell
+bundle exec rake elasticsearch:configure
+```
+
+
 
 ## Tests
 

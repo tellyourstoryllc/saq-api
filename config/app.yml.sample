@@ -19,6 +19,8 @@ development:
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
     config_prefix: knowme
+  elasticsearch:
+    url: http://127.0.0.1:9200
   facebook:
     app_access_token: TOKEN
   faye:
@@ -78,6 +80,8 @@ test:
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
     config_prefix: knowme
+  elasticsearch:
+    url: http://127.0.0.1:9200
   facebook:
     app_access_token: TOKEN
   faye:
