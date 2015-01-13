@@ -380,6 +380,7 @@ class Story < Message
     total = options[:size] + options[:from]
     options[:size] = [1000 - options[:from], 0].max if total > 1000
 
+    # Send request to Elasticsearch
     results = search(request, options)
 
     story_ids = results.map(&:_id)
