@@ -29,6 +29,13 @@ brew install redis
 # Start redis-server however you like
 ```
 
+Install Elasticsearch:
+
+```shell
+brew install elasticsearch
+# Start elasticsearch however you like
+```
+
 Install gems:
 
 ```shell
