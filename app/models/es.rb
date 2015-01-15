@@ -27,7 +27,11 @@ class ES
   end
 
   def self.update_attributes!(object, update_attrs)
-    object.__elasticsearch__.update_document_attributes(update_attrs)
+    if object.indexed_in_es?
+      object.__elasticsearch__.update_document_attributes(update_attrs)
+    else
+      index!(object)
+    end
   end
 
   def self.delete(object)
