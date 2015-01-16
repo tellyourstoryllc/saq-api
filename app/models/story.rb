@@ -13,6 +13,10 @@ class Story < Message
   mappings dynamic: 'false' do
     indexes :id, type: 'string', index: 'no'
     indexes :created_at, type: 'date', format: 'date_time_no_millis'
+    indexes :permission, type: 'string', index: 'not_analyzed'
+    indexes :source, type: 'string', index: 'not_analyzed'
+    indexes :status, type: 'string', index: 'not_analyzed'
+    indexes :has_face, type: 'boolean', index: 'not_analyzed'
     indexes :tags, type: 'string', analyzer: 'english'
   end
 
@@ -77,7 +81,7 @@ class Story < Message
 
     user.update_last_public_story(self)
     check_censor_level
-    add_to_elasticsearch
+    index_on_elasticsearch
 
     true
   end
@@ -208,7 +212,7 @@ class Story < Message
 
     # Update permission
     pushed_user_ids = update_permission(permission)
-    update_on_elasticsearch
+    index_on_elasticsearch
 
     pushed_user_ids
   end
@@ -343,11 +347,13 @@ class Story < Message
   def review!
     attrs['status'] = self.status = 'review'
     check_last_public_story
+    update_on_elasticsearch(status: status)
   end
 
   def approve!
     attrs['status'] = self.status = 'normal'
     check_last_public_story
+    update_on_elasticsearch(status: status)
   end
 
   def censor!
@@ -355,6 +361,7 @@ class Story < Message
     check_last_public_story
     add_censored_object
     increment_flags_censored
+    update_on_elasticsearch(status: status)
   end
 
   def tags
@@ -367,7 +374,30 @@ class Story < Message
   end
 
   def self.search_by_tag(tag, search_options = {})
-    request = {query: {match: {tags: tag}}}
+    request = {
+      query: {
+        filtered: {
+          filter: {
+            bool: {
+              must: [
+                {term: {permission: 'public'}},
+                {term: {source: 'camera'}},
+                {term: {has_face: true}}
+              ],
+              must_not: [
+                {terms: {status: %w(review censored)}}
+              ]
+            }
+          },
+
+          query: {
+            match: {
+              tags: tag
+            }
+          }
+        }
+      }
+    }
 
     options = {}
     options[:size] = (search_options[:limit].presence || 20).to_i
@@ -441,12 +471,12 @@ class Story < Message
     end
   end
 
-  def add_to_elasticsearch
-    ES.index(self) if allowed_in_public_feed?
+  def index_on_elasticsearch
+    ES.index(self)
   end
 
-  def update_on_elasticsearch
-    ES.update_attributes(self, tags: tags)
+  def update_on_elasticsearch(update_attrs)
+    ES.update_attributes(self, update_attrs)
   end
 
   def delete_from_elasticsearch
