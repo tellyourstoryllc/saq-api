@@ -60,10 +60,6 @@ class UserSerializer < ActiveModel::Serializer
     end
   end
 
-  def include_friend_code?
-    owner?
-  end
-
 
   private
 
