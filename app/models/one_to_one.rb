@@ -5,8 +5,6 @@ class OneToOne
 
   attr_accessor :fetched_message_ids_count
 
-  validate :outgoing_friend_or_contact?
-
 
   def save
     return unless valid?
@@ -70,13 +68,6 @@ class OneToOne
 
   def not_blocked?
     errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") if blocked?
-  end
-
-  def outgoing_friend_or_contact?
-    return if [sender.id, recipient.id].include?(Robot.user.id)
-
-    other_user = other_user(creator)
-    errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") unless creator.outgoing_friend_or_contact?(other_user)
   end
 
   def write_attrs

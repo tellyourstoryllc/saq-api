@@ -3,59 +3,6 @@ require "test_helper"
 describe MessagesController do
   describe "POST /messages/create" do
     describe "new 1-1" do
-      it "must not create a message for a new 1-1 if sender is not allowed (no relationship)" do
-        member = FactoryGirl.create(:registered_user)
-        one_to_one_id = OneToOne.id_for_user_ids(current_user.id, member.id)
-        text = 'hey'
-
-        post :create, {one_to_one_ids: one_to_one_id, text: text, token: current_user.token}
-
-        result.must_equal []
-
-        current_user.one_to_one_ids.members.wont_include one_to_one_id
-        current_user.one_to_one_user_ids.members.wont_include member.id
-
-        member.one_to_one_ids.members.wont_include one_to_one_id
-        member.one_to_one_user_ids.members.wont_include current_user.id
-      end
-
-      it "must not create a message for a new 1-1 if sender is not allowed (recipient has sender in contacts)" do
-        member = FactoryGirl.create(:registered_user)
-        ContactInviter.add_user(member, current_user)
-
-        one_to_one_id = OneToOne.id_for_user_ids(current_user.id, member.id)
-        text = 'hey'
-
-        post :create, {one_to_one_ids: one_to_one_id, text: text, token: current_user.token}
-
-        result.must_equal []
-
-        current_user.one_to_one_ids.members.wont_include one_to_one_id
-        current_user.one_to_one_user_ids.members.wont_include member.id
-
-        member.one_to_one_ids.members.wont_include one_to_one_id
-        member.one_to_one_user_ids.members.wont_include current_user.id
-      end
-
-      it "must not create a message for a new 1-1 if sender is not allowed (recipient added sender as contact and friend)" do
-        member = FactoryGirl.create(:registered_user)
-        ContactInviter.add_user(member, current_user)
-        member.add_friend(current_user)
-
-        one_to_one_id = OneToOne.id_for_user_ids(current_user.id, member.id)
-        text = 'hey'
-
-        post :create, {one_to_one_ids: one_to_one_id, text: text, token: current_user.token}
-
-        result.must_equal []
-
-        current_user.one_to_one_ids.members.wont_include one_to_one_id
-        current_user.one_to_one_user_ids.members.wont_include member.id
-
-        member.one_to_one_ids.members.wont_include one_to_one_id
-        member.one_to_one_user_ids.members.wont_include current_user.id
-      end
-
       it "must create a message for a new 1-1 if sender is allowed (sender added recipient as contact)" do
         member = FactoryGirl.create(:registered_user)
         ContactInviter.add_user(current_user, member)
