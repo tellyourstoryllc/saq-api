@@ -83,7 +83,7 @@ class UsersController < ApplicationController
     contact_inviter.facebook_autoconnect
 
     # Add robot as a contact and send initial messages
-    Robot.set_up_new_user(@current_user)
+    #Robot.set_up_new_user(@current_user)
 
     # Assign whether or not the user should get new user drip notifications
     # and if so, schedule them all

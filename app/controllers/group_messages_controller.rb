@@ -24,7 +24,7 @@ class GroupMessagesController < ApplicationController
         mixpanel.daily_message_events(@message)
       end
 
-      Robot.reply_to(current_user, @message)
+      #Robot.reply_to(current_user, @message)
 
       render_json @message
     else
