@@ -5,10 +5,13 @@ module Peanut::Flaggable
   included do
     set :flagger_ids
     set :initial_flagger_ids
+    attr_accessor :flag_reason
   end
 
   def flag(flag_giver, flag_reason)
     return if bad_flagger?(flag_giver)
+
+    self.flag_reason = flag_reason
 
     submit_to_moderator if submit_to_moderator?
     update_flag_metrics(flag_giver)
