@@ -16,7 +16,7 @@ __________________________________________________
 Update the db to *not* add all new columns as utf8mb4:
 
 ```sql
-ALTER DATABASE knowme_dev DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER DATABASE saq_dev DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ```
 __________________________________________________
 
@@ -32,14 +32,6 @@ Install Redis (>= 2.8.17) if not already installed:
 ```shell
 brew install redis
 # Start redis-server however you like
-```
-__________________________________________________
-
-Install Elasticsearch:
-
-```shell
-brew install elasticsearch
-# Start elasticsearch however you like
 ```
 __________________________________________________
 
@@ -61,52 +53,20 @@ __________________________________________________
 
 ## Add Static Data
 
-Import emoticons:
-
-```ruby
-Emoticon.reload
-```
-__________________________________________________
-
-Create robot user:
-
-```ruby
-robot_username = 'teamknowme'; Robot.class_eval{ def self.username; 'foo' end }; Account.create!(registered: true, password: STDIN.noecho(&:gets).chomp, user_attributes: {username: robot_username}, emails_attributes: [{email: 'bot@know.me'}])
-```
-__________________________________________________
-
 Create mobile push apps:
 
 ```ruby
-Rpush::Apns::App.create!(name: 'knowme_ios', certificate: File.read('/path/to/apn_knowme_prod.pem'), environment: 'production', connections: 5)
-```
-__________________________________________________
-
-Insert flag reasons:
-
-```sql
-INSERT INTO flag_reasons (`text`, moderate, created_at, updated_at) VALUES ('Nudity or sexual content', 1, NOW(), NOW());
-INSERT INTO flag_reasons (`text`, moderate, created_at, updated_at) VALUES ('Offensive content', 0, NOW(), NOW());
+Rpush::Apns::App.create!(name: 'saq_ios', certificate: File.read('/path/to/apn_saq_prod.pem'), environment: 'production', connections: 5)
 ```
 __________________________________________________
 
 In nanny console:
 
 ```ruby
-Client.new(name: 'knowme').save
+Client.new(name: 'saq').save
 ```
 
-Copy the nanny client token to the "moderator.token" knowme config.
-__________________________________________________
-
-
-Create the one app-level index if it doesn't yet exist (# of shards can never be changed!), and set/update all models' field mappings.
-
-Note: Run this every time one of the model's mappings change. When in doubt, run it.
-
-```shell
-bundle exec rake elasticsearch:configure
-```
+Copy the nanny client token to the "moderator.token" saq config.
 __________________________________________________
 
 

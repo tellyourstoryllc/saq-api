@@ -6,8 +6,8 @@ development:
     url: http://localhost:3009
     request_secret: SECRET
     signature_secret: SECRET
-  app_name: KnowMe
-  app_name_short: KnowMe
+  app_name: Sexual Abuse Quilt
+  app_name_short: SAQ
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -18,7 +18,7 @@ development:
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
-    config_prefix: knowme
+    config_prefix: saq
   elasticsearch:
     url: http://127.0.0.1:9200
   facebook:
@@ -39,10 +39,10 @@ development:
     callback_url: http://localhost:3009/moderation/callback
     token: d7029248789018e3-2
 
-  robot_username: teamknowme
+  robot_username: teamsaq
   rpush:
-    db_ios_app_name: knowme_ios
-    db_android_app_name: knowme_android
+    db_ios_app_name: saq_ios
+    db_android_app_name: saq_android
   redis:
     persisted:
       host: 127.0.0.1
@@ -54,7 +54,7 @@ development:
     domain: know.me
   statsd:
     server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
-    prefix: knowme
+    prefix: saq
   web:
     domain: localhost:3002
     url: http://localhost:3002
@@ -67,8 +67,8 @@ test:
     url: http://localhost:3009
     request_secret: SECRET
     signature_secret: SECRET
-  app_name: KnowMe
-  app_name_short: KnowMe
+  app_name: Sexual Abuse Quilt
+  app_name_short: saq
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -79,7 +79,7 @@ test:
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
-    config_prefix: knowme
+    config_prefix: saq
   elasticsearch:
     url: http://127.0.0.1:9200
   facebook:
@@ -100,7 +100,7 @@ test:
     callback_url: http://localhost:3009/moderation/callback
     token: d7029248789018e3-2
 
-  robot_username: teamknowme
+  robot_username: teamsaq
   rpush:
     db_ios_app_name: ~
     db_android_app_name: ~
@@ -115,7 +115,7 @@ test:
     domain: know.me
   statsd:
     server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
-    prefix: knowme
+    prefix: saq
   web:
     domain: test.host
     url: http://test.host
