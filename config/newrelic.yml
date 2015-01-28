@@ -42,7 +42,7 @@ common: &default_settings
   #       - Ajax Service
   #       - All Services
   #
-  app_name: Snap
+  app_name: SAQ
 
   # When "true", the agent collects performance data about your
   # application and reports this data to the New Relic service at
@@ -226,10 +226,10 @@ production:
 testing:
   <<: *default_settings
   monitor_mode: true
-  app_name: Snap (Testing)
+  app_name: SAQ (Testing)
 
 staging:
   <<: *default_settings
   #monitor_mode: true
   monitor_mode: false
-  app_name: Snap (Staging)
+  app_name: SAQ (Staging)
