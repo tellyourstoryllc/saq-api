@@ -34,7 +34,7 @@ Spork.prefork do
 
       stub_request(:any, Rails.configuration.app['faye']['url'])
       stub_request(:any, /#{Rails.configuration.app['moderator']['url']}/)
-      stub_request(:any, /#{Rails.configuration.app['elasticsearch']['url']}/)
+      #stub_request(:any, /#{Rails.configuration.app['elasticsearch']['url']}/)
       stub_request(:any, /mixpanel.com/)
       stub_request(:any, /facebook.com/)
       stub_request(:any, /amazonaws.com/)

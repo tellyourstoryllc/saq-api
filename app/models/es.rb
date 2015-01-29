@@ -7,6 +7,8 @@ class ES
 
 
   def self.index(object)
+    return
+
     if Settings.enabled?(:queue)
       ElasticsearchWorker.perform_async(:index, object.class.to_s, object.id)
     else
@@ -15,10 +17,14 @@ class ES
   end
 
   def self.index!(object)
+    return
+
     object.__elasticsearch__.index_document
   end
 
   def self.update_attributes(object, update_attrs)
+    return
+
     if Settings.enabled?(:queue)
       ElasticsearchWorker.perform_async(:update_attributes, object.class.to_s, object.id, update_attrs)
     else
@@ -27,6 +33,8 @@ class ES
   end
 
   def self.update_attributes!(object, update_attrs)
+    return
+
     if object.indexed_in_es?
       object.__elasticsearch__.update_document_attributes(update_attrs)
     else
@@ -35,6 +43,8 @@ class ES
   end
 
   def self.delete(object)
+    return
+
     if Settings.enabled?(:queue)
       ElasticsearchWorker.perform_async(:delete, object.class.to_s, object.id)
     else
@@ -43,6 +53,8 @@ class ES
   end
 
   def self.delete!(object)
+    return
+
     object.__elasticsearch__.delete_document
   end
 end

@@ -10,15 +10,15 @@ class Story < Message
   index_name Rails.configuration.app['app_name_short'].downcase
 
   # Define fields we want searchable in Elasticsearch, and how they're analyzed
-  mappings dynamic: 'false' do
-    indexes :id, type: 'string', index: 'no'
-    indexes :created_at, type: 'date', format: 'date_time_no_millis'
-    indexes :permission, type: 'string', index: 'not_analyzed'
-    indexes :source, type: 'string', index: 'not_analyzed'
-    indexes :status, type: 'string', index: 'not_analyzed'
-    indexes :has_face, type: 'boolean', index: 'not_analyzed'
-    indexes :tags, type: 'string', analyzer: 'english'
-  end
+  #mappings dynamic: 'false' do
+  #  indexes :id, type: 'string', index: 'no'
+  #  indexes :created_at, type: 'date', format: 'date_time_no_millis'
+  #  indexes :permission, type: 'string', index: 'not_analyzed'
+  #  indexes :source, type: 'string', index: 'not_analyzed'
+  #  indexes :status, type: 'string', index: 'not_analyzed'
+  #  indexes :has_face, type: 'boolean', index: 'not_analyzed'
+  #  indexes :tags, type: 'string', analyzer: 'english'
+  #end
 
 
   def initialize(attributes = {})
