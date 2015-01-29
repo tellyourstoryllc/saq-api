@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.5.29, for osx10.8 (i386)
 --
--- Host: localhost    Database: knowme_dev
+-- Host: localhost    Database: saq_dev
 -- ------------------------------------------------------
 -- Server version	5.5.29
 
@@ -745,7 +745,7 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-12-29 12:42:39
+-- Dump completed on 2015-01-27 18:03:49
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -901,8 +901,6 @@ INSERT INTO schema_migrations (version) VALUES ('20140505144600');
 INSERT INTO schema_migrations (version) VALUES ('20140509161115');
 
 INSERT INTO schema_migrations (version) VALUES ('20140513214441');
-
-INSERT INTO schema_migrations (version) VALUES ('20140516224025');
 
 INSERT INTO schema_migrations (version) VALUES ('20140519222919');
 

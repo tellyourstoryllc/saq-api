@@ -3,7 +3,7 @@ development:
     username: USERNAME
     password: PASSWORD
   api:
-    url: http://localhost:3009
+    url: http://localhost:3010
     request_secret: SECRET
     signature_secret: SECRET
   app_name: Sexual Abuse Quilt
@@ -19,8 +19,6 @@ development:
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
     config_prefix: saq
-  elasticsearch:
-    url: http://127.0.0.1:9200
   facebook:
     app_access_token: TOKEN
   faye:
@@ -35,8 +33,8 @@ development:
 
   # Make sure to use https for both urls
   moderator:
-    url: http://localhost:3002
-    callback_url: http://localhost:3009/moderation/callback
+    url: http://localhost:3011
+    callback_url: http://localhost:3010/moderation/callback
     token: d7029248789018e3-2
 
   robot_username: teamsaq
@@ -46,12 +44,12 @@ development:
   redis:
     persisted:
       host: 127.0.0.1
-      port: 6385
+      port: 6387
       db: 0
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: know.me
+    domain: thesaq.org
   statsd:
     server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
     prefix: saq
@@ -64,7 +62,7 @@ test:
     username: USERNAME
     password: PASSWORD
   api:
-    url: http://localhost:3009
+    url: http://localhost:3010
     request_secret: SECRET
     signature_secret: SECRET
   app_name: Sexual Abuse Quilt
@@ -80,8 +78,6 @@ test:
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
     config_prefix: saq
-  elasticsearch:
-    url: http://127.0.0.1:9200
   facebook:
     app_access_token: TOKEN
   faye:
@@ -96,8 +92,8 @@ test:
 
   # Make sure to use https for both urls
   moderator:
-    url: http://localhost:3002
-    callback_url: http://localhost:3009/moderation/callback
+    url: http://localhost:3011
+    callback_url: http://localhost:3010/moderation/callback
     token: d7029248789018e3-2
 
   robot_username: teamsaq
@@ -107,7 +103,7 @@ test:
   redis:
     persisted:
       host: 127.0.0.1
-      port: 6385
+      port: 6387
       db: 10
   sendgrid:
     username: USERNAME
