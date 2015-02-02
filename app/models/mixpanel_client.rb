@@ -110,10 +110,10 @@ class MixpanelClient
     send_event = if last_checkin.nil?
                    true
                  else
-                   registered_at = user.account.registered_at
-                   time_since_registration = Time.current - registered_at
-                   days_since_registration = (time_since_registration / 24.hours).floor
-                   bucket_start = registered_at + days_since_registration.days
+                   time = user.account.registered_at.presence || user.created_at
+                   time_since = Time.current - time
+                   days_since = (time_since / 24.hours).floor
+                   bucket_start = time + days_since.days
                    last_checkin < bucket_start
                  end
 
