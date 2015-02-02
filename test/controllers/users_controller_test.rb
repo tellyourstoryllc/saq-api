@@ -3,19 +3,20 @@ require "test_helper"
 describe UsersController do
   describe "POST /users/create" do
     describe "invalid" do
-      it "must not create a user if it's invalid" do
-        post :create
-        old_count = User.count
-        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: User gender can't be blank."})
-        User.count.must_equal old_count
-      end
+      #it "must not create a user if it's invalid" do
+      #  post :create
+      #  old_count = User.count
+      #  result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: User gender can't be blank."})
+      #  User.count.must_equal old_count
+      #end
 
       it "must not create a user using Facebook authentication if the given Facebook id and token are not valid" do
         stub_request(:any, /.*facebook.com/).to_return(body: '{}')
 
         post :create, {username: 'JohnDoe', email: 'joe@example.com', facebook_id: '100002345', facebook_token: 'invalidtoken'}
         old_count = User.count
-        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Invalid Facebook credentials, User gender can't be blank."})
+        #result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Invalid Facebook credentials, User gender can't be blank."})
+        result.must_equal('error' => {'message' => "Sorry, that could not be saved: Validation failed: Invalid Facebook credentials."})
         User.count.must_equal old_count
       end
     end
