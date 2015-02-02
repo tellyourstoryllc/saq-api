@@ -67,6 +67,7 @@ module Peanut::SubmittedForYourApproval
         api_secret: Rails.configuration.app['api']['request_secret'],
       },
       description: description, info_url: info_url,
+      reject_reasons: VideoModerationRejectReason.active.as_json
     })
 
     if [200,201,202].include?(response.code)
