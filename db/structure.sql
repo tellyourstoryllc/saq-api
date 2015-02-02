@@ -735,6 +735,25 @@ CREATE TABLE `users` (
   KEY `for_feed` (`last_public_story_created_at`,`deactivated`,`uninstalled`,`censored_profile`,`gender`,`latitude`,`longitude`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `video_moderation_reject_reasons`
+--
+
+DROP TABLE IF EXISTS `video_moderation_reject_reasons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `video_moderation_reject_reasons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `message_to_user` text COLLATE utf8_unicode_ci,
+  `default_reason` tinyint(1) NOT NULL DEFAULT '0',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -989,3 +1008,5 @@ INSERT INTO schema_migrations (version) VALUES ('20141224162301');
 INSERT INTO schema_migrations (version) VALUES ('20141224165850');
 
 INSERT INTO schema_migrations (version) VALUES ('20141229174138');
+
+INSERT INTO schema_migrations (version) VALUES ('20150202210409');
