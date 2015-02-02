@@ -96,6 +96,13 @@ class ApplicationController < ActionController::Base
     I18n.locale = locale || I18n.default_locale
   end
 
+  def create_user
+    return if current_user || current_device.try(:user_id)
+
+    account = Account.create(user_attributes: {})
+    @current_user = account.user
+  end
+
   def create_or_update_device
     if ios_device_params[:device_id].present?
       IosDevice.create_or_assign!(current_user, ios_device_params)

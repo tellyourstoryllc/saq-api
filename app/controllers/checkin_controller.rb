@@ -1,5 +1,6 @@
 class CheckinController < ApplicationController
   skip_before_action :require_token, only: :index
+  prepend_before_action :create_user, only: :index
 
 
   def index
