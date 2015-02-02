@@ -79,9 +79,9 @@ class Story < Message
     saved = super
     return unless saved
 
-    user.update_last_public_story(self)
     check_censor_level
-    index_on_elasticsearch
+    user.update_last_public_story(self)
+    #index_on_elasticsearch
 
     true
   end
@@ -466,7 +466,8 @@ class Story < Message
   def check_censor_level
     if user.censor_critical?
       auto_censor!
-    elsif user.censor_warning?
+    #elsif user.censor_warning?
+    else
       submit_to_moderator
     end
   end
