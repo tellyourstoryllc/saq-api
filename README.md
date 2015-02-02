@@ -69,6 +69,15 @@ Client.new(name: 'saq').save
 Copy the nanny client token to the "moderator.token" saq config.
 __________________________________________________
 
+Insert video_moderation_reject_reasons:
+
+```sql
+INSERT INTO video_moderation_reject_reasons (title, message_to_user, default_reason, created_at, updated_at) VALUES ('Default', "Sorry, your video was not approved.", 1, NOW(), NOW());
+INSERT INTO video_moderation_reject_reasons (title, message_to_user, default_reason, created_at, updated_at) VALUES ('Too Dark', "Sorry, your video was not approved because we couldn't see you clearly. Please try again in a brighter location.", 0, NOW(), NOW());
+INSERT INTO video_moderation_reject_reasons (title, message_to_user, default_reason, created_at, updated_at) VALUES ('Too Noisy', "Sorry, your video was not approved. There was too much background noise to hear you clearly. Please try again in a quiet location.", 0, NOW(), NOW());
+```
+__________________________________________________
+
 
 
 ## Tests
