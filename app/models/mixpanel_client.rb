@@ -27,11 +27,13 @@ class MixpanelClient
 
     friends_count, friends_bot_included, set_initial_exists, initial_friends_in_app_count, initial_bot_included = User.redis.pipelined do
       user.friend_ids.size
-      user.friend_ids.include?(Robot.user.id)
+      #user.friend_ids.include?(Robot.user.id)
+      false
 
       user.set_initial_friend_ids_in_app.exists?
       user.initial_friend_ids_in_app.size
-      user.initial_friend_ids_in_app.include?(Robot.user.id)
+      #user.initial_friend_ids_in_app.include?(Robot.user.id)
+      false
     end
 
     if friends_count > 0
@@ -292,7 +294,7 @@ class MixpanelClient
     return {} if sender.blank?
 
     friend_ids = sender.friend_ids_in_app
-    friend_ids.delete(Robot.user.id)
+    #friend_ids.delete(Robot.user.id)
 
     {'Sender ID' => sender.id, 'Sender Username' => sender.username,
       'Sender Friends in App' => friend_ids.size}

@@ -8,6 +8,8 @@ class Robot
   end
 
   def self.bot?(u)
+    return false
+
     user_id = u.is_a?(User) ? u.id : u
     user.try(:id) == user_id
   end
