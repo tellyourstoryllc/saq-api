@@ -62,16 +62,17 @@ class PublicFeed
     scope = scope.where(uninstalled: false)
     scope = scope.where('users.last_public_story_created_at IS NOT NULL')
     scope = scope.where(censored_profile: false)
-    scope = scope.joins(:account).where(accounts: { registered: true })
+    #scope = scope.joins(:account).where(accounts: { registered: true })
 
-    if bound_by_location?
-      near_options = {latitude: :last_public_story_latitude, longitude: :last_public_story_longitude, select: '1', bearing: false}
-      scope = scope.near([o[:latitude], o[:longitude]], current_radius, near_options)
-    end
+    #if bound_by_location?
+    #  near_options = {latitude: :last_public_story_latitude, longitude: :last_public_story_longitude, select: '1', bearing: false}
+    #  scope = scope.near([o[:latitude], o[:longitude]], current_radius, near_options)
+    #end
 
     # Sort.
     # By closest
-    order_by = if o[:sort] == 'closest' && o[:latitude] && o[:longitude]
+    #order_by = if o[:sort] == 'closest' && o[:latitude] && o[:longitude]
+    order_by = if false
       User.coordinate_order_options(o[:latitude], o[:longitude], {latitude: :last_public_story_latitude,
                                                                   longitude: :last_public_story_longitude})
     # By newest
@@ -136,7 +137,8 @@ class PublicFeed
   end
 
   def fetch_user_ids
-    populate_list(male_users_scope.pluck(:id), female_users_scope.pluck(:id))
+    #populate_list(male_users_scope.pluck(:id), female_users_scope.pluck(:id))
+    base_users_scope.pluck(:id)
   end
 
   # Populate user_ids until the desired ratio can no longer be maintained.
