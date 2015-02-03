@@ -74,26 +74,26 @@ class UsersController < ApplicationController
     mixpanel.user_registered(@current_user)
     group_mixpanel.group_created(@group) if @group
 
-    @account.send_welcome_email
+    #@account.send_welcome_email
 
     set_invite_flags
 
     # Fetch friends and autoconnect Facebook if needed
-    @account.facebook_user.try(:fetch_friends)
-    contact_inviter.facebook_autoconnect
+    #@account.facebook_user.try(:fetch_friends)
+    #contact_inviter.facebook_autoconnect
 
     # Add robot as a contact and send initial messages
     #Robot.set_up_new_user(@current_user)
 
     # Assign whether or not the user should get new user drip notifications
     # and if so, schedule them all
-    DripNotification.set_up_new_user(@current_user, current_device)
+    #DripNotification.set_up_new_user(@current_user, current_device)
 
     # Schedule widget notification (and reschedule if user is unavailable)
-    WidgetNotification.schedule(@current_user) if current_device && current_device.is_a?(IosDevice)
+    #WidgetNotification.schedule(@current_user) if current_device && current_device.is_a?(IosDevice)
 
     current_device.existing_user_status = 'r' if current_device
-    @current_user.notify_friends
+    #@current_user.notify_friends
 
     # Take ownership of all phones the current device owns
     current_device.phones.each{ |p| p.update(user_id: @current_user.id) } if current_device
