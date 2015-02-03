@@ -45,16 +45,7 @@ class MessageMailer < BaseMailer
     @actor = actor
     @user = @message.user
 
-    if @message.story?
-      @message_description = 'story'
-      @url = Rails.configuration.app['web']['url'] + "/stories/#{message.id}/liked?invite_channel=email"
-    else
-      @message_description = @message.message_attachment.try(:media_type_name) || 'message'
-      id = @message.conversation.id
-      @url = Rails.configuration.app['web']['url'] + "/chat/#{id}?invite_channel=email"
-    end
-
-    subject = "#{@actor.public_username || 'Someone'} liked your #{@message_description}"
+    subject = "Someone thanked you for sharing"
 
     mail(to: @user.emails.map(&:email), subject: subject)
   end

@@ -217,7 +217,7 @@ class MobileNotifier
     return if message.user_id == actor.id
 
     description = message.story? ? 'story' : (message.message_attachment.try(:media_type_name) || 'message')
-    alert = "#{actor.public_username || 'Somebody'} liked your #{description}"
+    alert = "Someone thanked you for sharing"
     custom_data = {}
 
     create_ios_notifications(alert, custom_data)
