@@ -1,5 +1,5 @@
 class BaseMailer < ActionMailer::Base
-  default from: "#{Rails.configuration.app['app_name']} <info@#{Rails.configuration.app['sendgrid']['domain']}>"
+  default from: "#{Rails.configuration.app['app_name_short']} <info@#{Rails.configuration.app['sendgrid']['domain']}>"
   include ActionView::Helpers::DateHelper
   add_template_helper ApplicationHelper
   BLACKLISTED_DOMAINS = /snap.io|ffm.fm|krazychat.com|krazykam.com/
