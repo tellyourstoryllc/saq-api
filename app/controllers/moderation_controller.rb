@@ -23,12 +23,25 @@ class ModerationController < ApplicationController
           vr.custom_message_to_user = params[:message_to_user]
         end
 
+        notify_censored(video_rejection)
+
         @model.censor!
       end
 
       render_success
     else
       render_error("Could not find a record for the given model_class and model_id.")
+    end
+  end
+
+
+  private
+
+  def notify_censored(video_rejection)
+    message = video_rejection.message_to_user
+
+    if @model.review? && !@model.deleted?
+      @model.user.send_censored_notifications(message)
     end
   end
 end

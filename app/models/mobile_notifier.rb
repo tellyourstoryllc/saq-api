@@ -340,4 +340,13 @@ class MobileNotifier
 
     create_ios_notifications(alert, custom_data)
   end
+
+  def notify_censored(alert)
+    return if alert.blank?
+
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
 end

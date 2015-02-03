@@ -358,6 +358,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def send_censored_notifications(text)
+    if mobile_notifier.pushes_enabled?
+      mobile_notifier.notify_censored(text)
+    end
+  end
+
   def send_widget_notifications
     return if !ios_devices.exists? || widget_notification_info['received']
 
