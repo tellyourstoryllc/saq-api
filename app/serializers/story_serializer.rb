@@ -26,11 +26,4 @@ class StorySerializer < MessageSerializer
   def include_permission?
     owner?
   end
-
-
-  private
-
-  def owner?
-    respond_to?(:scope) && scope.try(:id) == user_id
-  end
 end
