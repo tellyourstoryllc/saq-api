@@ -97,7 +97,7 @@ class ApplicationController < ActionController::Base
   end
 
   def create_user
-    return if current_user || current_device.try(:user_id)
+    return if current_user || (params[:device_id].blank? && params[:android_id].blank?) || current_device.try(:user_id)
 
     account = Account.create(user_attributes: {})
     @current_user = account.user
