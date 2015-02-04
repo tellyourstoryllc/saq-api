@@ -51,4 +51,12 @@
   </table>
 </div>
 
+<div>
+  <% if @user.banned? %>
+    <%= button_to 'Unban User', admin_unban_user_url(@user) %>
+  <% else %>
+    <%= button_to 'Ban User', admin_ban_user_url(@user) %>
+  <% end -%>
+</div>
+
 </div>

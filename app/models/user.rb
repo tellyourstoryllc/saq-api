@@ -838,6 +838,14 @@ class User < ActiveRecord::Base
     censor_level >= CENSORED_CRITICAL_LEVEL
   end
 
+  def ban!
+    update!(banned: true)
+  end
+
+  def unban!
+    update!(banned: false)
+  end
+
 
   private
 

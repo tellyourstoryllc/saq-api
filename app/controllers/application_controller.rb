@@ -1,7 +1,7 @@
 require 'active_record/validations'
 
 class ApplicationController < ActionController::Base
-  before_action :require_signature, :require_token, :set_locale, :create_or_update_device
+  before_action :require_signature, :require_token, :set_locale, :create_or_update_device, :check_banned
   around_action :set_client
   rescue_from ActiveRecord::RecordNotFound, Peanut::Redis::RecordNotFound, with: :render_404
   rescue_from Peanut::UnauthorizedError, with: :render_401
@@ -109,6 +109,10 @@ class ApplicationController < ActionController::Base
     elsif android_device_params[:android_id].present?
       AndroidDevice.create_or_assign!(current_user, android_device_params)
     end
+  end
+
+  def check_banned
+    render_error if current_user && current_user.banned?
   end
 
   def set_client

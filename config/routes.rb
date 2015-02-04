@@ -104,6 +104,8 @@ KrazyChat::Application.routes.draw do
     match '/admin/settings/:key/update', to: 'admin#update_setting', as: 'admin_update_setting'
     match '/admin/app_reviews', to: 'admin#app_reviews', as: 'admin_app_reviews'
     match '/admin/bot_messages', to: 'admin#bot_messages', as: 'admin_bot_messages'
+    match '/admin/users/:id/ban', to: 'admin#ban_user', as: 'admin_ban_user'
+    match '/admin/users/:id/unban', to: 'admin#unban_user', as: 'admin_unban_user'
 
     match '/logs/event', to: 'logs#event', as: 'logs_event'
 

@@ -77,6 +77,22 @@ class AdminController < ActionController::Base
     @bot_messages = BotMessage.includes(:user).latest.page(params[:page]).per(50)
   end
 
+  def ban_user
+    @user = User.find(params[:id])
+    @user.ban!
+
+    flash[:info] = "User #{@user.name} (id #{@user.id}) is now banned."
+    redirect_to admin_user_path(@user)
+  end
+
+  def unban_user
+    @user = User.find(params[:id])
+    @user.unban!
+
+    flash[:info] = "User #{@user.name} (id #{@user.id}) is no longer banned."
+    redirect_to admin_user_path(@user)
+  end
+
 
   protected
 
