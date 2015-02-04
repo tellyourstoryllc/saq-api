@@ -11,7 +11,8 @@ class AdminUserSearch
   end
 
   def to_scope
-    scp = User.joins(:account).where('accounts.registered_at IS NOT NULL')
+    #scp = User.joins(:account).where('accounts.registered_at IS NOT NULL')
+    scp = User
 
     # Default to all registered users.
     return scp if show_all?
