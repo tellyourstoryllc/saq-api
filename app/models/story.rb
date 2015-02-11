@@ -87,7 +87,8 @@ class Story < Message
   end
 
   def allowed_in_public_feed?
-    public? && !review? && !censored? && source == 'camera' && has_face == 'yes' && !deleted?
+    #public? && !review? && !censored? && source == 'camera' && has_face == 'yes' && !deleted?
+    public? && !review? && !censored? && source == 'camera' && !deleted?
   end
 
   def has_permission?(viewer)
