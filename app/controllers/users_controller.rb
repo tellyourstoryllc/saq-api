@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  skip_before_action :require_token, :create_or_update_device, only: [:index, :username_status, :create]
+  skip_before_action :require_token, :create_or_update_device, only: [:index, :username_status, :create_unregistered, :create]
   before_action :load_user, only: :flag
 
 
@@ -36,6 +36,12 @@ class UsersController < ApplicationController
              end
 
     render_json status
+  end
+
+  def create_unregistered
+    create_user!
+    create_or_update_device
+    render_json [current_user, current_user.account]
   end
 
   def create

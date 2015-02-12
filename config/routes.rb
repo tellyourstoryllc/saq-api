@@ -4,6 +4,7 @@ KrazyChat::Application.routes.draw do
     match '/me', to: 'users#me', as: 'me'
     match '/users', to: 'users#index', as: 'users'
     match '/users/username_status', to: 'users#username_status', as: 'check_username_status'
+    match '/users/create_unregistered', to: 'users#create_unregistered', as: 'create_unregistered_user'
     match '/users/create', to: 'users#create', as: 'create_user'
     match '/users/update', to: 'users#update', as: 'update_user'
     match '/accounts/update', to: 'accounts#update', as: 'update_account'
