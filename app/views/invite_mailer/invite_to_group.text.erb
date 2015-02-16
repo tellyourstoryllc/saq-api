@@ -1,6 +1,6 @@
 Hey,
 
-<%= @sender.name %> just sent you something on <%= Rails.configuration.app['app_name'] %>.
+<%= @sender.public_username || 'Somebody' %> just sent you something on <%= Rails.configuration.app['app_name'] %>.
 
 See it at: <%= @url %>
 

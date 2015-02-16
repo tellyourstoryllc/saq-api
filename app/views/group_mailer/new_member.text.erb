@@ -1,6 +1,6 @@
 Hi <%= @recipient.first_name %>,
 
-<%= @new_member.name %> just joined the room "<%= @group.name %>". Go say hi!
+<%= @new_member.public_username || 'Somebody' %> just joined the room "<%= @group.name %>". Go say hi!
 
 <%= @url %>
 

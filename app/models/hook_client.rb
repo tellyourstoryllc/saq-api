@@ -31,7 +31,7 @@ class HookClient
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
     sender_phone = sender_phone_text(sender)
 
-    text = render_from_template(ServerConfiguration.get('sms_invite_to_contacts'), {sender_name: sender.name, url: url, sender_phone: sender_phone})
+    text = render_from_template(ServerConfiguration.get('sms_invite_to_contacts'), {sender_name: (sender.public_username || 'Somebody'), url: url, sender_phone: sender_phone})
     send_sms(from, recipient_number, text)
   end
 
@@ -43,7 +43,7 @@ class HookClient
     url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
     sender_phone = sender_phone_text(sender)
 
-    text = render_from_template(ServerConfiguration.get('sms_invite_to_group'), {sender_name: sender.name, url: url, sender_phone: sender_phone})
+    text = render_from_template(ServerConfiguration.get('sms_invite_to_group'), {sender_name: (sender.public_username || 'Somebody'), url: url, sender_phone: sender_phone})
     send_sms(from, recipient_number, text)
   end
 
@@ -57,7 +57,7 @@ class HookClient
     sender_phone = sender_phone_text(sender)
 
     # expires_text = " that expires in #{distance_of_time_in_words(Time.current, Time.zone.at(message.expires_at))}" if message.expires_at
-    text = render_from_template(ServerConfiguration.get('sms_invite_via_message'), {sender_name: sender.name, url: url, media_type: media_type, sender_phone: sender_phone})
+    text = render_from_template(ServerConfiguration.get('sms_invite_via_message'), {sender_name: (sender.public_username || 'Somebody'), url: url, media_type: media_type, sender_phone: sender_phone})
     send_sms(from, recipient_number, text)
   end
 

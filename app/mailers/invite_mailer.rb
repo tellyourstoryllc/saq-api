@@ -6,7 +6,7 @@ class InviteMailer < BaseMailer
     one_to_one_id = OneToOne.id_for_user_ids(sender.id, recipient.id)
     @url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    mail(to: email, subject: "#{@sender.name} added you as a contact")
+    mail(to: email, subject: "#{@sender.public_username || 'Somebody'} added you as a contact")
   end
 
   def invite_to_group(sender, recipient, group, email, invite_token)
@@ -18,7 +18,7 @@ class InviteMailer < BaseMailer
 
     to = email.present? ? email : @recipient.emails.map(&:email)
 
-    mail(to: to, subject: "#{@sender.name} added you to the room \"#{@group.name}\"")
+    mail(to: to, subject: "#{@sender.public_username || 'Somebody'} added you to the room \"#{@group.name}\"")
   end
 
   def invite_via_message(sender, recipient, message, email, invite_token)
@@ -31,6 +31,6 @@ class InviteMailer < BaseMailer
     one_to_one_id = OneToOne.id_for_user_ids(sender.id, recipient.id)
     @url = Rails.configuration.app['web']['url'] + "/i/#{invite_token}"
 
-    mail(to: email, subject: "#{@sender.name} just sent you #{@media_type}#{@expires_text}")
+    mail(to: email, subject: "#{@sender.public_username || 'Somebody'} just sent you #{@media_type}#{@expires_text}")
   end
 end

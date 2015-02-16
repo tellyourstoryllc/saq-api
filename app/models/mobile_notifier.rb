@@ -170,13 +170,15 @@ class MobileNotifier
 
   def notification_alert(message, notification_type)
     friendly_media_type = message.message_attachment.try(:friendly_media_type)
+    username = message.user.public_username || 'Somebody'
+
     if friendly_media_type.present?
-      "#{message.user.name} sent #{friendly_media_type}"
+      "#{username} sent #{friendly_media_type}"
     elsif message.text.present?
-      "#{message.user.name}: #{message.text}" 
+      "#{username}: #{message.text}"
     else
       # Should never get here?
-      "#{message.user.name} sent you a message"
+      "#{username} sent you a message"
     end
   end
 

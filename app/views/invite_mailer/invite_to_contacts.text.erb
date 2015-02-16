@@ -1,6 +1,6 @@
 Hey,
 
-<%= @sender.name %> just added you on <%= Rails.configuration.app['app_name'] %>.
+<%= @sender.public_username || 'Somebody' %> just added you on <%= Rails.configuration.app['app_name'] %>.
 
 Add them back: <%= @url %>
 

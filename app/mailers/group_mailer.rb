@@ -5,6 +5,6 @@ class GroupMailer < BaseMailer
     @group = group
     @url = Rails.configuration.app['web']['url'] + "/rooms/#{@group.id}"
 
-    mail(to: @recipient.emails.map(&:email), subject: "#{@new_member.name} just joined the room \"#{group.name}\"")
+    mail(to: @recipient.emails.map(&:email), subject: "#{@new_member.public_username || 'Somebody'} just joined the room \"#{group.name}\"")
   end
 end

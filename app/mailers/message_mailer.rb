@@ -14,13 +14,14 @@ class MessageMailer < BaseMailer
     end
 
     @media_description = data[:media_description]
+    username = @user.public_username || 'Somebody'
 
     subject = if @media_description.present?
-                "#{@user.name} sent #{@media_description}"
+                "#{username} sent #{@media_description}"
               elsif @message.text
-                "#{@user.name}: #{@message.text}"
+                "#{username}: #{@message.text}"
               else
-                "#{@user.name} just sent you a message"
+                "#{username} just sent you a message"
               end
 
     mail(to: @recipient.emails.map(&:email), subject: subject)
