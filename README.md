@@ -16,7 +16,7 @@ __________________________________________________
 Update the db to *not* add all new columns as utf8mb4:
 
 ```sql
-ALTER DATABASE saq_dev DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+ALTER DATABASE tys_dev DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 ```
 __________________________________________________
 
@@ -56,17 +56,17 @@ __________________________________________________
 Create mobile push apps:
 
 ```ruby
-Rpush::Apns::App.create!(name: 'saq_ios', certificate: File.read('/path/to/apn_saq_prod.pem'), environment: 'production', connections: 5)
+Rpush::Apns::App.create!(name: 'tys_ios', certificate: File.read('/path/to/apn_tys_prod.pem'), environment: 'production', connections: 5)
 ```
 __________________________________________________
 
 In nanny console:
 
 ```ruby
-Client.new(name: 'saq').save
+Client.new(name: 'tys').save
 ```
 
-Copy the nanny client token to the "moderator.token" saq config.
+Copy the nanny client token to the "moderator.token" tys config.
 __________________________________________________
 
 Insert video_moderation_reject_reasons:
