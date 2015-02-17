@@ -6,8 +6,8 @@ development:
     url: http://localhost:3010
     request_secret: SECRET
     signature_secret: SECRET
-  app_name: Sexual Abuse Quilt
-  app_name_short: SAQ
+  app_name: Tell Your Story
+  app_name_short: TYS
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -18,7 +18,7 @@ development:
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
-    config_prefix: saq
+    config_prefix: tys
   facebook:
     app_access_token: TOKEN
   faye:
@@ -37,10 +37,10 @@ development:
     callback_url: http://localhost:3010/moderation/callback
     token: d7029248789018e3-2
 
-  robot_username: teamsaq
+  robot_username: teamtys
   rpush:
-    db_ios_app_name: saq_ios
-    db_android_app_name: saq_android
+    db_ios_app_name: tys_ios
+    db_android_app_name: tys_android
   redis:
     persisted:
       host: 127.0.0.1
@@ -49,10 +49,10 @@ development:
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: thesaq.org
+    domain: tellyourstory.org
   statsd:
     server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
-    prefix: saq
+    prefix: tys
   web:
     domain: localhost:3002
     url: http://localhost:3002
@@ -65,8 +65,8 @@ test:
     url: http://localhost:3010
     request_secret: SECRET
     signature_secret: SECRET
-  app_name: Sexual Abuse Quilt
-  app_name_short: saq
+  app_name: Tell Your Story
+  app_name_short: TYS
   aws:
     access_key_id: KEY
     secret_access_key: SECRET
@@ -77,7 +77,7 @@ test:
     convert_bin: '/usr/local/bin/convert'
     ffmpeg_bin: '/usr/local/bin/ffmpeg'
   client:
-    config_prefix: saq
+    config_prefix: tys
   facebook:
     app_access_token: TOKEN
   faye:
@@ -96,7 +96,7 @@ test:
     callback_url: http://localhost:3010/moderation/callback
     token: d7029248789018e3-2
 
-  robot_username: teamsaq
+  robot_username: teamtys
   rpush:
     db_ios_app_name: ~
     db_android_app_name: ~
@@ -108,10 +108,10 @@ test:
   sendgrid:
     username: USERNAME
     password: PASSWORD
-    domain: know.me
+    domain: tellyourstory.org
   statsd:
     server: 'ec2-54-188-154-120.us-west-2.compute.amazonaws.com:8125'
-    prefix: saq
+    prefix: tys
   web:
     domain: test.host
     url: http://test.host
