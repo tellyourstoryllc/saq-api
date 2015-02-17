@@ -15,7 +15,9 @@ class ModerationController < ApplicationController
 
     if @model
       if params[:passed] && params[:passed].include?('video_approval') && @model.is_a?(Story)
+        notify_approved
         @model.approve!
+
       elsif params[:failed] && params[:failed].include?('video_approval') && @model.is_a?(Story)
         video_rejection = VideoRejection.create! do |vr|
           vr.story_id = @model.id
@@ -36,6 +38,12 @@ class ModerationController < ApplicationController
 
 
   private
+
+  def notify_approved
+    if @model.review? && !@model.deleted?
+      @model.user.send_approved_notifications
+    end
+  end
 
   def notify_censored(video_rejection)
     message = video_rejection.message_to_user
