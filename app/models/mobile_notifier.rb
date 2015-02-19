@@ -357,4 +357,14 @@ class MobileNotifier
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)
   end
+
+  def notify_recent_stories(stories_count)
+    return if stories_count <= 0
+
+    alert = "#{stories_count} #{stories_count == 1 ? 'person' : 'people'} told their story yesterday"
+    custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
 end
