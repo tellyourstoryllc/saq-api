@@ -341,7 +341,7 @@ class MobileNotifier
     create_ios_notifications(alert, custom_data)
   end
 
-  def notify_approved
+  def notify_approved_story
     alert = "Your video has been approved."
     custom_data = {}
 
@@ -349,7 +349,7 @@ class MobileNotifier
     create_android_notifications(alert, custom_data)
   end
 
-  def notify_censored(alert)
+  def notify_censored_story(alert)
     return if alert.blank?
 
     custom_data = {}

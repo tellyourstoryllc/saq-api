@@ -41,7 +41,7 @@ class ModerationController < ApplicationController
 
   def notify_approved
     if @model.review? && !@model.deleted?
-      @model.user.send_approved_notifications
+      @model.user.send_approved_story_notifications
     end
   end
 
@@ -49,7 +49,7 @@ class ModerationController < ApplicationController
     message = video_rejection.message_to_user
 
     if @model.review? && !@model.deleted?
-      @model.user.send_censored_notifications(message)
+      @model.user.send_censored_story_notifications(message)
     end
   end
 end
