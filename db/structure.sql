@@ -727,13 +727,15 @@ CREATE TABLE `users` (
   `public_avatar_video` tinyint(1) NOT NULL DEFAULT '0',
   `censored_profile` tinyint(1) NOT NULL DEFAULT '0',
   `banned` tinyint(1) NOT NULL DEFAULT '0',
+  `last_checkin_at` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_users_on_username` (`username`),
   UNIQUE KEY `index_users_on_friend_code` (`friend_code`),
   KEY `index_users_on_created_at` (`created_at`),
   KEY `index_users_on_latitude_and_longitude` (`latitude`,`longitude`),
   KEY `index_on_last_public_story_location` (`last_public_story_latitude`,`last_public_story_longitude`),
-  KEY `for_feed` (`last_public_story_created_at`,`deactivated`,`uninstalled`,`censored_profile`,`gender`,`latitude`,`longitude`)
+  KEY `for_feed` (`last_public_story_created_at`,`deactivated`,`uninstalled`,`censored_profile`,`gender`,`latitude`,`longitude`),
+  KEY `index_users_on_last_checkin_at` (`last_checkin_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -783,7 +785,7 @@ CREATE TABLE `video_rejections` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-02-04 15:09:13
+-- Dump completed on 2015-02-19 16:32:45
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -1033,3 +1035,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150202210409');
 INSERT INTO schema_migrations (version) VALUES ('20150202215335');
 
 INSERT INTO schema_migrations (version) VALUES ('20150204200858');
+
+INSERT INTO schema_migrations (version) VALUES ('20150219213155');
