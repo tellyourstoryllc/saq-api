@@ -17,6 +17,7 @@ class Message
   sorted_set :liker_ids # User IDs who have liked this specific message
   list :likes # JSON strings for each like on this or any forwarded/decendant messages (all levels deep)
   list :exports # JSON strings for each export on this or any forwarded/decendant messages (all levels deep)
+  sorted_set :recent_story_ids, global: true
 
   validates :user_id, presence: true
   validate :conversation_id?, :blacklisted_recipient?, :not_blocked?, :text_under_limit?, :text_or_attachment_set?

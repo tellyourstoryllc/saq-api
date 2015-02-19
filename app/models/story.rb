@@ -321,6 +321,7 @@ class Story < Message
     FriendStoriesList.new(id: user.id).message_ids.delete(id)
     MyStoriesList.new(id: user.id).message_ids.delete(id)
 
+    Message.recent_story_ids.delete(id)
     delete_from_elasticsearch
 
     attrs.del
@@ -354,6 +355,7 @@ class Story < Message
   def approve!
     attrs['status'] = self.status = 'normal'
     check_last_public_story
+    add_to_recents
     update_on_elasticsearch(status: status)
   end
 
@@ -471,6 +473,10 @@ class Story < Message
     else
       submit_to_moderator
     end
+  end
+
+  def add_to_recents
+    Message.recent_story_ids[id] = Time.current.to_i
   end
 
   def index_on_elasticsearch
