@@ -7,6 +7,7 @@ class CheckinController < ApplicationController
     send_mixpanel_events
     add_to_daily_users
     increment_metrics
+    update_last_checkin_at
 
     objects = []
     config_class = case params[:client]
@@ -76,5 +77,9 @@ class CheckinController < ApplicationController
 
   def increment_metrics
     StatsD.increment('api_calls.checkin')
+  end
+
+  def update_last_checkin_at
+    current_user.update(last_checkin_at: Time.current) if current_user
   end
 end
