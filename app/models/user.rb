@@ -361,12 +361,16 @@ class User < ActiveRecord::Base
   def send_approved_story_notifications
     if mobile_notifier.pushes_enabled?
       mobile_notifier.notify_approved_story
+    else
+      email_notifier.notify_approved_story
     end
   end
 
   def send_censored_story_notifications(text)
     if mobile_notifier.pushes_enabled?
       mobile_notifier.notify_censored_story(text)
+    else
+      email_notifier.notify_censored_story(text)
     end
   end
 

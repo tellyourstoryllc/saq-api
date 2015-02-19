@@ -87,4 +87,21 @@ class MessageMailer < BaseMailer
 
     mail(to: @user.emails.map(&:email), subject: subject)
   end
+
+  def approved_story(user)
+    @user = user
+    @url = Rails.configuration.app['web']['url'] + "/?invite_channel=email"
+    subject = "Your video has been approved"
+
+    mail(to: @user.emails.map(&:email), subject: subject)
+  end
+
+  def censored_story(user, text)
+    @user = user
+    @url = Rails.configuration.app['web']['url'] + "/?invite_channel=email"
+    @text = text
+    subject = "Your video was not approved"
+
+    mail(to: @user.emails.map(&:email), subject: subject)
+  end
 end

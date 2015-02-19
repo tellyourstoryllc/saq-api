@@ -227,4 +227,28 @@ class EmailNotifier
     return if friend.id == user.id
     UserMailer.new_friend(user, friend, mutual).deliver!
   end
+
+  def notify_approved_story
+    if Settings.enabled?(:queue)
+      MessageMailerApprovedStoryWorker.perform_async(user.id)
+    else
+      notify_approved_story!
+    end
+  end
+
+  def notify_approved_story!
+    MessageMailer.approved_story(user).deliver!
+  end
+
+  def notify_censored_story(text)
+    if Settings.enabled?(:queue)
+      MessageMailerCensoredStoryWorker.perform_async(user.id, text)
+    else
+      notify_censored_story!(text)
+    end
+  end
+
+  def notify_censored_story!(text)
+    MessageMailer.censored_story(user, text).deliver!
+  end
 end
