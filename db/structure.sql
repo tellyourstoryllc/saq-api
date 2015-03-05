@@ -477,6 +477,7 @@ CREATE TABLE `message_attachments` (
   `preview_width` int(11) DEFAULT NULL,
   `preview_height` int(11) DEFAULT NULL,
   `sha` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `duration` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `index_message_attachments_on_group_id` (`group_id`),
   KEY `index_message_attachments_on_message_id` (`message_id`),
@@ -785,7 +786,7 @@ CREATE TABLE `video_rejections` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-02-19 16:32:45
+-- Dump completed on 2015-03-05 12:23:03
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -1037,3 +1038,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150202215335');
 INSERT INTO schema_migrations (version) VALUES ('20150204200858');
 
 INSERT INTO schema_migrations (version) VALUES ('20150219213155');
+
+INSERT INTO schema_migrations (version) VALUES ('20150305172227');
