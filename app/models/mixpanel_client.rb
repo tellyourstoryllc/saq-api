@@ -236,6 +236,10 @@ class MixpanelClient
     track('Created App Review', created_app_review_properties)
   end
 
+  def user_installed
+    track('User Installed')
+  end
+
 
   private
 

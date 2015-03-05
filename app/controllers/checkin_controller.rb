@@ -65,7 +65,15 @@ class CheckinController < ApplicationController
       mixpanel.mobile_install(device_id) if AndroidDevice.mixpanel_installed_device_ids.add(device_id)
     end
 
-    mixpanel.checked_in if current_user
+
+    if current_user
+      unless current_user.misc['install_event']
+        current_user.misc['install_event'] = 1
+        mixpanel.user_installed
+      end
+
+      mixpanel.checked_in
+    end
   end
 
   def add_to_daily_users
