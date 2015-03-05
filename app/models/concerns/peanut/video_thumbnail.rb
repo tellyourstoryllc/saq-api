@@ -31,6 +31,8 @@ module Peanut::VideoThumbnail
 
       # Need to change this from video so it gets set properly on S3
       file.content_type = 'image/jpeg'
+
+      model.duration = movie.duration.round
     end
   end
 end
