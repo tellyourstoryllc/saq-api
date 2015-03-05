@@ -240,6 +240,10 @@ class MixpanelClient
     track('User Installed')
   end
 
+  def created_story(story)
+    track('Created Story', created_story_properties(story))
+  end
+
 
   private
 
@@ -340,5 +344,9 @@ class MixpanelClient
   def created_app_review_properties
     app_review = user.app_reviews.latest.first
     {'Feedback' => app_review.feedback, 'Will Write Review' => app_review.will_write_review}
+  end
+
+  def created_story_properties(story)
+    {'Story ID' => story.id, 'Duration' => story.message_attachment.duration, 'File Size' => story.message_attachment.file_size}
   end
 end

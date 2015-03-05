@@ -143,6 +143,7 @@ class MessagesController < ApplicationController
 
       # Track activity in Mixpanel
       mixpanel.daily_message_events(story) unless importing_from_sc
+      mixpanel.created_story(story)
 
       @stories << story
     end
