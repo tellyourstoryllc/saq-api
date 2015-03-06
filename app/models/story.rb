@@ -327,6 +327,7 @@ class Story < Message
     attrs.del
 
     check_last_public_story
+    delete_from_moderator
   end
 
   def commenter_ids
@@ -423,6 +424,10 @@ class Story < Message
     users = User.includes(:account, :avatar_image, :avatar_video).where(id: stories.map(&:user_id).uniq)
 
     stories + users
+  end
+
+  def set_moderation_uuid(uuid)
+    self.attrs['moderation_uuid'] = uuid
   end
 
 

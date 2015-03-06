@@ -71,8 +71,19 @@ module Peanut::SubmittedForYourApproval
     })
 
     if [200,201,202].include?(response.code)
+      set_moderation_uuid(JSON.load(response.body)['uuid']) if respond_to?(:set_moderation_uuid)
       review!
     end
+  end
+
+  def delete_from_moderator
+    return unless review? && respond_to?(:moderation_uuid) && moderation_uuid
+
+    type = moderation_type
+    return unless [:photo, :video].include?(type)
+
+    endpoint = "#{Moderator.url}/api/#{type}/delete"
+    HTTParty.post(endpoint, body: {key: Moderator.token, uuid: moderation_uuid})
   end
 
   def review!

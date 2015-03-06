@@ -9,7 +9,7 @@ class Message
     :actor_id, :attachment_message_id, :type, :permission, :snapchat_media_id, :latitude, :longitude, :source,
     :created_at, :snapchat_created_at, :expires_in, :expires_at, :cached_likes_count, :cached_forwards_count,
     :message_attachment_overlay_id, :attachment_overlay_file, :attachment_overlay_url, :attachment_overlay_text,
-    :status, :has_face
+    :status, :has_face, :moderation_uuid
 
   hash_key :attrs
   list :ancestor_message_ids
