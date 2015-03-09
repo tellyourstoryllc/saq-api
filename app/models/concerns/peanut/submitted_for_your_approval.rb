@@ -39,7 +39,7 @@ module Peanut::SubmittedForYourApproval
   end
 
   def submit_to_moderator
-    return unless pending?
+    return unless pending? || approved?
 
     url = moderation_url
     return unless url && self.id

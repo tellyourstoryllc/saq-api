@@ -2,6 +2,8 @@ module Peanut::Flaggable
   extend ActiveSupport::Concern
 
   INITIAL_FLAGS_GRACE_LEVEL = 10
+  FLAG_THRESHOLD = 3
+
   included do
     set :flagger_ids
     set :initial_flagger_ids
@@ -12,6 +14,9 @@ module Peanut::Flaggable
   def flag(flag_giver, flag_reason = nil)
     return if bad_flagger?(flag_giver)
 
+    flagged = flagger_ids.add(flag_giver.id)
+    return unless flagged
+
     self.flag_reason = flag_reason
 
     submit_to_moderator if submit_to_moderator?
@@ -19,18 +24,16 @@ module Peanut::Flaggable
   end
 
   def submit_to_moderator?
-    (!flag_reason || flag_reason.moderate?) && pending?
+    (!flag_reason || flag_reason.moderate?) && flagger_ids.size >= FLAG_THRESHOLD
   end
 
   def update_flag_metrics(flag_giver)
-    if flagger_ids.add(flag_giver.id)
-      flag_recipient.misc.incr('flags_received')
-      flag_giver.misc.incr('flags_given')
+    flag_recipient.misc.incr('flags_received')
+    flag_giver.misc.incr('flags_given')
 
-      if pending? || review?
-        flag_giver.misc.incr('initial_flags_given')
-        initial_flagger_ids << flag_giver.id
-      end
+    if pending? || review?
+      flag_giver.misc.incr('initial_flags_given')
+      initial_flagger_ids << flag_giver.id
     end
   end
 
