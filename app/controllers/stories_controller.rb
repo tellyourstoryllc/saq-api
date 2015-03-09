@@ -38,11 +38,13 @@ class StoriesController < ApplicationController
   end
 
   def flag
-    @flag_reason = FlagReason.find(params[:flag_reason_id]) if params[:flag_reason_id].present?
+    check_flag_reason = FlagReason.exists?
 
-    if @flag_reason.nil?
-      render_error 'Invalid flag_reason_id'
+    if !check_flag_reason
+      @story.flag(current_user)
+      render_json @story
     else
+      @flag_reason = FlagReason.find(params[:flag_reason_id]) if params[:flag_reason_id].present?
       @story.flag(current_user, @flag_reason)
       render_json @story
     end

@@ -8,7 +8,8 @@ module Peanut::Flaggable
     attr_accessor :flag_reason
   end
 
-  def flag(flag_giver, flag_reason)
+
+  def flag(flag_giver, flag_reason = nil)
     return if bad_flagger?(flag_giver)
 
     self.flag_reason = flag_reason
@@ -18,7 +19,7 @@ module Peanut::Flaggable
   end
 
   def submit_to_moderator?
-    flag_reason.moderate? && pending?
+    (!flag_reason || flag_reason.moderate?) && pending?
   end
 
   def update_flag_metrics(flag_giver)
