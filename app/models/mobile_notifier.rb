@@ -342,7 +342,7 @@ class MobileNotifier
   end
 
   def notify_approved_story
-    alert = "Your video has been approved."
+    alert = "Your video has been approved"
     custom_data = {}
 
     create_ios_notifications(alert, custom_data)
