@@ -88,6 +88,7 @@ class User < ActiveRecord::Base
   # Miscellaneous flags, counters, timestamps
   # Use this where possible instead of separate keys, to reduce memory
   # install_event
+  # sent_initial_checkin_event
   # likes_received
   # likes_given
   # flags_received

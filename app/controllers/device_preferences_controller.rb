@@ -10,6 +10,13 @@ class DevicePreferencesController < ApplicationController
     end
 
     if @preferences.save
+      # Send a checked in event the first time the user is prompted
+      # to enable notifications, so we know their initial choice
+      unless current_user.misc['sent_initial_checkin_event']
+        current_user.misc['sent_initial_checkin_event'] = 1
+        mixpanel.track('Checked In')
+      end
+
       render_json @preferences
     else
       render_error @preferences.errors.full_messages
