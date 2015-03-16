@@ -1,7 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :object_type, :id, :token, :name, :username, :avatar_url, :avatar_video_url,
     :avatar_video_preview_url, :deactivated, :registered, :gender, :latitude, :longitude,
-    :location_name, :friend_code, :one_to_one_privacy
+    :location_name, :friend_code, :one_to_one_privacy, :unblurred_public_story
 
 
   def include_token?
@@ -58,6 +58,10 @@ class UserSerializer < ActiveModel::Serializer
     else
       longitude.to_f.round(2)
     end
+  end
+
+  def unblurred_public_story
+    object.last_public_story_unblurred
   end
 
 
