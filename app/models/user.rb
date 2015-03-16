@@ -829,7 +829,8 @@ class User < ActiveRecord::Base
 
     story_created_at = Time.zone.at(story.created_at) if story
     attrs = {last_public_story_id: story.try(:id), last_public_story_created_at: story_created_at,
-             last_public_story_latitude: story.try(:latitude), last_public_story_longitude: story.try(:longitude)}
+             last_public_story_latitude: story.try(:latitude), last_public_story_longitude: story.try(:longitude),
+             last_public_story_unblurred: (story.nil? ? nil : !story.blurred)}
     update(attrs) if last_public_story_created_at.nil? || force || story_created_at >= last_public_story_created_at
   end
 
