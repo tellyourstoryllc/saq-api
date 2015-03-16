@@ -729,6 +729,7 @@ CREATE TABLE `users` (
   `censored_profile` tinyint(1) NOT NULL DEFAULT '0',
   `banned` tinyint(1) NOT NULL DEFAULT '0',
   `last_checkin_at` datetime NOT NULL DEFAULT '2000-01-01 00:00:00',
+  `one_to_one_privacy` enum('nobody','unblurred_public_story','avatar_image','anybody') COLLATE utf8_unicode_ci NOT NULL DEFAULT 'nobody',
   PRIMARY KEY (`id`),
   UNIQUE KEY `index_users_on_username` (`username`),
   UNIQUE KEY `index_users_on_friend_code` (`friend_code`),
@@ -786,7 +787,7 @@ CREATE TABLE `video_rejections` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-05 12:23:03
+-- Dump completed on 2015-03-16 14:59:05
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -1040,3 +1041,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150204200858');
 INSERT INTO schema_migrations (version) VALUES ('20150219213155');
 
 INSERT INTO schema_migrations (version) VALUES ('20150305172227');
+
+INSERT INTO schema_migrations (version) VALUES ('20150316185308');
