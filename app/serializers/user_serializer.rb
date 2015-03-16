@@ -1,7 +1,7 @@
 class UserSerializer < ActiveModel::Serializer
   attributes :object_type, :id, :token, :name, :username, :avatar_url, :avatar_video_url,
     :avatar_video_preview_url, :deactivated, :registered, :gender, :latitude, :longitude,
-    :location_name, :friend_code
+    :location_name, :friend_code, :one_to_one_privacy
 
 
   def include_token?
