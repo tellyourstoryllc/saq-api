@@ -5,6 +5,8 @@ class OneToOne
 
   attr_accessor :fetched_message_ids_count
 
+  validate :check_privacy
+
 
   def save
     return unless valid?
@@ -63,11 +65,30 @@ class OneToOne
     end
   end
 
+  def allowed_by_privacy?
+    recip = other_user(creator)
+
+    case recip.one_to_one_privacy
+    when 'unblurred_public_story'
+      !!creator.last_public_story_unblurred
+    when 'avatar_image'
+      !!creator.last_public_story_unblurred || creator.avatar_url.present?
+    when 'anybody'
+      true
+    else
+      false
+    end
+  end
+
 
   private
 
   def not_blocked?
     errors.add(:base, "Sorry, you can't start a 1-1 conversation with that user.") if blocked?
+  end
+
+  def check_privacy
+    errors.add(:base, "Sorry, that user's privacy does not allow you to start a 1-1 conversation with them.") unless allowed_by_privacy?
   end
 
   def write_attrs
