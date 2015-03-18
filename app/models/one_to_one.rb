@@ -83,7 +83,7 @@ class OneToOne
   # 1-1 is pending if the other user initiated, the recipient's 1-1 privacy is avatar_image,
   # and the other user doesn't have an unblurred public story but he has an avatar image
   def pending?(current_user)
-    creator_id && creator_id != current_user.id && current_user.one_to_one_privacy == 'avatar_image' &&
+    request_status.blank? && creator_id && creator_id != current_user.id && current_user.one_to_one_privacy == 'avatar_image' &&
       !creator.last_public_story_unblurred && creator.avatar_url.present?
   end
 
