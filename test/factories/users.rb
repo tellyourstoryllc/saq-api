@@ -3,6 +3,7 @@ FactoryGirl.define do
     sequence(:username){ |n| "JohnDoe_#{n}" }
 
     gender 'male'
+    one_to_one_privacy 'anybody'
 
     trait :male do
       gender 'male'

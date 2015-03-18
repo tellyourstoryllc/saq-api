@@ -98,10 +98,11 @@ class MobileNotifier
   end
 
   def send_snap_notification(message, notification_type)
+    convo = message.conversation
+    return if convo && convo.respond_to?(:pending?) && convo.pending?(user)
+
     alert = notification_alert(message, notification_type)
     custom_data = {}
-
-    convo = message.conversation
 
     if convo.is_a?(Group)
       custom_data[:gid] = convo.id
@@ -363,6 +364,14 @@ class MobileNotifier
 
     alert = "#{stories_count} #{stories_count == 1 ? 'person' : 'people'} told their story yesterday"
     custom_data = {}
+
+    create_ios_notifications(alert, custom_data)
+    create_android_notifications(alert, custom_data)
+  end
+
+  def notify_pending_one_to_one(one_to_one)
+    alert = 'A user would like to chat with you'
+    custom_data = {oid: one_to_one.id}
 
     create_ios_notifications(alert, custom_data)
     create_android_notifications(alert, custom_data)

@@ -92,7 +92,7 @@ class MessagesController < ApplicationController
     one_to_one_ids = split_param(:one_to_one_ids)
 
     one_to_one_ids.each do |one_to_one_id|
-      one_to_one = load_one_to_one(one_to_one_id)
+      one_to_one = load_one_to_one_for_create(one_to_one_id)
       next if one_to_one.nil?
 
       message = Message.new(message_params.merge(one_to_one_id: one_to_one.id))
@@ -163,6 +163,26 @@ class MessagesController < ApplicationController
     if one_to_one.attrs.blank?
       one_to_one.creator_id = current_user.id
       one_to_one if one_to_one.save
+    else
+      one_to_one if one_to_one.authorized?(current_user)
+    end
+  end
+
+  def load_one_to_one_for_create(one_to_one_id)
+    one_to_one = OneToOne.new(id: one_to_one_id)
+
+    if one_to_one.attrs.blank?
+      one_to_one.creator_id = current_user.id
+
+      if one_to_one.save
+        # If the 1-1 is pending, notify the recipient that a user wants to chat
+        recipient = one_to_one.other_user(one_to_one.creator)
+        recipient.mobile_notifier.notify_pending_one_to_one(one_to_one) if one_to_one.pending?(recipient)
+
+        one_to_one
+      else
+        nil
+      end
     else
       one_to_one if one_to_one.authorized?(current_user)
     end
