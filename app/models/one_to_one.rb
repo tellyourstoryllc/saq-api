@@ -3,7 +3,7 @@ class OneToOne
   include Redis::Objects
   include Peanut::TwoUserConversation
 
-  attr_accessor :fetched_message_ids_count
+  attr_accessor :fetched_message_ids_count, :request_status
 
   validate :check_privacy
 
@@ -87,6 +87,16 @@ class OneToOne
       !creator.last_public_story_unblurred && creator.avatar_url.present?
   end
 
+  def request_status=(status)
+    if viewer && request_status.blank? &&
+      %w(approved denied).include?(status) && pending?(viewer)
+
+      attrs[:request_status] = status
+    end
+
+    @request_status = status
+  end
+
 
   private
 
@@ -100,6 +110,6 @@ class OneToOne
 
   def write_attrs
     self.created_at = Time.current.to_i
-    self.attrs.bulk_set(id: id, creator_id: creator_id, created_at: created_at)
+    self.attrs.bulk_set(id: id, creator_id: creator_id, created_at: created_at, request_status: request_status)
   end
 end

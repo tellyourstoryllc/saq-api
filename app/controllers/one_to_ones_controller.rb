@@ -36,10 +36,10 @@ class OneToOnesController < ApplicationController
   end
 
   def update_params
-    params.permit(:last_seen_rank, :last_deleted_rank, :hidden)
+    params.permit(:last_seen_rank, :last_deleted_rank, :hidden, :request_status)
   end
 
   def publish_updated_one_to_one
-    faye_publisher.publish_one_to_one_to_user(current_user, OneToOneSerializer.new(@one_to_one).as_json)
+    faye_publisher.publish_one_to_one_to_user(current_user, OneToOneSerializer.new(@one_to_one, scope: current_user).as_json)
   end
 end
