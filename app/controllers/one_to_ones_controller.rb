@@ -19,10 +19,15 @@ class OneToOnesController < ApplicationController
     end
 
     # Reload the 1-1
-    load_one_to_one
+    @one_to_one = OneToOne.new(id: params[:id])
+    @one_to_one.viewer = current_user
 
-    publish_updated_one_to_one
-    render_json @one_to_one
+    if @one_to_one.valid? && @one_to_one.authorized?(current_user)
+      publish_updated_one_to_one
+      render_json @one_to_one
+    else
+      render_json []
+    end
   end
 
 

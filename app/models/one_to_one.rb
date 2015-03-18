@@ -92,6 +92,12 @@ class OneToOne
       %w(approved denied).include?(status) && pending?(viewer)
 
       attrs[:request_status] = status
+
+      # If the viewer denied the request, block the sender
+      if status == 'denied'
+        other_user = other_user(viewer)
+        viewer.block(other_user)
+      end
     end
 
     @request_status = status
