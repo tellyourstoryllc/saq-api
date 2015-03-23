@@ -197,6 +197,7 @@ class Story < Message
 
   def update(update_attrs)
     permission = update_attrs.delete(:permission)
+    update_attrs.delete(:shareable_to) unless %w(youtube anywhere).include?(update_attrs[:shareable_to])
 
     update_attrs.each do |k, v|
       send("#{k}=", v)
@@ -208,7 +209,7 @@ class Story < Message
     update_message_attachment_overlay(overlay_file, overlay_text) if overlay_file.present?
 
     # Update simple attrs
-    simple_attrs = update_attrs.slice(:latitude, :longitude, :has_face)
+    simple_attrs = update_attrs.slice(:latitude, :longitude, :has_face, :shareable_to)
     attrs.bulk_set(simple_attrs) if simple_attrs.present?
 
     # Update permission

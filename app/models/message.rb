@@ -9,7 +9,7 @@ class Message
     :actor_id, :attachment_message_id, :type, :permission, :snapchat_media_id, :latitude, :longitude, :source,
     :created_at, :snapchat_created_at, :expires_in, :expires_at, :cached_likes_count, :cached_forwards_count,
     :message_attachment_overlay_id, :attachment_overlay_file, :attachment_overlay_url, :attachment_overlay_text,
-    :status, :has_face, :moderation_uuid, :blurred
+    :status, :has_face, :moderation_uuid, :blurred, :shareable_to
 
   hash_key :attrs
   list :ancestor_message_ids
@@ -443,7 +443,7 @@ class Message
                           longitude: longitude, source: source, message_attachment_overlay_id: message_attachment_overlay_id,
                           attachment_overlay_url: attachment_overlay_url, attachment_overlay_text: attachment_overlay_text, status: status,
                           has_face: has_face, created_at: created_at, snapchat_created_at: snapchat_created_at, expires_in: expires_in,
-                          expires_at: expires_at, blurred: blurred)
+                          expires_at: expires_at, blurred: blurred, shareable_to: shareable_to)
 
       if expires_in.present?
         redis.expire(attrs.key, expires_in)
