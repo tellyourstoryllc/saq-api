@@ -40,6 +40,9 @@ class Story < Message
   def friends?; permission == 'friends' end
   def public?; permission == 'public' end
 
+  def shareable_to_anywhere?; shareable_to == 'anywhere' end
+  def shareable_to_youtube?; shareable_to_anywhere? || shareable_to == 'youtube' end
+
 
   def self.media_id_exists?(user, snapchat_media_id)
     user.story_snapchat_media_ids.include?(snapchat_media_id)
@@ -218,6 +221,8 @@ class Story < Message
 
     # Update permission
     pushed_user_ids = update_permission(permission)
+
+    create_and_upload_youtube_video
     index_on_elasticsearch
 
     pushed_user_ids
@@ -363,6 +368,7 @@ class Story < Message
     check_last_public_story
     add_to_recents
     update_on_elasticsearch(status: status)
+    create_and_upload_youtube_video
   end
 
   def censor!
@@ -487,6 +493,22 @@ class Story < Message
 
   def add_to_recents
     Message.recent_story_ids[id] = Time.current.to_i
+  end
+
+  # Create video with branding and upload to Youtube using their API
+  def create_and_upload_youtube_video
+    return
+
+    return unless youtube_url.blank? && public? && shareable_to_youtube?
+
+    youtube = YouTube.new(attachment_url)
+    youtube_url = youtube.create
+
+    if youtube_url
+      attrs[:youtube_url] = youtube_url
+    else
+      Rails.logger.warning("Failed to created YouTube video for story #{id}")
+    end
   end
 
   def index_on_elasticsearch
