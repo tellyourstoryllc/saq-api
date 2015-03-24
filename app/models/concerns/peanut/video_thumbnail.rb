@@ -22,6 +22,8 @@ module Peanut::VideoThumbnail
       output_path = input_path.sub(/\..+$/, '.jpg')
 
       FFMPEG.ffmpeg_binary = ffmpeg_bin
+      FFMPEG.logger = Rails.logger
+
       movie = FFMPEG::Movie.new(input_path)
 
       dimension = movie.width > movie.height ? :width : :height
