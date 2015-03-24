@@ -42,7 +42,7 @@ gem 'redis_logger', git: 'git://github.com/bray/redis_logger.git'
 gem 'mini_magick'
 gem 'carrierwave', '0.9.0'
 gem 'fog', '1.19.0'
-gem 'streamio-ffmpeg', '1.0.0'
+gem 'streamio-ffmpeg', git: 'git://github.com/bray/streamio-ffmpeg.git'
 
 gem 'faye', '1.0.0'
 gem 'koala', '1.6.0'

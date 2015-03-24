@@ -15,6 +15,12 @@ GIT
       multi_json (~> 1.0)
       net-http-persistent
 
+GIT
+  remote: git://github.com/bray/streamio-ffmpeg.git
+  revision: 1a7db769aa466bb2dbd9f7f9fe723301bfb6a590
+  specs:
+    streamio-ffmpeg (1.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -251,7 +257,6 @@ GEM
       sprockets (~> 2.8)
     sqlite3 (1.3.8)
     statsd-instrument (1.5.0)
-    streamio-ffmpeg (1.0.0)
     subexec (0.2.3)
     therubyracer (0.12.0)
       libv8 (~> 3.16.14.0)
@@ -327,7 +332,7 @@ DEPENDENCIES
   spork-rails (= 4.0.0)
   sqlite3
   statsd-instrument (= 1.5.0)
-  streamio-ffmpeg (= 1.0.0)
+  streamio-ffmpeg!
   therubyracer
   turbolinks
   turn
