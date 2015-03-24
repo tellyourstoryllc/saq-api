@@ -177,11 +177,15 @@ class Story < Message
   end
 
   def update_permission(new_permission)
-    return if new_permission == permission
+    return if new_permission.blank? || new_permission == permission
 
     old_permission = permission
     self.permission = new_permission
-    return unless allowed_permission?
+
+    if !allowed_permission?
+      self.permission = old_permission
+      return
+    end
 
     attrs[:permission] = permission
 
