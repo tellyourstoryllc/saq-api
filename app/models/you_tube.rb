@@ -12,6 +12,7 @@ class YouTube
     FFMPEG.ffmpeg_binary = ffmpeg_bin
 
     # Download the source video, create the YouTube video, and upload it
+    output_path = nil
     open(video_url) do |file|
       output_path = file.path + '_youtube.mp4'
 
@@ -27,7 +28,9 @@ class YouTube
 
       # Upload it to YouTube
 
-      # TODO delete output after uploading
     end
+
+  ensure
+    File.delete(output_path) if File.exists?(output_path)
   end
 end
