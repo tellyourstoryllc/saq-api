@@ -19,7 +19,10 @@ class YouTube
 
       # Stitch together a YouTube video
       # TODO real command
-      system("#{ffmpeg_bin} -i #{file.path} #{output_path}")
+      command = "#{ffmpeg_bin} -i #{file.path} #{output_path}"
+
+      Rails.logger.debug "... with command #{command} ... "
+      system(command)
 
 
       # Upload it to YouTube
