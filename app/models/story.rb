@@ -495,11 +495,22 @@ class Story < Message
     Message.recent_story_ids[id] = Time.current.to_i
   end
 
+  def youtube_lock_key
+    "message:#{id}:youtube_lock_key"
+  end
+
   # Create video with branding and upload to Youtube using their API
   def create_and_upload_youtube_video
     return
 
     return unless youtube_id.blank? && public? && !review? && !censored? && !blurred && shareable_to_youtube?
+
+    locked = redis.set(youtube_lock_key, Time.current.to_f, {nx: true})
+
+    unless locked
+      Rails.logger.warn("Failed to obtain YouTube lock for story #{id}")
+      return
+    end
 
     youtube = YouTube.new(attachment_url, user.public_username)
     youtube_video_id = youtube.create
@@ -510,6 +521,8 @@ class Story < Message
     else
       Rails.logger.warn("Failed to created YouTube video for story #{id}")
     end
+
+    redis.del(youtube_lock_key)
   end
 
   def index_on_elasticsearch
