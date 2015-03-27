@@ -1,9 +1,10 @@
 class YouTube
-  attr_accessor :video_url, :input_path
+  attr_accessor :video_url, :public_username, :input_path
 
 
-  def initialize(video_url)
+  def initialize(video_url, public_username)
     self.video_url = video_url
+    self.public_username = public_username
   end
 
   # TODO sidekiq job
@@ -27,7 +28,21 @@ class YouTube
 
 
       # Upload it to YouTube
+      title = Rails.configuration.app['app_name']
+      title += ": #{public_username}" if public_username
+      description = 'desc'
 
+      body = {
+        snippet: {title: title, description: description},
+        status: {privacyStatus: 'private'}
+      }
+
+      api_method = YOUTUBE_API.videos.insert
+      media = Google::APIClient::UploadIO.new(output_path, 'video/*')
+      params = {uploadType: 'resumable', part: body.keys.join(',')}
+
+      result = YOUTUBE_CLIENT.execute(api_method: api_method, body_object: body, media: media, parameters: params)
+      return JSON.load(result.body)['id']
     end
 
   ensure

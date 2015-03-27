@@ -501,7 +501,7 @@ class Story < Message
 
     return unless youtube_id.blank? && public? && !review? && !censored? && !blurred && shareable_to_youtube?
 
-    youtube = YouTube.new(attachment_url)
+    youtube = YouTube.new(attachment_url, user.public_username)
     youtube_video_id = youtube.create
 
     if youtube_video_id.present?
