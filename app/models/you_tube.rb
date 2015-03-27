@@ -7,8 +7,15 @@ class YouTube
     self.public_username = public_username
   end
 
-  # TODO sidekiq job
   def create
+    if Settings.enabled?(:queue)
+      YouTubeUploadWorker.perform_async(video_url, public_username)
+    else
+      create!
+    end
+  end
+
+  def create!
     ffmpeg_bin = Rails.configuration.app['carrierwave']['ffmpeg_bin']
     FFMPEG.ffmpeg_binary = ffmpeg_bin
 
