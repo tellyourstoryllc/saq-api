@@ -56,6 +56,11 @@ development:
   web:
     domain: localhost:3002
     url: http://localhost:3002
+  youtube:
+    client_id: TODO
+    client_secret: TODO
+    old_access_token: TODO
+    refresh_token: TODO
 
 test:
   admin:
@@ -115,3 +120,8 @@ test:
   web:
     domain: test.host
     url: http://test.host
+  youtube:
+    client_id: ~
+    client_secret: ~
+    old_access_token: ~
+    refresh_token: ~
