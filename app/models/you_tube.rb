@@ -39,10 +39,8 @@ class YouTube
       title += ": #{public_username}" if public_username
       description = 'desc'
 
-      body = {
-        snippet: {title: title, description: description},
-        status: {privacyStatus: 'private'}
-      }
+      body = {snippet: {title: title, description: description}}
+      body[:status] = {privacyStatus: 'private'} unless Rails.env.production?
 
       api_method = YOUTUBE_API.videos.insert
       media = Google::APIClient::UploadIO.new(output_path, 'video/*')
