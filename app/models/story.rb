@@ -508,7 +508,7 @@ class Story < Message
       self.youtube_id = youtube_video_id
       attrs[:youtube_id] = youtube_id
     else
-      Rails.logger.warning("Failed to created YouTube video for story #{id}")
+      Rails.logger.warn("Failed to created YouTube video for story #{id}")
     end
   end
 
