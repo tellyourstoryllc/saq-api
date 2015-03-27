@@ -499,7 +499,7 @@ class Story < Message
   def create_and_upload_youtube_video
     return
 
-    return unless youtube_id.blank? && public? && shareable_to_youtube?
+    return unless youtube_id.blank? && public? && !review? && !censored? && shareable_to_youtube?
 
     youtube = YouTube.new(attachment_url)
     youtube_video_id = youtube.create
