@@ -1,15 +1,14 @@
-class YouTube
-  attr_accessor :video_url, :public_username, :input_path
+class YouTubeStoryUploader
+  attr_accessor :story
 
 
-  def initialize(video_url, public_username)
-    self.video_url = video_url
-    self.public_username = public_username
+  def initialize(story)
+    self.story = story
   end
 
   def create
     if Settings.enabled?(:queue)
-      YouTubeUploadWorker.perform_async(video_url, public_username)
+      YouTubeUploadWorker.perform_async(story.id)
     else
       create!
     end
@@ -21,6 +20,8 @@ class YouTube
 
     # Download the source video, create the YouTube video, and upload it
     output_path = nil
+    video_url = story.attachment_url
+
     open(video_url) do |file|
       output_path = file.path + '_youtube.mp4'
 
@@ -36,6 +37,7 @@ class YouTube
 
       # Upload it to YouTube
       title = Rails.configuration.app['app_name']
+      public_username = story.user.public_username
       title += ": #{public_username}" if public_username
       description = 'desc'
 
@@ -47,7 +49,16 @@ class YouTube
       params = {uploadType: 'resumable', part: body.keys.join(',')}
 
       result = YOUTUBE_CLIENT.execute(api_method: api_method, body_object: body, media: media, parameters: params)
-      return JSON.load(result.body)['id']
+      youtube_id = JSON.load(result.body)['id']
+
+      if youtube_id.present?
+        story.youtube_id = youtube_id
+        story.attrs[:youtube_id] = youtube_id
+      else
+        Rails.logger.warn("Failed to created YouTube video for story #{story.id}")
+      end
+
+      story.delete_youtube_lock_key
     end
 
   ensure

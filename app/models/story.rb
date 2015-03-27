@@ -441,6 +441,10 @@ class Story < Message
     self.attrs['moderation_uuid'] = uuid
   end
 
+  def delete_youtube_lock_key
+    redis.del(youtube_lock_key)
+  end
+
 
   private
 
@@ -512,17 +516,8 @@ class Story < Message
       return
     end
 
-    youtube = YouTube.new(attachment_url, user.public_username)
-    youtube_video_id = youtube.create
-
-    if youtube_video_id.present?
-      self.youtube_id = youtube_video_id
-      attrs[:youtube_id] = youtube_id
-    else
-      Rails.logger.warn("Failed to created YouTube video for story #{id}")
-    end
-
-    redis.del(youtube_lock_key)
+    youtube = YouTubeStoryUploader.new(self)
+    youtube.create
   end
 
   def index_on_elasticsearch
