@@ -499,13 +499,14 @@ class Story < Message
   def create_and_upload_youtube_video
     return
 
-    return unless youtube_url.blank? && public? && shareable_to_youtube?
+    return unless youtube_id.blank? && public? && shareable_to_youtube?
 
     youtube = YouTube.new(attachment_url)
-    youtube_url = youtube.create
+    youtube_video_id = youtube.create
 
-    if youtube_url
-      attrs[:youtube_url] = youtube_url
+    if youtube_video_id.present?
+      self.youtube_id = youtube_video_id
+      attrs[:youtube_id] = youtube_id
     else
       Rails.logger.warning("Failed to created YouTube video for story #{id}")
     end
