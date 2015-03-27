@@ -188,6 +188,7 @@ class ApplicationController < ActionController::Base
   def secure_request?
     params[:api_secret] == Rails.configuration.app['api']['request_secret'] &&
       ((params[:controller] == 'accounts' && params[:action] == 'send_reset_email') ||
+       (params[:controller] == 'accounts' && params[:action] == 'send_reset_sms') ||
        (params[:controller] == 'accounts' && params[:action] == 'reset_password') ||
        (params[:controller] == 'moderation' && params[:action] == 'callback'))
   end
