@@ -204,7 +204,7 @@ class Story < Message
 
   def update(update_attrs)
     permission = update_attrs.delete(:permission)
-    update_attrs.delete(:shareable_to) unless %w(youtube anywhere).include?(update_attrs[:shareable_to])
+    update_attrs.delete(:shareable_to) unless %w(nowhere youtube anywhere).include?(update_attrs[:shareable_to])
 
     update_attrs.each do |k, v|
       send("#{k}=", v)
