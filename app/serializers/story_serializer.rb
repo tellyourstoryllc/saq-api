@@ -24,19 +24,19 @@ class StorySerializer < MessageSerializer
     end
   end
 
-  def include_blurred?
-    owner?
-  end
-
-  def youtube_id
-    object.youtube_id if object.shareable_to_youtube?
-  end
-
   def include_permission?
     owner?
   end
 
   def include_status?
     owner?
+  end
+
+  def include_blurred?
+    owner?
+  end
+
+  def youtube_id
+    object.youtube_id if object.shareable_to_youtube?
   end
 end
