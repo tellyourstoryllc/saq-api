@@ -42,7 +42,8 @@ class YouTubeStoryUploader
       description = 'desc'
 
       body = {snippet: {title: title, description: description}}
-      body[:status] = {privacyStatus: 'private'} unless Rails.env.production?
+      #body[:status] = {privacyStatus: 'private'} unless Rails.env.production?
+      body[:status] = {privacyStatus: 'private'} if Rails.env.development?
 
       api_method = YOUTUBE_API.videos.insert
       media = Google::APIClient::UploadIO.new(output_path, 'video/*')
