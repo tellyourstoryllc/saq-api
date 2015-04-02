@@ -64,4 +64,30 @@ class YouTubeStoryUploader
   ensure
     File.delete(output_path) if File.exists?(output_path)
   end
+
+  def update(attrs)
+    return if story.blank? || attrs.blank?
+
+    if Settings.enabled?(:queue)
+      YouTubeUpdateWorker.perform_async(story.id, attrs)
+    else
+      update!(attrs)
+    end
+  end
+
+  def update!(attrs)
+    return if story.blank? || attrs.blank?
+
+    privacy = attrs['privacy']
+    return unless %w(private public).include?(privacy)
+
+    api_method = YOUTUBE_API.videos.update
+    body = {id: story.youtube_id, status: {privacyStatus: privacy}}
+    params = {part: body.keys.join(',')}
+
+    api_args = {api_method: api_method, body_object: body, parameters: params}
+    result = YOUTUBE_CLIENT.execute(api_args)
+
+    raise Peanut::YouTubeAPIError.new("YouTube API call failed: args: #{api_args.inspect}; response: #{JSON.parse(result.body)}") unless result.success?
+  end
 end

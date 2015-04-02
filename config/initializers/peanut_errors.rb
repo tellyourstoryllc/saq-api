@@ -12,4 +12,7 @@ module Peanut
     class RecordNotFound < StandardError
     end
   end
+
+  class YouTubeAPIError < StandardError
+  end
 end

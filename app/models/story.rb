@@ -205,6 +205,7 @@ class Story < Message
   def update(update_attrs)
     permission = update_attrs.delete(:permission)
     update_attrs.delete(:shareable_to) unless %w(nowhere youtube anywhere).include?(update_attrs[:shareable_to])
+    @old_shareable_to = shareable_to
 
     update_attrs.each do |k, v|
       send("#{k}=", v)
@@ -223,6 +224,7 @@ class Story < Message
     pushed_user_ids = update_permission(permission)
 
     create_and_upload_youtube_video
+    update_youtube_video
     index_on_elasticsearch
 
     pushed_user_ids
@@ -516,6 +518,21 @@ class Story < Message
 
     youtube = YouTubeStoryUploader.new(self)
     youtube.create
+  end
+
+  def update_youtube_video
+    return if youtube_id.blank?
+
+    privacy = if %w(youtube anywhere).include?(@old_shareable_to) && !shareable_to_youtube?
+                'private'
+              elsif @old_shareable_to == 'nowhere' && shareable_to_youtube?
+                'public'
+              end
+
+    return if privacy.nil?
+
+    youtube = YouTubeStoryUploader.new(self)
+    youtube.update(privacy: privacy)
   end
 
   def index_on_elasticsearch
