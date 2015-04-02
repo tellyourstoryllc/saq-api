@@ -36,9 +36,7 @@ class YouTubeStoryUploader
 
 
       # Upload it to YouTube
-      title = Rails.configuration.app['app_name']
-      public_username = story.user.public_username
-      title += ": #{public_username}" if public_username
+      title = Rails.configuration.app['app_name'].dup
       description = ''
 
       body = {snippet: {title: title, description: description}}
