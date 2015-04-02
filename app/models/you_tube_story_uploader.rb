@@ -39,7 +39,7 @@ class YouTubeStoryUploader
       title = Rails.configuration.app['app_name']
       public_username = story.user.public_username
       title += ": #{public_username}" if public_username
-      description = 'desc'
+      description = ''
 
       body = {snippet: {title: title, description: description}}
       #body[:status] = {privacyStatus: 'private'} unless Rails.env.production?
