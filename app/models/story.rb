@@ -505,8 +505,6 @@ class Story < Message
 
   # Create video with branding and upload to Youtube using their API
   def create_and_upload_youtube_video
-    return if Rails.env.production?
-
     return unless youtube_id.blank? && public? && !review? && !censored? && !blurred && shareable_to_youtube?
 
     locked = redis.set(youtube_lock_key, Time.current.to_f, {nx: true})
