@@ -36,6 +36,8 @@ class YouTubeStoryUploader
 
 
       # Upload it to YouTube
+      api_method = YOUTUBE_API.videos.insert
+
       title = Rails.configuration.app['app_name'].dup
       description = ''
 
@@ -43,7 +45,6 @@ class YouTubeStoryUploader
       #body[:status] = {privacyStatus: 'private'} unless Rails.env.production?
       body[:status] = {privacyStatus: 'private'} if Rails.env.development?
 
-      api_method = YOUTUBE_API.videos.insert
       media = Google::APIClient::UploadIO.new(output_path, 'video/*')
       params = {uploadType: 'resumable', part: body.keys.join(',')}
 
