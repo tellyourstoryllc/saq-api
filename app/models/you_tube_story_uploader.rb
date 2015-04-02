@@ -38,7 +38,7 @@ class YouTubeStoryUploader
       # Upload it to YouTube
       api_method = YOUTUBE_API.videos.insert
 
-      title = Rails.configuration.app['app_name'].dup
+      title = "Story ##{Message.youtube_videos_count.incr} - #{Time.current.to_date.strftime("%B %-e, %Y")}"
       description = ''
 
       body = {snippet: {title: title, description: description}}
