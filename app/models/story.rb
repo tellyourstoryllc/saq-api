@@ -335,6 +335,7 @@ class Story < Message
 
     Message.recent_story_ids.delete(id)
     delete_from_elasticsearch
+    delete_from_youtube
 
     attrs.del
 
@@ -545,5 +546,9 @@ class Story < Message
 
   def delete_from_elasticsearch
     ES.delete(self)
+  end
+
+  def delete_from_youtube
+    YouTubeStoryUploader.new.delete(youtube_id)
   end
 end

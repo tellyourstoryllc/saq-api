@@ -2,7 +2,7 @@ class YouTubeStoryUploader
   attr_accessor :story
 
 
-  def initialize(story)
+  def initialize(story = nil)
     self.story = story
   end
 
@@ -86,6 +86,28 @@ class YouTubeStoryUploader
     params = {part: body.keys.join(',')}
 
     api_args = {api_method: api_method, body_object: body, parameters: params}
+    result = YOUTUBE_CLIENT.execute(api_args)
+
+    raise Peanut::YouTubeAPIError.new("YouTube API call failed: args: #{api_args.inspect}; response: #{JSON.parse(result.body)}") unless result.success?
+  end
+
+  def delete(youtube_id)
+    return if youtube_id.blank?
+
+    if Settings.enabled?(:queue)
+      YouTubeDeleteWorker.perform_async(youtube_id)
+    else
+      delete!
+    end
+  end
+
+  def delete!(youtube_id)
+    return if youtube_id.blank?
+
+    api_method = YOUTUBE_API.videos.delete
+    params = {id: youtube_id}
+
+    api_args = {api_method: api_method, parameters: params}
     result = YOUTUBE_CLIENT.execute(api_args)
 
     raise Peanut::YouTubeAPIError.new("YouTube API call failed: args: #{api_args.inspect}; response: #{JSON.parse(result.body)}") unless result.success?
