@@ -48,7 +48,7 @@ class YouTubeStoryUploader
       media = Google::APIClient::UploadIO.new(output_path, 'video/*')
       params = {uploadType: 'resumable', part: body.keys.join(',')}
 
-      result = YOUTUBE_CLIENT.execute(api_method: api_method, body_object: body, media: media, parameters: params)
+      result = YOUTUBE_CLIENT.execute!(api_method: api_method, body_object: body, media: media, parameters: params)
       youtube_id = JSON.load(result.body)['id']
 
       if youtube_id.present?
@@ -86,9 +86,7 @@ class YouTubeStoryUploader
     params = {part: body.keys.join(',')}
 
     api_args = {api_method: api_method, body_object: body, parameters: params}
-    result = YOUTUBE_CLIENT.execute(api_args)
-
-    raise Peanut::YouTubeAPIError.new("YouTube API call failed: args: #{api_args.inspect}; response: #{JSON.parse(result.body)}") unless result.success?
+    YOUTUBE_CLIENT.execute!(api_args)
   end
 
   def delete(youtube_id)
@@ -108,8 +106,6 @@ class YouTubeStoryUploader
     params = {id: youtube_id}
 
     api_args = {api_method: api_method, parameters: params}
-    result = YOUTUBE_CLIENT.execute(api_args)
-
-    raise Peanut::YouTubeAPIError.new("YouTube API call failed: args: #{api_args.inspect}; response: #{JSON.parse(result.body)}") unless result.success?
+    YOUTUBE_CLIENT.execute!(api_args)
   end
 end
