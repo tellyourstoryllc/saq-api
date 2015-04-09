@@ -715,7 +715,7 @@ CREATE TABLE `users` (
   `deactivated` tinyint(1) NOT NULL DEFAULT '0',
   `birthday` date DEFAULT NULL,
   `uninstalled` tinyint(1) NOT NULL DEFAULT '0',
-  `gender` enum('male','female') COLLATE utf8_unicode_ci NOT NULL,
+  `gender` enum('male','female') COLLATE utf8_unicode_ci DEFAULT NULL,
   `latitude` decimal(10,7) DEFAULT NULL,
   `longitude` decimal(10,7) DEFAULT NULL,
   `location_name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -788,7 +788,7 @@ CREATE TABLE `video_rejections` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-03-16 15:13:21
+-- Dump completed on 2015-04-09 14:39:43
 INSERT INTO schema_migrations (version) VALUES ('20131001192546');
 
 INSERT INTO schema_migrations (version) VALUES ('20131002214704');
@@ -1046,3 +1046,5 @@ INSERT INTO schema_migrations (version) VALUES ('20150305172227');
 INSERT INTO schema_migrations (version) VALUES ('20150316185308');
 
 INSERT INTO schema_migrations (version) VALUES ('20150316191229');
+
+INSERT INTO schema_migrations (version) VALUES ('20150409183716');
