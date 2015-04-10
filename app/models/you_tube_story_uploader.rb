@@ -23,13 +23,23 @@ class YouTubeStoryUploader
     video_url = story.attachment_url
 
     open(video_url) do |file|
+      user_video = FFMPEG::Movie.new(file.path)
+
+      dir_path = Rails.configuration.app['youtube_video']['dir_path']
+      body_path = File.join(dir_path, 'youtube_body.jpg')
+      intro_path = File.join(dir_path, 'youtube_intro.mp4')
+      outro_path = File.join(dir_path, 'youtube_outro.mp4')
+
       output_path = file.path + '_youtube.mp4'
 
       Rails.logger.debug "Creating YouTube video: #{video_url} #{output_path} ..."
 
+      fade_in_duration = 1
+      fade_out_duration = 1
+      fade_out_frame_start = user_video.duration - fade_out_duration
+
       # Stitch together a YouTube video
-      # TODO real command
-      command = "#{ffmpeg_bin} -i #{file.path} #{output_path}"
+      command = %(#{ffmpeg_bin} -loop 1 -i #{body_path} -i #{file.path} -i #{intro_path} -i #{outro_path} -filter_complex "amix=inputs=1 [mix]; [1:v] scale=500:-1 [scaled]; [scaled] fade=t=in:d=#{fade_in_duration} [fade_in]; [fade_in] fade=t=out:st=#{fade_out_frame_start}:d=#{fade_out_duration} [faded]; [0:v] [faded] overlay=x=main_w/2-overlay_w/2:y=210:shortest=1 [overlay]; [2:v] [2:a] [overlay] [mix] [3:v] [3:a] concat=n=3:v=1:a=1 [v] [a]" -map "[v]" -map "[a]" #{output_path})
 
       Rails.logger.debug "... with command #{command} ... "
       system(command)

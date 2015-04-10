@@ -61,6 +61,8 @@ development:
     client_secret: TODO
     old_access_token: TODO
     refresh_token: TODO
+  youtube_video:
+    dir_path: /path/to/youtube_dir
 
 test:
   admin:
@@ -125,3 +127,5 @@ test:
     client_secret: ~
     old_access_token: ~
     refresh_token: ~
+  youtube_video:
+    dir_path: /path/to/youtube_dir
