@@ -59,7 +59,7 @@ class PublicFeed
 
     scope = User.select('users.id')
     scope = scope.where(deactivated: false)
-    scope = scope.where(uninstalled: false)
+    #scope = scope.where(uninstalled: false)
     scope = scope.where('users.last_public_story_created_at IS NOT NULL')
     scope = scope.where(censored_profile: false)
     #scope = scope.joins(:account).where(accounts: { registered: true })
